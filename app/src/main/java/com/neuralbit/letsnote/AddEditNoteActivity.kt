@@ -25,9 +25,9 @@ class AddEditNoteActivity : AppCompatActivity() {
     private lateinit var noteType : String
     private lateinit var allNotes : List<Note>
     private val TAG = "AddNoteActivity"
-    private var deleted : Boolean = false
+    private var deletable : Boolean = false
     private lateinit var tvTimeStamp : TextView
-    private var textChanged : Boolean =false
+    private var textChanged : Boolean = false
     private lateinit var cm : Common
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,6 +65,7 @@ class AddEditNoteActivity : AppCompatActivity() {
             noteTitleEdit.setText(noteTitle)
             noteDescriptionEdit.setText(noteDesc)
         }else{
+
             tvTimeStamp.visibility =GONE
 
         }
@@ -95,10 +96,11 @@ class AddEditNoteActivity : AppCompatActivity() {
             override fun afterTextChanged(p0: Editable?) {
             }
         })
-        viewModal.texChanged.observe(this,{ del->
-            del?.let {
-                textChanged= it
-            }
+        viewModal.texChanged.observe(this,{
+            textChanged= it
+        })
+        viewModal.delete.observe(this, {
+            deletable = it
         })
 
         val backButton = findViewById<ImageButton>(R.id.backButton)
@@ -116,7 +118,7 @@ class AddEditNoteActivity : AppCompatActivity() {
                 }
             }
             Toast.makeText(this,"Note deleted",Toast.LENGTH_SHORT).show()
-            deleted=true
+            viewModal.Delete(true)
             goToMain()
         }
 
@@ -126,33 +128,29 @@ class AddEditNoteActivity : AppCompatActivity() {
         val noteDescription = noteDescriptionEdit.text.toString()
 
         val currentDate= cm.currentTimeToLong()
-
-        if( noteType.equals("Edit")){
-            if(noteTitle.isNotEmpty() && noteDescription.isNotEmpty()){
-                val updateNote = Note(noteTitle,noteDescription,currentDate)
-                updateNote.id = noteID
-                viewModal.updateNote(updateNote)
-                Toast.makeText(this,"Note updated .. " , Toast.LENGTH_SHORT).show()
-            }
-        }else{
-            if(noteTitle.isNotEmpty() && noteDescription.isNotEmpty()){
-                viewModal.addNote((Note(noteTitle,noteDescription,currentDate)))
-                Toast.makeText(this,"Note added .. " , Toast.LENGTH_SHORT).show()
-
-
-            }
-        }
-    }
-
-    override fun onStop() {
-        if(!deleted){
+        if(!deletable){
             if(textChanged){
-                saveNote()
+                if( noteType.equals("Edit")){
+                    if(noteTitle.isNotEmpty() && noteDescription.isNotEmpty()){
+                        val updateNote = Note(noteTitle,noteDescription,currentDate)
+                        updateNote.id = noteID
+                        viewModal.updateNote(updateNote)
+                        Toast.makeText(this,"Note updated .. " , Toast.LENGTH_SHORT).show()
+                    }
+                }else{
+                    if(noteTitle.isNotEmpty() && noteDescription.isNotEmpty()){
+                        viewModal.addNote((Note(noteTitle,noteDescription,currentDate)))
+                        Toast.makeText(this,"Note added .. " , Toast.LENGTH_SHORT).show()
+
+
+                    }
+                }
             }
         }
-        super.onStop()
 
     }
+
+
 
     override fun onBackPressed() {
         super.onBackPressed()
@@ -161,6 +159,8 @@ class AddEditNoteActivity : AppCompatActivity() {
     }
 
     private fun goToMain() {
+        saveNote()
+
         val intent = Intent(this@AddEditNoteActivity,MainActivity::class.java)
         startActivity(intent)
     }

@@ -13,6 +13,8 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     val repo : NoteRepo
     var texChange = false
     var texChanged = MutableLiveData<Boolean>()
+    var deleted = false
+    var delete = MutableLiveData<Boolean>()
     init{
 
         val dao = NoteDatabase.getDatabase(application).getNotesDao()
@@ -25,6 +27,12 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         texChange = b
         texChanged.value= texChange
     }
+
+    fun Delete(b : Boolean){
+        deleted= b
+        delete.value = deleted
+    }
+
     fun deleteNote(note: Note)= viewModelScope.launch(Dispatchers.IO){
         repo.delete(note)
     }
