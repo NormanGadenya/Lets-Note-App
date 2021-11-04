@@ -10,7 +10,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/noteEditTitle"
-        android:hint="Edit Note Title"
+        android:hint="Title"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        android:padding="8dp"
+        android:background="@android:color/transparent"
         app:layout_constraintTop_toTopOf="parent"
         />
 
@@ -18,17 +22,13 @@
         android:id="@+id/noteEditDesc"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Edit Note Description"
-        android:text="Norman"
+        android:hint="Note content"
+        android:overScrollMode="always"
+        android:scrollbarStyle="insideInset"
         android:inputType="textMultiLine"
-        app:layout_constraintTop_toBottomOf="@+id/noteEditTitle" />
-
-    <Button
-        android:id="@+id/BtnUpdate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Update"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:background="@android:color/transparent"
+        android:padding="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/noteEditTitle"
+        android:importantForAutofill="no" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

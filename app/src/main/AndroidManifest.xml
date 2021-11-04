@@ -11,7 +11,8 @@
         android:theme="@style/Theme.LetsNote">
         <activity
             android:name=".AddEditNoteActivity"
-            android:exported="true" />
+            android:parentActivityName=".MainActivity"
+            />
         <activity
             android:name=".MainActivity"
             android:exported="true">
