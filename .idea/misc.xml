@@ -5,7 +5,7 @@
       <map>
         <entry key="app/src/main/res/layout/activity_add_edit_note.xml" value="0.5" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.5" />
-        <entry key="app/src/main/res/layout/note_action_bar.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/note_action_bar.xml" value="0.5" />
         <entry key="app/src/main/res/layout/note_rv_item.xml" value="0.33" />
       </map>
     </option>

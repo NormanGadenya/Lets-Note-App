@@ -1,20 +1,20 @@
 package com.neuralbit.letsnote
 
 import android.content.Intent
+import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
-import android.widget.EditText
-import android.widget.ImageButton
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.ActionBar
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.snackbar.Snackbar
 import java.util.*
 
 class AddEditNoteActivity : AppCompatActivity() {
@@ -49,7 +49,6 @@ class AddEditNoteActivity : AppCompatActivity() {
                 allNotes=it
             }
         })
-
 
 
 
@@ -121,7 +120,22 @@ class AddEditNoteActivity : AppCompatActivity() {
             viewModal.Delete(true)
             goToMain()
         }
+        val archiveButton = findViewById<ImageButton>(R.id.archiveButton)
+        archiveButton.setOnClickListener {
+            viewModal.Archive(true)
+            val sharedPreferences = getSharedPreferences("ArchivedNotes",MODE_PRIVATE)
+            val editor = sharedPreferences.edit()
+            editor.putInt("noteId",noteID)
+            editor.apply()
+//
+            val coordinatorlayout = findViewById<View>(R.id.coordinatorlayout)
+            val snackbar = Snackbar.make(coordinatorlayout,"Button pressed",Snackbar.LENGTH_LONG)
+            snackbar.setAction("UNDO"
+            ) {
 
+            }
+            snackbar.show()
+        }
     }
     private fun saveNote(){
         val noteTitle = noteTitleEdit.text.toString()
