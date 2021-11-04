@@ -30,6 +30,7 @@ class MainActivity : AppCompatActivity(), NoteClickInterface, NoteDeleteInterfac
         })
         addFAB.setOnClickListener{
             val intent = Intent( this@MainActivity,AddEditNoteActivity::class.java)
+            intent.putExtra("noteType","newNote")
             startActivity(intent)
             this.finish()
         }
@@ -42,6 +43,7 @@ class MainActivity : AppCompatActivity(), NoteClickInterface, NoteDeleteInterfac
         intent.putExtra("noteTitle",note.title)
         intent.putExtra("noteDescription",note.description)
         intent.putExtra("noteID",note.id)
+        intent.putExtra("noteTimeStamp",note.timeStamp )
         startActivity(intent)
         this.finish()
 

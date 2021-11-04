@@ -14,6 +14,6 @@ interface NotesDao {
     @Delete
     suspend fun delete(note:Note)
 
-    @Query("Select * from NotesTable order by id ASC")
+    @Query("Select * from NotesTable order by timeStamp DESC")
     fun getAllNotes(): LiveData<List<Note>>
 }
