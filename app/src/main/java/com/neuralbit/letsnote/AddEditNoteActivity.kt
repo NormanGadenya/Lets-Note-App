@@ -28,7 +28,10 @@ class AddEditNoteActivity : AppCompatActivity() {
     private var deletable : Boolean = false
     private lateinit var tvTimeStamp : TextView
     private var textChanged : Boolean = false
+    private var archived : Boolean = false
     private lateinit var cm : Common
+    private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var editor : SharedPreferences.Editor
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,6 +40,8 @@ class AddEditNoteActivity : AppCompatActivity() {
         supportActionBar?.displayOptions = ActionBar.DISPLAY_SHOW_CUSTOM
         supportActionBar?.setDisplayShowCustomEnabled(true)
         cm= Common()
+        sharedPreferences = getSharedPreferences("ArchivedNotes",MODE_PRIVATE)
+        editor = sharedPreferences.edit()
         supportActionBar?.setCustomView(R.layout.note_action_bar)
         noteDescriptionEdit = findViewById(R.id.noteEditDesc)
         tvTimeStamp = findViewById(R.id.tvTimeStamp)
@@ -49,8 +54,6 @@ class AddEditNoteActivity : AppCompatActivity() {
                 allNotes=it
             }
         })
-
-
 
         noteType = intent.getStringExtra("noteType") as String
 
@@ -101,7 +104,9 @@ class AddEditNoteActivity : AppCompatActivity() {
         viewModal.delete.observe(this, {
             deletable = it
         })
-
+        viewModal.archive.observe(this, {
+            archived = it
+        })
         val backButton = findViewById<ImageButton>(R.id.backButton)
         backButton.setOnClickListener {
             goToMain()
@@ -123,16 +128,23 @@ class AddEditNoteActivity : AppCompatActivity() {
         val archiveButton = findViewById<ImageButton>(R.id.archiveButton)
         archiveButton.setOnClickListener {
             viewModal.Archive(true)
-            val sharedPreferences = getSharedPreferences("ArchivedNotes",MODE_PRIVATE)
-            val editor = sharedPreferences.edit()
-            editor.putInt("noteId",noteID)
-            editor.apply()
-//
+            val archivedNotes =sharedPreferences.getStringSet("archivedNotes", null)
+            var set = mutableSetOf<String>()
+            if (archivedNotes != null){
+                for ( noteId in archivedNotes ){
+                    set.add(noteId)
+                }
+            }
+            set.add(noteID.toString())
+            editor.putStringSet("archivedNotes",set)
+
+
             val coordinatorlayout = findViewById<View>(R.id.coordinatorlayout)
-            val snackbar = Snackbar.make(coordinatorlayout,"Button pressed",Snackbar.LENGTH_LONG)
+            val snackbar = Snackbar.make(coordinatorlayout,"Note Achieved",Snackbar.LENGTH_LONG)
             snackbar.setAction("UNDO"
             ) {
-
+                viewModal.Archive(false)
+                set.remove(noteID.toString())
             }
             snackbar.show()
         }
@@ -169,6 +181,14 @@ class AddEditNoteActivity : AppCompatActivity() {
     override fun onBackPressed() {
         super.onBackPressed()
         goToMain()
+
+    }
+
+    override fun onStop() {
+        if (archived){
+            editor.apply()
+        }
+        super.onStop()
 
     }
 

@@ -16,4 +16,6 @@ interface NotesDao {
 
     @Query("Select * from NotesTable order by timeStamp DESC")
     fun getAllNotes(): LiveData<List<Note>>
+
+    
 }

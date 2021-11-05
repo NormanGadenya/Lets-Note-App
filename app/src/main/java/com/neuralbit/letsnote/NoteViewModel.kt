@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.*
 
 class NoteViewModel(application : Application) : AndroidViewModel(application) {
     val allNotes: LiveData<List<Note>>
@@ -17,10 +18,14 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     var delete = MutableLiveData<Boolean>()
     var archived = false
     var archive = MutableLiveData<Boolean>()
+
+    private var filteredList = MutableLiveData<List<Note>>()
+    var notes : List<Note> = listOf()
     init{
 
         val dao = NoteDatabase.getDatabase(application).getNotesDao()
         repo= NoteRepo(dao)
+
         allNotes = repo.allNotes
 
     }
@@ -28,6 +33,20 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     fun TextChanged (b : Boolean){
         texChange = b
         texChanged.value= texChange
+    }
+
+    fun filterList( text: String  ) : LiveData<List<Note>>{
+        val textlower = text.toLowerCase()
+        val newList = arrayListOf<Note>()
+
+        for ( note in notes){
+            if(note.title.toLowerCase().contains(textlower) || note.title.toLowerCase(Locale.ROOT).contains(textlower) ){
+                newList.add(note)
+            }
+        }
+        filteredList.value = newList
+
+        return filteredList
     }
 
     fun Delete(b : Boolean){

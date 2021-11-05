@@ -3,7 +3,9 @@ package com.neuralbit.letsnote
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -13,6 +15,7 @@ class MainActivity : AppCompatActivity(), NoteClickInterface, NoteDeleteInterfac
     lateinit var  notesRV: RecyclerView
     lateinit var addFAB : FloatingActionButton
     lateinit var viewModal: NoteViewModel
+    val TAG = "MainActivity"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,10 +25,12 @@ class MainActivity : AppCompatActivity(), NoteClickInterface, NoteDeleteInterfac
         notesRV.layoutManager = LinearLayoutManager(this)
         val noteRVAdapter = NoteRVAdapter(this,this,this)
         notesRV.adapter= noteRVAdapter
+        var list1 :List<Note> = arrayListOf()
         viewModal = ViewModelProvider(this,ViewModelProvider.AndroidViewModelFactory.getInstance(application)).get(NoteViewModel::class.java)
         viewModal.allNotes.observe(this,{ list->
             list?.let {
                 noteRVAdapter.updateList(it)
+                viewModal.notes=it
             }
         })
         addFAB.setOnClickListener{
@@ -34,7 +39,10 @@ class MainActivity : AppCompatActivity(), NoteClickInterface, NoteDeleteInterfac
             startActivity(intent)
             this.finish()
         }
-
+        viewModal.filterList("Hello").observe(this,{
+            Log.d(TAG, "onCreate: ${viewModal.notes}" )
+            //TODO fix filter list
+        })
     }
 
     override fun onNoteClick(note: Note) {
