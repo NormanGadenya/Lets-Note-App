@@ -108,12 +108,7 @@ class AddEditNoteActivity : AppCompatActivity() {
             archived = it
         })
 
-        viewModal.archivedNote.observe(this,{
-            for (arch in it){
-                Log.d(TAG, "onCreate: ${arch.title}")
 
-            }
-        })
         val backButton = findViewById<ImageButton>(R.id.backButton)
         backButton.setOnClickListener {
             goToMain()
@@ -154,6 +149,8 @@ class AddEditNoteActivity : AppCompatActivity() {
             ) {
                 viewModal.Archive(false)
                 set.remove(noteID.toString())
+                viewModal.removeArchive(archivedNote)
+                Toast.makeText(this,"Note Unarchived", Toast.LENGTH_SHORT).show()
             }
             snackbar.show()
         }

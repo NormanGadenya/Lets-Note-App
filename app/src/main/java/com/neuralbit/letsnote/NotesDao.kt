@@ -26,4 +26,7 @@ interface NotesDao {
     @Query("Select * from ArchivedNotesTable join NotesTable on ArchivedNotesTable.id = NotesTable.id  ")
     fun getArchivedNotes() : LiveData<List<Note>>
 
+
+
+
 }

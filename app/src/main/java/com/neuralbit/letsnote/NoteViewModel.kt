@@ -87,4 +87,9 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     fun archiveNote(id:ArchivedNote) = viewModelScope.launch(Dispatchers.IO){
         repo.insertArchive(id)
     }
+
+    fun removeArchive(id:ArchivedNote) = viewModelScope.launch(Dispatchers.IO){
+        repo.deleteArchive(id)
+    }
+
 }
