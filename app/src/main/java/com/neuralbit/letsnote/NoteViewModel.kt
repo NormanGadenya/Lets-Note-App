@@ -1,16 +1,15 @@
 package com.neuralbit.letsnote
 
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
+import android.util.Log
+import androidx.lifecycle.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
 
 class NoteViewModel(application : Application) : AndroidViewModel(application) {
-    val allNotes: LiveData<List<Note>>
+    var allNotes: LiveData<List<Note>>
+    val TAG = "NoteViewModel"
     val repo : NoteRepo
     var texChange = false
     var texChanged = MutableLiveData<Boolean>()
@@ -18,15 +17,15 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     var delete = MutableLiveData<Boolean>()
     var archived = false
     var archive = MutableLiveData<Boolean>()
-
-    private var filteredList = MutableLiveData<List<Note>>()
+    lateinit var list : List<Note>
     var notes : List<Note> = listOf()
+    var searchQurery : MutableLiveData<String> = MutableLiveData()
     init{
 
         val dao = NoteDatabase.getDatabase(application).getNotesDao()
         repo= NoteRepo(dao)
-
         allNotes = repo.allNotes
+
 
     }
 
@@ -35,18 +34,35 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         texChanged.value= texChange
     }
 
-    fun filterList( text: String  ) : LiveData<List<Note>>{
-        val textlower = text.toLowerCase()
-        val newList = arrayListOf<Note>()
+    fun filterList(  ) : LiveData<List<Note>>{
+        val textLower = searchQurery.value
 
-        for ( note in notes){
-            if(note.title.toLowerCase().contains(textlower) || note.title.toLowerCase(Locale.ROOT).contains(textlower) ){
-                newList.add(note)
-            }
+        var list : List<Note>
+
+
+        return Transformations.map(allNotes,){
+            filterLiveList(it,textLower)
         }
-        filteredList.value = newList
+    }
+    fun filterLiveList(list: List<Note>, text : String? ): List<Note>{
+        var newList = ArrayList<Note>()
 
-        return filteredList
+        return if(text!=null){
+            var textLower= text.toLowerCase()
+            for ( note in list){
+
+                if(note.title.toLowerCase().contains(textLower) || note.description.toLowerCase().contains(textLower) ){
+                    newList.add(note)
+
+                }
+            }
+
+            newList
+        }else{
+            list
+        }
+
+
     }
 
     fun Delete(b : Boolean){

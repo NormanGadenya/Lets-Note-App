@@ -3,6 +3,7 @@ package com.neuralbit.letsnote
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -27,11 +28,13 @@ class MainActivity : AppCompatActivity(), NoteClickInterface, NoteDeleteInterfac
         notesRV.adapter= noteRVAdapter
         var list1 :List<Note> = arrayListOf()
         viewModal = ViewModelProvider(this,ViewModelProvider.AndroidViewModelFactory.getInstance(application)).get(NoteViewModel::class.java)
-        viewModal.allNotes.observe(this,{ list->
-            list?.let {
+        viewModal.allNotes.observe(this,{
+
+                Log.d(TAG, "onCreate: x" )
                 noteRVAdapter.updateList(it)
                 viewModal.notes=it
-            }
+                viewModal.list= it
+
         })
         addFAB.setOnClickListener{
             val intent = Intent( this@MainActivity,AddEditNoteActivity::class.java)
@@ -39,9 +42,9 @@ class MainActivity : AppCompatActivity(), NoteClickInterface, NoteDeleteInterfac
             startActivity(intent)
             this.finish()
         }
-        viewModal.filterList("Hello").observe(this,{
-            Log.d(TAG, "onCreate: ${viewModal.notes}" )
-            //TODO fix filter list
+        viewModal.searchQurery.value = "Hello"
+        viewModal.filterList().observe(this,{
+            noteRVAdapter.updateList(it)
         })
     }
 

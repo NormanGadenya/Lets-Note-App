@@ -9,6 +9,7 @@ class NoteRepo( private val notesDao : NotesDao ) {
 
     }
 
+
     suspend fun delete(note:Note){
         notesDao.delete(note)
     }
