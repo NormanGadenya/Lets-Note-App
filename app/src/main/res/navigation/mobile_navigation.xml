@@ -7,19 +7,19 @@
 
     <fragment
         android:id="@+id/nav_home"
-        android:name="com.neuralbit.letsnote.ui.home.HomeFragment"
-        android:label="@string/menu_home"
-        tools:layout="@layout/fragment_home" />
+        android:name="com.neuralbit.letsnote.ui.allNotes.AllNotesFragment"
+        android:label="@string/menu_allNotes"
+        tools:layout="@layout/fragment_all_notes" />
 
     <fragment
-        android:id="@+id/nav_gallery"
-        android:name="com.neuralbit.letsnote.ui.gallery.GalleryFragment"
-        android:label="@string/menu_gallery"
-        tools:layout="@layout/fragment_gallery" />
+        android:id="@+id/nav_arch"
+        android:name="com.neuralbit.letsnote.ui.archived.ArchivedFragment"
+        android:label="@string/menu_archived"
+        tools:layout="@layout/fragment_archived_notes" />
 
     <fragment
         android:id="@+id/nav_slideshow"
-        android:name="com.neuralbit.letsnote.ui.slideshow.SlideshowFragment"
+        android:name="com.neuralbit.letsnote.ui.tag.TagFragment"
         android:label="@string/menu_slideshow"
-        tools:layout="@layout/fragment_slideshow" />
+        tools:layout="@layout/fragment_tag" />
 </navigation>

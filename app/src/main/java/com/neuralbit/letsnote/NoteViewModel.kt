@@ -20,11 +20,13 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     lateinit var list : List<Note>
     var notes : List<Note> = listOf()
     var searchQurery : MutableLiveData<String> = MutableLiveData()
+    var archivedNote : LiveData<List<Note>>
     init{
 
         val dao = NoteDatabase.getDatabase(application).getNotesDao()
         repo= NoteRepo(dao)
         allNotes = repo.allNotes
+        archivedNote = repo.archivedNotes
 
 
     }
@@ -81,5 +83,8 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         repo.update(note)
     }fun addNote(note: Note)= viewModelScope.launch(Dispatchers.IO){
         repo.insert(note)
+    }
+    fun archiveNote(id:ArchivedNote) = viewModelScope.launch(Dispatchers.IO){
+        repo.insertArchive(id)
     }
 }

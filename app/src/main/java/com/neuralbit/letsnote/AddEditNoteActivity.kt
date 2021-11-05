@@ -107,6 +107,13 @@ class AddEditNoteActivity : AppCompatActivity() {
         viewModal.archive.observe(this, {
             archived = it
         })
+
+        viewModal.archivedNote.observe(this,{
+            for (arch in it){
+                Log.d(TAG, "onCreate: ${arch.title}")
+
+            }
+        })
         val backButton = findViewById<ImageButton>(R.id.backButton)
         backButton.setOnClickListener {
             goToMain()
@@ -135,6 +142,8 @@ class AddEditNoteActivity : AppCompatActivity() {
                     set.add(noteId)
                 }
             }
+            var archivedNote = ArchivedNote(noteID)
+            viewModal.archiveNote(archivedNote)
             set.add(noteID.toString())
             editor.putStringSet("archivedNotes",set)
 
@@ -195,7 +204,7 @@ class AddEditNoteActivity : AppCompatActivity() {
     private fun goToMain() {
         saveNote()
 
-        val intent = Intent(this@AddEditNoteActivity,MainActivity::class.java)
+        val intent = Intent(this@AddEditNoteActivity,MainActivity2::class.java)
         startActivity(intent)
     }
 
