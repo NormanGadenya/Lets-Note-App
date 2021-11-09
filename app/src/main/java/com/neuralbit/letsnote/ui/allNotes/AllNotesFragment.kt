@@ -2,9 +2,9 @@ package com.neuralbit.letsnote.ui.allNotes
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.util.Log
+import android.view.*
+import android.widget.SearchView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -28,25 +28,24 @@ class AllNotesFragment : Fragment() , NoteClickInterface, NoteDeleteInterface {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        homeViewModel =
-            ViewModelProvider(this).get(AllNotesViewModel::class.java)
-
+    ): View {
+        homeViewModel = ViewModelProvider(this).get(AllNotesViewModel::class.java)
         _binding = FragmentAllNotesBinding.inflate(inflater, container, false)
+
         val root: View = binding.root
         addFAB = binding.FABAddNote
         notesRV = binding.notesRV
-        val staggeredLayoutManager = StaggeredGridLayoutManager( 2,LinearLayoutManager.VERTICAL)
+        val staggeredLayoutManager = StaggeredGridLayoutManager( 1,LinearLayoutManager.VERTICAL)
         notesRV.layoutManager = staggeredLayoutManager
-        val noteRVAdapter = context?.let { NoteRVAdapter(it,this,this) }
-
+        val noteRVAdapter = context?.let { NoteRVAdapter(it,this,this)
+        }
         notesRV.adapter= noteRVAdapter
 
         homeViewModel.allNotes.observe(viewLifecycleOwner,{
             noteRVAdapter?.updateList(it)
 
-
         })
+
         addFAB.setOnClickListener{
             val intent = Intent( context,AddEditNoteActivity::class.java)
             intent.putExtra("noteType","newNote")
@@ -60,6 +59,8 @@ class AllNotesFragment : Fragment() , NoteClickInterface, NoteDeleteInterface {
         super.onDestroyView()
         _binding = null
     }
+
+
 
     override fun onNoteClick(note: Note) {
         val intent = Intent( context, AddEditNoteActivity::class.java)

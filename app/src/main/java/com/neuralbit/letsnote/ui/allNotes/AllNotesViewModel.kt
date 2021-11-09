@@ -7,6 +7,7 @@ import com.neuralbit.letsnote.NoteDatabase
 import com.neuralbit.letsnote.NoteRepo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.ArrayList
 
 class AllNotesViewModel (application : Application) : AndroidViewModel(application) {
     var allNotes: LiveData<List<Note>>
@@ -24,4 +25,32 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
     fun deleteNote(note: Note)= viewModelScope.launch(Dispatchers.IO){
         repo.delete(note)
     }
+
+    fun filterList(  ) : LiveData<List<Note>>{
+        val textLower = searchQurery.value
+
+        return Transformations.map(allNotes,){
+            filterLiveList(it,textLower)
+        }
+    }
+    private fun filterLiveList(list: List<Note>, text : String? ): List<Note>{
+        var newList = ArrayList<Note>()
+
+        return if(text!=null){
+            var textLower= text.toLowerCase()
+            for ( note in list){
+
+                if(note.title.toLowerCase().contains(textLower) || note.description.toLowerCase().contains(textLower) ){
+                    newList.add(note)
+                }
+            }
+
+            newList
+        }else{
+            list
+        }
+
+
+    }
+
 }

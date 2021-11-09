@@ -2,6 +2,9 @@ package com.neuralbit.letsnote
 
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
@@ -10,6 +13,7 @@ import android.util.Log
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
+import android.view.WindowManager
 import android.widget.*
 import androidx.appcompat.app.ActionBar
 import androidx.core.widget.addTextChangedListener
@@ -40,6 +44,12 @@ class AddEditNoteActivity : AppCompatActivity() {
         supportActionBar?.displayOptions = ActionBar.DISPLAY_SHOW_CUSTOM
         supportActionBar?.setDisplayShowCustomEnabled(true)
         cm= Common()
+        if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            var window = window
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+            window.statusBarColor= Color.GRAY
+            supportActionBar?.setBackgroundDrawable(ColorDrawable(Color.GRAY))
+        }
         sharedPreferences = getSharedPreferences("ArchivedNotes",MODE_PRIVATE)
         editor = sharedPreferences.edit()
         supportActionBar?.setCustomView(R.layout.note_action_bar)

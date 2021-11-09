@@ -39,14 +39,11 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     fun filterList(  ) : LiveData<List<Note>>{
         val textLower = searchQurery.value
 
-        var list : List<Note>
-
-
         return Transformations.map(allNotes,){
             filterLiveList(it,textLower)
         }
     }
-    fun filterLiveList(list: List<Note>, text : String? ): List<Note>{
+    private fun filterLiveList(list: List<Note>, text : String? ): List<Note>{
         var newList = ArrayList<Note>()
 
         return if(text!=null){

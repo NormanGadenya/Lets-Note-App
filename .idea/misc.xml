@@ -4,8 +4,8 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="app/src/main/res/drawable/main_tool_back.xml" value="0.33" />
-        <entry key="app/src/main/res/layout/activity_add_edit_note.xml" value="0.5" />
-        <entry key="app/src/main/res/layout/activity_main.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/activity_add_edit_note.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_main2.xml" value="0.3697916666666667" />
         <entry key="app/src/main/res/layout/app_bar_main.xml" value="0.33" />
         <entry key="app/src/main/res/layout/content_main.xml" value="0.25" />
@@ -15,13 +15,13 @@
         <entry key="app/src/main/res/layout/fragment_gallery.xml" value="0.33" />
         <entry key="app/src/main/res/layout/fragment_home.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_slideshow.xml" value="0.33645833333333336" />
-        <entry key="app/src/main/res/layout/main_action_bar.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/main_action_bar.xml" value="0.22" />
         <entry key="app/src/main/res/layout/main_bar_back.xml" value="0.24322916666666666" />
         <entry key="app/src/main/res/layout/nav_header_main.xml" value="0.4497991967871486" />
         <entry key="app/src/main/res/layout/note_action_bar.xml" value="0.5" />
         <entry key="app/src/main/res/layout/note_rv_item.xml" value="0.5" />
         <entry key="app/src/main/res/menu/activity_main_drawer.xml" value="0.5" />
-        <entry key="app/src/main/res/menu/main_activity2.xml" value="0.2625" />
+        <entry key="app/src/main/res/menu/main_activity2.xml" value="0.18" />
       </map>
     </option>
   </component>
@@ -30,5 +30,12 @@
   </component>
   <component name="ProjectType">
     <option name="id" value="Android" />
+  </component>
+  <component name="VisualizationToolProject">
+    <option name="state">
+      <ProjectState>
+        <option name="scale" value="0.22" />
+      </ProjectState>
+    </option>
   </component>
 </project>
