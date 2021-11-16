@@ -4,9 +4,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import android.widget.SearchView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -17,7 +17,7 @@ import com.neuralbit.letsnote.databinding.FragmentAllNotesBinding
 
 class AllNotesFragment : Fragment() , NoteClickInterface, NoteDeleteInterface {
 
-    private lateinit var homeViewModel: AllNotesViewModel
+    private val allNotesViewModel: AllNotesViewModel by activityViewModels()
     private var _binding: FragmentAllNotesBinding? = null
     val TAG = "HOMEFRAGMENT"
     lateinit var  notesRV: RecyclerView
@@ -29,29 +29,37 @@ class AllNotesFragment : Fragment() , NoteClickInterface, NoteDeleteInterface {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        homeViewModel = ViewModelProvider(this).get(AllNotesViewModel::class.java)
         _binding = FragmentAllNotesBinding.inflate(inflater, container, false)
 
         val root: View = binding.root
         addFAB = binding.FABAddNote
         notesRV = binding.notesRV
-        val staggeredLayoutManager = StaggeredGridLayoutManager( 1,LinearLayoutManager.VERTICAL)
+        val staggeredLayoutManager = StaggeredGridLayoutManager( 2,LinearLayoutManager.VERTICAL)
         notesRV.layoutManager = staggeredLayoutManager
-        val noteRVAdapter = context?.let { NoteRVAdapter(it,this,this)
-        }
+        val noteRVAdapter = context?.let { NoteRVAdapter(it,this,this) }
+
         notesRV.adapter= noteRVAdapter
 
-        homeViewModel.allNotes.observe(viewLifecycleOwner,{
+        allNotesViewModel.allNotes.observe(viewLifecycleOwner,{
+
             noteRVAdapter?.updateList(it)
 
         })
 
+
+        allNotesViewModel.searchQuery.observe(viewLifecycleOwner,{ s ->
+            allNotesViewModel.filterList().observe(viewLifecycleOwner,{
+                noteRVAdapter?.updateList(it)
+            })
+        })
+
+        
         addFAB.setOnClickListener{
             val intent = Intent( context,AddEditNoteActivity::class.java)
-            intent.putExtra("noteType","newNote")
+            intent.putExtra("noteType","NewNote")
             startActivity(intent)
         }
-
+       
         return root
     }
 
@@ -74,7 +82,8 @@ class AllNotesFragment : Fragment() , NoteClickInterface, NoteDeleteInterface {
 
     }
 
+
     override fun onDeleteIconClick(note: Note) {
-        homeViewModel.deleteNote(note)
+        allNotesViewModel.deleteNote(note)
         Toast.makeText(context,"${note.title} Deleted" , Toast.LENGTH_SHORT).show()    }
 }

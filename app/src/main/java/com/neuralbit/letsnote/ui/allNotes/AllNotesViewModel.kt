@@ -1,6 +1,7 @@
 package com.neuralbit.letsnote.ui.allNotes
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.*
 import com.neuralbit.letsnote.Note
 import com.neuralbit.letsnote.NoteDatabase
@@ -12,7 +13,7 @@ import java.util.ArrayList
 class AllNotesViewModel (application : Application) : AndroidViewModel(application) {
     var allNotes: LiveData<List<Note>>
     val repo : NoteRepo
-    var searchQurery : MutableLiveData<String> = MutableLiveData()
+    var searchQuery : MutableLiveData<String> = MutableLiveData()
 
     init{
 
@@ -20,18 +21,24 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
         repo= NoteRepo(dao)
         allNotes = repo.allNotes
 
+
     }
 
     fun deleteNote(note: Note)= viewModelScope.launch(Dispatchers.IO){
         repo.delete(note)
     }
 
-    fun filterList(  ) : LiveData<List<Note>>{
-        val textLower = searchQurery.value
-
-        return Transformations.map(allNotes,){
-            filterLiveList(it,textLower)
+    fun filterList( ) : LiveData<List<Note>>{
+        val textLower = searchQuery.value
+        Log.d("LOG", "filterList:${searchQuery.value} ")
+        return if (searchQuery.value!=null){
+            Transformations.map(allNotes,){
+                filterLiveList(it,textLower)
+            }
+        }else{
+            allNotes
         }
+
     }
     private fun filterLiveList(list: List<Note>, text : String? ): List<Note>{
         var newList = ArrayList<Note>()

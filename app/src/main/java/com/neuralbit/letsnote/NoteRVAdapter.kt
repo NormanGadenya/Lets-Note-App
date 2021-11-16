@@ -12,7 +12,10 @@ class NoteRVAdapter (
     val context: Context,
     val noteClickInterface :NoteClickInterface,
     val noteDeleteInterface :NoteDeleteInterface
+
+
     ): RecyclerView.Adapter<NoteRVAdapter.ViewHolder>(){
+
     private val allNotes = ArrayList<Note>()
         inner class ViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView){
             val noteTitleTV: TextView = itemView.findViewById<TextView>(R.id.tvNoteTitle)
@@ -38,6 +41,7 @@ class NoteRVAdapter (
 
         holder.noteTitleTV.text = title
         holder.noteTextTV.text = desc
+
         holder.deleteIV.setOnClickListener{
             noteDeleteInterface.onDeleteIconClick(allNotes.get(position))
         }
@@ -55,6 +59,8 @@ class NoteRVAdapter (
         allNotes.addAll(newList)
         notifyDataSetChanged()
     }
+
+
 }
 
 interface NoteDeleteInterface {

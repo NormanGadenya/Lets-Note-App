@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,7 +18,7 @@ import com.neuralbit.letsnote.databinding.FragmentArchivedNotesBinding
 
 class ArchivedFragment : Fragment() , NoteClickInterface, NoteDeleteInterface {
 
-    private lateinit var archivedViewModel: ArchivedViewModel
+    private val archivedViewModel: ArchivedViewModel by activityViewModels()
     private var _binding: FragmentArchivedNotesBinding? = null
     lateinit var  notesRV: RecyclerView
     // This property is only valid between onCreateView and
@@ -28,9 +29,8 @@ class ArchivedFragment : Fragment() , NoteClickInterface, NoteDeleteInterface {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        archivedViewModel =
-            ViewModelProvider(this).get(ArchivedViewModel::class.java)
+    ): View {
+
 
         _binding = FragmentArchivedNotesBinding.inflate(inflater, container, false)
         val root: View = binding.root
@@ -43,6 +43,12 @@ class ArchivedFragment : Fragment() , NoteClickInterface, NoteDeleteInterface {
             noteRVAdapter?.updateList(it)
 
         })
+        archivedViewModel.searchQuery.observe(viewLifecycleOwner,{
+            archivedViewModel.filterList().observe(viewLifecycleOwner,{
+                noteRVAdapter?.updateList(it)
+            })
+        })
+
         return root
     }
 
@@ -53,12 +59,17 @@ class ArchivedFragment : Fragment() , NoteClickInterface, NoteDeleteInterface {
 
     override fun onNoteClick(note: Note) {
         val intent = Intent( context, AddEditNoteActivity::class.java)
+        intent.putExtra("archivedNote",true)
         intent.putExtra("noteType","Edit")
+
         intent.putExtra("noteTitle",note.title)
         intent.putExtra("noteDescription",note.description)
         intent.putExtra("noteID",note.id)
         intent.putExtra("noteTimeStamp",note.timeStamp )
+
         startActivity(intent)
+
+
 
 
     }

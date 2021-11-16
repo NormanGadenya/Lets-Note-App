@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.Menu
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -64,22 +65,31 @@ class AddEditNoteActivity : AppCompatActivity() {
                 allNotes=it
             }
         })
+        val archiveButton = findViewById<ImageButton>(R.id.archiveButton)
+        val restoreButton = findViewById<ImageButton>(R.id.restoreButton)
 
-        noteType = intent.getStringExtra("noteType") as String
+        noteType = intent.getStringExtra("noteType").toString()
+        val archivedNote = intent.getBooleanExtra("archivedNote",false)
+        when (noteType) {
+            "Edit" -> {
+                val noteTitle = intent.getStringExtra("noteTitle")
+                val noteDesc = intent.getStringExtra("noteDescription")
+                val noteTimeStamp = intent.getLongExtra("noteTimeStamp",0)
+                tvTimeStamp.text= getString(R.string.timeStamp,cm.convertLongToTime(noteTimeStamp)[0],cm.convertLongToTime(noteTimeStamp)[1])
+                tvTimeStamp.visibility =VISIBLE
+                noteID = intent.getIntExtra("noteID", -1)
+                noteTitleEdit.setText(noteTitle)
+                noteDescriptionEdit.setText(noteDesc)
+                if(archivedNote) {
+                    archiveButton.visibility = GONE
+                    restoreButton.visibility = VISIBLE
+                }
+            }
+            else -> {
 
-        if (noteType.equals("Edit")) {
-            val noteTitle = intent.getStringExtra("noteTitle")
-            val noteDesc = intent.getStringExtra("noteDescription")
-            val noteTimeStamp = intent.getLongExtra("noteTimeStamp",0)
-            tvTimeStamp.text= getString(R.string.timeStamp,cm.convertLongToTime(noteTimeStamp)[0],cm.convertLongToTime(noteTimeStamp)[1])
-            tvTimeStamp.visibility =VISIBLE
-            noteID = intent.getIntExtra("noteID", -1)
-            noteTitleEdit.setText(noteTitle)
-            noteDescriptionEdit.setText(noteDesc)
-        }else{
+                tvTimeStamp.visibility =GONE
 
-            tvTimeStamp.visibility =GONE
-
+            }
         }
 
         noteTitleEdit.addTextChangedListener(object : TextWatcher{
@@ -116,6 +126,13 @@ class AddEditNoteActivity : AppCompatActivity() {
         })
         viewModal.archive.observe(this, {
             archived = it
+            if(archived){
+                archiveButton.visibility = GONE
+                restoreButton.visibility = VISIBLE
+            }else{
+                archiveButton.visibility = VISIBLE
+                restoreButton.visibility = GONE
+            }
         })
 
 
@@ -137,32 +154,42 @@ class AddEditNoteActivity : AppCompatActivity() {
             viewModal.Delete(true)
             goToMain()
         }
-        val archiveButton = findViewById<ImageButton>(R.id.archiveButton)
         archiveButton.setOnClickListener {
             viewModal.Archive(true)
             val archivedNotes =sharedPreferences.getStringSet("archivedNotes", null)
-            var set = mutableSetOf<String>()
+            val set = mutableSetOf<String>()
             if (archivedNotes != null){
                 for ( noteId in archivedNotes ){
                     set.add(noteId)
                 }
             }
-            var archivedNote = ArchivedNote(noteID)
+            val archivedNote = ArchivedNote(noteID)
             viewModal.archiveNote(archivedNote)
             set.add(noteID.toString())
             editor.putStringSet("archivedNotes",set)
-
 
             val coordinatorlayout = findViewById<View>(R.id.coordinatorlayout)
             val snackbar = Snackbar.make(coordinatorlayout,"Note Achieved",Snackbar.LENGTH_LONG)
             snackbar.setAction("UNDO"
             ) {
                 viewModal.Archive(false)
+
                 set.remove(noteID.toString())
                 viewModal.removeArchive(archivedNote)
                 Toast.makeText(this,"Note Unarchived", Toast.LENGTH_SHORT).show()
             }
             snackbar.show()
+
+        }
+
+        restoreButton.setOnClickListener {
+            val archivedNote = ArchivedNote(noteID)
+
+            viewModal.removeArchive(archivedNote)
+            viewModal.Archive(false)
+            Toast.makeText(this,"Note Unarchived", Toast.LENGTH_SHORT).show()
+
+
         }
     }
     private fun saveNote(){

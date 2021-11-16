@@ -24,6 +24,19 @@
         android:background="?attr/selectableItemBackgroundBorderless"
         app:layout_constraintEnd_toStartOf="@id/deleteButton"
         app:layout_constraintTop_toTopOf="parent"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginRight="8dp"
+        />
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/restoreButton"
+        android:src="@drawable/ic_baseline_restore_24"
+        android:visibility="gone"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        app:layout_constraintEnd_toStartOf="@id/deleteButton"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginRight="8dp"
         />
