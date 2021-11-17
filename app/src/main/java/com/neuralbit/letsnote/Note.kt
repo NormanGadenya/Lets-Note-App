@@ -10,6 +10,7 @@ class Note(
     @ColumnInfo(name = "title")val title: String,
     @ColumnInfo(name ="description")val description: String,
     @ColumnInfo(name ="timeStamp")val timeStamp: Long,
+    @ColumnInfo(name ="noteColor")val noteColor : String
 )
 {
     @PrimaryKey(autoGenerate = true)

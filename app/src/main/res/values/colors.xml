@@ -7,4 +7,9 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="English_violet">#493657</color>
+    <color name="Wild_orchid"> #ce7da5 </color>
+    <color name="Celadon"> #bee5bf </color>
+    <color name="Honeydew">#dff3e3 </color>
+    <color name ="Apricot"> #ffd1ba </color>
 </resources>

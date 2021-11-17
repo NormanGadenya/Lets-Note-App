@@ -35,11 +35,70 @@
             app:layout_constraintTop_toBottomOf="@+id/noteEditTitle"
             android:importantForAutofill="no" />
 
+
+        <ImageButton
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="8dp"
+            android:id="@+id/whiteBackground"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:foreground="@color/white"
+            app:layout_constraintBottom_toTopOf="@+id/tvTimeStamp"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <ImageButton
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="8dp"
+            android:foreground="@color/Wild_orchid"
+            android:id="@+id/wOrchidBackground"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            app:layout_constraintBottom_toTopOf="@+id/tvTimeStamp"
+            app:layout_constraintStart_toEndOf="@+id/whiteBackground" />
+        <ImageButton
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="8dp"
+            android:foreground="@color/Celadon"
+            android:id="@+id/celadonBackground"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            app:layout_constraintBottom_toTopOf="@+id/tvTimeStamp"
+            app:layout_constraintStart_toEndOf="@id/wOrchidBackground"/>
+        <ImageButton
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="8dp"
+            android:foreground="@color/Honeydew"
+            android:id="@+id/HoneydrewBackground"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            app:layout_constraintBottom_toTopOf="@+id/tvTimeStamp"
+            app:layout_constraintStart_toEndOf="@id/celadonBackground"/>
+        <ImageButton
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="8dp"
+            android:foreground="@color/Apricot"
+            android:id="@+id/apricotBackground"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            app:layout_constraintBottom_toTopOf="@+id/tvTimeStamp"
+            app:layout_constraintStart_toEndOf="@+id/HoneydrewBackground" />
+
+        <ImageButton
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="8dp"
+            android:foreground="@color/English_violet"
+            android:id="@+id/evBackground"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            app:layout_constraintBottom_toTopOf="@+id/tvTimeStamp"
+            app:layout_constraintStart_toEndOf="@+id/apricotBackground" />
+
         <TextView
             android:id="@+id/tvTimeStamp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="8dp"
+            android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 

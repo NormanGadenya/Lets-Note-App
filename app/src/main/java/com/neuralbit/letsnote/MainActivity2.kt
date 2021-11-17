@@ -48,9 +48,7 @@ class MainActivity2 : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        //TODO fix search notes
 
-        // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.main_activity2, menu)
         val searchViewMenuItem = menu.findItem(R.id.search)
         val searchView = searchViewMenuItem.actionView as SearchView

@@ -38,6 +38,7 @@ class NoteRVAdapter (
          if ( desc.length > 250){
              desc= desc.substring(0,250) + "..."
          }
+        //TODO fix background color
 
         holder.noteTitleTV.text = title
         holder.noteTextTV.text = desc

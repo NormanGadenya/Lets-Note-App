@@ -17,6 +17,7 @@ import android.view.View.VISIBLE
 import android.view.WindowManager
 import android.widget.*
 import androidx.appcompat.app.ActionBar
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
@@ -30,15 +31,15 @@ class AddEditNoteActivity : AppCompatActivity() {
     private lateinit var noteType : String
     private lateinit var allNotes : List<Note>
     private lateinit var archivedNotes : List<Note>
-
+    private lateinit var noteColor : String
     private val TAG = "AddNoteActivity"
     private var deletable : Boolean = false
     private lateinit var tvTimeStamp : TextView
     private var textChanged : Boolean = false
     private var archived : Boolean = false
     private lateinit var cm : Common
-    private lateinit var sharedPreferences: SharedPreferences
-    private lateinit var editor : SharedPreferences.Editor
+    private lateinit var coordinatorlayout : View
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,13 +48,7 @@ class AddEditNoteActivity : AppCompatActivity() {
         supportActionBar?.displayOptions = ActionBar.DISPLAY_SHOW_CUSTOM
         supportActionBar?.setDisplayShowCustomEnabled(true)
         cm= Common()
-        if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-            var window = window
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-            window.statusBarColor= Color.GRAY
-            supportActionBar?.setBackgroundDrawable(ColorDrawable(Color.GRAY))
-        }
-
+        //TODO fix background color
         supportActionBar?.setCustomView(R.layout.note_action_bar)
         noteDescriptionEdit = findViewById(R.id.noteEditDesc)
         tvTimeStamp = findViewById(R.id.tvTimeStamp)
@@ -71,9 +66,35 @@ class AddEditNoteActivity : AppCompatActivity() {
         })
         val archiveButton = findViewById<ImageButton>(R.id.archiveButton)
         val restoreButton = findViewById<ImageButton>(R.id.restoreButton)
+        val evColor = findViewById<ImageButton>(R.id.evBackground)
+        val woColor = findViewById<ImageButton>(R.id.wOrchidBackground)
+        val cColor = findViewById<ImageButton>(R.id.celadonBackground)
+        val hdColor = findViewById<ImageButton>(R.id.HoneydrewBackground)
+        val aColor = findViewById<ImageButton>(R.id.apricotBackground)
+        val whColor = findViewById<ImageButton>(R.id.whiteBackground)
 
+        evColor.setOnClickListener {
+            noteColor = "English_violet"
+        }
+        woColor.setOnClickListener {
+            noteColor = "Wild_orchid"
+        }
+        cColor.setOnClickListener {
+            noteColor = "Celadon"
+        }
+        hdColor.setOnClickListener {
+            noteColor = "Honeydew"
+        }
+        aColor.setOnClickListener {
+            noteColor = "Apricot"
+        }
+        whColor.setOnClickListener {
+            noteColor = "White"
+        }
         noteType = intent.getStringExtra("noteType").toString()
         val archivedNote = intent.getBooleanExtra("archivedNote",false)
+        noteColor = intent.getStringExtra("noteColor").toString()
+        setBgColor()
         when (noteType) {
             "Edit" -> {
                 val noteTitle = intent.getStringExtra("noteTitle")
@@ -171,7 +192,7 @@ class AddEditNoteActivity : AppCompatActivity() {
             viewModal.Archive(true)
             val archivedNote = ArchivedNote(noteID)
             viewModal.archiveNote(archivedNote)
-            val coordinatorlayout = findViewById<View>(R.id.coordinatorlayout)
+            coordinatorlayout = findViewById(R.id.coordinatorlayout)
             val snackbar = Snackbar.make(coordinatorlayout,"Note Achieved",Snackbar.LENGTH_LONG)
             snackbar.setAction("UNDO"
             ) {
@@ -194,6 +215,27 @@ class AddEditNoteActivity : AppCompatActivity() {
 
         }
     }
+
+    private fun setBgColor(){
+        if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            val window = window
+
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+            var colorID= R.color.white
+            when(noteColor) {
+                "White" -> { colorID = R.color.white }
+                "English_violet" -> { colorID = R.color.English_violet }
+                "Wild_orchid" -> { colorID = R.color.Wild_orchid }
+                "Celadon" -> { colorID = R.color.Celadon }
+                "Honeydew" -> { colorID = R.color.Honeydew }
+                "Apricot" -> { colorID = R.color.Apricot }
+            }
+
+            window.statusBarColor = resources.getColor(colorID)
+            supportActionBar?.setBackgroundDrawable(ColorDrawable(resources.getColor(colorID)))
+            coordinatorlayout.setBackgroundColor(resources.getColor(colorID))
+        }
+    }
     private fun saveNote(){
         val noteTitle = noteTitleEdit.text.toString()
         val noteDescription = noteDescriptionEdit.text.toString()
@@ -203,14 +245,14 @@ class AddEditNoteActivity : AppCompatActivity() {
             if(textChanged){
                 if( noteType.equals("Edit")){
                     if(noteTitle.isNotEmpty() && noteDescription.isNotEmpty()){
-                        val updateNote = Note(noteTitle,noteDescription,currentDate)
+                        val updateNote = Note(noteTitle,noteDescription,currentDate, noteColor)
                         updateNote.id = noteID
                         viewModal.updateNote(updateNote)
                         Toast.makeText(this,"Note updated .. " , Toast.LENGTH_SHORT).show()
                     }
                 }else{
                     if(noteTitle.isNotEmpty() && noteDescription.isNotEmpty()){
-                        viewModal.addNote((Note(noteTitle,noteDescription,currentDate)))
+                        viewModal.addNote((Note(noteTitle,noteDescription,currentDate, noteColor )))
                         Toast.makeText(this,"Note added .. " , Toast.LENGTH_SHORT).show()
 
 
@@ -229,13 +271,6 @@ class AddEditNoteActivity : AppCompatActivity() {
 
     }
 
-    override fun onStop() {
-        if (archived){
-            editor.apply()
-        }
-        super.onStop()
-
-    }
 
     private fun goToMain() {
         saveNote()
