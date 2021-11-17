@@ -29,6 +29,8 @@ class AddEditNoteActivity : AppCompatActivity() {
     private lateinit var viewModal :NoteViewModel
     private lateinit var noteType : String
     private lateinit var allNotes : List<Note>
+    private lateinit var archivedNotes : List<Note>
+
     private val TAG = "AddNoteActivity"
     private var deletable : Boolean = false
     private lateinit var tvTimeStamp : TextView
@@ -51,8 +53,7 @@ class AddEditNoteActivity : AppCompatActivity() {
             window.statusBarColor= Color.GRAY
             supportActionBar?.setBackgroundDrawable(ColorDrawable(Color.GRAY))
         }
-        sharedPreferences = getSharedPreferences("ArchivedNotes",MODE_PRIVATE)
-        editor = sharedPreferences.edit()
+
         supportActionBar?.setCustomView(R.layout.note_action_bar)
         noteDescriptionEdit = findViewById(R.id.noteEditDesc)
         tvTimeStamp = findViewById(R.id.tvTimeStamp)
@@ -64,6 +65,9 @@ class AddEditNoteActivity : AppCompatActivity() {
             list?.let {
                 allNotes=it
             }
+        })
+        viewModal.archivedNote.observe(this,{
+            archivedNotes = it
         })
         val archiveButton = findViewById<ImageButton>(R.id.archiveButton)
         val restoreButton = findViewById<ImageButton>(R.id.restoreButton)
@@ -142,12 +146,21 @@ class AddEditNoteActivity : AppCompatActivity() {
         }
 
         val deleteButton = findViewById<ImageButton>(R.id.deleteButton)
+
         deleteButton.setOnClickListener {
-            if( noteType.equals("Edit")){
-                for (note in allNotes) {
+            if(noteType == "Edit"){
+
+
+                for (note in archivedNotes) {
+                    Log.d(TAG, "onCreate: ${note.id} $noteID")
+
                     if(note.id == noteID){
                         viewModal.deleteNote(note)
                     }
+                }
+                if(archivedNote){
+                    val archivedNote = ArchivedNote(noteID)
+                    viewModal.removeArchive(archivedNote)
                 }
             }
             Toast.makeText(this,"Note deleted",Toast.LENGTH_SHORT).show()
@@ -156,29 +169,18 @@ class AddEditNoteActivity : AppCompatActivity() {
         }
         archiveButton.setOnClickListener {
             viewModal.Archive(true)
-            val archivedNotes =sharedPreferences.getStringSet("archivedNotes", null)
-            val set = mutableSetOf<String>()
-            if (archivedNotes != null){
-                for ( noteId in archivedNotes ){
-                    set.add(noteId)
-                }
-            }
             val archivedNote = ArchivedNote(noteID)
             viewModal.archiveNote(archivedNote)
-            set.add(noteID.toString())
-            editor.putStringSet("archivedNotes",set)
-
             val coordinatorlayout = findViewById<View>(R.id.coordinatorlayout)
             val snackbar = Snackbar.make(coordinatorlayout,"Note Achieved",Snackbar.LENGTH_LONG)
             snackbar.setAction("UNDO"
             ) {
                 viewModal.Archive(false)
-
-                set.remove(noteID.toString())
                 viewModal.removeArchive(archivedNote)
                 Toast.makeText(this,"Note Unarchived", Toast.LENGTH_SHORT).show()
             }
             snackbar.show()
+            
 
         }
 
