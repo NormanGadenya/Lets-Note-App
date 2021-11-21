@@ -44,7 +44,7 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
         val pinnedNoteRVAdapter = context?.let { NoteRVAdapter(it,this) }
         notesRV.adapter= noteRVAdapter
         pinnedNotesRV.adapter = pinnedNoteRVAdapter
-
+        //TODO introduce new pinned list fragment
         allNotesViewModel.allNotes.observe(viewLifecycleOwner,{
 
             noteRVAdapter?.updateList(it)
@@ -57,6 +57,10 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
         allNotesViewModel.searchQuery.observe(viewLifecycleOwner,{ s ->
             allNotesViewModel.filterList().observe(viewLifecycleOwner,{
                 noteRVAdapter?.updateList(it)
+
+            })
+            allNotesViewModel.filterPinnedList().observe(viewLifecycleOwner,{
+                pinnedNoteRVAdapter?.updateList(it)
             })
         })
 

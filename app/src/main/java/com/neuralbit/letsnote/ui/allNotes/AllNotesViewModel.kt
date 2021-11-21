@@ -41,6 +41,19 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
         }
 
     }
+
+    fun filterPinnedList( ) : LiveData<List<Note>>{
+        val textLower = searchQuery.value
+        Log.d("LOG", "filterList:${searchQuery.value} ")
+        return if (searchQuery.value!=null){
+            Transformations.map(pinnedNotes,){
+                filterLiveList(it,textLower)
+            }
+        }else{
+            pinnedNotes
+        }
+
+    }
     private fun filterLiveList(list: List<Note>, text : String? ): List<Note>{
         var newList = ArrayList<Note>()
 
