@@ -6,11 +6,41 @@
     android:layout_height="match_parent"
     tools:context=".ui.allNotes.AllNotesFragment">
 
+    <TextView
+        android:id="@+id/pinnedNotesTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/pinned_notes"
+        android:textSize="32sp"
+        android:layout_margin="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/pinnedNotesRV"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:listitem="@layout/note_rv_item"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/pinnedNotesTV"
+        />
+
+
+    <TextView
+        android:id="@+id/otherNotesTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:text="@string/other_notes"
+        android:textSize="32sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pinnedNotesRV" />
+
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/notesRV"
+        android:layout_marginTop="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/otherNotesTV"
         />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

@@ -16,13 +16,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.neuralbit.letsnote.*
 import com.neuralbit.letsnote.databinding.FragmentArchivedNotesBinding
 
-class ArchivedFragment : Fragment() , NoteClickInterface, NoteDeleteInterface {
+class ArchivedFragment : Fragment() , NoteClickInterface {
 
     private val archivedViewModel: ArchivedViewModel by activityViewModels()
     private var _binding: FragmentArchivedNotesBinding? = null
     lateinit var  notesRV: RecyclerView
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
 
     override fun onCreateView(
@@ -36,7 +34,7 @@ class ArchivedFragment : Fragment() , NoteClickInterface, NoteDeleteInterface {
         val root: View = binding.root
         notesRV = binding.archivedRV
         notesRV.layoutManager = LinearLayoutManager(context)
-        val noteRVAdapter = context?.let { NoteRVAdapter(it,this,this) }
+        val noteRVAdapter = context?.let { NoteRVAdapter(it,this) }
         notesRV.adapter= noteRVAdapter
 
         archivedViewModel.archivedNotes.observe(viewLifecycleOwner,{
@@ -61,7 +59,7 @@ class ArchivedFragment : Fragment() , NoteClickInterface, NoteDeleteInterface {
         val intent = Intent( context, AddEditNoteActivity::class.java)
         intent.putExtra("archivedNote",true)
         intent.putExtra("noteType","Edit")
-
+        intent.putExtra("noteColor",note.noteColor)
         intent.putExtra("noteTitle",note.title)
         intent.putExtra("noteDescription",note.description)
         intent.putExtra("noteID",note.id)
@@ -74,7 +72,4 @@ class ArchivedFragment : Fragment() , NoteClickInterface, NoteDeleteInterface {
 
     }
 
-    override fun onDeleteIconClick(note: Note) {
-        archivedViewModel.deleteNote(note)
-        Toast.makeText(context,"${note.title} Deleted" , Toast.LENGTH_SHORT).show()    }
 }

@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
-class MainActivity : AppCompatActivity(), NoteClickInterface, NoteDeleteInterface {
+class MainActivity : AppCompatActivity(), NoteClickInterface{
     lateinit var  notesRV: RecyclerView
     lateinit var addFAB : FloatingActionButton
     lateinit var viewModal: NoteViewModel
@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity(), NoteClickInterface, NoteDeleteInterfac
         notesRV = findViewById(R.id.notesRV)
         addFAB = findViewById(R.id.FABAddNote)
         notesRV.layoutManager = LinearLayoutManager(this)
-        val noteRVAdapter = NoteRVAdapter(this,this,this)
+        val noteRVAdapter = NoteRVAdapter(this,this)
         notesRV.adapter= noteRVAdapter
         var list1 :List<Note> = arrayListOf()
         viewModal = ViewModelProvider(this,ViewModelProvider.AndroidViewModelFactory.getInstance(application)).get(NoteViewModel::class.java)
@@ -60,7 +60,5 @@ class MainActivity : AppCompatActivity(), NoteClickInterface, NoteDeleteInterfac
 
     }
 
-    override fun onDeleteIconClick(note: Note) {
-        viewModal.deleteNote(note)
-        Toast.makeText(this,"${note.title} Deleted" ,Toast.LENGTH_SHORT).show()    }
+
 }

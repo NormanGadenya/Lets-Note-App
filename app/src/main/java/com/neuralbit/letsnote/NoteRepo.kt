@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 class NoteRepo( private val notesDao : NotesDao ) {
     val allNotes: LiveData<List<Note>> = notesDao.getAllNotes()
     val archivedNotes : LiveData<List<Note>> = notesDao.getArchivedNotes()
+    val pinnedNotes : LiveData<List<Note>> = notesDao.getPinnedNotes()
     suspend fun  insert(note:Note){
         notesDao.insert(note)
     }
@@ -23,5 +24,11 @@ class NoteRepo( private val notesDao : NotesDao ) {
     }
     suspend fun deleteArchive(id: ArchivedNote){
         notesDao.deleteArchive(id)
+    }
+    suspend fun insertPinned(id: PinnedNote){
+        notesDao.insertPinned(id)
+    }
+    suspend fun deletePinned(id: PinnedNote){
+        notesDao.deletePinned(id)
     }
 }

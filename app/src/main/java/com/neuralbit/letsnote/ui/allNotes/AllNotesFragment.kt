@@ -15,12 +15,13 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.neuralbit.letsnote.*
 import com.neuralbit.letsnote.databinding.FragmentAllNotesBinding
 
-class AllNotesFragment : Fragment() , NoteClickInterface, NoteDeleteInterface {
+class AllNotesFragment : Fragment() , NoteClickInterface {
 
     private val allNotesViewModel: AllNotesViewModel by activityViewModels()
     private var _binding: FragmentAllNotesBinding? = null
     val TAG = "HOMEFRAGMENT"
     lateinit var  notesRV: RecyclerView
+    lateinit var  pinnedNotesRV: RecyclerView
     lateinit var addFAB : FloatingActionButton
     private val binding get() = _binding!!
 
@@ -34,18 +35,24 @@ class AllNotesFragment : Fragment() , NoteClickInterface, NoteDeleteInterface {
         val root: View = binding.root
         addFAB = binding.FABAddNote
         notesRV = binding.notesRV
-        val staggeredLayoutManager = StaggeredGridLayoutManager( 2,LinearLayoutManager.VERTICAL)
-        notesRV.layoutManager = staggeredLayoutManager
-        val noteRVAdapter = context?.let { NoteRVAdapter(it,this,this) }
-
+        pinnedNotesRV = binding.pinnedNotesRV
+        val layoutManagerAll = StaggeredGridLayoutManager( 2,LinearLayoutManager.VERTICAL)
+        val layoutManagerPinned = StaggeredGridLayoutManager( 2,LinearLayoutManager.VERTICAL)
+        notesRV.layoutManager = layoutManagerAll
+        pinnedNotesRV.layoutManager =layoutManagerPinned
+        val noteRVAdapter = context?.let { NoteRVAdapter(it,this) }
+        val pinnedNoteRVAdapter = context?.let { NoteRVAdapter(it,this) }
         notesRV.adapter= noteRVAdapter
+        pinnedNotesRV.adapter = pinnedNoteRVAdapter
 
         allNotesViewModel.allNotes.observe(viewLifecycleOwner,{
 
             noteRVAdapter?.updateList(it)
 
         })
-
+        allNotesViewModel.pinnedNotes.observe(viewLifecycleOwner,{
+            pinnedNoteRVAdapter?.updateList(it)
+        })
 
         allNotesViewModel.searchQuery.observe(viewLifecycleOwner,{ s ->
             allNotesViewModel.filterList().observe(viewLifecycleOwner,{
@@ -76,14 +83,11 @@ class AllNotesFragment : Fragment() , NoteClickInterface, NoteDeleteInterface {
         intent.putExtra("noteTitle",note.title)
         intent.putExtra("noteDescription",note.description)
         intent.putExtra("noteID",note.id)
+        intent.putExtra("noteColor",note.noteColor)
         intent.putExtra("noteTimeStamp",note.timeStamp )
         startActivity(intent)
 
 
     }
 
-
-    override fun onDeleteIconClick(note: Note) {
-        allNotesViewModel.deleteNote(note)
-        Toast.makeText(context,"${note.title} Deleted" , Toast.LENGTH_SHORT).show()    }
 }

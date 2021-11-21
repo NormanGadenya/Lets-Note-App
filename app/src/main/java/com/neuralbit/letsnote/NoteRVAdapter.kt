@@ -1,6 +1,8 @@
 package com.neuralbit.letsnote
 
 import android.content.Context
+import android.graphics.Color
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,16 +13,15 @@ import androidx.recyclerview.widget.RecyclerView
 class NoteRVAdapter (
     val context: Context,
     val noteClickInterface :NoteClickInterface,
-    val noteDeleteInterface :NoteDeleteInterface
 
 
     ): RecyclerView.Adapter<NoteRVAdapter.ViewHolder>(){
 
     private val allNotes = ArrayList<Note>()
         inner class ViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView){
-            val noteTitleTV: TextView = itemView.findViewById<TextView>(R.id.tvNoteTitle)
-            val noteTextTV: TextView = itemView.findViewById<TextView>(R.id.tvNoteDesc)
-            val deleteIV: ImageView = itemView.findViewById<ImageView>(R.id.IvDelete)
+            val noteTitleTV: TextView = itemView.findViewById(R.id.tvNoteTitle)
+            val noteTextTV: TextView = itemView.findViewById(R.id.tvNoteDesc)
+            val noteCard : View = itemView.findViewById(R.id.noteCard)
 
         }
 
@@ -30,22 +31,40 @@ class NoteRVAdapter (
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        var title = allNotes.get(position).title
-        var desc = allNotes.get(position).description
+        var title = allNotes[position].title
+        var desc = allNotes[position].description
+        var noteColor : String? = allNotes[position].noteColor
         if (title.length >20 ){
             title = title.substring(0,15)+"..."
         }
          if ( desc.length > 250){
              desc= desc.substring(0,250) + "..."
          }
-        //TODO fix background color
 
         holder.noteTitleTV.text = title
         holder.noteTextTV.text = desc
-
-        holder.deleteIV.setOnClickListener{
-            noteDeleteInterface.onDeleteIconClick(allNotes.get(position))
+        var colorID= R.color.white
+        var textColorID =R.color.black
+        if (noteColor !=null){
+            when(noteColor) {
+                "White" -> {
+                    colorID = R.color.white
+                }
+                "English_violet" -> {
+                    colorID = R.color.English_violet
+                    textColorID = Color.WHITE
+                }
+                "Wild_orchid" -> { colorID = R.color.Wild_orchid }
+                "Celadon" -> { colorID = R.color.Celadon }
+                "Honeydew" -> { colorID = R.color.Honeydew }
+                "Apricot" -> { colorID = R.color.Apricot }
+            }
+            Log.d("TAG", "onBindViewHolder: $noteColor")
+            holder.noteCard.setBackgroundColor(context.resources.getColor(colorID))
+            holder.noteTitleTV.setTextColor(textColorID)
+            holder.noteTextTV.setTextColor(textColorID)
         }
+
         holder.itemView.setOnClickListener{
             noteClickInterface.onNoteClick(allNotes.get(position))
         }
@@ -64,9 +83,7 @@ class NoteRVAdapter (
 
 }
 
-interface NoteDeleteInterface {
-    fun onDeleteIconClick(note:Note)
-}
+
 
 interface  NoteClickInterface{
     fun onNoteClick(note:Note)

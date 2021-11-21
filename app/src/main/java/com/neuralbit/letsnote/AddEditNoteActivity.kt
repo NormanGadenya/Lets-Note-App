@@ -22,8 +22,22 @@ import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
 import java.util.*
+import androidx.core.graphics.drawable.DrawableCompat
+
+import android.graphics.drawable.Drawable
+
+import androidx.appcompat.content.res.AppCompatResources
+
+
+
 
 class AddEditNoteActivity : AppCompatActivity() {
+    private lateinit var actionBarIcons: List<Int>
+    private lateinit var restoreButton: ImageButton
+    private lateinit var archiveButton: ImageButton
+    private lateinit var deleteButton: ImageButton
+    private lateinit var backButton: ImageButton
+    private lateinit var pinButton: ImageButton
     private lateinit var noteTitleEdit : EditText
     private lateinit var noteDescriptionEdit : EditText
     private var noteID = -1
@@ -31,7 +45,7 @@ class AddEditNoteActivity : AppCompatActivity() {
     private lateinit var noteType : String
     private lateinit var allNotes : List<Note>
     private lateinit var archivedNotes : List<Note>
-    private lateinit var noteColor : String
+    private var noteColor : String ? = null
     private val TAG = "AddNoteActivity"
     private var deletable : Boolean = false
     private lateinit var tvTimeStamp : TextView
@@ -41,14 +55,15 @@ class AddEditNoteActivity : AppCompatActivity() {
     private lateinit var coordinatorlayout : View
 
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_edit_note)
         noteTitleEdit = findViewById(R.id.noteEditTitle)
         supportActionBar?.displayOptions = ActionBar.DISPLAY_SHOW_CUSTOM
         supportActionBar?.setDisplayShowCustomEnabled(true)
+        actionBarIcons = listOf(R.drawable.ic_baseline_arrow_back_24,R.drawable.ic_baseline_archive_24,R.drawable.ic_baseline_restore_24)
         cm= Common()
-        //TODO fix background color
         supportActionBar?.setCustomView(R.layout.note_action_bar)
         noteDescriptionEdit = findViewById(R.id.noteEditDesc)
         tvTimeStamp = findViewById(R.id.tvTimeStamp)
@@ -64,37 +79,63 @@ class AddEditNoteActivity : AppCompatActivity() {
         viewModal.archivedNote.observe(this,{
             archivedNotes = it
         })
-        val archiveButton = findViewById<ImageButton>(R.id.archiveButton)
-        val restoreButton = findViewById<ImageButton>(R.id.restoreButton)
+        deleteButton = findViewById(R.id.deleteButton)
+        backButton = findViewById(R.id.backButton)
+        archiveButton = findViewById(R.id.archiveButton)
+        restoreButton = findViewById(R.id.restoreButton)
         val evColor = findViewById<ImageButton>(R.id.evBackground)
         val woColor = findViewById<ImageButton>(R.id.wOrchidBackground)
         val cColor = findViewById<ImageButton>(R.id.celadonBackground)
         val hdColor = findViewById<ImageButton>(R.id.HoneydrewBackground)
         val aColor = findViewById<ImageButton>(R.id.apricotBackground)
         val whColor = findViewById<ImageButton>(R.id.whiteBackground)
+        coordinatorlayout = findViewById(R.id.coordinatorlayout)
+        pinButton = findViewById(R.id.pinButton)
 
         evColor.setOnClickListener {
             noteColor = "English_violet"
+            setBgColor()
+            viewModal.noteChanged(true)
+
         }
         woColor.setOnClickListener {
             noteColor = "Wild_orchid"
+            viewModal.noteChanged(true)
+            setBgColor()
+
+
         }
         cColor.setOnClickListener {
             noteColor = "Celadon"
+            viewModal.noteChanged(true)
+            setBgColor()
+
         }
         hdColor.setOnClickListener {
             noteColor = "Honeydew"
+            viewModal.noteChanged(true)
+            setBgColor()
+
         }
         aColor.setOnClickListener {
             noteColor = "Apricot"
+            viewModal.noteChanged(true)
+            setBgColor()
+
         }
         whColor.setOnClickListener {
             noteColor = "White"
+            viewModal.noteChanged(true)
+            setBgColor()
+
         }
         noteType = intent.getStringExtra("noteType").toString()
         val archivedNote = intent.getBooleanExtra("archivedNote",false)
-        noteColor = intent.getStringExtra("noteColor").toString()
-        setBgColor()
+        noteColor = intent.getStringExtra("noteColor")
+        if(noteColor!=null){
+            setBgColor()
+        }
+
         when (noteType) {
             "Edit" -> {
                 val noteTitle = intent.getStringExtra("noteTitle")
@@ -122,7 +163,7 @@ class AddEditNoteActivity : AppCompatActivity() {
             }
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 if(p3>0){
-                    viewModal.TextChanged(true)
+                    viewModal.noteChanged(true)
                 }
             }
 
@@ -136,7 +177,7 @@ class AddEditNoteActivity : AppCompatActivity() {
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 if(p3>0){
-                    viewModal.TextChanged(true)
+                    viewModal.noteChanged(true)
                 }
             }
 
@@ -161,12 +202,9 @@ class AddEditNoteActivity : AppCompatActivity() {
         })
 
 
-        val backButton = findViewById<ImageButton>(R.id.backButton)
         backButton.setOnClickListener {
             goToMain()
         }
-
-        val deleteButton = findViewById<ImageButton>(R.id.deleteButton)
 
         deleteButton.setOnClickListener {
             if(noteType == "Edit"){
@@ -192,7 +230,6 @@ class AddEditNoteActivity : AppCompatActivity() {
             viewModal.Archive(true)
             val archivedNote = ArchivedNote(noteID)
             viewModal.archiveNote(archivedNote)
-            coordinatorlayout = findViewById(R.id.coordinatorlayout)
             val snackbar = Snackbar.make(coordinatorlayout,"Note Achieved",Snackbar.LENGTH_LONG)
             snackbar.setAction("UNDO"
             ) {
@@ -204,10 +241,23 @@ class AddEditNoteActivity : AppCompatActivity() {
             
 
         }
+        pinButton.setOnClickListener {
+            viewModal.Pinned(true)
+            val pinnedNote = PinnedNote(noteID)
+            viewModal.pinNote(pinnedNote)
+            val snackbar = Snackbar.make(coordinatorlayout,"Note pinned",Snackbar.LENGTH_LONG)
+            snackbar.setAction("UNDO"
+            ) {
+                viewModal.Pinned(false)
+                viewModal.removePin(pinnedNote)
+                Toast.makeText(this,"Note unpinned", Toast.LENGTH_SHORT).show()
+            }
+            snackbar.show()
+
+        }
 
         restoreButton.setOnClickListener {
             val archivedNote = ArchivedNote(noteID)
-
             viewModal.removeArchive(archivedNote)
             viewModal.Archive(false)
             Toast.makeText(this,"Note Unarchived", Toast.LENGTH_SHORT).show()
@@ -217,25 +267,45 @@ class AddEditNoteActivity : AppCompatActivity() {
     }
 
     private fun setBgColor(){
-        if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-            val window = window
+        val window = window
 
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-            var colorID= R.color.white
-            when(noteColor) {
-                "White" -> { colorID = R.color.white }
-                "English_violet" -> { colorID = R.color.English_violet }
-                "Wild_orchid" -> { colorID = R.color.Wild_orchid }
-                "Celadon" -> { colorID = R.color.Celadon }
-                "Honeydew" -> { colorID = R.color.Honeydew }
-                "Apricot" -> { colorID = R.color.Apricot }
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+        var colorID= R.color.white
+        var textColorID =R.color.black
+        var buttonColorID = R.color.white
+        when(noteColor) {
+            "White" -> {
+                colorID = R.color.white
+                buttonColorID = Color.BLACK
             }
+            "English_violet" -> {
+                colorID = R.color.English_violet
+                textColorID = Color.WHITE
 
-            window.statusBarColor = resources.getColor(colorID)
-            supportActionBar?.setBackgroundDrawable(ColorDrawable(resources.getColor(colorID)))
-            coordinatorlayout.setBackgroundColor(resources.getColor(colorID))
+            }
+            "Wild_orchid" -> { colorID = R.color.Wild_orchid }
+            "Celadon" -> { colorID = R.color.Celadon }
+            "Honeydew" -> { colorID = R.color.Honeydew }
+            "Apricot" -> { colorID = R.color.Apricot }
         }
+
+        noteTitleEdit.setTextColor(textColorID)
+        noteDescriptionEdit.setTextColor(textColorID)
+        tvTimeStamp.setTextColor(textColorID)
+//            for ( drawable in actionBarIcons){
+//                changeIconColor(buttonColorID,drawable)
+//            }
+//            window.statusBarColor = resources.getColor(colorID)
+//            supportActionBar?.setBackgroundDrawable(ColorDrawable(resources.getColor(colorID)))
+        coordinatorlayout.setBackgroundColor(resources.getColor(colorID))
     }
+
+    private fun changeIconColor(iconColorID : Int, drawable : Int){
+        val unwrappedDrawable = AppCompatResources.getDrawable(applicationContext, drawable)
+        val wrappedDrawable = DrawableCompat.wrap(unwrappedDrawable!!)
+        DrawableCompat.setTint(wrappedDrawable, iconColorID)
+    }
+
     private fun saveNote(){
         val noteTitle = noteTitleEdit.text.toString()
         val noteDescription = noteDescriptionEdit.text.toString()
@@ -243,7 +313,7 @@ class AddEditNoteActivity : AppCompatActivity() {
         val currentDate= cm.currentTimeToLong()
         if(!deletable){
             if(textChanged){
-                if( noteType.equals("Edit")){
+                if(noteType == "Edit"){
                     if(noteTitle.isNotEmpty() && noteDescription.isNotEmpty()){
                         val updateNote = Note(noteTitle,noteDescription,currentDate, noteColor)
                         updateNote.id = noteID

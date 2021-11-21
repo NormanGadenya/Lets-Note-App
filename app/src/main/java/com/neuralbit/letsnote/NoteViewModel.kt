@@ -3,6 +3,7 @@ package com.neuralbit.letsnote
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
+import com.neuralbit.letsnote.databinding.FragmentAllNotesBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
@@ -17,10 +18,13 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     var delete = MutableLiveData<Boolean>()
     var archived = false
     var archive = MutableLiveData<Boolean>()
+    var pinned = false
+    var pin = MutableLiveData<Boolean>()
     lateinit var list : List<Note>
     var notes : List<Note> = listOf()
     var searchQurery : MutableLiveData<String> = MutableLiveData()
     var archivedNote : LiveData<List<Note>>
+
     init{
 
         val dao = NoteDatabase.getDatabase(application).getNotesDao()
@@ -28,10 +32,9 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         allNotes = repo.allNotes
         archivedNote = repo.archivedNotes
 
-
     }
 
-    fun TextChanged (b : Boolean){
+    fun noteChanged (b : Boolean){
         texChange = b
         texChanged.value= texChange
     }
@@ -68,9 +71,15 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         deleted= b
         delete.value = deleted
     }
+
     fun Archive(b : Boolean){
         archived = b
         archive.value = archived
+    }
+
+    fun Pinned(b : Boolean){
+        pinned = b
+        pin.value = pinned
     }
 
     fun deleteNote(note: Note)= viewModelScope.launch(Dispatchers.IO){
@@ -87,6 +96,14 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
 
     fun removeArchive(id:ArchivedNote) = viewModelScope.launch(Dispatchers.IO){
         repo.deleteArchive(id)
+    }
+
+    fun pinNote(id:PinnedNote) = viewModelScope.launch(Dispatchers.IO){
+        repo.insertPinned(id)
+    }
+
+    fun removePin(id:PinnedNote) = viewModelScope.launch(Dispatchers.IO){
+        repo.deletePinned(id)
     }
 
 }

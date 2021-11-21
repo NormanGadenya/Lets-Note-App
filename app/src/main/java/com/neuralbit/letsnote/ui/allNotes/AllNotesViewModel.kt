@@ -13,6 +13,7 @@ import java.util.ArrayList
 class AllNotesViewModel (application : Application) : AndroidViewModel(application) {
     var allNotes: LiveData<List<Note>>
     val repo : NoteRepo
+    var pinnedNotes: LiveData<List<Note>>
     var searchQuery : MutableLiveData<String> = MutableLiveData()
 
     init{
@@ -20,7 +21,7 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
         val dao = NoteDatabase.getDatabase(application).getNotesDao()
         repo= NoteRepo(dao)
         allNotes = repo.allNotes
-
+        pinnedNotes = repo.pinnedNotes
 
     }
 
