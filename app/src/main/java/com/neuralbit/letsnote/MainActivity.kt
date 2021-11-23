@@ -1,64 +1,81 @@
 package com.neuralbit.letsnote
 
-import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Handler
-import android.util.Log
-import android.widget.Toast
+import android.view.Menu
 import androidx.activity.viewModels
-import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
+import androidx.appcompat.widget.SearchView
+import com.google.android.material.navigation.NavigationView
+import androidx.navigation.findNavController
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.navigateUp
+import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.navigation.ui.setupWithNavController
+import androidx.drawerlayout.widget.DrawerLayout
+import androidx.appcompat.app.AppCompatActivity
+import com.neuralbit.letsnote.databinding.ActivityMain2Binding
+import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
+import com.neuralbit.letsnote.ui.archived.ArchivedViewModel
 
-class MainActivity : AppCompatActivity(), NoteClickInterface{
-    lateinit var  notesRV: RecyclerView
-    lateinit var addFAB : FloatingActionButton
-    lateinit var viewModal: NoteViewModel
-    val TAG = "MainActivity"
+class MainActivity : AppCompatActivity() {
+
+    private lateinit var appBarConfiguration: AppBarConfiguration
+    private lateinit var binding: ActivityMain2Binding
+    private val TAG = "MainActivity"
+    private val allNotesViewModal : AllNotesViewModel by viewModels()
+    private val archivedViewModel : ArchivedViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        notesRV = findViewById(R.id.notesRV)
-        addFAB = findViewById(R.id.FABAddNote)
-        notesRV.layoutManager = LinearLayoutManager(this)
-        val noteRVAdapter = NoteRVAdapter(this,this)
-        notesRV.adapter= noteRVAdapter
-        var list1 :List<Note> = arrayListOf()
-        viewModal = ViewModelProvider(this,ViewModelProvider.AndroidViewModelFactory.getInstance(application)).get(NoteViewModel::class.java)
-        viewModal.allNotes.observe(this,{
 
-                Log.d(TAG, "onCreate: x" )
-                noteRVAdapter.updateList(it)
-                viewModal.notes=it
-                viewModal.list= it
+        binding = ActivityMain2Binding.inflate(layoutInflater)
+        setContentView(binding.root)
+        setSupportActionBar(binding.appBarMain.toolbar)
+        val drawerLayout: DrawerLayout = binding.drawerLayout
+        val navView: NavigationView = binding.navView
+        val navController = findNavController(R.id.nav_host_fragment_content_main)
 
-        })
-        addFAB.setOnClickListener{
-            val intent = Intent( this@MainActivity,AddEditNoteActivity::class.java)
-            intent.putExtra("noteType","newNote")
-            startActivity(intent)
-            this.finish()
-        }
-        viewModal.searchQurery.value = "Hello"
-        viewModal.filterList().observe(this,{
-            noteRVAdapter.updateList(it)
-        })
+        // Passing each menu ID as a set of Ids because each
+        // menu should be considered as top level destinations.
+        appBarConfiguration = AppBarConfiguration(
+            setOf(
+                R.id.nav_home, R.id.nav_arch, R.id.nav_tag
+            ), drawerLayout
+        )
+
+        setupActionBarWithNavController(navController, appBarConfiguration)
+        navView.setupWithNavController(navController)
     }
 
-    override fun onNoteClick(note: Note) {
-        val intent = Intent( this@MainActivity,AddEditNoteActivity::class.java)
-        intent.putExtra("noteType","Edit")
-        intent.putExtra("noteTitle",note.title)
-        intent.putExtra("noteDescription",note.description)
-        intent.putExtra("noteID",note.id)
-        intent.putExtra("noteTimeStamp",note.timeStamp )
-        startActivity(intent)
-        this.finish()
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
 
+        menuInflater.inflate(R.menu.main_activity2, menu)
+        val searchViewMenuItem = menu.findItem(R.id.search)
+        val searchView = searchViewMenuItem.actionView as SearchView
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(p0: String?): Boolean {
+                if (p0 != null) {
+                    allNotesViewModal.searchQuery.value = p0
+                    archivedViewModel.searchQuery.value = p0
+                }
+                return false
+            }
+
+            override fun onQueryTextChange(p0: String?): Boolean {
+                if (p0 != null) {
+                    allNotesViewModal.searchQuery.value = p0
+                    archivedViewModel.searchQuery.value = p0
+
+                }
+                return false
+            }
+        })
+
+        return true
     }
 
 
+    override fun onSupportNavigateUp(): Boolean {
+        val navController = findNavController(R.id.nav_host_fragment_content_main)
+        return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
+    }
 }

@@ -1,30 +1,22 @@
 package com.neuralbit.letsnote
 
 import android.content.Intent
-import android.content.SharedPreferences
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
-import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
-import android.view.Menu
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.WindowManager
 import android.widget.*
 import androidx.appcompat.app.ActionBar
-import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
 import java.util.*
 import androidx.core.graphics.drawable.DrawableCompat
-
-import android.graphics.drawable.Drawable
 
 import androidx.appcompat.content.res.AppCompatResources
 
@@ -345,7 +337,7 @@ class AddEditNoteActivity : AppCompatActivity() {
     private fun goToMain() {
         saveNote()
 
-        val intent = Intent(this@AddEditNoteActivity,MainActivity2::class.java)
+        val intent = Intent(this@AddEditNoteActivity,MainActivity::class.java)
         startActivity(intent)
     }
 
