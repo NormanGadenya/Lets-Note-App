@@ -14,7 +14,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/noteEditTitle"
-            android:hint="Title"
+            android:hint="@string/title"
             android:textSize="32sp"
             android:textStyle="bold"
             android:padding="8dp"
@@ -35,6 +35,15 @@
             app:layout_constraintTop_toBottomOf="@+id/noteEditTitle"
             android:importantForAutofill="no" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/tags"
+            android:textSize="20sp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginStart="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/whiteBackground"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <ImageButton
             android:layout_width="40dp"

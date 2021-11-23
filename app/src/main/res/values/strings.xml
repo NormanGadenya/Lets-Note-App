@@ -17,4 +17,6 @@
     <string name="search">search</string>
     <string name="pinned_notes">Pinned Notes</string>
     <string name="other_notes">Other Notes</string>
+    <string name="title">Title</string>
+    <string name="tags">Tags</string>
 </resources>

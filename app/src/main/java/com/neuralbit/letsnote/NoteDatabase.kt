@@ -18,7 +18,7 @@ abstract class NoteDatabase : RoomDatabase(){
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     NoteDatabase::class.java,
-                    "note_database4"
+                    "note_database5"
                 ).build()
                 INSTANCE = instance
                 instance

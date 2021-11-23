@@ -33,7 +33,7 @@ class NoteRVAdapter (
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         var title = allNotes[position].title
         var desc = allNotes[position].description
-        var noteColor : String? = allNotes[position].noteColor
+        var noteColor : String? = allNotes[position].tagColor
         if (title.length >20 ){
             title = title.substring(0,15)+"..."
         }

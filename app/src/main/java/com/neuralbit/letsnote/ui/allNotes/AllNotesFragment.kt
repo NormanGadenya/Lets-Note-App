@@ -87,7 +87,7 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
         intent.putExtra("noteTitle",note.title)
         intent.putExtra("noteDescription",note.description)
         intent.putExtra("noteID",note.id)
-        intent.putExtra("noteColor",note.noteColor)
+        intent.putExtra("noteColor",note.tagColor)
         intent.putExtra("noteTimeStamp",note.timeStamp )
         startActivity(intent)
 
