@@ -13,5 +13,26 @@
             android:icon="@drawable/ic_baseline_archive_24"
             android:title="@string/menu_archived" />
 
+
+    </group>
+    <group android:checkableBehavior="single">
+        <item android:id="@+id/whiteTag"
+            android:title="White Tag"
+            android:icon="@drawable/white_tag"
+            />
+        <item android:id="@+id/apricotTag"
+            android:title="Apricot Tag"
+            android:icon="@drawable/apricot_tag"
+            />
+        <item android:id="@+id/evTag"
+            android:title="English Violet Tag"
+            android:icon="@drawable/eng_violet_tag"
+            />
+        <item android:id="@+id/wildOrchidTag"
+            android:title="Wild Orchid Tag"
+            android:icon="@drawable/wild_orchid_tag"
+            />
+
+
     </group>
 </menu>

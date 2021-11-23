@@ -18,7 +18,7 @@
         tools:layout="@layout/fragment_archived_notes" />
 
     <fragment
-        android:id="@+id/nav_tag"
+        android:id="@+id/nav_tags"
         android:name="com.neuralbit.letsnote.ui.tag.TagFragment"
         android:label="@string/menu_slideshow"
         tools:layout="@layout/fragment_tag" />
