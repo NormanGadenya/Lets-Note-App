@@ -16,6 +16,7 @@ class ArchivedViewModel (application : Application): AndroidViewModel(applicatio
     val repo : NoteRepo
     var searchQuery : MutableLiveData<String> = MutableLiveData()
 
+
     init{
 
         val dao = NoteDatabase.getDatabase(application).getNotesDao()

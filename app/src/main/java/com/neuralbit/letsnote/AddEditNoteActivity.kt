@@ -37,6 +37,7 @@ class AddEditNoteActivity : AppCompatActivity() {
     private lateinit var noteType : String
     private lateinit var allNotes : List<Note>
     private lateinit var archivedNotes : List<Note>
+    private lateinit var pinnedNotes : List<Note>
     private var noteColor : String ? = null
     private val TAG = "AddNoteActivity"
     private var deletable : Boolean = false
@@ -71,6 +72,10 @@ class AddEditNoteActivity : AppCompatActivity() {
         viewModal.archivedNote.observe(this,{
             archivedNotes = it
         })
+        viewModal.pinnedNotes.observe(this ,{
+            pinnedNotes = it
+        })
+
         deleteButton = findViewById(R.id.deleteButton)
         backButton = findViewById(R.id.backButton)
         archiveButton = findViewById(R.id.archiveButton)
@@ -123,6 +128,7 @@ class AddEditNoteActivity : AppCompatActivity() {
         }
         noteType = intent.getStringExtra("noteType").toString()
         val archivedNote = intent.getBooleanExtra("archivedNote",false)
+        val pinnedNote = intent.getBooleanExtra("pinnedNote",false)
         noteColor = intent.getStringExtra("noteColor")
         if(noteColor!=null){
             setBgColor()
@@ -200,23 +206,25 @@ class AddEditNoteActivity : AppCompatActivity() {
 
         deleteButton.setOnClickListener {
             if(noteType == "Edit"){
-
-
-                for (note in archivedNotes) {
-                    Log.d(TAG, "onCreate: ${note.id} $noteID")
-
-                    if(note.id == noteID){
-                        viewModal.deleteNote(note)
-                    }
-                }
                 if(archivedNote){
                     val archivedNote = ArchivedNote(noteID)
                     viewModal.removeArchive(archivedNote)
                 }
+                if(pinnedNote){
+                    val pinnedNote = PinnedNote(noteID)
+                    viewModal.removePin(pinnedNote)
+                }
+                for ( note in allNotes) {
+                    if (note.id == noteID) {
+                        viewModal.deleteNote(note)
+                    }
+                }
+
+                Toast.makeText(this,"Note deleted",Toast.LENGTH_SHORT).show()
+                viewModal.Delete(true)
+                goToMain()
             }
-            Toast.makeText(this,"Note deleted",Toast.LENGTH_SHORT).show()
-            viewModal.Delete(true)
-            goToMain()
+
         }
         archiveButton.setOnClickListener {
             viewModal.Archive(true)

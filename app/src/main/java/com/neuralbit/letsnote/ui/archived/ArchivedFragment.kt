@@ -22,6 +22,8 @@ class ArchivedFragment : Fragment() , NoteClickInterface {
     private var _binding: FragmentArchivedNotesBinding? = null
     lateinit var  notesRV: RecyclerView
     private val binding get() = _binding!!
+    private lateinit var pinnedNotes: List<Note>
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -46,6 +48,7 @@ class ArchivedFragment : Fragment() , NoteClickInterface {
                 noteRVAdapter?.updateList(it)
             })
         })
+        archivedViewModel
 
         return root
     }
@@ -64,7 +67,9 @@ class ArchivedFragment : Fragment() , NoteClickInterface {
         intent.putExtra("noteDescription",note.description)
         intent.putExtra("noteID",note.id)
         intent.putExtra("noteTimeStamp",note.timeStamp )
-
+        if(note in pinnedNotes ){
+            intent.putExtra("pinnedNote",true)
+        }
         startActivity(intent)
 
 

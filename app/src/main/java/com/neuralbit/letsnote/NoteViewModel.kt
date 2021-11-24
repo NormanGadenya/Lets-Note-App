@@ -24,6 +24,7 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     var notes : List<Note> = listOf()
     var searchQurery : MutableLiveData<String> = MutableLiveData()
     var archivedNote : LiveData<List<Note>>
+    var pinnedNotes : LiveData<List<Note>>
 
     init{
 
@@ -31,6 +32,7 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         repo= NoteRepo(dao)
         allNotes = repo.allNotes
         archivedNote = repo.archivedNotes
+        pinnedNotes = repo.pinnedNotes
 
     }
 

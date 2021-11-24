@@ -4,6 +4,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.view.View.GONE
+import android.view.View.VISIBLE
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -14,6 +17,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.neuralbit.letsnote.*
 import com.neuralbit.letsnote.databinding.FragmentAllNotesBinding
+import org.w3c.dom.Text
 
 class AllNotesFragment : Fragment() , NoteClickInterface {
 
@@ -24,6 +28,10 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
     lateinit var  pinnedNotesRV: RecyclerView
     lateinit var addFAB : FloatingActionButton
     private val binding get() = _binding!!
+    lateinit var pinnedNotesTV: TextView
+    lateinit var otherNotesTV: TextView
+    private lateinit var allNotes: List<Note>
+    private lateinit var pinnedNotes: List<Note>
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,6 +44,8 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
         addFAB = binding.FABAddNote
         notesRV = binding.notesRV
         pinnedNotesRV = binding.pinnedNotesRV
+        pinnedNotesTV = binding.pinnedNotesTV
+        otherNotesTV = binding.otherNotesTV
         val layoutManagerAll = StaggeredGridLayoutManager( 2,LinearLayoutManager.VERTICAL)
         val layoutManagerPinned = StaggeredGridLayoutManager( 2,LinearLayoutManager.VERTICAL)
         notesRV.layoutManager = layoutManagerAll
@@ -46,12 +56,26 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
         pinnedNotesRV.adapter = pinnedNoteRVAdapter
         //TODO introduce new pinned list fragment
         allNotesViewModel.allNotes.observe(viewLifecycleOwner,{
-
+            allNotes = it
             noteRVAdapter?.updateList(it)
-
         })
         allNotesViewModel.pinnedNotes.observe(viewLifecycleOwner,{
             pinnedNoteRVAdapter?.updateList(it)
+            pinnedNotes = it
+            if(it.isNotEmpty()){
+                allNotesViewModel.allNotes.observe(viewLifecycleOwner,{allNotes->
+                    if (allNotes.isNotEmpty()){
+                        otherNotesTV.visibility= VISIBLE
+                    }else{
+                        otherNotesTV.visibility= GONE
+                    }
+                })
+
+                pinnedNotesTV.visibility=VISIBLE
+            }else{
+                otherNotesTV.visibility = GONE
+                pinnedNotesTV.visibility = GONE
+            }
         })
 
         allNotesViewModel.searchQuery.observe(viewLifecycleOwner,{ s ->
@@ -89,6 +113,9 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
         intent.putExtra("noteID",note.id)
         intent.putExtra("noteColor",note.tagColor)
         intent.putExtra("noteTimeStamp",note.timeStamp )
+        if(note in pinnedNotes ){
+            intent.putExtra("pinnedNote",true)
+        }
         startActivity(intent)
 
 
