@@ -80,53 +80,53 @@ class AddEditNoteActivity : AppCompatActivity() {
         backButton = findViewById(R.id.backButton)
         archiveButton = findViewById(R.id.archiveButton)
         restoreButton = findViewById(R.id.restoreButton)
-        val evColor = findViewById<ImageButton>(R.id.evBackground)
-        val woColor = findViewById<ImageButton>(R.id.wOrchidBackground)
-        val cColor = findViewById<ImageButton>(R.id.celadonBackground)
-        val hdColor = findViewById<ImageButton>(R.id.HoneydrewBackground)
-        val aColor = findViewById<ImageButton>(R.id.apricotBackground)
-        val whColor = findViewById<ImageButton>(R.id.whiteBackground)
+//        val evColor = findViewById<ImageButton>(R.id.evBackground)
+//        val woColor = findViewById<ImageButton>(R.id.wOrchidBackground)
+//        val cColor = findViewById<ImageButton>(R.id.celadonBackground)
+//        val hdColor = findViewById<ImageButton>(R.id.HoneydrewBackground)
+//        val aColor = findViewById<ImageButton>(R.id.apricotBackground)
+//        val whColor = findViewById<ImageButton>(R.id.whiteBackground)
         val tagContainer = findViewById<View>(R.id.tagContainer)
         coordinatorlayout = findViewById(R.id.coordinatorlayout)
         pinButton = findViewById(R.id.pinButton)
 
-        evColor.setOnClickListener {
-            noteColor = "English_violet"
-            setBgColor()
-            viewModal.noteChanged(true)
-
-        }
-        woColor.setOnClickListener {
-            noteColor = "Wild_orchid"
-            viewModal.noteChanged(true)
-            setBgColor()
-
-
-        }
-        cColor.setOnClickListener {
-            noteColor = "Celadon"
-            viewModal.noteChanged(true)
-            setBgColor()
-
-        }
-        hdColor.setOnClickListener {
-            noteColor = "Honeydew"
-            viewModal.noteChanged(true)
-            setBgColor()
-
-        }
-        aColor.setOnClickListener {
-            noteColor = "Apricot"
-            viewModal.noteChanged(true)
-            setBgColor()
-
-        }
-        whColor.setOnClickListener {
-            noteColor = "White"
-            viewModal.noteChanged(true)
-            setBgColor()
-
-        }
+//        evColor.setOnClickListener {
+//            noteColor = "English_violet"
+//            setBgColor()
+//            viewModal.noteChanged(true)
+//
+//        }
+//        woColor.setOnClickListener {
+//            noteColor = "Wild_orchid"
+//            viewModal.noteChanged(true)
+//            setBgColor()
+//
+//
+//        }
+//        cColor.setOnClickListener {
+//            noteColor = "Celadon"
+//            viewModal.noteChanged(true)
+//            setBgColor()
+//
+//        }
+//        hdColor.setOnClickListener {
+//            noteColor = "Honeydew"
+//            viewModal.noteChanged(true)
+//            setBgColor()
+//
+//        }
+//        aColor.setOnClickListener {
+//            noteColor = "Apricot"
+//            viewModal.noteChanged(true)
+//            setBgColor()
+//
+//        }
+//        whColor.setOnClickListener {
+//            noteColor = "White"
+//            viewModal.noteChanged(true)
+//            setBgColor()
+//
+//        }
         noteType = intent.getStringExtra("noteType").toString()
         archived = intent.getBooleanExtra("archivedNote",false)
         viewModal.Archive(archived)
@@ -320,14 +320,14 @@ class AddEditNoteActivity : AppCompatActivity() {
             if(textChanged){
                 if(noteType == "Edit"){
                     if(noteTitle.isNotEmpty() && noteDescription.isNotEmpty()){
-                        val updateNote = Note(noteTitle,noteDescription,currentDate, null)
+                        val updateNote = Note(noteTitle,noteDescription,currentDate)
                         updateNote.id = noteID
                         viewModal.updateNote(updateNote)
                         Toast.makeText(this,"Note updated .. " , Toast.LENGTH_SHORT).show()
                     }
                 }else{
                     if(noteTitle.isNotEmpty() && noteDescription.isNotEmpty()){
-                        viewModal.addNote((Note(noteTitle,noteDescription,currentDate,null )))
+                        viewModal.addNote((Note(noteTitle,noteDescription,currentDate )))
                         Toast.makeText(this,"Note added .. " , Toast.LENGTH_SHORT).show()
 
 

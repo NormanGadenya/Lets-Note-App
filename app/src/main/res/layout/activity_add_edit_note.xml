@@ -39,77 +39,29 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/tagContainer"
+            android:padding="@dimen/activity_horizontal_margin"
             app:layout_constraintBottom_toTopOf="@+id/tvTimeStamp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
                 android:layout_marginBottom="8dp"
                 android:text="@string/tags"
                 android:textSize="20sp"
-                app:layout_constraintBottom_toTopOf="@+id/whiteBackground"
+                app:layout_constraintBottom_toTopOf="@+id/addTag"
                 app:layout_constraintStart_toStartOf="parent" />
 
             <ImageButton
-                android:id="@+id/whiteBackground"
+                android:id="@+id/addTag"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_marginStart="8dp"
+
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:foreground="@color/white"
+                android:foreground="@drawable/ic_baseline_add_24"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
 
-            <ImageButton
-                android:id="@+id/wOrchidBackground"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="8dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:foreground="@color/Wild_orchid"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/whiteBackground" />
 
-            <ImageButton
-                android:id="@+id/celadonBackground"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="8dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:foreground="@color/Celadon"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@id/wOrchidBackground" />
-
-            <ImageButton
-                android:id="@+id/HoneydrewBackground"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="8dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:foreground="@color/Honeydew"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@id/celadonBackground" />
-
-            <ImageButton
-                android:id="@+id/apricotBackground"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="8dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:foreground="@color/Apricot"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/HoneydrewBackground" />
-
-            <ImageButton
-                android:id="@+id/evBackground"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="8dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:foreground="@color/English_violet"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/apricotBackground" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

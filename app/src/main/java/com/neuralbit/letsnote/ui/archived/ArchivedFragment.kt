@@ -67,7 +67,7 @@ class ArchivedFragment : Fragment() , NoteClickInterface {
         val intent = Intent( context, AddEditNoteActivity::class.java)
         intent.putExtra("archivedNote",true)
         intent.putExtra("noteType","Edit")
-        intent.putExtra("noteColor",note.tagColor)
+//        intent.putExtra("noteColor",note.tagColor)
         intent.putExtra("noteTitle",note.title)
         intent.putExtra("noteDescription",note.description)
         intent.putExtra("noteID",note.id)
