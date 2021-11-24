@@ -15,10 +15,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.neuralbit.letsnote.*
 import com.neuralbit.letsnote.databinding.FragmentArchivedNotesBinding
+import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 
 class ArchivedFragment : Fragment() , NoteClickInterface {
 
     private val archivedViewModel: ArchivedViewModel by activityViewModels()
+    private val allNotesViewModel: AllNotesViewModel by activityViewModels()
     private var _binding: FragmentArchivedNotesBinding? = null
     lateinit var  notesRV: RecyclerView
     private val binding get() = _binding!!
@@ -43,12 +45,15 @@ class ArchivedFragment : Fragment() , NoteClickInterface {
             noteRVAdapter?.updateList(it)
 
         })
+        allNotesViewModel.pinnedNotes.observe(viewLifecycleOwner,{
+            pinnedNotes = it
+        })
+
         archivedViewModel.searchQuery.observe(viewLifecycleOwner,{
             archivedViewModel.filterList().observe(viewLifecycleOwner,{
                 noteRVAdapter?.updateList(it)
             })
         })
-        archivedViewModel
 
         return root
     }

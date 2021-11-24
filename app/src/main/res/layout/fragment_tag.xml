@@ -6,6 +6,13 @@
     android:layout_height="match_parent"
     tools:context=".ui.tag.TagFragment">
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/noteCardTags"
+        tools:listitem="@layout/tag_item"
+        tools:itemCount="10"
+        />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

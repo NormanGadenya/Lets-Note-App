@@ -43,7 +43,7 @@ class AddEditNoteActivity : AppCompatActivity() {
     private var deletable : Boolean = false
     private lateinit var tvTimeStamp : TextView
     private var textChanged : Boolean = false
-    private var archived : Boolean = false
+    private var archived = false
     private lateinit var cm : Common
     private lateinit var coordinatorlayout : View
 
@@ -86,6 +86,7 @@ class AddEditNoteActivity : AppCompatActivity() {
         val hdColor = findViewById<ImageButton>(R.id.HoneydrewBackground)
         val aColor = findViewById<ImageButton>(R.id.apricotBackground)
         val whColor = findViewById<ImageButton>(R.id.whiteBackground)
+        val tagContainer = findViewById<View>(R.id.tagContainer)
         coordinatorlayout = findViewById(R.id.coordinatorlayout)
         pinButton = findViewById(R.id.pinButton)
 
@@ -127,7 +128,8 @@ class AddEditNoteActivity : AppCompatActivity() {
 
         }
         noteType = intent.getStringExtra("noteType").toString()
-        val archivedNote = intent.getBooleanExtra("archivedNote",false)
+        archived = intent.getBooleanExtra("archivedNote",false)
+        viewModal.Archive(archived)
         val pinnedNote = intent.getBooleanExtra("pinnedNote",false)
         noteColor = intent.getStringExtra("noteColor")
         if(noteColor!=null){
@@ -144,7 +146,7 @@ class AddEditNoteActivity : AppCompatActivity() {
                 noteID = intent.getIntExtra("noteID", -1)
                 noteTitleEdit.setText(noteTitle)
                 noteDescriptionEdit.setText(noteDesc)
-                if(archivedNote) {
+                if(archived) {
                     archiveButton.visibility = GONE
                     restoreButton.visibility = VISIBLE
                 }
@@ -189,13 +191,16 @@ class AddEditNoteActivity : AppCompatActivity() {
             deletable = it
         })
         viewModal.archive.observe(this, {
-            archived = it
             if(archived){
+                pinButton.visibility = GONE
                 archiveButton.visibility = GONE
                 restoreButton.visibility = VISIBLE
+                tagContainer.visibility = GONE
             }else{
+                pinButton.visibility = VISIBLE
                 archiveButton.visibility = VISIBLE
                 restoreButton.visibility = GONE
+                tagContainer.visibility = VISIBLE
             }
         })
 
@@ -206,7 +211,7 @@ class AddEditNoteActivity : AppCompatActivity() {
 
         deleteButton.setOnClickListener {
             if(noteType == "Edit"){
-                if(archivedNote){
+                if(archived){
                     val archivedNote = ArchivedNote(noteID)
                     viewModal.removeArchive(archivedNote)
                 }
@@ -315,14 +320,14 @@ class AddEditNoteActivity : AppCompatActivity() {
             if(textChanged){
                 if(noteType == "Edit"){
                     if(noteTitle.isNotEmpty() && noteDescription.isNotEmpty()){
-                        val updateNote = Note(noteTitle,noteDescription,currentDate, noteColor)
+                        val updateNote = Note(noteTitle,noteDescription,currentDate, null)
                         updateNote.id = noteID
                         viewModal.updateNote(updateNote)
                         Toast.makeText(this,"Note updated .. " , Toast.LENGTH_SHORT).show()
                     }
                 }else{
                     if(noteTitle.isNotEmpty() && noteDescription.isNotEmpty()){
-                        viewModal.addNote((Note(noteTitle,noteDescription,currentDate, noteColor )))
+                        viewModal.addNote((Note(noteTitle,noteDescription,currentDate,null )))
                         Toast.makeText(this,"Note added .. " , Toast.LENGTH_SHORT).show()
 
 
