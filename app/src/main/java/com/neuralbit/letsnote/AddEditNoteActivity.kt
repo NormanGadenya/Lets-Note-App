@@ -19,8 +19,7 @@ import java.util.*
 import androidx.core.graphics.drawable.DrawableCompat
 
 import androidx.appcompat.content.res.AppCompatResources
-
-
+import androidx.room.util.StringUtil
 
 
 class AddEditNoteActivity : AppCompatActivity() {
@@ -45,6 +44,7 @@ class AddEditNoteActivity : AppCompatActivity() {
     private var textChanged : Boolean = false
     private var archived = false
     private lateinit var cm : Common
+    private lateinit var noteDesc : String
     private lateinit var coordinatorlayout : View
 
 
@@ -135,11 +135,10 @@ class AddEditNoteActivity : AppCompatActivity() {
         if(noteColor!=null){
             setBgColor()
         }
-
         when (noteType) {
             "Edit" -> {
                 val noteTitle = intent.getStringExtra("noteTitle")
-                val noteDesc = intent.getStringExtra("noteDescription")
+                noteDesc = intent.getStringExtra("noteDescription").toString()
                 val noteTimeStamp = intent.getLongExtra("noteTimeStamp",0)
                 tvTimeStamp.text= getString(R.string.timeStamp,cm.convertLongToTime(noteTimeStamp)[0],cm.convertLongToTime(noteTimeStamp)[1])
                 tvTimeStamp.visibility =VISIBLE
@@ -173,17 +172,30 @@ class AddEditNoteActivity : AppCompatActivity() {
         })
         noteDescriptionEdit.addTextChangedListener(object : TextWatcher{
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                val changedString =p0.toString()
+
+
             }
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 if(p3>0){
                     viewModal.noteChanged(true)
                 }
+                var changedString =p0.toString()
+
+                Log.d(TAG, "onTextChanged: $p1 ${p2}")
+                if(p0!=null && noteDesc != changedString){
+
+                }
+                Log.d(TAG, "onTextChanged: ${noteDesc==changedString} $noteDesc  $changedString")
+
             }
 
             override fun afterTextChanged(p0: Editable?) {
+
             }
         })
+
         viewModal.texChanged.observe(this,{
             textChanged= it
         })

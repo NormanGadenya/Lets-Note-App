@@ -9,31 +9,49 @@
     tools:context=".AddEditNoteActivity">
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
+        android:padding="@dimen/activity_horizontal_margin"
         android:layout_height="match_parent">
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/noteEditTitle"
             android:hint="@string/title"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
             android:textSize="32sp"
             android:textStyle="bold"
-            android:padding="8dp"
             android:background="@android:color/transparent"
             app:layout_constraintTop_toTopOf="parent"
             />
 
         <EditText
             android:id="@+id/noteEditDesc"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:hint="Note content"
-            android:overScrollMode="always"
-            android:scrollbarStyle="insideInset"
             android:inputType="textMultiLine"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
             android:background="@android:color/transparent"
-            android:padding="8dp"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/noteEditTitle"
             android:importantForAutofill="no" />
+
+        <Button
+            android:id="@+id/newTagBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/tags"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/noteEditDesc" />
+
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tagSpinner"
+            app:layout_constraintStart_toEndOf="@id/newTagBtn"
+            app:layout_constraintTop_toTopOf="@id/newTagBtn"
+            />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -55,7 +73,6 @@
                 android:id="@+id/addTag"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:foreground="@drawable/ic_baseline_add_24"
                 app:layout_constraintBottom_toBottomOf="parent"
