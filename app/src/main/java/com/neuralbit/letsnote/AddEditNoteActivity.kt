@@ -20,6 +20,7 @@ import androidx.core.graphics.drawable.DrawableCompat
 
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.room.util.StringUtil
+import java.lang.StringBuilder
 
 
 class AddEditNoteActivity : AppCompatActivity() {
@@ -46,8 +47,10 @@ class AddEditNoteActivity : AppCompatActivity() {
     private lateinit var cm : Common
     private lateinit var noteDesc : String
     private lateinit var coordinatorlayout : View
-
-
+    private var wordStart = 0
+    private var wordEnd = 0
+    private var tag = ""
+    private var tagStringBuilder = StringBuilder()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -181,12 +184,28 @@ class AddEditNoteActivity : AppCompatActivity() {
                 if(p3>0){
                     viewModal.noteChanged(true)
                 }
+
                 var changedString =p0.toString()
 
-                Log.d(TAG, "onTextChanged: $p1 ${p2}")
-                if(p0!=null && noteDesc != changedString){
+                if(p0?.get(p0.length - 1) == '#'){
+                    wordStart = p0.length
+                }
+
+                if(wordStart> 0){
+                    if(p0?.get(p0.length - 1) == ' '){
+                        wordEnd = p0.length
+
+                    }
 
                 }
+                for ( i in wordStart until wordEnd){
+                    tagStringBuilder.append(tag).append(p0?.get(i))
+                }
+                tag = tagStringBuilder.toString()
+
+                Log.d(TAG, "onTextChanged: $tag")
+
+
                 Log.d(TAG, "onTextChanged: ${noteDesc==changedString} $noteDesc  $changedString")
 
             }
