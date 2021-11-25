@@ -130,6 +130,8 @@ class AddEditNoteActivity : AppCompatActivity() {
 //            setBgColor()
 //
 //        }
+
+        //TODO fix spinner and add tag functionality
         noteType = intent.getStringExtra("noteType").toString()
         archived = intent.getBooleanExtra("archivedNote",false)
         viewModal.Archive(archived)
@@ -185,7 +187,6 @@ class AddEditNoteActivity : AppCompatActivity() {
                     viewModal.noteChanged(true)
                 }
 
-                var changedString =p0.toString()
 
                 if(p0?.get(p0.length - 1) == '#'){
                     wordStart = p0.length
@@ -197,16 +198,18 @@ class AddEditNoteActivity : AppCompatActivity() {
 
                     }
 
+
                 }
-                for ( i in wordStart until wordEnd){
-                    tagStringBuilder.append(tag).append(p0?.get(i))
+                Log.d(TAG, "onTextChanged: $wordEnd")
+                val c = p0.toString()
+
+                if(wordStart !=0 && wordEnd !=0){
+                    Log.d(TAG, "onTextChanged: ${c.substring(wordStart,wordEnd)}")
+                    wordStart = 0
+                    wordEnd = 0
                 }
-                tag = tagStringBuilder.toString()
-
-                Log.d(TAG, "onTextChanged: $tag")
 
 
-                Log.d(TAG, "onTextChanged: ${noteDesc==changedString} $noteDesc  $changedString")
 
             }
 
