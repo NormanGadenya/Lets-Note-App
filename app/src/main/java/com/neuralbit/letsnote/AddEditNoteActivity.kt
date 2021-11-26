@@ -20,6 +20,7 @@ import androidx.core.graphics.drawable.DrawableCompat
 
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.room.util.StringUtil
+import com.neuralbit.letsnote.databinding.ActivityAddEditNoteBinding
 import java.lang.StringBuilder
 
 
@@ -49,8 +50,8 @@ class AddEditNoteActivity : AppCompatActivity() {
     private lateinit var coordinatorlayout : View
     private var wordStart = 0
     private var wordEnd = 0
-    private var tag = ""
-    private var tagStringBuilder = StringBuilder()
+    private var tagString : String ? = null
+    private lateinit var newTagButton : Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,6 +84,7 @@ class AddEditNoteActivity : AppCompatActivity() {
         backButton = findViewById(R.id.backButton)
         archiveButton = findViewById(R.id.archiveButton)
         restoreButton = findViewById(R.id.restoreButton)
+        newTagButton = findViewById(R.id.newTagBtn)
 //        val evColor = findViewById<ImageButton>(R.id.evBackground)
 //        val woColor = findViewById<ImageButton>(R.id.wOrchidBackground)
 //        val cColor = findViewById<ImageButton>(R.id.celadonBackground)
@@ -93,43 +95,6 @@ class AddEditNoteActivity : AppCompatActivity() {
         coordinatorlayout = findViewById(R.id.coordinatorlayout)
         pinButton = findViewById(R.id.pinButton)
 
-//        evColor.setOnClickListener {
-//            noteColor = "English_violet"
-//            setBgColor()
-//            viewModal.noteChanged(true)
-//
-//        }
-//        woColor.setOnClickListener {
-//            noteColor = "Wild_orchid"
-//            viewModal.noteChanged(true)
-//            setBgColor()
-//
-//
-//        }
-//        cColor.setOnClickListener {
-//            noteColor = "Celadon"
-//            viewModal.noteChanged(true)
-//            setBgColor()
-//
-//        }
-//        hdColor.setOnClickListener {
-//            noteColor = "Honeydew"
-//            viewModal.noteChanged(true)
-//            setBgColor()
-//
-//        }
-//        aColor.setOnClickListener {
-//            noteColor = "Apricot"
-//            viewModal.noteChanged(true)
-//            setBgColor()
-//
-//        }
-//        whColor.setOnClickListener {
-//            noteColor = "White"
-//            viewModal.noteChanged(true)
-//            setBgColor()
-//
-//        }
 
         //TODO fix spinner and add tag functionality
         noteType = intent.getStringExtra("noteType").toString()
@@ -161,6 +126,27 @@ class AddEditNoteActivity : AppCompatActivity() {
 
             }
         }
+        viewModal.wordEnd.observe(this,{
+            wordEnd = it
+//            if(it!=0){
+//                newTagButton.visibility = VISIBLE
+//            }else{
+//                newTagButton.visibility = GONE
+//
+//            }
+        })
+
+        viewModal.wordStart.observe(this,{
+            wordStart = it
+
+        })
+        viewModal.noteDescString.observe(this,{
+
+            if(it!=null){
+                newTagButton.text=it
+                newTagButton.visibility = VISIBLE
+            }
+        })
 
         noteTitleEdit.addTextChangedListener(object : TextWatcher{
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
@@ -189,26 +175,29 @@ class AddEditNoteActivity : AppCompatActivity() {
 
 
                 if(p0?.get(p0.length - 1) == '#'){
-                    wordStart = p0.length
+                    viewModal.wordStart.value = p0.length
+//                    wordStart = p0.length
                 }
 
                 if(wordStart> 0){
-                    if(p0?.get(p0.length - 1) == ' '){
-                        wordEnd = p0.length
-
-                    }
-
+//                    if(p0?.get(p0.length - 1) == ' '){
+////                        wordEnd = p0.length
+//                        viewModal.wordEnd.value = p0.length
+//
+//                    }
+                    viewModal.wordEnd.value = p0?.length
 
                 }
-                Log.d(TAG, "onTextChanged: $wordEnd")
-                val c = p0.toString()
-
+//                Log.d(TAG, "onTextChanged: $wordEnd")
+                viewModal.noteDescString.value = p0.toString()
                 if(wordStart !=0 && wordEnd !=0){
-                    Log.d(TAG, "onTextChanged: ${c.substring(wordStart,wordEnd)}")
-                    wordStart = 0
-                    wordEnd = 0
-                }
 
+                    viewModal.getTagString(p0.toString())
+//                    newTagButton.visibility = VISIBLE
+//                    newTagButton.text = "+Create #$tagString"
+//                    viewModal.wordStart.value = 0
+//                    viewModal.wordEnd.value = 0
+                }
 
 
             }

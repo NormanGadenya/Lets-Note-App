@@ -22,10 +22,12 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     var pin = MutableLiveData<Boolean>()
     lateinit var list : List<Note>
     var notes : List<Note> = listOf()
-    var searchQurery : MutableLiveData<String> = MutableLiveData()
+    var searchQurery : MutableLiveData<String>
     var archivedNote : LiveData<List<Note>>
     var pinnedNotes : LiveData<List<Note>>
-
+    var wordStart : MutableLiveData<Int>
+    var wordEnd : MutableLiveData<Int>
+    var noteDescString : MutableLiveData<String>
     init{
 
         val dao = NoteDatabase.getDatabase(application).getNotesDao()
@@ -33,6 +35,20 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         allNotes = repo.allNotes
         archivedNote = repo.archivedNotes
         pinnedNotes = repo.pinnedNotes
+        searchQurery = MutableLiveData<String>()
+        wordStart = MutableLiveData()
+        wordEnd = MutableLiveData()
+        noteDescString = MutableLiveData()
+
+    }
+
+    fun getTagString(text: String){
+        if(wordStart.value!=0 && wordEnd.value!=0){
+            noteDescString.value = text.substring(wordStart.value!!, wordEnd.value!!)
+
+        }
+
+
 
     }
 
