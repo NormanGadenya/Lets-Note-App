@@ -64,7 +64,7 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         texChanged.value= texChange
     }
 
-    fun filterList( ) : LiveData<List<Tag>>{
+    fun filterList( ) : LiveData<List<Tag>>  {
         val textLower = noteDescString.value
         Log.d(TAG, "filterList: ${noteDescString.value}")
         return Transformations.map(allTags,){

@@ -23,9 +23,14 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.room.util.StringUtil
 import com.neuralbit.letsnote.databinding.ActivityAddEditNoteBinding
 import java.lang.StringBuilder
+import java.lang.reflect.Array
+import android.widget.ArrayAdapter
 
 
-class AddEditNoteActivity : AppCompatActivity()  {
+
+
+
+class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedListener  {
     private lateinit var actionBarIcons: List<Int>
     private lateinit var restoreButton: ImageButton
     private lateinit var archiveButton: ImageButton
@@ -87,12 +92,15 @@ class AddEditNoteActivity : AppCompatActivity()  {
             pinnedNotes = it
         })
 
+
         deleteButton = findViewById(R.id.deleteButton)
         backButton = findViewById(R.id.backButton)
         archiveButton = findViewById(R.id.archiveButton)
         restoreButton = findViewById(R.id.restoreButton)
         newTagButton = findViewById(R.id.newTagBtn)
         tagSpinner = findViewById(R.id.tagSpinner)
+        tagSpinner.onItemSelectedListener = this
+
 //        val evColor = findViewById<ImageButton>(R.id.evBackground)
 //        val woColor = findViewById<ImageButton>(R.id.wOrchidBackground)
 //        val cColor = findViewById<ImageButton>(R.id.celadonBackground)
@@ -163,11 +171,11 @@ class AddEditNoteActivity : AppCompatActivity()  {
                         newTagButton.visibility = VISIBLE
                     }else{
                         tagSpinner.visibility = VISIBLE
-
+                        loadSpinner()
                         newTagButton.visibility = GONE
                     }
-                    tagList = it as ArrayList<Tag>
-                    loadSpinner()
+                    tagList = it
+
 
                 })
 
@@ -182,6 +190,9 @@ class AddEditNoteActivity : AppCompatActivity()  {
 
             }
 
+        })
+        viewModal.filterList().observe(this,{
+            Log.d(TAG, "onCreate: $it")
         })
 
 //        viewModal.filterList().observe(this,{
@@ -235,6 +246,7 @@ class AddEditNoteActivity : AppCompatActivity()  {
                         viewModal.wordEnd.value = p0?.length
                         viewModal.getTagString(p0.toString())
 
+//                        loadSpinner()
 
                         if(p0?.get(p0.length - 1) == ' '){
                             viewModal.newTagTyped.value = false
@@ -268,7 +280,7 @@ class AddEditNoteActivity : AppCompatActivity()  {
         newTagButton.setOnClickListener {
             if (tagString != null) {
                 viewModal.addTag(Tag(tagString!!))
-
+                viewModal.newTagTyped.value =false
             }
         }
 
@@ -296,9 +308,7 @@ class AddEditNoteActivity : AppCompatActivity()  {
         backButton.setOnClickListener {
             goToMain()
         }
-
-
-
+        
 
         deleteButton.setOnClickListener {
             if(noteType == "Edit"){
@@ -370,18 +380,19 @@ class AddEditNoteActivity : AppCompatActivity()  {
 
             onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                   noteDescriptionEdit.append(tagList?.get(p2)?.tagTitle)
                     val tag : Tag = adapter.getItem(p2) as Tag
-                    Log.d(TAG, "onItemSelected: $p2")
+                    Log.d(TAG, "onItemSelected: $p3")
                     noteDescriptionEdit.append(tag.tagTitle)
                     Log.d(TAG, "onItemSelected: ${tagList?.get(p2)?.tagTitle}")
                 }
 
                 override fun onNothingSelected(p0: AdapterView<*>?) {
+
                 }
 
             }
         }
+
     }
     private fun setBgColor(){
         val window = window
@@ -466,7 +477,13 @@ class AddEditNoteActivity : AppCompatActivity()  {
         startActivity(intent)
     }
 
+    override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+        TODO("Not yet implemented")
+    }
 
+    override fun onNothingSelected(p0: AdapterView<*>?) {
+        TODO("Not yet implemented")
+    }
 
 
 }
