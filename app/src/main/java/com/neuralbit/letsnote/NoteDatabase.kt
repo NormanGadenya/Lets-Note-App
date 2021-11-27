@@ -1,7 +1,7 @@
 package com.neuralbit.letsnote
 
 import android.content.Context
-import android.nfc.Tag
+
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -9,6 +9,7 @@ import androidx.room.RoomDatabase
 @Database(entities = [Note::class, Tag::class,ArchivedNote::class, PinnedNote::class],version =1 , exportSchema = false)
 abstract class NoteDatabase : RoomDatabase(){
     abstract fun getNotesDao() : NotesDao
+    abstract fun getTagDao() : TagDao
 
 
     companion object {

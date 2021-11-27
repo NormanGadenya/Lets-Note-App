@@ -2,7 +2,7 @@ package com.neuralbit.letsnote
 
 import androidx.lifecycle.LiveData
 
-class TagRepo(private val tagDao : NotesDao) {
+class TagRepo(private val tagDao : TagDao) {
     val allTags : LiveData<List<Tag>> = tagDao.getTags()
 
     suspend fun insert(tag : Tag) {
