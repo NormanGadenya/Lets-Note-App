@@ -28,6 +28,7 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     var wordStart : MutableLiveData<Int>
     var wordEnd : MutableLiveData<Int>
     var noteDescString : MutableLiveData<String>
+    var newTagTyped : MutableLiveData<Boolean>
     init{
 
         val dao = NoteDatabase.getDatabase(application).getNotesDao()
@@ -39,15 +40,13 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         wordStart = MutableLiveData()
         wordEnd = MutableLiveData()
         noteDescString = MutableLiveData()
+        newTagTyped = MutableLiveData()
 
     }
 
     fun getTagString(text: String){
-        if(wordStart.value!=0 && wordEnd.value!=0){
-            noteDescString.value = text.substring(wordStart.value!!, wordEnd.value!!)
 
-        }
-
+        noteDescString.value = text.substring(wordStart.value!!, wordEnd.value!!)
 
 
     }

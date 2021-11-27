@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.KeyEvent
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -52,6 +53,8 @@ class AddEditNoteActivity : AppCompatActivity() {
     private var wordEnd = 0
     private var tagString : String ? = null
     private lateinit var newTagButton : Button
+    private var newTagTyped = false
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -126,6 +129,9 @@ class AddEditNoteActivity : AppCompatActivity() {
 
             }
         }
+        viewModal.newTagTyped.observe(this,{
+            newTagTyped = it
+        })
         viewModal.wordEnd.observe(this,{
             wordEnd = it
 //            if(it!=0){
@@ -141,11 +147,16 @@ class AddEditNoteActivity : AppCompatActivity() {
 
         })
         viewModal.noteDescString.observe(this,{
+            if(newTagTyped){
+                if(it!=null){
+                    newTagButton.text=it
+                    newTagButton.visibility = VISIBLE
+                }
+            }else{
+                newTagButton.visibility = GONE
 
-            if(it!=null){
-                newTagButton.text=it
-                newTagButton.visibility = VISIBLE
             }
+
         })
 
         noteTitleEdit.addTextChangedListener(object : TextWatcher{
@@ -176,27 +187,19 @@ class AddEditNoteActivity : AppCompatActivity() {
 
                 if(p0?.get(p0.length - 1) == '#'){
                     viewModal.wordStart.value = p0.length
-//                    wordStart = p0.length
+                    viewModal.newTagTyped.value = true
                 }
 
-                if(wordStart> 0){
-//                    if(p0?.get(p0.length - 1) == ' '){
-////                        wordEnd = p0.length
-//                        viewModal.wordEnd.value = p0.length
-//
-//                    }
+                if(wordStart> 0) {
                     viewModal.wordEnd.value = p0?.length
-
-                }
-//                Log.d(TAG, "onTextChanged: $wordEnd")
-                viewModal.noteDescString.value = p0.toString()
-                if(wordStart !=0 && wordEnd !=0){
-
                     viewModal.getTagString(p0.toString())
-//                    newTagButton.visibility = VISIBLE
-//                    newTagButton.text = "+Create #$tagString"
-//                    viewModal.wordStart.value = 0
-//                    viewModal.wordEnd.value = 0
+
+
+                    if(p0?.get(p0.length - 1) == ' '){
+                        viewModal.newTagTyped.value = false
+
+                    }
+
                 }
 
 
@@ -206,6 +209,8 @@ class AddEditNoteActivity : AppCompatActivity() {
 
             }
         })
+
+
 
         viewModal.texChanged.observe(this,{
             textChanged= it
