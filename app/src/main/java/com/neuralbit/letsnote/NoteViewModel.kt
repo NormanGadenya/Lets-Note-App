@@ -58,27 +58,28 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
 
     }
 
+
     fun noteChanged (b : Boolean){
         texChange = b
         texChanged.value= texChange
     }
 
-    fun filterList(  ) : LiveData<List<Note>>{
-        val textLower = searchQurery.value
-
-        return Transformations.map(allNotes,){
+    fun filterList( ) : LiveData<List<Tag>>{
+        val textLower = noteDescString.value
+        Log.d(TAG, "filterList: ${noteDescString.value}")
+        return Transformations.map(allTags,){
             filterLiveList(it,textLower)
         }
     }
-    private fun filterLiveList(list: List<Note>, text : String? ): List<Note>{
-        var newList = ArrayList<Note>()
+    private fun filterLiveList(list: List<Tag>, text : String? ): List<Tag>{
+        var newList = ArrayList<Tag>()
 
         return if(text!=null){
             var textLower= text.toLowerCase()
-            for ( note in list){
+            for ( tag in list){
 
-                if(note.title.toLowerCase().contains(textLower) || note.description.toLowerCase().contains(textLower) ){
-                    newList.add(note)
+                if(tag.tagTitle.toLowerCase().contains(textLower)  ){
+                    newList.add(tag)
 
                 }
             }
@@ -90,6 +91,7 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
 
 
     }
+
 
     fun Delete(b : Boolean){
         deleted= b

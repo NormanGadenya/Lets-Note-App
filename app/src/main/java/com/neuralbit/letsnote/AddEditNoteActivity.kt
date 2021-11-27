@@ -25,7 +25,7 @@ import com.neuralbit.letsnote.databinding.ActivityAddEditNoteBinding
 import java.lang.StringBuilder
 
 
-class AddEditNoteActivity : AppCompatActivity() {
+class AddEditNoteActivity : AppCompatActivity()  {
     private lateinit var actionBarIcons: List<Int>
     private lateinit var restoreButton: ImageButton
     private lateinit var archiveButton: ImageButton
@@ -56,9 +56,11 @@ class AddEditNoteActivity : AppCompatActivity() {
     private lateinit var newTagButton : Button
     private var newTagTyped = false
     private var backPressed  = false
+    private lateinit var tagSpinner :Spinner
+    private var tagList : List<Tag> ? = null
 
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?)  {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_edit_note)
         noteTitleEdit = findViewById(R.id.noteEditTitle)
@@ -90,6 +92,7 @@ class AddEditNoteActivity : AppCompatActivity() {
         archiveButton = findViewById(R.id.archiveButton)
         restoreButton = findViewById(R.id.restoreButton)
         newTagButton = findViewById(R.id.newTagBtn)
+        tagSpinner = findViewById(R.id.tagSpinner)
 //        val evColor = findViewById<ImageButton>(R.id.evBackground)
 //        val woColor = findViewById<ImageButton>(R.id.wOrchidBackground)
 //        val cColor = findViewById<ImageButton>(R.id.celadonBackground)
@@ -99,7 +102,6 @@ class AddEditNoteActivity : AppCompatActivity() {
         val tagContainer = findViewById<View>(R.id.tagContainer)
         coordinatorlayout = findViewById(R.id.coordinatorlayout)
         pinButton = findViewById(R.id.pinButton)
-
 
         //TODO fix spinner and add tag functionality
         noteType = intent.getStringExtra("noteType").toString()
@@ -152,12 +154,28 @@ class AddEditNoteActivity : AppCompatActivity() {
             wordStart = it
         })
 
-        viewModal.noteDescString.observe(this,{
+        viewModal.noteDescString.observe(this,{ noteDescStr ->
             if(newTagTyped){
-                if(it!=null){
-                    tagString = it
-                    newTagButton.text=it
-                    newTagButton.visibility = VISIBLE
+
+                viewModal.filterList().observe(this,{
+                    if (it.isEmpty()){
+                        tagSpinner.visibility = GONE
+                        newTagButton.visibility = VISIBLE
+                    }else{
+                        tagSpinner.visibility = VISIBLE
+
+                        newTagButton.visibility = GONE
+                    }
+                    tagList = it as ArrayList<Tag>
+                    loadSpinner()
+
+                })
+
+                if(noteDescStr!=null){
+                    tagString = noteDescStr
+                    newTagButton.text= getString(R.string.createNewTag,noteDescStr)
+
+//                    newTagButton.visibility = VISIBLE
                 }
             }else{
                 newTagButton.visibility = GONE
@@ -165,8 +183,23 @@ class AddEditNoteActivity : AppCompatActivity() {
             }
 
         })
-        
-        
+
+//        viewModal.filterList().observe(this,{
+//            if (it.isEmpty()){
+//                tagSpinner.visibility = GONE
+//                newTagButton.visibility = VISIBLE
+//            }else{
+//
+//                tagSpinner.visibility = VISIBLE
+//
+//                newTagButton.visibility = GONE
+//            }
+//            tagList = it as ArrayList<Tag>
+//
+//            loadSpinner()
+//
+//        })
+
         noteTitleEdit.addTextChangedListener(object : TextWatcher{
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
             }
@@ -263,9 +296,9 @@ class AddEditNoteActivity : AppCompatActivity() {
         backButton.setOnClickListener {
             goToMain()
         }
-        viewModal.allTags.observe(this,{
-            Log.d(TAG, "onCreate: $it")
-        })
+
+
+
 
         deleteButton.setOnClickListener {
             if(noteType == "Edit"){
@@ -329,6 +362,27 @@ class AddEditNoteActivity : AppCompatActivity() {
         }
     }
 
+    private fun loadSpinner() {
+
+        tagSpinner.apply {
+            adapter = tagList?.let { TagSpinnerAdapter(context , it) }
+
+
+            onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                   noteDescriptionEdit.append(tagList?.get(p2)?.tagTitle)
+                    val tag : Tag = adapter.getItem(p2) as Tag
+                    Log.d(TAG, "onItemSelected: $p2")
+                    noteDescriptionEdit.append(tag.tagTitle)
+                    Log.d(TAG, "onItemSelected: ${tagList?.get(p2)?.tagTitle}")
+                }
+
+                override fun onNothingSelected(p0: AdapterView<*>?) {
+                }
+
+            }
+        }
+    }
     private fun setBgColor(){
         val window = window
 
@@ -411,6 +465,8 @@ class AddEditNoteActivity : AppCompatActivity() {
         val intent = Intent(this@AddEditNoteActivity,MainActivity::class.java)
         startActivity(intent)
     }
+
+
 
 
 }

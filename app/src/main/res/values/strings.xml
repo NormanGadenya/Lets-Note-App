@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Lets note</string>
     <string name="timeStamp"> Edited on %1$s at %2$s</string>
+    <string name="createNewTag">Create #%1$s</string>
     <string name="title_activity_main2">MainActivity2</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
