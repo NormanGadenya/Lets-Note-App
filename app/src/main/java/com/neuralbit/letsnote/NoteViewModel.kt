@@ -10,8 +10,10 @@ import java.util.*
 
 class NoteViewModel(application : Application) : AndroidViewModel(application) {
     var allNotes: LiveData<List<Note>>
+    var allTags: LiveData<List<Tag>>
     val TAG = "NoteViewModel"
     val repo : NoteRepo
+    val tagRepo : TagRepo
     var texChange = false
     var texChanged = MutableLiveData<Boolean>()
     var deleted = false
@@ -29,19 +31,24 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     var wordEnd : MutableLiveData<Int>
     var noteDescString : MutableLiveData<String>
     var newTagTyped : MutableLiveData<Boolean>
+    var backPressed : MutableLiveData<Boolean>
+
     init{
 
         val dao = NoteDatabase.getDatabase(application).getNotesDao()
+        val tagDao = NoteDatabase.getDatabase(application).getTagDao()
         repo= NoteRepo(dao)
+        tagRepo = TagRepo(tagDao)
         allNotes = repo.allNotes
         archivedNote = repo.archivedNotes
         pinnedNotes = repo.pinnedNotes
+        allTags = tagRepo.allTags
         searchQurery = MutableLiveData<String>()
         wordStart = MutableLiveData()
         wordEnd = MutableLiveData()
         noteDescString = MutableLiveData()
         newTagTyped = MutableLiveData()
-
+        backPressed = MutableLiveData()
     }
 
     fun getTagString(text: String){
@@ -121,6 +128,14 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
 
     fun removePin(id:PinnedNote) = viewModelScope.launch(Dispatchers.IO){
         repo.deletePinned(id)
+    }
+
+    fun addTag(tag : Tag) = viewModelScope.launch(Dispatchers.IO){
+        tagRepo.insert(tag)
+    }
+
+    fun deleteTag(tag : Tag) = viewModelScope.launch(Dispatchers.IO){
+        tagRepo.delete(tag)
     }
 
 }

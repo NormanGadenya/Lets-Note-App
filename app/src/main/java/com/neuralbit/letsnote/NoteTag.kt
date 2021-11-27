@@ -1,4 +1,4 @@
-package com.neuralbit.letsnote.ui
+package com.neuralbit.letsnote
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

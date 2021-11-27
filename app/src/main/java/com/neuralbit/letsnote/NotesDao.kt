@@ -26,6 +26,14 @@ interface NotesDao {
     @Delete
     suspend fun deletePinned(noteId : PinnedNote)
 
+    @Insert(onConflict= OnConflictStrategy.IGNORE )
+    suspend fun insertTag(tag:Tag)
+
+    @Delete
+    suspend fun deleteTag(tag: Tag)
+
+    @Query("select * from TagTable")
+    fun getTags(): LiveData<List<Tag>>
 
 
     @Query("Select * from NotesTable where not exists (select * from ArchivedNotesTable where ArchivedNotesTable.id = NotesTable.id) and not exists (select * from PinnedNotesTable where PinnedNotesTable.id= NotesTable.id) order by timeStamp DESC")

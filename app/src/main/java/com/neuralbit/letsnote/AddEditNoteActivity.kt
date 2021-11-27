@@ -35,6 +35,7 @@ class AddEditNoteActivity : AppCompatActivity() {
     private lateinit var noteTitleEdit : EditText
     private lateinit var noteDescriptionEdit : EditText
     private var noteID = -1
+    private var tagID = -1
     private lateinit var viewModal :NoteViewModel
     private lateinit var noteType : String
     private lateinit var allNotes : List<Note>
@@ -54,6 +55,7 @@ class AddEditNoteActivity : AppCompatActivity() {
     private var tagString : String ? = null
     private lateinit var newTagButton : Button
     private var newTagTyped = false
+    private var backPressed  = false
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -142,13 +144,18 @@ class AddEditNoteActivity : AppCompatActivity() {
 //            }
         })
 
+        viewModal.backPressed.observe(this,{
+            backPressed = it
+        })
+
         viewModal.wordStart.observe(this,{
             wordStart = it
-
         })
+
         viewModal.noteDescString.observe(this,{
             if(newTagTyped){
                 if(it!=null){
+                    tagString = it
                     newTagButton.text=it
                     newTagButton.visibility = VISIBLE
                 }
@@ -158,7 +165,8 @@ class AddEditNoteActivity : AppCompatActivity() {
             }
 
         })
-
+        
+        
         noteTitleEdit.addTextChangedListener(object : TextWatcher{
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
             }
@@ -184,19 +192,21 @@ class AddEditNoteActivity : AppCompatActivity() {
                     viewModal.noteChanged(true)
                 }
 
+                if(!backPressed){
+                    if(p0?.get(p0.length - 1) == '#'){
+                        viewModal.wordStart.value = p0.length
+                        viewModal.newTagTyped.value = true
+                    }
 
-                if(p0?.get(p0.length - 1) == '#'){
-                    viewModal.wordStart.value = p0.length
-                    viewModal.newTagTyped.value = true
-                }
-
-                if(wordStart> 0) {
-                    viewModal.wordEnd.value = p0?.length
-                    viewModal.getTagString(p0.toString())
+                    if(wordStart> 0) {
+                        viewModal.wordEnd.value = p0?.length
+                        viewModal.getTagString(p0.toString())
 
 
-                    if(p0?.get(p0.length - 1) == ' '){
-                        viewModal.newTagTyped.value = false
+                        if(p0?.get(p0.length - 1) == ' '){
+                            viewModal.newTagTyped.value = false
+
+                        }
 
                     }
 
@@ -210,7 +220,24 @@ class AddEditNoteActivity : AppCompatActivity() {
             }
         })
 
+        noteDescriptionEdit.setOnKeyListener(object : View.OnKeyListener{
+            override fun onKey(p0: View?, p1: Int, p2: KeyEvent?): Boolean {
+                if(p1 == KeyEvent.KEYCODE_DEL){
+                    viewModal.backPressed.value = true
+                }else{
+                    viewModal.backPressed.value = false
+                }
+                return false
+            }
 
+        })
+        
+        newTagButton.setOnClickListener {
+            if (tagString != null) {
+                viewModal.addTag(Tag(tagString!!))
+
+            }
+        }
 
         viewModal.texChanged.observe(this,{
             textChanged= it
@@ -236,6 +263,9 @@ class AddEditNoteActivity : AppCompatActivity() {
         backButton.setOnClickListener {
             goToMain()
         }
+        viewModal.allTags.observe(this,{
+            Log.d(TAG, "onCreate: $it")
+        })
 
         deleteButton.setOnClickListener {
             if(noteType == "Edit"){
