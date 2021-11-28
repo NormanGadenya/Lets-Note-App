@@ -2,7 +2,6 @@ package com.neuralbit.letsnote
 
 import android.content.Intent
 import android.graphics.Color
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -14,20 +13,17 @@ import android.view.View.VISIBLE
 import android.view.WindowManager
 import android.widget.*
 import androidx.appcompat.app.ActionBar
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
+import com.teamwork.autocomplete.MultiAutoComplete
+import com.teamwork.autocomplete.adapter.AutoCompleteTypeAdapter
+import com.teamwork.autocomplete.adapter.OnTokensChangedListener
+import com.teamwork.autocomplete.tokenizer.PrefixTokenizer
+import com.teamwork.autocomplete.view.MultiAutoCompleteEditText
 import java.util.*
-import androidx.core.graphics.drawable.DrawableCompat
-
-import androidx.appcompat.content.res.AppCompatResources
-import androidx.room.util.StringUtil
-import com.neuralbit.letsnote.databinding.ActivityAddEditNoteBinding
-import java.lang.StringBuilder
-import java.lang.reflect.Array
-import android.widget.ArrayAdapter
-
-
-
 
 
 class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedListener  {
@@ -38,7 +34,7 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
     private lateinit var backButton: ImageButton
     private lateinit var pinButton: ImageButton
     private lateinit var noteTitleEdit : EditText
-    private lateinit var noteDescriptionEdit : EditText
+    private lateinit var noteDescriptionEdit : MultiAutoCompleteEditText
     private var noteID = -1
     private var tagID = -1
     private lateinit var viewModal :NoteViewModel
@@ -58,10 +54,10 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
     private var wordStart = 0
     private var wordEnd = 0
     private var tagString : String ? = null
-    private lateinit var newTagButton : Button
+//    private lateinit var newTagButton : Button
     private var newTagTyped = false
     private var backPressed  = false
-    private lateinit var tagSpinner :Spinner
+//    private lateinit var tagSpinner :Spinner
     private var tagList : List<Tag> ? = null
 
 
@@ -97,9 +93,9 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
         backButton = findViewById(R.id.backButton)
         archiveButton = findViewById(R.id.archiveButton)
         restoreButton = findViewById(R.id.restoreButton)
-        newTagButton = findViewById(R.id.newTagBtn)
-        tagSpinner = findViewById(R.id.tagSpinner)
-        tagSpinner.onItemSelectedListener = this
+//        newTagButton = findViewById(R.id.newTagBtn)
+//        tagSpinner = findViewById(R.id.tagSpinner)
+//        tagSpinner.onItemSelectedListener = this
 
 //        val evColor = findViewById<ImageButton>(R.id.evBackground)
 //        val woColor = findViewById<ImageButton>(R.id.wOrchidBackground)
@@ -120,6 +116,9 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
         if(noteColor!=null){
             setBgColor()
         }
+        val ls = arrayListOf("#James","#Peter","#Clark")
+
+
         when (noteType) {
             "Edit" -> {
                 val noteTitle = intent.getStringExtra("noteTitle")
@@ -165,28 +164,50 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
         viewModal.noteDescString.observe(this,{ noteDescStr ->
             if(newTagTyped){
 
-                viewModal.filterList().observe(this,{
-                    if (it.isEmpty()){
-                        tagSpinner.visibility = GONE
-                        newTagButton.visibility = VISIBLE
+                viewModal.allTags.observe(this,{
+                    
+                    var adpter : AutoCompleteTypeAdapter<Tag> = AutoCompleteTypeAdapter.Build.from(TagViewBinder(),TagTokenFilter())
+                    it?.let { adpter.setItems(it) }
+                    var multiAutoComplete = MultiAutoComplete.Builder()
+                        .tokenizer(PrefixTokenizer('#'))
+                        .addTypeAdapter(adpter)
+                        .build()
+                    multiAutoComplete.onViewAttached(noteDescriptionEdit)
+                    var tag = Tag(noteDescStr)
+                    if(tag in it){
+                        Log.d(TAG, "onCreate: yes")
                     }else{
-                        tagSpinner.visibility = VISIBLE
-                        loadSpinner()
-                        newTagButton.visibility = GONE
+                        viewModal.addTag(tag)
+
+//                        if(noteDescStr[noteDescStr.length -1]==' '){
+//                           tag= Tag(noteDescStr.substring(0,noteDescStr.length-1))
+//                            viewModal.newTagTyped.value = false
+//#
+//                        }
                     }
-                    tagList = it
-
-
                 })
+//                viewModal.filterList().observe(this,{
+////                    if (it.isEmpty()){
+////                        tagSpinner.visibility = GONE
+////                        newTagButton.visibility = VISIBLE
+////                    }else{
+////                        tagSpinner.visibility = VISIBLE
+////                        loadSpinner()
+////                        newTagButton.visibility = GONE
+////                    }
+//                    tagList = it
+//
+//
+//                })
 
                 if(noteDescStr!=null){
                     tagString = noteDescStr
-                    newTagButton.text= getString(R.string.createNewTag,noteDescStr)
+//                    newTagButton.text= getString(R.string.createNewTag,noteDescStr)
 
 //                    newTagButton.visibility = VISIBLE
                 }
             }else{
-                newTagButton.visibility = GONE
+//                newTagButton.visibility = GONE
 
             }
 
@@ -277,12 +298,12 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
 
         })
         
-        newTagButton.setOnClickListener {
-            if (tagString != null) {
-                viewModal.addTag(Tag(tagString!!))
-                viewModal.newTagTyped.value =false
-            }
-        }
+//        newTagButton.setOnClickListener {
+//            if (tagString != null) {
+//                viewModal.addTag(Tag(tagString!!))
+//                viewModal.newTagTyped.value =false
+//            }
+//        }
 
         viewModal.texChanged.observe(this,{
             textChanged= it
@@ -372,28 +393,28 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
         }
     }
 
-    private fun loadSpinner() {
-
-        tagSpinner.apply {
-            adapter = tagList?.let { TagSpinnerAdapter(context , it) }
-
-
-            onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                    val tag : Tag = adapter.getItem(p2) as Tag
-                    Log.d(TAG, "onItemSelected: $p3")
-                    noteDescriptionEdit.append(tag.tagTitle)
-                    Log.d(TAG, "onItemSelected: ${tagList?.get(p2)?.tagTitle}")
-                }
-
-                override fun onNothingSelected(p0: AdapterView<*>?) {
-
-                }
-
-            }
-        }
-
-    }
+//    private fun loadSpinner() {
+//
+//        tagSpinner.apply {
+//            adapter = tagList?.let { TagSpinnerAdapter(context , it) }
+//
+//
+//            onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+//                override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+//                    val tag : Tag = adapter.getItem(p2) as Tag
+//                    Log.d(TAG, "onItemSelected: $p3")
+//                    noteDescriptionEdit.append(tag.tagTitle)
+//                    Log.d(TAG, "onItemSelected: ${tagList?.get(p2)?.tagTitle}")
+//                }
+//
+//                override fun onNothingSelected(p0: AdapterView<*>?) {
+//
+//                }
+//
+//            }
+//        }
+//
+//    }
     private fun setBgColor(){
         val window = window
 

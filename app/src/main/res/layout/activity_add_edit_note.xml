@@ -24,13 +24,15 @@
             app:layout_constraintTop_toTopOf="parent"
             />
 
-        <EditText
+        <com.teamwork.autocomplete.view.MultiAutoCompleteEditText
             android:id="@+id/noteEditDesc"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:hint="Note content"
             android:inputType="textMultiLine"
             android:paddingTop="8dp"
+            android:completionThreshold="1"
+            android:completionHint="Create new Tag"
             android:paddingBottom="8dp"
             android:background="@android:color/transparent"
             app:layout_constraintStart_toStartOf="parent"

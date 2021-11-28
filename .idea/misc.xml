@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="../../../../layout/custom_preview.xml" value="0.25" />
         <entry key="app/src/main/res/drawable/apricot_tag.xml" value="0.22291666666666668" />
         <entry key="app/src/main/res/drawable/celadon_tag.xml" value="0.22291666666666668" />
         <entry key="app/src/main/res/drawable/eng_violet_tag.xml" value="0.22291666666666668" />
