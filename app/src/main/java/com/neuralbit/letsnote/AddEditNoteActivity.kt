@@ -173,19 +173,28 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
                         .addTypeAdapter(adpter)
                         .build()
                     multiAutoComplete.onViewAttached(noteDescriptionEdit)
-                    var tag = Tag(noteDescStr)
-                    if(tag in it){
-                        Log.d(TAG, "onCreate: yes")
-                    }else{
-                        viewModal.addTag(tag)
 
-//                        if(noteDescStr[noteDescStr.length -1]==' '){
-//                           tag= Tag(noteDescStr.substring(0,noteDescStr.length-1))
-//                            viewModal.newTagTyped.value = false
-//#
-//                        }
+                    if(noteDescStr.isNotEmpty()){
+                        if(noteDescStr.length >=2){
+
+                            if(noteDescStr[noteDescStr.length-1]== ' '){
+                                val tag = Tag(noteDescStr.substring(0,noteDescStr.length-1))
+                                if(tag in it){
+                                    Log.d(TAG, "onCreate: yes")
+                                }else{
+                                    Log.d(TAG, "onCreate: no")
+
+                                    viewModal.addTag(tag)
+                                }
+                            }
+
+                        }
                     }
+
+
                 })
+
+                //TODO link notes to tags
 //                viewModal.filterList().observe(this,{
 ////                    if (it.isEmpty()){
 ////                        tagSpinner.visibility = GONE
