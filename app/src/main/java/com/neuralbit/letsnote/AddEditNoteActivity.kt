@@ -17,6 +17,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.HORIZONTAL
 import com.google.android.material.snackbar.Snackbar
 import com.teamwork.autocomplete.MultiAutoComplete
 import com.teamwork.autocomplete.adapter.AutoCompleteTypeAdapter
@@ -59,6 +62,7 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
     private var backPressed  = false
 //    private lateinit var tagSpinner :Spinner
     private var tagList : ArrayList<Tag> = ArrayList()
+    private lateinit var tagListRV : RecyclerView
 
 
     override fun onCreate(savedInstanceState: Bundle?)  {
@@ -72,6 +76,13 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
         supportActionBar?.setCustomView(R.layout.note_action_bar)
         noteDescriptionEdit = findViewById(R.id.noteEditDesc)
         tvTimeStamp = findViewById(R.id.tvTimeStamp)
+        tagListRV = findViewById(R.id.tagListRV)
+        val layoutManager = LinearLayoutManager(applicationContext,LinearLayoutManager.HORIZONTAL,false)
+        layoutManager.orientation = HORIZONTAL
+        val tagListAdapter = TagRVAdapter(applicationContext)
+        tagListRV.layoutManager= layoutManager
+        tagListRV.adapter = tagListAdapter
+
         viewModal = ViewModelProvider(
             this,
             ViewModelProvider.AndroidViewModelFactory.getInstance(application)
@@ -115,7 +126,6 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
         if(noteColor!=null){
             setBgColor()
         }
-        val ls = arrayListOf("#James","#Peter","#Clark")
 
 
         when (noteType) {
@@ -183,7 +193,8 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
                                     viewModal.addTag(tag)
                                 }
                                 viewModal.addTagToList(tag)
-                                Log.d(TAG, "onCreate: mas ${viewModal.tagList}")
+                                Log.d(TAG, "onCreatess: ${viewModal.tagList}")
+                                tagListAdapter.updateList(viewModal.tagList)
                             }
 
                         }

@@ -84,7 +84,13 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
 
-
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/tagListRV"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/addTag" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
