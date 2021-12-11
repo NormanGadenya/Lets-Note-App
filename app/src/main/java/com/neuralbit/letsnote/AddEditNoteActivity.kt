@@ -58,7 +58,7 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
     private var newTagTyped = false
     private var backPressed  = false
 //    private lateinit var tagSpinner :Spinner
-    private var tagList : List<Tag> ? = null
+    private var tagList : ArrayList<Tag> = ArrayList()
 
 
     override fun onCreate(savedInstanceState: Bundle?)  {
@@ -107,7 +107,6 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
         coordinatorlayout = findViewById(R.id.coordinatorlayout)
         pinButton = findViewById(R.id.pinButton)
 
-        //TODO fix spinner and add tag functionality
         noteType = intent.getStringExtra("noteType").toString()
         archived = intent.getBooleanExtra("archivedNote",false)
         viewModal.Archive(archived)
@@ -160,7 +159,8 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
         viewModal.wordStart.observe(this,{
             wordStart = it
         })
-
+        
+        
         viewModal.noteDescString.observe(this,{ noteDescStr ->
             if(newTagTyped){
 
@@ -179,13 +179,11 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
 
                             if(noteDescStr[noteDescStr.length-1]== ' '){
                                 val tag = Tag(noteDescStr.substring(0,noteDescStr.length-1))
-                                if(tag in it){
-                                    Log.d(TAG, "onCreate: yes")
-                                }else{
-                                    Log.d(TAG, "onCreate: no")
-
+                                if(tag !in it){
                                     viewModal.addTag(tag)
                                 }
+                                viewModal.addTagToList(tag)
+                                Log.d(TAG, "onCreate: mas ${viewModal.tagList}")
                             }
 
                         }
@@ -195,19 +193,6 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
                 })
 
                 //TODO link notes to tags
-//                viewModal.filterList().observe(this,{
-////                    if (it.isEmpty()){
-////                        tagSpinner.visibility = GONE
-////                        newTagButton.visibility = VISIBLE
-////                    }else{
-////                        tagSpinner.visibility = VISIBLE
-////                        loadSpinner()
-////                        newTagButton.visibility = GONE
-////                    }
-//                    tagList = it
-//
-//
-//                })
 
                 if(noteDescStr!=null){
                     tagString = noteDescStr
@@ -225,21 +210,6 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
             Log.d(TAG, "onCreate: $it")
         })
 
-//        viewModal.filterList().observe(this,{
-//            if (it.isEmpty()){
-//                tagSpinner.visibility = GONE
-//                newTagButton.visibility = VISIBLE
-//            }else{
-//
-//                tagSpinner.visibility = VISIBLE
-//
-//                newTagButton.visibility = GONE
-//            }
-//            tagList = it as ArrayList<Tag>
-//
-//            loadSpinner()
-//
-//        })
 
         noteTitleEdit.addTextChangedListener(object : TextWatcher{
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {

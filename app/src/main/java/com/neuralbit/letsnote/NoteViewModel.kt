@@ -7,6 +7,7 @@ import com.neuralbit.letsnote.databinding.FragmentAllNotesBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
+import kotlin.collections.ArrayList
 
 class NoteViewModel(application : Application) : AndroidViewModel(application) {
     var allNotes: LiveData<List<Note>>
@@ -32,6 +33,7 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     var noteDescString : MutableLiveData<String>
     var newTagTyped : MutableLiveData<Boolean>
     var backPressed : MutableLiveData<Boolean>
+    var tagList : ArrayList<Tag>
 
     init{
 
@@ -49,6 +51,7 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         noteDescString = MutableLiveData()
         newTagTyped = MutableLiveData()
         backPressed = MutableLiveData()
+        tagList = ArrayList<Tag>()
     }
 
     fun getTagString(text: String){
@@ -56,6 +59,14 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         noteDescString.value = text.substring(wordStart.value!!, wordEnd.value!!)
 
 
+    }
+
+    fun addTagToList(tag : Tag) {
+
+        if (!tagList.contains(tag)){
+            tagList.add(tag)
+
+        }
     }
 
 
@@ -72,10 +83,10 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         }
     }
     private fun filterLiveList(list: List<Tag>, text : String? ): List<Tag>{
-        var newList = ArrayList<Tag>()
+        val newList = ArrayList<Tag>()
 
         return if(text!=null){
-            var textLower= text.toLowerCase()
+            val textLower= text.toLowerCase()
             for ( tag in list){
 
                 if(tag.tagTitle.toLowerCase().contains(textLower)  ){
