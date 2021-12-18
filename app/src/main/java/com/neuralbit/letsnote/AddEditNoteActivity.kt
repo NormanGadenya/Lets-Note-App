@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.HORIZONTAL
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.teamwork.autocomplete.MultiAutoComplete
 import com.teamwork.autocomplete.adapter.AutoCompleteTypeAdapter
@@ -78,6 +79,7 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
         tvTimeStamp = findViewById(R.id.tvTimeStamp)
         tagListRV = findViewById(R.id.tagListRV)
         val layoutManager = LinearLayoutManager(applicationContext,LinearLayoutManager.HORIZONTAL,false)
+
         layoutManager.orientation = HORIZONTAL
         val tagListAdapter = TagRVAdapter(applicationContext)
         tagListRV.layoutManager= layoutManager
@@ -278,11 +280,7 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
 
         noteDescriptionEdit.setOnKeyListener(object : View.OnKeyListener{
             override fun onKey(p0: View?, p1: Int, p2: KeyEvent?): Boolean {
-                if(p1 == KeyEvent.KEYCODE_DEL){
-                    viewModal.backPressed.value = true
-                }else{
-                    viewModal.backPressed.value = false
-                }
+                viewModal.backPressed.value = p1 == KeyEvent.KEYCODE_DEL
                 return false
             }
 
@@ -295,25 +293,25 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
 //            }
 //        }
 
-        viewModal.texChanged.observe(this,{
-            textChanged= it
-        })
-        viewModal.delete.observe(this, {
+        viewModal.texChanged.observe(this) {
+            textChanged = it
+        }
+        viewModal.delete.observe(this) {
             deletable = it
-        })
-        viewModal.archive.observe(this, {
-            if(archived){
+        }
+        viewModal.archive.observe(this) {
+            if (archived) {
                 pinButton.visibility = GONE
                 archiveButton.visibility = GONE
                 restoreButton.visibility = VISIBLE
                 tagContainer.visibility = GONE
-            }else{
+            } else {
                 pinButton.visibility = VISIBLE
                 archiveButton.visibility = VISIBLE
                 restoreButton.visibility = GONE
                 tagContainer.visibility = VISIBLE
             }
-        })
+        }
 
 
         backButton.setOnClickListener {
