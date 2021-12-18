@@ -453,14 +453,14 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
         if(!deletable){
             if(textChanged){
                 if(noteType == "Edit"){
-                    if(noteTitle.isNotEmpty() && noteDescription.isNotEmpty()){
+                    if(noteTitle.isNotEmpty() || noteDescription.isNotEmpty()){
                         val updateNote = Note(noteTitle,noteDescription,currentDate)
                         updateNote.id = noteID
                         viewModal.updateNote(updateNote)
                         Toast.makeText(this,"Note updated .. " , Toast.LENGTH_SHORT).show()
                     }
                 }else{
-                    if(noteTitle.isNotEmpty() && noteDescription.isNotEmpty()){
+                    if(noteTitle.isNotEmpty() || noteDescription.isNotEmpty()){
                         viewModal.addNote((Note(noteTitle,noteDescription,currentDate )))
                         Toast.makeText(this,"Note added .. " , Toast.LENGTH_SHORT).show()
 

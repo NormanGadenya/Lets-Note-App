@@ -24,7 +24,7 @@ class TagRVAdapter (val context: Context) : RecyclerView.Adapter<TagRVAdapter.Vi
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         Log.d(TAG, "onBindViewHolder: $allTags")
         val tagTitle = allTags[position].tagTitle
-        holder.tagTitle.text = tagTitle
+        holder.tagTitle.text = context.getString(R.string.tagTitle,tagTitle)
     }
 
     override fun getItemCount(): Int {

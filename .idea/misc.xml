@@ -12,9 +12,10 @@
         <entry key="app/src/main/res/drawable/ic_baseline_bookmark_24.xml" value="0.353125" />
         <entry key="app/src/main/res/drawable/ic_ev_24.xml" value="0.353125" />
         <entry key="app/src/main/res/drawable/main_tool_back.xml" value="0.33" />
+        <entry key="app/src/main/res/drawable/tag_background.xml" value="0.1975" />
         <entry key="app/src/main/res/drawable/white_tag.xml" value="0.353125" />
         <entry key="app/src/main/res/drawable/wild_orchid_tag.xml" value="0.22291666666666668" />
-        <entry key="app/src/main/res/layout/activity_add_edit_note.xml" value="0.5" />
+        <entry key="app/src/main/res/layout/activity_add_edit_note.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_main2.xml" value="0.3697916666666667" />
         <entry key="app/src/main/res/layout/app_bar_main.xml" value="0.33" />
@@ -32,7 +33,7 @@
         <entry key="app/src/main/res/layout/note_action_bar.xml" value="0.5" />
         <entry key="app/src/main/res/layout/note_rv_item.xml" value="0.27977315689981097" />
         <entry key="app/src/main/res/layout/spinner_tag_row.xml" value="0.3328125" />
-        <entry key="app/src/main/res/layout/tag_adapter_item.xml" value="0.3328125" />
+        <entry key="app/src/main/res/layout/tag_adapter_item.xml" value="0.5" />
         <entry key="app/src/main/res/layout/tag_item.xml" value="0.3328125" />
         <entry key="app/src/main/res/layout/tag_notes_fragment.xml" value="0.22864583333333333" />
         <entry key="app/src/main/res/layout/tag_spinner_row.xml" value="0.3328125" />

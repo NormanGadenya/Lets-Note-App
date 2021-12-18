@@ -61,7 +61,9 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
             var textLower= text.toLowerCase()
             for ( note in list){
 
-                if(note.title.toLowerCase().contains(textLower) || note.description.toLowerCase().contains(textLower) ){
+                if(note.title?.toLowerCase()?.contains(textLower) == true || note.description?.toLowerCase()
+                        ?.contains(textLower) == true
+                ){
                     newList.add(note)
                 }
             }

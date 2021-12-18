@@ -34,10 +34,10 @@ class NoteRVAdapter (
         var title = allNotes[position].title
         var desc = allNotes[position].description
 //        var noteColor : String? = allNotes[position].tagColor
-        if (title.length >20 ){
+        if (title?.length!! >20 ){
             title = title.substring(0,15)+"..."
         }
-         if ( desc.length > 250){
+         if ( desc?.length !!> 250){
              desc= desc.substring(0,250) + "..."
          }
 
