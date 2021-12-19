@@ -15,6 +15,7 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     val TAG = "NoteViewModel"
     val repo : NoteRepo
     val tagRepo : TagRepo
+    val noteTagRepo : NoteTagRepo
     var texChange = false
     var texChanged = MutableLiveData<Boolean>()
     var deleted = false
@@ -39,8 +40,10 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
 
         val dao = NoteDatabase.getDatabase(application).getNotesDao()
         val tagDao = NoteDatabase.getDatabase(application).getTagDao()
+        val noteTagDao = NoteDatabase.getDatabase(application).getNoteTagDao()
         repo= NoteRepo(dao)
         tagRepo = TagRepo(tagDao)
+        noteTagRepo = NoteTagRepo(noteTagDao)
         allNotes = repo.allNotes
         archivedNote = repo.archivedNotes
         pinnedNotes = repo.pinnedNotes
@@ -55,11 +58,10 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     }
 
     fun getTagString(text: String){
-
         noteDescString.value = text.substring(wordStart.value!!, wordEnd.value!!)
 
-
     }
+
 
     fun addTagToList(tag : Tag) {
 
@@ -149,6 +151,17 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
 
     fun deleteTag(tag : Tag) = viewModelScope.launch(Dispatchers.IO){
         tagRepo.delete(tag)
+    }
+
+    fun insertNoteTagCrossRef(crossRef: NoteTagCrossRef) = viewModelScope.launch(Dispatchers.IO){
+        noteTagRepo.insertNoteTagCrossRef(crossRef)
+    }
+
+    fun getNotesWithTag(tagID : Int) = viewModelScope.launch(Dispatchers.IO){
+        noteTagRepo.getNotesWithTag(tagID)
+    }
+    fun getTagsWithNote(noteID : Int) = viewModelScope.launch(Dispatchers.IO){
+        noteTagRepo.getTagsWithNote(noteID)
     }
 
 }

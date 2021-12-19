@@ -20,11 +20,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.HORIZONTAL
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.teamwork.autocomplete.MultiAutoComplete
 import com.teamwork.autocomplete.adapter.AutoCompleteTypeAdapter
-import com.teamwork.autocomplete.adapter.OnTokensChangedListener
 import com.teamwork.autocomplete.tokenizer.PrefixTokenizer
 import com.teamwork.autocomplete.view.MultiAutoCompleteEditText
 import java.util.*
@@ -330,7 +328,7 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
                     viewModal.removePin(pinnedNote)
                 }
                 for ( note in allNotes) {
-                    if (note.id == noteID) {
+                    if (note.noteID == noteID) {
                         viewModal.deleteNote(note)
                     }
                 }
@@ -453,7 +451,7 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
                 if(noteType == "Edit"){
                     if(noteTitle.isNotEmpty() || noteDescription.isNotEmpty()){
                         val updateNote = Note(noteTitle,noteDescription,currentDate)
-                        updateNote.id = noteID
+                        updateNote.noteID = noteID
                         viewModal.updateNote(updateNote)
                         Toast.makeText(this,"Note updated .. " , Toast.LENGTH_SHORT).show()
                     }

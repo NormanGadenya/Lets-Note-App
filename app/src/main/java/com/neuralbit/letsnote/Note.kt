@@ -14,6 +14,6 @@ class Note(
 )
 {
     @PrimaryKey(autoGenerate = true)
-    var id=0
+    var noteID=0
     }
 

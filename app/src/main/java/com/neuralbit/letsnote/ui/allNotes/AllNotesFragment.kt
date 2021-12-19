@@ -2,22 +2,18 @@ package com.neuralbit.letsnote.ui.allNotes
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.neuralbit.letsnote.*
 import com.neuralbit.letsnote.databinding.FragmentAllNotesBinding
-import org.w3c.dom.Text
 
 class AllNotesFragment : Fragment() , NoteClickInterface {
 
@@ -110,7 +106,7 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
         intent.putExtra("noteType","Edit")
         intent.putExtra("noteTitle",note.title)
         intent.putExtra("noteDescription",note.description)
-        intent.putExtra("noteID",note.id)
+        intent.putExtra("noteID",note.noteID)
 //        intent.putExtra("noteColor",note.tagColor)
         intent.putExtra("noteTimeStamp",note.timeStamp )
         if(note in pinnedNotes ){

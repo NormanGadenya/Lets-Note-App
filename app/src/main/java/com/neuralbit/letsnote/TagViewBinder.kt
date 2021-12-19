@@ -10,7 +10,7 @@ class TagViewBinder : AutoCompleteViewBinder<Tag> {
     val TAG = TagViewBinder::class.simpleName
     override fun getItemId(item: Tag): Long {
         try {
-            return item.id.toLong()
+            return item.tagID.toLong()
         }catch (e : Exception) {
             Log.e(TAG, "getItemId: ",e )
         }

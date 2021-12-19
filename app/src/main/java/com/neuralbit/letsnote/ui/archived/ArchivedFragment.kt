@@ -5,12 +5,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.neuralbit.letsnote.*
@@ -70,7 +66,7 @@ class ArchivedFragment : Fragment() , NoteClickInterface {
 //        intent.putExtra("noteColor",note.tagColor)
         intent.putExtra("noteTitle",note.title)
         intent.putExtra("noteDescription",note.description)
-        intent.putExtra("noteID",note.id)
+        intent.putExtra("noteID",note.noteID)
         intent.putExtra("noteTimeStamp",note.timeStamp )
         if(note in pinnedNotes ){
             intent.putExtra("pinnedNote",true)

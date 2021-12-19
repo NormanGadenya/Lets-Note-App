@@ -11,5 +11,5 @@ data class Tag (
     ){
 
     @PrimaryKey(autoGenerate = true)
-    var id=0
+    var tagID=0
 }
