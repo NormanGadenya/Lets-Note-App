@@ -69,6 +69,7 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
     private lateinit var tagListRV : RecyclerView
     private  var lastNoteID : Int = 0
     private var isKeyBoardShowing = false
+    private var deletedTag = ArrayList<String>()
 
 
     @RequiresApi(Build.VERSION_CODES.M)
@@ -162,7 +163,7 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
         noteColor = intent.getStringExtra("noteColor")
         if(noteColor!=null){
             setBgColor()
-        }
+         }
         viewModal.pinned.observe(this){
             if (it){
                 pinButton.setImageResource(R.drawable.ic_baseline_push_pin_24)
@@ -286,14 +287,26 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
         })
         noteDescriptionEdit.addTextChangedListener(object : TextWatcher{
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                val changedString =p0.toString()
+                if (backPressed){
+                    val str = p0.toString().split(" ")
+                    Log.d(TAG, "beforeTextChanged: ${viewModal.tagList}")
+                    val delString = str[str.size-1]
+                    if(delString[0] == '#'){
+                        if(!deletedTag.contains(delString)){
+                            deletedTag.add(delString)
+
+                        }
+                    }
+
+                    Log.d(TAG, "onTextChanged: ${str[str.size-1]} & $str")
+                }
             }
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 if(p3>0){
                     viewModal.noteChanged(true)
                 }
-
+                var str : List<String> = ArrayList<String>()
                 if(!backPressed){
                     if(p0?.get(p0.length - 1) == '#'){
                         viewModal.wordStart.value = p0.length
@@ -306,10 +319,13 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
 
                         if(p0?.get(p0.length - 1) == ' '){
                             viewModal.newTagTyped.value = false
-
                         }
 
+
                     }
+
+                }else{
+
 
                 }
 
@@ -496,6 +512,8 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
                         viewModal.insertNoteTagCrossRef(crossRef)
                     }
 
+                    Log.d(TAG, "saveNote: $deletedTag")
+
                 }
 
 
@@ -517,7 +535,7 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
         saveNote()
 
         val intent = Intent(this@AddEditNoteActivity,MainActivity::class.java)
-        startActivity(intent)
+//        startActivity(intent)
     }
 
     override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
