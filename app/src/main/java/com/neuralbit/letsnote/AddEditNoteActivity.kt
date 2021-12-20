@@ -71,6 +71,7 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface {
     private var isKeyBoardShowing = false
     private var deletedTag = ArrayList<String>()
     private var tagDeleted = false
+    private lateinit var tagListAdapter : TagRVAdapter
 
 
     override fun onCreate(savedInstanceState: Bundle?)  {
@@ -89,7 +90,7 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface {
         val layoutManager = LinearLayoutManager(applicationContext,LinearLayoutManager.HORIZONTAL,false)
 
         layoutManager.orientation = HORIZONTAL
-        val tagListAdapter = TagRVAdapter(applicationContext,this)
+         tagListAdapter= TagRVAdapter(applicationContext,this)
         tagListRV.layoutManager= layoutManager
         tagListRV.adapter = tagListAdapter
 
@@ -278,7 +279,13 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface {
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 if(p3>0){
                     viewModal.noteChanged(true)
+                    if(!tagListAdapter.deleteIgnored){
+                        tagListAdapter.deleteIgnored = true
+                        tagListAdapter.notifyDataSetChanged()
+
+                    }
                 }
+
             }
 
             override fun afterTextChanged(p0: Editable?) {
@@ -293,6 +300,12 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface {
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 if(p3>0){
                     viewModal.noteChanged(true)
+                    if(!tagListAdapter.deleteIgnored){
+                        tagListAdapter.deleteIgnored = true
+                        tagListAdapter.notifyDataSetChanged()
+
+                    }
+
                 }
                 var str : List<String> = ArrayList<String>()
                 if(!backPressed){
@@ -526,10 +539,13 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface {
 
     
 
-    override fun selectedTags(selectedTags: List<Tag>) {
-        for (t in selectedTags){
-            Log.d(TAG, "selectedTags: ${t.tagTitle}")
+    override fun deleteTag(tag: Tag) {
+        viewModal.tagList.remove(tag)
+        if (noteType == "Edit"){
+            viewModal.deleteNoteTagCrossRef(NoteTagCrossRef(noteID,tag.tagTitle))
         }
+        tagListAdapter.updateList(viewModal.tagList)
+
     }
 
 
