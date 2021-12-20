@@ -45,18 +45,31 @@
             android:id="@+id/view"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-
+            android:layout_marginBottom="16dp"
             android:background="@drawable/note_wrapper"
             app:layout_constraintBottom_toTopOf="@+id/tagListRV" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/tagListRV"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toTopOf="@id/tvTimeStamp"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintEnd_toStartOf="@+id/deleteTagBtn"
+            app:layout_constraintStart_toStartOf="parent" />
 
-            />
+        <Button
+            android:id="@+id/deleteTagBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:text="delete"
+            android:layout_marginTop="4dp"
+            android:backgroundTint="@android:color/holo_red_dark"
+            app:layout_constraintBottom_toTopOf="@+id/tvTimeStamp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/view" />
+
         <TextView
             android:id="@+id/tvTimeStamp"
             android:layout_width="match_parent"

@@ -32,9 +32,10 @@ import com.teamwork.autocomplete.tokenizer.PrefixTokenizer
 import com.teamwork.autocomplete.view.MultiAutoCompleteEditText
 import kotlinx.coroutines.launch
 import java.util.*
+import kotlin.collections.ArrayList
 
 
-class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedListener  {
+class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface {
     private lateinit var actionBarIcons: List<Int>
     private lateinit var restoreButton: ImageButton
     private lateinit var archiveButton: ImageButton
@@ -67,12 +68,11 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
     private var backPressed  = false
     private var tagList : ArrayList<Tag> = ArrayList()
     private lateinit var tagListRV : RecyclerView
-    private  var lastNoteID : Int = 0
     private var isKeyBoardShowing = false
     private var deletedTag = ArrayList<String>()
+    private var tagDeleted = false
 
 
-    @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?)  {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_edit_note)
@@ -89,7 +89,7 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
         val layoutManager = LinearLayoutManager(applicationContext,LinearLayoutManager.HORIZONTAL,false)
 
         layoutManager.orientation = HORIZONTAL
-        val tagListAdapter = TagRVAdapter(applicationContext)
+        val tagListAdapter = TagRVAdapter(applicationContext,this)
         tagListRV.layoutManager= layoutManager
         tagListRV.adapter = tagListAdapter
 
@@ -287,19 +287,7 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
         })
         noteDescriptionEdit.addTextChangedListener(object : TextWatcher{
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                if (backPressed){
-                    val str = p0.toString().split(" ")
-                    Log.d(TAG, "beforeTextChanged: ${viewModal.tagList}")
-                    val delString = str[str.size-1]
-                    if(delString[0] == '#'){
-                        if(!deletedTag.contains(delString)){
-                            deletedTag.add(delString)
 
-                        }
-                    }
-
-                    Log.d(TAG, "onTextChanged: ${str[str.size-1]} & $str")
-                }
             }
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
@@ -308,6 +296,7 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
                 }
                 var str : List<String> = ArrayList<String>()
                 if(!backPressed){
+                    tagDeleted = false
                     if(p0?.get(p0.length - 1) == '#'){
                         viewModal.wordStart.value = p0.length
                         viewModal.newTagTyped.value = true
@@ -323,9 +312,6 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
 
 
                     }
-
-                }else{
-
 
                 }
 
@@ -535,15 +521,15 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
         saveNote()
 
         val intent = Intent(this@AddEditNoteActivity,MainActivity::class.java)
-//        startActivity(intent)
+        startActivity(intent)
     }
 
-    override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-        TODO("Not yet implemented")
-    }
+    
 
-    override fun onNothingSelected(p0: AdapterView<*>?) {
-        TODO("Not yet implemented")
+    override fun selectedTags(selectedTags: List<Tag>) {
+        for (t in selectedTags){
+            Log.d(TAG, "selectedTags: ${t.tagTitle}")
+        }
     }
 
 

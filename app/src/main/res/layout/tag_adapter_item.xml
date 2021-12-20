@@ -3,14 +3,19 @@
     android:layout_width="wrap_content"
     android:layout_marginStart="8dp"
     android:layout_marginEnd="8dp"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="wrap_content"
+    android:clickable="true"
+    android:background="@drawable/tag_background"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:focusable="true">
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="8dp"
-        android:background="@drawable/tag_background"
+        android:text="#tag"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:id="@+id/tagTitle"/>
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>
