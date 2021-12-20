@@ -9,7 +9,6 @@
     tools:context=".AddEditNoteActivity">
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:padding="@dimen/activity_horizontal_margin"
         android:layout_height="match_parent">
         <EditText
             android:layout_width="match_parent"
@@ -17,6 +16,8 @@
             android:id="@+id/noteEditTitle"
             android:hint="@string/title"
             android:paddingTop="8dp"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
             android:paddingBottom="8dp"
             android:textSize="32sp"
             android:textStyle="bold"
@@ -28,54 +29,41 @@
             android:id="@+id/noteEditDesc"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:background="@android:color/transparent"
+            android:completionHint="Create new Tag"
+            android:completionThreshold="1"
             android:hint="Note content"
+            android:importantForAutofill="no"
             android:inputType="textMultiLine"
             android:paddingTop="8dp"
-            android:completionThreshold="1"
-            android:completionHint="Create new Tag"
             android:paddingBottom="8dp"
-            android:background="@android:color/transparent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/noteEditTitle"
-            android:importantForAutofill="no" />
+            app:layout_constraintTop_toBottomOf="@+id/noteEditTitle" />
 
-        <Button
-            android:id="@+id/newTagBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/tags"
-            android:backgroundTint="@color/Apricot"
-            android:visibility="gone"
-            android:textColor="@color/black"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/noteEditDesc" />
+        <View
+            android:id="@+id/view"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
 
+            android:background="@drawable/note_wrapper"
+            app:layout_constraintBottom_toTopOf="@+id/tagListRV" />
 
-
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/tagListRV"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/tagContainer"
-            app:layout_constraintBottom_toTopOf="@+id/tvTimeStamp">
+            app:layout_constraintBottom_toTopOf="@id/tvTimeStamp"
+            app:layout_constraintEnd_toEndOf="parent"
 
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/tagListRV"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-
-                />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-
+            />
         <TextView
             android:id="@+id/tvTimeStamp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="8dp"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>

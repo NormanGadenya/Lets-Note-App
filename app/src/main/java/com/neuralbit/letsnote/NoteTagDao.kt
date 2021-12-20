@@ -17,7 +17,7 @@ interface NoteTagDao {
 
     @Transaction
     @Query("select * from NotesTable where noteID = :noteID")
-    suspend fun getTagsWithNote(noteID:Int) : List<TagsWithNote>
+    suspend fun getTagsWithNote(noteID: Long) : List<TagsWithNote>
 
 
 }

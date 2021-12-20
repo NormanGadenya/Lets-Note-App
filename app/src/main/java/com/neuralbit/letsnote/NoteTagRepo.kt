@@ -1,7 +1,5 @@
 package com.neuralbit.letsnote
 
-import androidx.lifecycle.LiveData
-
 class NoteTagRepo(
     private val noteTagDao: NoteTagDao,
 
@@ -19,7 +17,7 @@ class NoteTagRepo(
         return noteTagDao.getNotesWithTag(tagTitle)
     }
 
-    suspend fun getTagsWithNote(noteID : Int) :List<TagsWithNote>{
+    suspend fun getTagsWithNote(noteID: Long) :List<TagsWithNote>{
         return noteTagDao.getTagsWithNote(noteID)
     }
 

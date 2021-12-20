@@ -3,10 +3,8 @@ package com.neuralbit.letsnote
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
-import com.neuralbit.letsnote.databinding.FragmentAllNotesBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.*
 import kotlin.collections.ArrayList
 
 class NoteViewModel(application : Application) : AndroidViewModel(application) {
@@ -151,7 +149,7 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         noteTagRepo.getNotesWithTag(tagTitle)
     }
 
-     suspend fun getTagsWithNote(noteID : Int):List<TagsWithNote> {
+     suspend fun getTagsWithNote(noteID: Long):List<TagsWithNote> {
         return noteTagRepo.getTagsWithNote(noteID)
     }
 

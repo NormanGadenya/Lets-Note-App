@@ -2,6 +2,7 @@ package com.neuralbit.letsnote
 
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.Rect
 import android.os.Build
 import android.os.Bundle
 import android.text.Editable
@@ -11,13 +12,13 @@ import android.view.KeyEvent
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
+import android.view.ViewTreeObserver
 import android.view.WindowManager
 import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -42,7 +43,7 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
     private lateinit var pinButton: ImageButton
     private lateinit var noteTitleEdit : EditText
     private lateinit var noteDescriptionEdit : MultiAutoCompleteEditText
-    private var noteID = -1
+    private var noteID : Long= -1
     private var tagID = -1
     private lateinit var viewModal :NoteViewModel
     private lateinit var noteType : String
@@ -67,6 +68,7 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
     private var tagList : ArrayList<Tag> = ArrayList()
     private lateinit var tagListRV : RecyclerView
     private  var lastNoteID : Int = 0
+    private var isKeyBoardShowing = false
 
 
     @RequiresApi(Build.VERSION_CODES.M)
@@ -82,6 +84,7 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
         noteDescriptionEdit = findViewById(R.id.noteEditDesc)
         tvTimeStamp = findViewById(R.id.tvTimeStamp)
         tagListRV = findViewById(R.id.tagListRV)
+        coordinatorlayout = findViewById(R.id.coordinatorlayout)
         val layoutManager = LinearLayoutManager(applicationContext,LinearLayoutManager.HORIZONTAL,false)
 
         layoutManager.orientation = HORIZONTAL
@@ -99,13 +102,40 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
                 
             }
         }
+
+        coordinatorlayout.viewTreeObserver.addOnGlobalLayoutListener { ViewTreeObserver.OnGlobalLayoutListener {
+          val r = Rect()
+          coordinatorlayout.getWindowVisibleDisplayFrame(r)
+          val screenHeight =  coordinatorlayout.rootView.height
+          val keypadHeight = screenHeight - r.bottom
+          if (keypadHeight > screenHeight * 0.15) { // 0.15 ratio is perhaps enough to determine keypad height.
+            // keyboard is opened
+            if (!isKeyBoardShowing) {
+                isKeyBoardShowing = true
+                Log.d(TAG, "onCreate: opened")
+                onKeyboardVisibilityChanged(true)
+            }
+        }
+          else {
+            // keyboard is closed
+            if (isKeyBoardShowing) {
+                Log.d(TAG, "onCreate: closed")
+
+                isKeyBoardShowing = false
+                onKeyboardVisibilityChanged(false)
+            }
+        }
+
+        } }
         viewModal.archivedNote.observe(this) {
             archivedNotes = it
         }
         viewModal.pinnedNotes.observe(this) {
             pinnedNotes = it
         }
-
+        KeyboardUtils.addKeyboardToggleListener(this,KeyboardUtils.SoftKeyboardToggleListener {
+            onKeyboardVisibilityChanged(it)
+        })
 
         deleteButton = findViewById(R.id.deleteButton)
         backButton = findViewById(R.id.backButton)
@@ -121,7 +151,6 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
 //        val hdColor = findViewById<ImageButton>(R.id.HoneydrewBackground)
 //        val aColor = findViewById<ImageButton>(R.id.apricotBackground)
 //        val whColor = findViewById<ImageButton>(R.id.whiteBackground)
-        val tagContainer = findViewById<View>(R.id.tagContainer)
         coordinatorlayout = findViewById(R.id.coordinatorlayout)
         pinButton = findViewById(R.id.pinButton)
 
@@ -156,7 +185,7 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
                 val noteTimeStamp = intent.getLongExtra("noteTimeStamp",0)
                 tvTimeStamp.text= getString(R.string.timeStamp,cm.convertLongToTime(noteTimeStamp)[0],cm.convertLongToTime(noteTimeStamp)[1])
                 tvTimeStamp.visibility =VISIBLE
-                noteID = intent.getIntExtra("noteID", -1)
+                noteID = intent.getLongExtra("noteID", -1)
                 noteTitleEdit.setText(noteTitle)
                 noteDescriptionEdit.setText(noteDesc)
                 if(archived) {
@@ -184,12 +213,6 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
         }
         viewModal.wordEnd.observe(this) {
             wordEnd = it
-//            if(it!=0){
-//                newTagButton.visibility = VISIBLE
-//            }else{
-//                newTagButton.visibility = GONE
-//
-//            }
         }
 
 
@@ -208,12 +231,12 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
 
                 viewModal.allTags.observe(this) {
 
-                    var adpter: AutoCompleteTypeAdapter<Tag> =
+                    val adapter: AutoCompleteTypeAdapter<Tag> =
                         AutoCompleteTypeAdapter.Build.from(TagViewBinder(), TagTokenFilter())
-                    it?.let { adpter.setItems(it) }
-                    var multiAutoComplete = MultiAutoComplete.Builder()
+                    it?.let { adapter.setItems(it) }
+                    val multiAutoComplete = MultiAutoComplete.Builder()
                         .tokenizer(PrefixTokenizer('#'))
-                        .addTypeAdapter(adpter)
+                        .addTypeAdapter(adapter)
                         .build()
                     multiAutoComplete.onViewAttached(noteDescriptionEdit)
 
@@ -226,7 +249,6 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
                                     viewModal.addTag(tag)
                                 }
                                 viewModal.addTagToList(tag)
-                                Log.d(TAG, "onCreatess: ${viewModal.tagList}")
                                 tagListAdapter.updateList(viewModal.tagList)
                             }
 
@@ -236,13 +258,10 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
 
                 }
 
-                //TODO link notes to tags
 
                 if (noteDescStr != null) {
                     tagString = noteDescStr
-//                    newTagButton.text= getString(R.string.createNewTag,noteDescStr)
 
-//                    newTagButton.visibility = VISIBLE
                 }
             } else {
 //                newTagButton.visibility = GONE
@@ -268,8 +287,6 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
         noteDescriptionEdit.addTextChangedListener(object : TextWatcher{
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 val changedString =p0.toString()
-
-
             }
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
@@ -286,8 +303,6 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
                     if(wordStart> 0) {
                         viewModal.wordEnd.value = p0?.length
                         viewModal.getTagString(p0.toString())
-
-//                        loadSpinner()
 
                         if(p0?.get(p0.length - 1) == ' '){
                             viewModal.newTagTyped.value = false
@@ -306,14 +321,11 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
             }
         })
 
-        noteDescriptionEdit.setOnKeyListener(object : View.OnKeyListener{
-            override fun onKey(p0: View?, p1: Int, p2: KeyEvent?): Boolean {
-                viewModal.backPressed.value = p1 == KeyEvent.KEYCODE_DEL
-                return false
-            }
+        noteDescriptionEdit.setOnKeyListener { p0, p1, p2 ->
+            viewModal.backPressed.value = p1 == KeyEvent.KEYCODE_DEL
+            false
+        }
 
-        })
-        
 //        newTagButton.setOnClickListener {
 //            if (tagString != null) {
 //                viewModal.addTag(Tag(tagString!!))
@@ -332,12 +344,10 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
                 pinButton.visibility = GONE
                 archiveButton.visibility = GONE
                 restoreButton.visibility = VISIBLE
-                tagContainer.visibility = GONE
             } else {
                 pinButton.visibility = VISIBLE
                 archiveButton.visibility = VISIBLE
                 restoreButton.visibility = GONE
-                tagContainer.visibility = VISIBLE
             }
         }
 
@@ -410,28 +420,16 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
         }
     }
 
-//    private fun loadSpinner() {
-//
-//        tagSpinner.apply {
-//            adapter = tagList?.let { TagSpinnerAdapter(context , it) }
-//
-//
-//            onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-//                override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-//                    val tag : Tag = adapter.getItem(p2) as Tag
-//                    Log.d(TAG, "onItemSelected: $p3")
-//                    noteDescriptionEdit.append(tag.tagTitle)
-//                    Log.d(TAG, "onItemSelected: ${tagList?.get(p2)?.tagTitle}")
-//                }
-//
-//                override fun onNothingSelected(p0: AdapterView<*>?) {
-//
-//                }
-//
-//            }
-//        }
-//
-//    }
+    private fun onKeyboardVisibilityChanged(b: Boolean) {
+        if(b){
+            noteDescriptionEdit.maxLines = 11
+        }else{
+            noteDescriptionEdit.maxLines = 23
+
+        }
+    }
+
+
     private fun setBgColor(){
         val window = window
 
@@ -487,7 +485,7 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
                         Toast.makeText(this,"Note updated .. " , Toast.LENGTH_SHORT).show()
 
                     }else{
-                        noteID = allNotes.size + 1
+                        noteID = allNotes.size.toLong() + 1
                         viewModal.addNote(note)
                         Toast.makeText(this,"Note added .. " , Toast.LENGTH_SHORT).show()
                         

@@ -4,6 +4,6 @@ import androidx.room.Entity
 
 @Entity(primaryKeys = ["noteID","tagTitle"])
 data class NoteTagCrossRef(
-    val noteID : Int,
-    val tagTitle : String
+    val noteID: Long,
+    val tagTitle: String
 )
