@@ -7,7 +7,7 @@ import androidx.room.Relation
 data class NotesWithTag(
     @Embedded val tag : Tag,
     @Relation(
-        parentColumn = "tagID",
+        parentColumn = "tagTitle",
         entityColumn = "noteID",
         associateBy = Junction(NoteTagCrossRef::class)
     )

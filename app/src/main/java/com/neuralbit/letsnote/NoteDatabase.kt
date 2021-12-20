@@ -13,7 +13,7 @@ import androidx.room.RoomDatabase
         ArchivedNote::class,
         PinnedNote::class,
         NoteTagCrossRef::class
-               ],version =2 , exportSchema = false)
+               ],version =3 , exportSchema = false)
 abstract class NoteDatabase : RoomDatabase(){
     abstract fun getNotesDao() : NotesDao
     abstract fun getTagDao() : TagDao
@@ -28,7 +28,7 @@ abstract class NoteDatabase : RoomDatabase(){
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     NoteDatabase::class.java,
-                    "note_database13"
+                    "note_database16"
                 ).build()
                 INSTANCE = instance
                 instance

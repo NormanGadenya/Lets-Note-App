@@ -2,6 +2,7 @@ package com.neuralbit.letsnote
 
 import android.content.Intent
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -12,11 +13,14 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.WindowManager
 import android.widget.*
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.HORIZONTAL
@@ -25,6 +29,7 @@ import com.teamwork.autocomplete.MultiAutoComplete
 import com.teamwork.autocomplete.adapter.AutoCompleteTypeAdapter
 import com.teamwork.autocomplete.tokenizer.PrefixTokenizer
 import com.teamwork.autocomplete.view.MultiAutoCompleteEditText
+import kotlinx.coroutines.launch
 import java.util.*
 
 
@@ -59,11 +64,12 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
 //    private lateinit var newTagButton : Button
     private var newTagTyped = false
     private var backPressed  = false
-//    private lateinit var tagSpinner :Spinner
     private var tagList : ArrayList<Tag> = ArrayList()
     private lateinit var tagListRV : RecyclerView
+    private  var lastNoteID : Int = 0
 
 
+    @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?)  {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_edit_note)
@@ -87,17 +93,18 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
             this,
             ViewModelProvider.AndroidViewModelFactory.getInstance(application)
         ).get(NoteViewModel::class.java)
-        viewModal.allNotes.observe(this,{ list->
+        viewModal.allNotes.observe(this) { list ->
             list?.let {
-                allNotes=it
+                allNotes = it
+                
             }
-        })
-        viewModal.archivedNote.observe(this,{
+        }
+        viewModal.archivedNote.observe(this) {
             archivedNotes = it
-        })
-        viewModal.pinnedNotes.observe(this ,{
+        }
+        viewModal.pinnedNotes.observe(this) {
             pinnedNotes = it
-        })
+        }
 
 
         deleteButton = findViewById(R.id.deleteButton)
@@ -120,13 +127,27 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
 
         noteType = intent.getStringExtra("noteType").toString()
         archived = intent.getBooleanExtra("archivedNote",false)
-        viewModal.Archive(archived)
+        viewModal.archived.value = archived
         val pinnedNote = intent.getBooleanExtra("pinnedNote",false)
+        viewModal.pinned.value = pinnedNote
         noteColor = intent.getStringExtra("noteColor")
         if(noteColor!=null){
             setBgColor()
         }
-
+        viewModal.pinned.observe(this){
+            if (it){
+                pinButton.setImageResource(R.drawable.ic_baseline_push_pin_24)
+            }else{
+                pinButton.setImageResource(R.drawable.ic_outline_push_pin_24)
+            }
+        }
+        viewModal.archived.observe(this){
+            if (it){
+                archiveButton.setImageResource(R.drawable.ic_baseline_unarchive_24)
+            }else{
+                archiveButton.setImageResource(R.drawable.ic_outline_archive_24)
+            }
+        }
 
         when (noteType) {
             "Edit" -> {
@@ -142,6 +163,14 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
                     archiveButton.visibility = GONE
                     restoreButton.visibility = VISIBLE
                 }
+                lifecycleScope.launch {
+                    for (tag in viewModal.getTagsWithNote(noteID).last().tags){
+                        viewModal.addTagToList(tag)
+                    }
+                    tagListAdapter.updateList(viewModal.tagList)
+
+//                    (viewModal.getTagsWithNote(noteID).first().tags)
+                }
             }
             else -> {
 
@@ -149,10 +178,11 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
 
             }
         }
-        viewModal.newTagTyped.observe(this,{
+
+        viewModal.newTagTyped.observe(this) {
             newTagTyped = it
-        })
-        viewModal.wordEnd.observe(this,{
+        }
+        viewModal.wordEnd.observe(this) {
             wordEnd = it
 //            if(it!=0){
 //                newTagButton.visibility = VISIBLE
@@ -160,23 +190,26 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
 //                newTagButton.visibility = GONE
 //
 //            }
-        })
+        }
 
-        viewModal.backPressed.observe(this,{
+
+
+        viewModal.backPressed.observe(this) {
             backPressed = it
-        })
+        }
 
-        viewModal.wordStart.observe(this,{
+        viewModal.wordStart.observe(this) {
             wordStart = it
-        })
-        
-        
-        viewModal.noteDescString.observe(this,{ noteDescStr ->
-            if(newTagTyped){
+        }
 
-                viewModal.allTags.observe(this,{
-                    
-                    var adpter : AutoCompleteTypeAdapter<Tag> = AutoCompleteTypeAdapter.Build.from(TagViewBinder(),TagTokenFilter())
+
+        viewModal.noteDescString.observe(this) { noteDescStr ->
+            if (newTagTyped) {
+
+                viewModal.allTags.observe(this) {
+
+                    var adpter: AutoCompleteTypeAdapter<Tag> =
+                        AutoCompleteTypeAdapter.Build.from(TagViewBinder(), TagTokenFilter())
                     it?.let { adpter.setItems(it) }
                     var multiAutoComplete = MultiAutoComplete.Builder()
                         .tokenizer(PrefixTokenizer('#'))
@@ -184,12 +217,12 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
                         .build()
                     multiAutoComplete.onViewAttached(noteDescriptionEdit)
 
-                    if(noteDescStr.isNotEmpty()){
-                        if(noteDescStr.length >=2){
+                    if (noteDescStr.isNotEmpty()) {
+                        if (noteDescStr.length >= 2) {
 
-                            if(noteDescStr[noteDescStr.length-1]== ' '){
-                                val tag = Tag(noteDescStr.substring(0,noteDescStr.length-1))
-                                if(tag !in it){
+                            if (noteDescStr[noteDescStr.length - 1] == ' ') {
+                                val tag = Tag(noteDescStr.substring(0, noteDescStr.length - 1))
+                                if (tag !in it) {
                                     viewModal.addTag(tag)
                                 }
                                 viewModal.addTagToList(tag)
@@ -201,25 +234,22 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
                     }
 
 
-                })
+                }
 
                 //TODO link notes to tags
 
-                if(noteDescStr!=null){
+                if (noteDescStr != null) {
                     tagString = noteDescStr
 //                    newTagButton.text= getString(R.string.createNewTag,noteDescStr)
 
 //                    newTagButton.visibility = VISIBLE
                 }
-            }else{
+            } else {
 //                newTagButton.visibility = GONE
 
             }
 
-        })
-        viewModal.filterList().observe(this,{
-            Log.d(TAG, "onCreate: $it")
-        })
+        }
 
 
         noteTitleEdit.addTextChangedListener(object : TextWatcher{
@@ -294,10 +324,10 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
         viewModal.texChanged.observe(this) {
             textChanged = it
         }
-        viewModal.delete.observe(this) {
+        viewModal.deleted.observe(this) {
             deletable = it
         }
-        viewModal.archive.observe(this) {
+        viewModal.archived.observe(this) {
             if (archived) {
                 pinButton.visibility = GONE
                 archiveButton.visibility = GONE
@@ -315,7 +345,8 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
         backButton.setOnClickListener {
             goToMain()
         }
-        
+
+
 
         deleteButton.setOnClickListener {
             if(noteType == "Edit"){
@@ -334,19 +365,19 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
                 }
 
                 Toast.makeText(this,"Note deleted",Toast.LENGTH_SHORT).show()
-                viewModal.Delete(true)
+                viewModal.deleted.value = true
                 goToMain()
             }
 
         }
         archiveButton.setOnClickListener {
-            viewModal.Archive(true)
+            viewModal.archived.value = true
             val archivedNote = ArchivedNote(noteID)
             viewModal.archiveNote(archivedNote)
             val snackbar = Snackbar.make(coordinatorlayout,"Note Achieved",Snackbar.LENGTH_LONG)
             snackbar.setAction("UNDO"
             ) {
-                viewModal.Archive(false)
+                viewModal.archived.value = false
                 viewModal.removeArchive(archivedNote)
                 Toast.makeText(this,"Note Unarchived", Toast.LENGTH_SHORT).show()
             }
@@ -355,14 +386,14 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
 
         }
         pinButton.setOnClickListener {
-            viewModal.Pinned(true)
-            val pinnedNote = PinnedNote(noteID)
-            viewModal.pinNote(pinnedNote)
+            viewModal.pinned.value = !pinnedNote
+            val pN=PinnedNote(noteID)
+            viewModal.pinNote(pN)
             val snackbar = Snackbar.make(coordinatorlayout,"Note pinned",Snackbar.LENGTH_LONG)
             snackbar.setAction("UNDO"
             ) {
-                viewModal.Pinned(false)
-                viewModal.removePin(pinnedNote)
+                viewModal.pinned.value = pinnedNote
+                viewModal.removePin(pN)
                 Toast.makeText(this,"Note unpinned", Toast.LENGTH_SHORT).show()
             }
             snackbar.show()
@@ -372,7 +403,7 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
         restoreButton.setOnClickListener {
             val archivedNote = ArchivedNote(noteID)
             viewModal.removeArchive(archivedNote)
-            viewModal.Archive(false)
+            viewModal.archived.value = false
             Toast.makeText(this,"Note Unarchived", Toast.LENGTH_SHORT).show()
 
 
@@ -448,21 +479,28 @@ class AddEditNoteActivity : AppCompatActivity() , AdapterView.OnItemSelectedList
         val currentDate= cm.currentTimeToLong()
         if(!deletable){
             if(textChanged){
-                if(noteType == "Edit"){
-                    if(noteTitle.isNotEmpty() || noteDescription.isNotEmpty()){
-                        val updateNote = Note(noteTitle,noteDescription,currentDate)
-                        updateNote.noteID = noteID
-                        viewModal.updateNote(updateNote)
+                if (noteTitle.isNotEmpty() || noteDescription.isNotEmpty()){
+                    val note = Note(noteTitle,noteDescription,currentDate)
+                    if(noteType == "Edit"){
+                        note.noteID = noteID
+                        viewModal.updateNote(note)
                         Toast.makeText(this,"Note updated .. " , Toast.LENGTH_SHORT).show()
-                    }
-                }else{
-                    if(noteTitle.isNotEmpty() || noteDescription.isNotEmpty()){
-                        viewModal.addNote((Note(noteTitle,noteDescription,currentDate )))
+
+                    }else{
+                        noteID = allNotes.size + 1
+                        viewModal.addNote(note)
                         Toast.makeText(this,"Note added .. " , Toast.LENGTH_SHORT).show()
-
-
+                        
                     }
+                    for(tag in viewModal.tagList){
+
+                        val crossRef = NoteTagCrossRef(noteID,tag.tagTitle)
+                        viewModal.insertNoteTagCrossRef(crossRef)
+                    }
+
                 }
+
+
             }
         }
 

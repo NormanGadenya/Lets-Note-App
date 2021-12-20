@@ -15,12 +15,12 @@ class NoteTagRepo(
         noteTagDao.deleteNoteTagCrossRef(crossRef)
     }
 
-    suspend fun getNotesWithTag(tagID : Int) {
-        noteTagDao.getNotesWithTag(tagID)
+    suspend fun getNotesWithTag(tagTitle : String):List<NotesWithTag>{
+        return noteTagDao.getNotesWithTag(tagTitle)
     }
 
-    suspend fun getTagsWithNote(noteID : Int){
-        noteTagDao.getTagsWithNote(noteID)
+    suspend fun getTagsWithNote(noteID : Int) :List<TagsWithNote>{
+        return noteTagDao.getTagsWithNote(noteID)
     }
 
 }

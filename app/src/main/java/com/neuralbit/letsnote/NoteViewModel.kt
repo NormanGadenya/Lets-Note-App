@@ -18,11 +18,9 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     val noteTagRepo : NoteTagRepo
     var texChange = false
     var texChanged = MutableLiveData<Boolean>()
-    var deleted = false
-    var delete = MutableLiveData<Boolean>()
-    var archived = false
-    var archive = MutableLiveData<Boolean>()
-    var pinned = false
+    var deleted = MutableLiveData<Boolean>()
+    var archived = MutableLiveData<Boolean>()
+    var pinned = MutableLiveData<Boolean>()
     var pin = MutableLiveData<Boolean>()
     lateinit var list : List<Note>
     var notes : List<Note> = listOf()
@@ -55,6 +53,9 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         newTagTyped = MutableLiveData()
         backPressed = MutableLiveData()
         tagList = ArrayList<Tag>()
+        pinned = MutableLiveData()
+        archived = MutableLiveData()
+        deleted = MutableLiveData()
     }
 
     fun getTagString(text: String){
@@ -106,20 +107,6 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     }
 
 
-    fun Delete(b : Boolean){
-        deleted= b
-        delete.value = deleted
-    }
-
-    fun Archive(b : Boolean){
-        archived = b
-        archive.value = archived
-    }
-
-    fun Pinned(b : Boolean){
-        pinned = b
-        pin.value = pinned
-    }
 
     fun deleteNote(note: Note)= viewModelScope.launch(Dispatchers.IO){
         repo.delete(note)
@@ -156,12 +143,18 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     fun insertNoteTagCrossRef(crossRef: NoteTagCrossRef) = viewModelScope.launch(Dispatchers.IO){
         noteTagRepo.insertNoteTagCrossRef(crossRef)
     }
+    fun deleteNoteTagCrossRef(crossRef: NoteTagCrossRef) = viewModelScope.launch(Dispatchers.IO){
+        noteTagRepo.deleteNoteTagCrossRef(crossRef)
+    }
 
-    fun getNotesWithTag(tagID : Int) = viewModelScope.launch(Dispatchers.IO){
-        noteTagRepo.getNotesWithTag(tagID)
+    fun getNotesWithTag(tagTitle : String) = viewModelScope.launch(Dispatchers.IO){
+        noteTagRepo.getNotesWithTag(tagTitle)
     }
-    fun getTagsWithNote(noteID : Int) = viewModelScope.launch(Dispatchers.IO){
-        noteTagRepo.getTagsWithNote(noteID)
+
+     suspend fun getTagsWithNote(noteID : Int):List<TagsWithNote> {
+        return noteTagRepo.getTagsWithNote(noteID)
     }
+
+
 
 }

@@ -2,8 +2,8 @@ package com.neuralbit.letsnote
 
 import androidx.room.Entity
 
-@Entity(primaryKeys = ["noteID","tagID"])
+@Entity(primaryKeys = ["noteID","tagTitle"])
 data class NoteTagCrossRef(
     val noteID : Int,
-    val tagID : Int
+    val tagTitle : String
 )
