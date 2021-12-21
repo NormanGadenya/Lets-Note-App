@@ -20,12 +20,16 @@ import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.HORIZONTAL
+import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.tabs.TabLayout
+import com.neuralbit.letsnote.ui.dateTimeDialog.FragmentAdapter
 import com.teamwork.autocomplete.MultiAutoComplete
 import com.teamwork.autocomplete.adapter.AutoCompleteTypeAdapter
 import com.teamwork.autocomplete.tokenizer.PrefixTokenizer
@@ -42,7 +46,9 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface {
     private lateinit var deleteButton: ImageButton
     private lateinit var backButton: ImageButton
     private lateinit var pinButton: ImageButton
+    private lateinit var alertButton: ImageButton
     private lateinit var noteTitleEdit : EditText
+
     private lateinit var noteDescriptionEdit : MultiAutoCompleteEditText
     private var noteID : Long= -1
     private var tagID = -1
@@ -72,7 +78,9 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface {
     private var deletedTag = ArrayList<String>()
     private var tagDeleted = false
     private lateinit var tagListAdapter : TagRVAdapter
-
+    private lateinit var tabLayout : TabLayout
+    private lateinit var viewPager: ViewPager2
+    private lateinit var fragmentAdapter:FragmentAdapter
 
     override fun onCreate(savedInstanceState: Bundle?)  {
         super.onCreate(savedInstanceState)
@@ -87,6 +95,30 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface {
         tvTimeStamp = findViewById(R.id.tvTimeStamp)
         tagListRV = findViewById(R.id.tagListRV)
         coordinatorlayout = findViewById(R.id.coordinatorlayout)
+        alertButton = findViewById(R.id.alertButton)
+        tabLayout = findViewById(R.id.timePlaceTab)
+        viewPager = findViewById(R.id.timePlaceVP)
+
+        val fm = supportFragmentManager
+        fragmentAdapter = FragmentAdapter(fm,lifecycle)
+        viewPager.adapter = fragmentAdapter
+
+        tabLayout.addTab(tabLayout.newTab().setText("Time"))
+        tabLayout.addTab(tabLayout.newTab().setText("Place"))
+        tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener{
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                viewPager.currentItem = tab?.position!!
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+                TODO("Not yet implemented")
+            }
+        })
+
         val layoutManager = LinearLayoutManager(applicationContext,LinearLayoutManager.HORIZONTAL,false)
 
         layoutManager.orientation = HORIZONTAL
@@ -271,7 +303,9 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface {
             }
 
         }
+        alertButton.setOnClickListener {
 
+        }
 
         noteTitleEdit.addTextChangedListener(object : TextWatcher{
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
@@ -341,12 +375,6 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface {
             false
         }
 
-//        newTagButton.setOnClickListener {
-//            if (tagString != null) {
-//                viewModal.addTag(Tag(tagString!!))
-//                viewModal.newTagTyped.value =false
-//            }
-//        }
 
         viewModal.texChanged.observe(this) {
             textChanged = it
@@ -382,6 +410,9 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface {
                 if(pinnedNote){
                     val pinnedNote = PinnedNote(noteID)
                     viewModal.removePin(pinnedNote)
+                }
+                for(tag in viewModal.tagList){
+                    viewModal.deleteNoteTagCrossRef(NoteTagCrossRef(noteID,tag.tagTitle))
                 }
                 for ( note in allNotes) {
                     if (note.noteID == noteID) {

@@ -7,23 +7,24 @@
     android:layout_height="match_parent"
     android:id="@+id/coordinatorlayout"
     tools:context=".AddEditNoteActivity">
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
         <EditText
+            android:id="@+id/noteEditTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/noteEditTitle"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:background="@android:color/transparent"
             android:hint="@string/title"
             android:paddingTop="8dp"
-            android:layout_marginEnd="@dimen/activity_horizontal_margin"
-            android:layout_marginStart="@dimen/activity_horizontal_margin"
             android:paddingBottom="8dp"
             android:textSize="32sp"
             android:textStyle="bold"
-            android:background="@android:color/transparent"
-            app:layout_constraintTop_toTopOf="parent"
-            />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <com.teamwork.autocomplete.view.MultiAutoCompleteEditText
             android:id="@+id/noteEditDesc"
@@ -41,34 +42,49 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/noteEditTitle" />
 
-        <View
-            android:id="@+id/view"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/note_wrapper"
-            app:layout_constraintBottom_toTopOf="@+id/tagListRV" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/tagListRV"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintBottom_toTopOf="@id/tvTimeStamp"
             android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toTopOf="@id/tvTimeStamp"
             app:layout_constraintStart_toStartOf="parent" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            android:background="#CDFFFFFF"
+            android:id="@+id/timePkWrapper"/>
+        <TimePicker
+            android:id="@+id/timePicker"
+            android:layout_width="wrap_content"
+            android:visibility="gone"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/noteEditDesc" />
 
-
+        <DatePicker
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/datePicker"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/noteEditDesc"/>
 
         <TextView
             android:id="@+id/tvTimeStamp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:layout_marginEnd="@dimen/activity_horizontal_margin"
             android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:padding="8dp"
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
-
+    <include layout="@layout/alert_bottom_sheet"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

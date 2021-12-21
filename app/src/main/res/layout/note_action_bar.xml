@@ -19,6 +19,20 @@
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:id="@+id/alertButton"
+        android:src="@drawable/ic_baseline_add_alert_24"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        app:layout_constraintEnd_toStartOf="@+id/pinButton"
+        app:layout_constraintTop_toTopOf="parent"
+        android:visibility="visible"
+        android:layout_marginEnd="16dp"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:id="@+id/pinButton"
         android:src="@drawable/ic_baseline_push_pin_24"
         android:background="?attr/selectableItemBackgroundBorderless"

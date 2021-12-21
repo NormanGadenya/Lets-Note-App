@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 
 class TagRVAdapter (
     val context: Context,
-    val tagRVInterface :TagRVInterface
+    private val tagRVInterface :TagRVInterface
 
     ) : RecyclerView.Adapter<TagRVAdapter.ViewHolder>(){
     var deleteIgnored = false
