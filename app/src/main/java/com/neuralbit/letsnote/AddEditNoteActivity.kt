@@ -3,7 +3,6 @@ package com.neuralbit.letsnote
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.Rect
-import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -15,26 +14,22 @@ import android.view.View.VISIBLE
 import android.view.ViewTreeObserver
 import android.view.WindowManager
 import android.widget.*
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.drawable.DrawableCompat
-import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.HORIZONTAL
-import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.tabs.TabLayout
 import com.teamwork.autocomplete.MultiAutoComplete
 import com.teamwork.autocomplete.adapter.AutoCompleteTypeAdapter
 import com.teamwork.autocomplete.tokenizer.PrefixTokenizer
 import com.teamwork.autocomplete.view.MultiAutoCompleteEditText
 import kotlinx.coroutines.launch
-import java.util.*
 import kotlin.collections.ArrayList
 
 
@@ -68,15 +63,14 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface {
     private var wordStart = 0
     private var wordEnd = 0
     private var tagString : String ? = null
-//    private lateinit var newTagButton : Button
     private var newTagTyped = false
     private var backPressed  = false
-    private var tagList : ArrayList<Tag> = ArrayList()
     private lateinit var tagListRV : RecyclerView
     private var isKeyBoardShowing = false
     private var deletedTag = ArrayList<String>()
     private var tagDeleted = false
     private lateinit var tagListAdapter : TagRVAdapter
+    private lateinit var bottomSheet : BottomSheetDialog
 
 
     override fun onCreate(savedInstanceState: Bundle?)  {
@@ -150,6 +144,8 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface {
         backButton = findViewById(R.id.backButton)
         archiveButton = findViewById(R.id.archiveButton)
         restoreButton = findViewById(R.id.restoreButton)
+        bottomSheet =  BottomSheetDialog(this)
+
 //        newTagButton = findViewById(R.id.newTagBtn)
 //        tagSpinner = findViewById(R.id.tagSpinner)
 //        tagSpinner.onItemSelectedListener = this
@@ -272,14 +268,14 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface {
                     tagString = noteDescStr
 
                 }
-            } else {
-//                newTagButton.visibility = GONE
-
             }
 
         }
         alertButton.setOnClickListener {
-
+            alertSheetDialog()
+        }
+        bottomSheet.setOnDismissListener {
+            //TODO set bottom sheet On dismiss behaviour
         }
 
         noteTitleEdit.addTextChangedListener(object : TextWatcher{
@@ -383,8 +379,7 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface {
                     viewModal.removeArchive(archivedNote)
                 }
                 if(pinnedNote){
-                    val pinnedNote = PinnedNote(noteID)
-                    viewModal.removePin(pinnedNote)
+                    viewModal.removePin(PinnedNote(noteID))
                 }
                 for(tag in viewModal.tagList){
                     viewModal.deleteNoteTagCrossRef(NoteTagCrossRef(noteID,tag.tagTitle))
@@ -439,6 +434,11 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface {
 
 
         }
+    }
+
+    private fun alertSheetDialog() {
+        bottomSheet.setContentView(R.layout.alert_bottom_sheet)
+        bottomSheet.show()
     }
 
     private fun onKeyboardVisibilityChanged(b: Boolean) {

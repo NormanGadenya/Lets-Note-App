@@ -8,8 +8,7 @@
     android:padding="@dimen/activity_horizontal_margin"
     android:focusableInTouchMode="true"
     android:id="@+id/alert_actions"
-    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
-    app:behavior_hideable="true"
+
     android:background="@color/white"
     android:layout_height="300dp">
     <androidx.constraintlayout.widget.ConstraintLayout

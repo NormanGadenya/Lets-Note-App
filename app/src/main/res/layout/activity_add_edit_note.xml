@@ -20,6 +20,8 @@
             android:layout_marginEnd="@dimen/activity_horizontal_margin"
             android:background="@android:color/transparent"
             android:hint="@string/title"
+            android:inputType="textAutoComplete"
+            android:autofillHints="name"
             android:paddingTop="8dp"
             android:paddingBottom="8dp"
             android:textSize="32sp"
@@ -34,7 +36,7 @@
             android:background="@android:color/transparent"
             android:completionHint="Create new Tag"
             android:completionThreshold="1"
-            android:hint="Note content"
+            android:hint="@string/note_content"
             android:importantForAutofill="no"
             android:inputType="textMultiLine"
             android:paddingTop="8dp"
@@ -51,12 +53,7 @@
             android:layout_marginBottom="8dp"
             app:layout_constraintBottom_toTopOf="@id/tvTimeStamp"
             app:layout_constraintStart_toStartOf="parent" />
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone"
-            android:background="#CDFFFFFF"
-            android:id="@+id/timePkWrapper"/>
+
         <TimePicker
             android:id="@+id/timePicker"
             android:layout_width="wrap_content"
@@ -85,6 +82,5 @@
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
-    <include layout="@layout/alert_bottom_sheet"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
