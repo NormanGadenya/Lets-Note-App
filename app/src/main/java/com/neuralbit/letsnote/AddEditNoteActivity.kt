@@ -29,7 +29,6 @@ import androidx.recyclerview.widget.RecyclerView.HORIZONTAL
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
-import com.neuralbit.letsnote.ui.dateTimeDialog.FragmentAdapter
 import com.teamwork.autocomplete.MultiAutoComplete
 import com.teamwork.autocomplete.adapter.AutoCompleteTypeAdapter
 import com.teamwork.autocomplete.tokenizer.PrefixTokenizer
@@ -78,9 +77,7 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface {
     private var deletedTag = ArrayList<String>()
     private var tagDeleted = false
     private lateinit var tagListAdapter : TagRVAdapter
-    private lateinit var tabLayout : TabLayout
-    private lateinit var viewPager: ViewPager2
-    private lateinit var fragmentAdapter:FragmentAdapter
+
 
     override fun onCreate(savedInstanceState: Bundle?)  {
         super.onCreate(savedInstanceState)
@@ -96,28 +93,6 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface {
         tagListRV = findViewById(R.id.tagListRV)
         coordinatorlayout = findViewById(R.id.coordinatorlayout)
         alertButton = findViewById(R.id.alertButton)
-        tabLayout = findViewById(R.id.timePlaceTab)
-        viewPager = findViewById(R.id.timePlaceVP)
-
-        val fm = supportFragmentManager
-        fragmentAdapter = FragmentAdapter(fm,lifecycle)
-        viewPager.adapter = fragmentAdapter
-
-        tabLayout.addTab(tabLayout.newTab().setText("Time"))
-        tabLayout.addTab(tabLayout.newTab().setText("Place"))
-        tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener{
-            override fun onTabSelected(tab: TabLayout.Tab?) {
-                viewPager.currentItem = tab?.position!!
-            }
-
-            override fun onTabUnselected(tab: TabLayout.Tab?) {
-                TODO("Not yet implemented")
-            }
-
-            override fun onTabReselected(tab: TabLayout.Tab?) {
-                TODO("Not yet implemented")
-            }
-        })
 
         val layoutManager = LinearLayoutManager(applicationContext,LinearLayoutManager.HORIZONTAL,false)
 
