@@ -1,5 +1,7 @@
 package com.neuralbit.letsnote
 
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.Rect
@@ -26,19 +28,15 @@ import androidx.recyclerview.widget.RecyclerView.HORIZONTAL
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import com.neuralbit.letsnote.entities.*
-import com.neuralbit.letsnote.utilities.Common
-import com.neuralbit.letsnote.utilities.KeyboardUtils
-import com.neuralbit.letsnote.utilities.TagTokenFilter
-import com.neuralbit.letsnote.utilities.TagViewBinder
+import com.neuralbit.letsnote.utilities.*
 import com.teamwork.autocomplete.MultiAutoComplete
 import com.teamwork.autocomplete.adapter.AutoCompleteTypeAdapter
 import com.teamwork.autocomplete.tokenizer.PrefixTokenizer
 import com.teamwork.autocomplete.view.MultiAutoCompleteEditText
 import kotlinx.coroutines.launch
-import kotlin.collections.ArrayList
 
 
-class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface {
+class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface{
     private lateinit var actionBarIcons: List<Int>
     private lateinit var restoreButton: ImageButton
     private lateinit var archiveButton: ImageButton
@@ -47,7 +45,6 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface {
     private lateinit var pinButton: ImageButton
     private lateinit var alertButton: ImageButton
     private lateinit var noteTitleEdit : EditText
-
     private lateinit var noteDescriptionEdit : MultiAutoCompleteEditText
     private var noteID : Long= -1
     private var tagID = -1
@@ -279,7 +276,7 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface {
 
         }
         alertButton.setOnClickListener {
-            alertSheetDialog()
+            showAlertSheetDialog()
         }
         bottomSheet.setOnDismissListener {
             //TODO set bottom sheet On dismiss behaviour
@@ -464,9 +461,20 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface {
         } }
     }
 
-    private fun alertSheetDialog() {
+    private fun showAlertSheetDialog() {
         bottomSheet.setContentView(R.layout.alert_bottom_sheet)
         bottomSheet.show()
+        val opt1 = bottomSheet.findViewById<View>(R.id.auto1)
+        val opt2 = bottomSheet.findViewById<View>(R.id.auto2)
+        val opt3 = bottomSheet.findViewById<View>(R.id.auto3)
+        val customDT = bottomSheet.findViewById<View>(R.id.customDateTime)
+        customDT?.setOnClickListener {
+            openDateTimeDialog()
+        }
+
+//        opt1.setOnClickListener { }
+//        opt2.setOnClickListener {  }
+//        opt3.setOnClickListener {  }
     }
 
     private fun onKeyboardVisibilityChanged(b: Boolean) {
@@ -511,6 +519,44 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface {
 //            window.statusBarColor = resources.getColor(colorID)
 //            supportActionBar?.setBackgroundDrawable(ColorDrawable(resources.getColor(colorID)))
         coordinatorlayout.setBackgroundColor(resources.getColor(colorID))
+    }
+
+    private fun openDateTimeDialog(){
+        val alertDialog: AlertDialog? = this?.let {
+            val builder = AlertDialog.Builder(it)
+            builder.apply {
+                setPositiveButton("ok",
+                    DialogInterface.OnClickListener { dialog, id ->
+                        // User clicked OK button
+                    })
+                setNegativeButton("cancel",
+                    DialogInterface.OnClickListener { dialog, id ->
+                        // User cancelled the dialog
+                    })
+                setView(R.layout.custom_datetime_dialog)
+                setTitle("Choose date and time")
+            }
+            // Set other dialog properties
+
+
+            // Create the AlertDialog
+            builder.create()
+        }
+        alertDialog?.show()
+        val timePickerBtn=alertDialog?.findViewById<View>(R.id.timePickButton)
+        val datePickerBtn = alertDialog?.findViewById<ImageButton>(R.id.datePickButton)
+        val timeTitleTV = alertDialog?.findViewById<TextView>(R.id.timeTitle)
+        val dateTitleTV = alertDialog?.findViewById<TextView>(R.id.dateTitle)
+        timePickerBtn?.setOnClickListener {
+            TimePickerFragment().show(supportFragmentManager,"timePicker")
+        }
+        datePickerBtn?.setOnClickListener {
+            val newFragment = DatePickerFragment(this)
+            newFragment.show(supportFragmentManager, "datePicker")
+        }
+
+
+
     }
 
     private fun changeIconColor(iconColorID : Int, drawable : Int){
@@ -581,6 +627,7 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface {
         tagListAdapter.updateList(viewModal.tagList)
 
     }
+
 
 
 }
