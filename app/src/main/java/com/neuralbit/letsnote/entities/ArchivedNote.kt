@@ -5,7 +5,9 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 
-@Entity(tableName = "ArchivedNotesTable")
+@Entity
 class ArchivedNote(
-    @PrimaryKey @ColumnInfo(name = "noteID") val noteID: Long
+
+    @PrimaryKey (autoGenerate = false)
+    @ColumnInfo(name = "noteID") val noteID: Long
 )

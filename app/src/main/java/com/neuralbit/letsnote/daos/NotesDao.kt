@@ -36,17 +36,17 @@ interface NotesDao {
     @Delete
     suspend fun deleteTag(tag: Tag)
 
-    @Query("select * from TagTable")
+    @Query("select * from Tag")
     fun getTags(): LiveData<List<Tag>>
 
 
-    @Query("Select * from NotesTable where not exists (select * from ArchivedNotesTable where ArchivedNotesTable.noteID = NotesTable.noteID) and not exists (select * from PinnedNotesTable where PinnedNotesTable.noteID= NotesTable.noteID) order by timeStamp DESC")
+    @Query("Select * from Note where not exists (select * from ArchivedNote where ArchivedNote.noteID = Note.noteID) and not exists (select * from PinnedNote where PinnedNote.noteID= Note.noteID) order by timeStamp DESC")
     fun getAllNotes(): LiveData<List<Note>>
 
-    @Query("Select * from ArchivedNotesTable join NotesTable on ArchivedNotesTable.noteID = NotesTable.noteID ")
+    @Query("Select * from ArchivedNote join Note on ArchivedNote.noteID = Note.noteID ")
     fun getArchivedNotes() : LiveData<List<Note>>
 
-    @Query("Select * from PinnedNotesTable  join NotesTable on PinnedNotesTable.noteID = NotesTable.noteID where not exists (select * from ArchivedNotesTable where ArchivedNotesTable.noteID = PinnedNotesTable.noteID ) ")
+    @Query("Select * from PinnedNote  join Note on PinnedNote.noteID = Note.noteID where not exists (select * from ArchivedNote where ArchivedNote.noteID = PinnedNote.noteID ) ")
     fun getPinnedNotes() : LiveData<List<Note>>
 
 

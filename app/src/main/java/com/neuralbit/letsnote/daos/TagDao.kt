@@ -13,6 +13,6 @@ interface TagDao {
     @Delete
     suspend fun deleteTag(tag: Tag)
 
-    @Query("select * from TagTable")
+    @Query("select * from Tag")
     fun getTags(): LiveData<List<Tag>>
 }

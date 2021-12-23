@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.util.*
 
-@Entity(tableName = "NotesTable")
+@Entity
 class Note(
     @ColumnInfo(name = "title")val title: String ?,
     @ColumnInfo(name ="description")val description: String ?,

@@ -5,7 +5,8 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 
-@Entity(tableName = "PinnedNotesTable")
+@Entity
 class PinnedNote(
-    @PrimaryKey @ColumnInfo(name = "noteID") val noteID: Long
+    @PrimaryKey (autoGenerate = false)
+    @ColumnInfo(name = "noteID") val noteID: Long
 )
