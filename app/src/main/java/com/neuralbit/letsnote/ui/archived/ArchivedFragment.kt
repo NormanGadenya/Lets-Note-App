@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.neuralbit.letsnote.*
 import com.neuralbit.letsnote.databinding.FragmentArchivedNotesBinding
+import com.neuralbit.letsnote.entities.Note
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 
 class ArchivedFragment : Fragment() , NoteClickInterface {

@@ -1,8 +1,9 @@
-package com.neuralbit.letsnote
+package com.neuralbit.letsnote.utilities
 
-import android.util.Log
 import android.view.View
 import android.widget.TextView
+import com.neuralbit.letsnote.R
+import com.neuralbit.letsnote.entities.Tag
 import com.teamwork.autocomplete.view.AutoCompleteViewBinder
 import com.teamwork.autocomplete.view.AutoCompleteViewHolder
 
@@ -30,7 +31,7 @@ class TagViewBinder : AutoCompleteViewBinder<Tag> {
         item: Tag,
         constraint: CharSequence?
     ) {
-        var tagViewHolder :TagViewHolder = viewHolder as TagViewHolder
+        var tagViewHolder : TagViewHolder = viewHolder as TagViewHolder
         tagViewHolder.tagTitle.text = item.tagTitle
     }
 

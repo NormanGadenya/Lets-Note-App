@@ -1,18 +1,22 @@
-package com.neuralbit.letsnote
+package com.neuralbit.letsnote.daos
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.neuralbit.letsnote.entities.ArchivedNote
+import com.neuralbit.letsnote.entities.Note
+import com.neuralbit.letsnote.entities.PinnedNote
+import com.neuralbit.letsnote.entities.Tag
 
 @Dao
 interface NotesDao {
     @Insert(onConflict= OnConflictStrategy.IGNORE )
-    suspend fun insert(note:Note)
+    suspend fun insert(note: Note)
 
     @Update
-    suspend fun update(note:Note)
+    suspend fun update(note: Note)
 
     @Delete
-    suspend fun delete(note:Note)
+    suspend fun delete(note: Note)
 
     @Insert(onConflict= OnConflictStrategy.IGNORE )
     suspend fun insertArchive(noteId : ArchivedNote)
@@ -27,7 +31,7 @@ interface NotesDao {
     suspend fun deletePinned(noteId : PinnedNote)
 
     @Insert(onConflict= OnConflictStrategy.IGNORE )
-    suspend fun insertTag(tag:Tag)
+    suspend fun insertTag(tag: Tag)
 
     @Delete
     suspend fun deleteTag(tag: Tag)

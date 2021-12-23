@@ -1,7 +1,9 @@
-package com.neuralbit.letsnote
+package com.neuralbit.letsnote.daos
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.neuralbit.letsnote.relationships.NotesWithTag
+import com.neuralbit.letsnote.relationships.TagsWithNote
+import com.neuralbit.letsnote.entities.NoteTagCrossRef
 
 @Dao
 interface NoteTagDao {

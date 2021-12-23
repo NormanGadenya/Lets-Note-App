@@ -4,8 +4,7 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.neuralbit.letsnote.NoteClickInterface
-import com.neuralbit.letsnote.Tag
+import com.neuralbit.letsnote.entities.Tag
 
 class TagRVAdapter (
     val context: Context,

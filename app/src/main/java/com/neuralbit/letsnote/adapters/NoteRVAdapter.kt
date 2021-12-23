@@ -1,14 +1,12 @@
 package com.neuralbit.letsnote
 
 import android.content.Context
-import android.graphics.Color
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.neuralbit.letsnote.entities.Note
 
 class NoteRVAdapter (
     val context: Context,
@@ -86,5 +84,5 @@ class NoteRVAdapter (
 
 
 interface  NoteClickInterface{
-    fun onNoteClick(note:Note)
+    fun onNoteClick(note: Note)
 }

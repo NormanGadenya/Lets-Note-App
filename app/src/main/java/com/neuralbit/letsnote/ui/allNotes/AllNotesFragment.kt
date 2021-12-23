@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.neuralbit.letsnote.*
 import com.neuralbit.letsnote.databinding.FragmentAllNotesBinding
+import com.neuralbit.letsnote.entities.Note
 
 class AllNotesFragment : Fragment() , NoteClickInterface {
 

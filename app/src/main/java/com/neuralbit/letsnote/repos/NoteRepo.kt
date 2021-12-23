@@ -1,6 +1,10 @@
-package com.neuralbit.letsnote
+package com.neuralbit.letsnote.repos
 
 import androidx.lifecycle.LiveData
+import com.neuralbit.letsnote.entities.ArchivedNote
+import com.neuralbit.letsnote.daos.NotesDao
+import com.neuralbit.letsnote.entities.Note
+import com.neuralbit.letsnote.entities.PinnedNote
 
 class NoteRepo(
     private val notesDao : NotesDao
@@ -8,12 +12,12 @@ class NoteRepo(
     val allNotes: LiveData<List<Note>> = notesDao.getAllNotes()
     val archivedNotes : LiveData<List<Note>> = notesDao.getArchivedNotes()
     val pinnedNotes : LiveData<List<Note>> = notesDao.getPinnedNotes()
-    suspend fun  insert(note:Note){
+    suspend fun  insert(note: Note){
         notesDao.insert(note)
     }
 
 
-    suspend fun delete(note:Note){
+    suspend fun delete(note: Note){
         notesDao.delete(note)
     }
 

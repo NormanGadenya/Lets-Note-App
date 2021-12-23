@@ -1,7 +1,6 @@
-package com.neuralbit.letsnote
+package com.neuralbit.letsnote.utilities
 
-import android.util.Log
-import android.widget.MultiAutoCompleteTextView
+import com.neuralbit.letsnote.entities.Tag
 import com.teamwork.autocomplete.filter.HandleTokenFilter
 
 class TagTokenFilter(handleChar :Char = '#') : HandleTokenFilter<Tag>(handleChar){

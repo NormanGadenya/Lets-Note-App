@@ -3,6 +3,11 @@ package com.neuralbit.letsnote
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
+import com.neuralbit.letsnote.entities.*
+import com.neuralbit.letsnote.relationships.TagsWithNote
+import com.neuralbit.letsnote.repos.NoteRepo
+import com.neuralbit.letsnote.repos.NoteTagRepo
+import com.neuralbit.letsnote.repos.TagRepo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.collections.ArrayList
@@ -114,19 +119,19 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     }fun addNote(note: Note)= viewModelScope.launch(Dispatchers.IO){
         repo.insert(note)
     }
-    fun archiveNote(id:ArchivedNote) = viewModelScope.launch(Dispatchers.IO){
+    fun archiveNote(id: ArchivedNote) = viewModelScope.launch(Dispatchers.IO){
         repo.insertArchive(id)
     }
 
-    fun removeArchive(id:ArchivedNote) = viewModelScope.launch(Dispatchers.IO){
+    fun removeArchive(id: ArchivedNote) = viewModelScope.launch(Dispatchers.IO){
         repo.deleteArchive(id)
     }
 
-    fun pinNote(id:PinnedNote) = viewModelScope.launch(Dispatchers.IO){
+    fun pinNote(id: PinnedNote) = viewModelScope.launch(Dispatchers.IO){
         repo.insertPinned(id)
     }
 
-    fun removePin(id:PinnedNote) = viewModelScope.launch(Dispatchers.IO){
+    fun removePin(id: PinnedNote) = viewModelScope.launch(Dispatchers.IO){
         repo.deletePinned(id)
     }
 

@@ -9,8 +9,8 @@ import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
+import com.neuralbit.letsnote.entities.Tag
 
 class TagRVAdapter (
     val context: Context,

@@ -25,6 +25,11 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.HORIZONTAL
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
+import com.neuralbit.letsnote.entities.*
+import com.neuralbit.letsnote.utilities.Common
+import com.neuralbit.letsnote.utilities.KeyboardUtils
+import com.neuralbit.letsnote.utilities.TagTokenFilter
+import com.neuralbit.letsnote.utilities.TagViewBinder
 import com.teamwork.autocomplete.MultiAutoComplete
 import com.teamwork.autocomplete.adapter.AutoCompleteTypeAdapter
 import com.teamwork.autocomplete.tokenizer.PrefixTokenizer
@@ -136,7 +141,7 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface {
         viewModal.pinnedNotes.observe(this) {
             pinnedNotes = it
         }
-        KeyboardUtils.addKeyboardToggleListener(this,KeyboardUtils.SoftKeyboardToggleListener {
+        KeyboardUtils.addKeyboardToggleListener(this, KeyboardUtils.SoftKeyboardToggleListener {
             onKeyboardVisibilityChanged(it)
         })
 
@@ -413,7 +418,7 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface {
         }
         pinButton.setOnClickListener {
             viewModal.pinned.value = !pinnedNote
-            val pN=PinnedNote(noteID)
+            val pN= PinnedNote(noteID)
             viewModal.pinNote(pN)
             val snackbar = Snackbar.make(coordinatorlayout,"Note pinned",Snackbar.LENGTH_LONG)
             snackbar.setAction("UNDO"

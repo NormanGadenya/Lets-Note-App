@@ -1,4 +1,4 @@
-package com.neuralbit.letsnote;
+package com.neuralbit.letsnote.utilities;
 
 import android.app.Activity;
 import android.content.Context;

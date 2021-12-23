@@ -5,6 +5,10 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.neuralbit.letsnote.daos.NoteTagDao
+import com.neuralbit.letsnote.daos.NotesDao
+import com.neuralbit.letsnote.daos.TagDao
+import com.neuralbit.letsnote.entities.*
 
 @Database(
     entities = [

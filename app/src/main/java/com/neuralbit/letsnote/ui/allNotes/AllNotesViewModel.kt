@@ -3,9 +3,9 @@ package com.neuralbit.letsnote.ui.allNotes
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
-import com.neuralbit.letsnote.Note
+import com.neuralbit.letsnote.entities.Note
 import com.neuralbit.letsnote.NoteDatabase
-import com.neuralbit.letsnote.NoteRepo
+import com.neuralbit.letsnote.repos.NoteRepo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.ArrayList
