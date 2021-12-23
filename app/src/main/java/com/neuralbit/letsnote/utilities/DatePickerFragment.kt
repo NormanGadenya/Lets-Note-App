@@ -10,7 +10,10 @@ import androidx.fragment.app.DialogFragment
 import java.util.*
 
 
-class DatePickerFragment (val ctx :Activity ): DialogFragment(), DatePickerDialog.OnDateSetListener {
+class DatePickerFragment (
+    private val ctx :Activity,
+    private val getDateFromPicker: GetDateFromPicker
+    ): DialogFragment(), DatePickerDialog.OnDateSetListener {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
@@ -23,6 +26,10 @@ class DatePickerFragment (val ctx :Activity ): DialogFragment(), DatePickerDialo
     }
 
     override fun onDateSet(view: DatePicker, year: Int, month: Int, day: Int) {
-        // Do something with the date chosen by the user
+        getDateFromPicker.getDateInfo(year,month,day)
     }
+}
+
+interface GetDateFromPicker{
+    fun getDateInfo( year:Int,month: Int, day: Int )
 }

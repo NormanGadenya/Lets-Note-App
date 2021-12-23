@@ -36,7 +36,7 @@ import com.teamwork.autocomplete.view.MultiAutoCompleteEditText
 import kotlinx.coroutines.launch
 
 
-class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface{
+class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicker, GetDateFromPicker, GetTagFromDialog{
     private lateinit var actionBarIcons: List<Int>
     private lateinit var restoreButton: ImageButton
     private lateinit var archiveButton: ImageButton
@@ -46,6 +46,7 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface{
     private lateinit var alertButton: ImageButton
     private lateinit var noteTitleEdit : EditText
     private lateinit var noteDescriptionEdit : MultiAutoCompleteEditText
+    private lateinit var addTagBtn : ImageButton
     private var noteID : Long= -1
     private var tagID = -1
     private lateinit var viewModal :NoteViewModel
@@ -90,7 +91,7 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface{
         tagListRV = findViewById(R.id.tagListRV)
         coordinatorlayout = findViewById(R.id.coordinatorlayout)
         alertButton = findViewById(R.id.alertButton)
-
+        addTagBtn = findViewById(R.id.addTagBtn)
         val layoutManager = LinearLayoutManager(applicationContext,LinearLayoutManager.HORIZONTAL,false)
 
         layoutManager.orientation = HORIZONTAL
@@ -126,7 +127,12 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface{
         archiveButton = findViewById(R.id.archiveButton)
         restoreButton = findViewById(R.id.restoreButton)
         bottomSheet =  BottomSheetDialog(this)
-
+        
+        addTagBtn.setOnClickListener {
+            val addTagDialog = AddTagDialog(this)
+            addTagDialog.show(supportFragmentManager,"addTagDialog")
+            
+        }
 //        newTagButton = findViewById(R.id.newTagBtn)
 //        tagSpinner = findViewById(R.id.tagSpinner)
 //        tagSpinner.onItemSelectedListener = this
@@ -226,6 +232,7 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface{
 
             }
         }
+
 
         viewModal.newTagTyped.observe(this) { newTagTyped = it }
 
@@ -548,10 +555,10 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface{
         val timeTitleTV = alertDialog?.findViewById<TextView>(R.id.timeTitle)
         val dateTitleTV = alertDialog?.findViewById<TextView>(R.id.dateTitle)
         timePickerBtn?.setOnClickListener {
-            TimePickerFragment().show(supportFragmentManager,"timePicker")
+            TimePickerFragment(this).show(supportFragmentManager,"timePicker")
         }
         datePickerBtn?.setOnClickListener {
-            val newFragment = DatePickerFragment(this)
+            val newFragment = DatePickerFragment(this,this)
             newFragment.show(supportFragmentManager, "datePicker")
         }
 
@@ -628,6 +635,22 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface{
 
     }
 
+    override fun getTimeInfo(hour: Int, min: Int) {
+        Log.d(TAG, "getTimeInfo: $hour and $min")
+    }
+
+    override fun getDateInfo(year: Int, month: Int, day: Int) {
+        Log.d(TAG, "getDateInfo: $year $month $day")
+    }
+
+    override fun getTag(tag: Tag) {
+        Log.d(TAG, "getTag: $tag")
+        viewModal.addTag(tag)
+        viewModal.addTagToList(tag)
+        tagListAdapter.updateList(viewModal.tagList)
+        viewModal.noteChanged(true)
+
+    }
 
 
 }

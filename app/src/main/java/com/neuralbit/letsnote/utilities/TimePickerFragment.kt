@@ -11,9 +11,10 @@ import java.text.DateFormat
 import com.google.android.material.timepicker.TimeFormat
 import java.util.*
 
-class TimePickerFragment : DialogFragment() , TimePickerDialog.OnTimeSetListener {
+class TimePickerFragment(private val getTimeFromPicker : GetTimeFromPicker ) : DialogFragment() , TimePickerDialog.OnTimeSetListener {
+
     override fun onTimeSet(p0: TimePicker?, p1: Int, p2: Int) {
-        Log.d("TAG", "onTimeSet: $p1 and $p2")
+        getTimeFromPicker.getTimeInfo(p1,p2)
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -24,4 +25,8 @@ class TimePickerFragment : DialogFragment() , TimePickerDialog.OnTimeSetListener
 
         return TimePickerDialog(activity,this,hour,minute, is24HourFormat(activity))
     }
+}
+
+interface GetTimeFromPicker{
+    fun getTimeInfo( hour:Int, min:Int)
 }

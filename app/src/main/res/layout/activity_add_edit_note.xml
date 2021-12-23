@@ -44,33 +44,34 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/noteEditTitle" />
 
+        <ImageView
+            android:id="@+id/imageView6"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/price_tag"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tagListRV" />
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_baseline_add_24"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:id="@+id/addTagBtn"
+            app:layout_constraintTop_toBottomOf="@id/imageView6"
+            app:layout_constraintBottom_toTopOf="@id/tvTimeStamp"
+            app:layout_constraintStart_toStartOf="@id/imageView6"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/tagListRV"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
-            app:layout_constraintBottom_toTopOf="@id/tvTimeStamp"
-            app:layout_constraintStart_toStartOf="parent" />
+            android:layout_marginStart="8dp"
+            tools:itemCount="1"
+            app:layout_constraintBottom_toTopOf="@id/addTagBtn"
+            app:layout_constraintStart_toEndOf="@+id/imageView6" />
 
-        <TimePicker
-            android:id="@+id/timePicker"
-            android:layout_width="wrap_content"
-            android:visibility="gone"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/noteEditDesc" />
-
-        <DatePicker
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/datePicker"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/noteEditDesc"/>
 
         <TextView
             android:id="@+id/tvTimeStamp"
