@@ -25,16 +25,16 @@ class NoteRepo(
         notesDao.update(note)
     }
 
-    suspend fun insertArchive(id: ArchivedNote){
-        notesDao.insertArchive(id)
+    suspend fun insertArchive(archivedNote: ArchivedNote){
+        notesDao.insertArchive(archivedNote)
     }
-    suspend fun deleteArchive(id: ArchivedNote){
-        notesDao.deleteArchive(id)
+    suspend fun deleteArchive(archivedNote: ArchivedNote){
+        notesDao.deleteArchive(archivedNote)
     }
-    suspend fun insertPinned(id: PinnedNote){
-        notesDao.insertPinned(id)
+    suspend fun insertPinned(pinnedNote: PinnedNote){
+        notesDao.insertPinned(pinnedNote)
     }
-    suspend fun deletePinned(id: PinnedNote){
-        notesDao.deletePinned(id)
+    suspend fun deletePinned(pinnedNote: PinnedNote){
+        notesDao.deletePinned(pinnedNote)
     }
 }

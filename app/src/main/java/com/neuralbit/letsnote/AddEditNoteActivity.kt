@@ -76,6 +76,7 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface {
     private var tagDeleted = false
     private lateinit var tagListAdapter : TagRVAdapter
     private lateinit var bottomSheet : BottomSheetDialog
+    private var pinBtnClicked = false
 
 
     override fun onCreate(savedInstanceState: Bundle?)  {
@@ -111,30 +112,8 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface {
             }
         }
 
-        coordinatorlayout.viewTreeObserver.addOnGlobalLayoutListener { ViewTreeObserver.OnGlobalLayoutListener {
-          val r = Rect()
-          coordinatorlayout.getWindowVisibleDisplayFrame(r)
-          val screenHeight =  coordinatorlayout.rootView.height
-          val keypadHeight = screenHeight - r.bottom
-          if (keypadHeight > screenHeight * 0.15) { // 0.15 ratio is perhaps enough to determine keypad height.
-            // keyboard is opened
-            if (!isKeyBoardShowing) {
-                isKeyBoardShowing = true
-                Log.d(TAG, "onCreate: opened")
-                onKeyboardVisibilityChanged(true)
-            }
-        }
-          else {
-            // keyboard is closed
-            if (isKeyBoardShowing) {
-                Log.d(TAG, "onCreate: closed")
+        manipulateNoteDescLines()
 
-                isKeyBoardShowing = false
-                onKeyboardVisibilityChanged(false)
-            }
-        }
-
-        } }
         viewModal.archivedNote.observe(this) {
             archivedNotes = it
         }
@@ -167,17 +146,50 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface {
         noteType = intent.getStringExtra("noteType").toString()
         archived = intent.getBooleanExtra("archivedNote",false)
         viewModal.archived.value = archived
-        val pinnedNote = intent.getBooleanExtra("pinnedNote",false)
+        var pinnedNote = intent.getBooleanExtra("pinnedNote",false)
         viewModal.pinned.value = pinnedNote
         noteColor = intent.getStringExtra("noteColor")
         if(noteColor!=null){
             setBgColor()
          }
         viewModal.pinned.observe(this){
+            pinnedNote = it
+            val pN= PinnedNote(noteID)
+            var snackbar = Snackbar.make(coordinatorlayout, "Note pinned", Snackbar.LENGTH_LONG)
+
             if (it){
                 pinButton.setImageResource(R.drawable.ic_baseline_push_pin_24)
+                viewModal.pinNote(pN)
+                if(pinBtnClicked){
+                    snackbar.setAction(
+                        "UNDO"
+                    ) {
+                        pinBtnClicked = false
+                        viewModal.pinned.value = !pinnedNote
+                        viewModal.removePin(PinnedNote(noteID))
+                        Toast.makeText(this, "Note unpinned", Toast.LENGTH_SHORT).show()
+                    }
+                    snackbar.show()
+                }
+
+
             }else{
+                viewModal.removePin(pN)
                 pinButton.setImageResource(R.drawable.ic_outline_push_pin_24)
+                if(pinBtnClicked){
+                    snackbar = Snackbar.make(coordinatorlayout, "Note unpinned", Snackbar.LENGTH_LONG)
+
+                    snackbar.setAction(
+                        "UNDO"
+                    ) {
+                        pinBtnClicked = false
+                        viewModal.pinned.value = !pinnedNote
+                        viewModal.pinNote(PinnedNote(noteID))
+                        Toast.makeText(this, "Note unpinned", Toast.LENGTH_SHORT).show()
+                    }
+                    snackbar.show()
+                }
+
             }
         }
         viewModal.archived.observe(this){
@@ -218,23 +230,13 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface {
             }
         }
 
-        viewModal.newTagTyped.observe(this) {
-            newTagTyped = it
-        }
-        viewModal.wordEnd.observe(this) {
-            wordEnd = it
-        }
+        viewModal.newTagTyped.observe(this) { newTagTyped = it }
 
+        viewModal.wordEnd.observe(this) { wordEnd = it }
 
+        viewModal.backPressed.observe(this) { backPressed = it }
 
-        viewModal.backPressed.observe(this) {
-            backPressed = it
-        }
-
-        viewModal.wordStart.observe(this) {
-            wordStart = it
-        }
-
+        viewModal.wordStart.observe(this) { wordStart = it }
 
         viewModal.noteDescString.observe(this) { noteDescStr ->
             if (newTagTyped) {
@@ -359,13 +361,15 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface {
             deletable = it
         }
         viewModal.archived.observe(this) {
-            if (archived) {
+            if (it) {
                 pinButton.visibility = GONE
                 archiveButton.visibility = GONE
+                alertButton.visibility = GONE
                 restoreButton.visibility = VISIBLE
             } else {
                 pinButton.visibility = VISIBLE
                 archiveButton.visibility = VISIBLE
+                alertButton.visibility = VISIBLE
                 restoreButton.visibility = GONE
             }
         }
@@ -417,18 +421,12 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface {
 
         }
         pinButton.setOnClickListener {
-            viewModal.pinned.value = !pinnedNote
-            val pN= PinnedNote(noteID)
-            viewModal.pinNote(pN)
-            val snackbar = Snackbar.make(coordinatorlayout,"Note pinned",Snackbar.LENGTH_LONG)
-            snackbar.setAction("UNDO"
-            ) {
-                viewModal.pinned.value = pinnedNote
-                viewModal.removePin(pN)
-                Toast.makeText(this,"Note unpinned", Toast.LENGTH_SHORT).show()
-            }
-            snackbar.show()
+            pinBtnClicked = true
 
+            viewModal.pinned.value = !pinnedNote
+            Log.d(TAG, "onCreate: $pinnedNote")
+
+            
         }
 
         restoreButton.setOnClickListener {
@@ -439,6 +437,31 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface {
 
 
         }
+    }
+
+    private fun manipulateNoteDescLines() {
+        coordinatorlayout.viewTreeObserver.addOnGlobalLayoutListener { ViewTreeObserver.OnGlobalLayoutListener {
+            val r = Rect()
+            coordinatorlayout.getWindowVisibleDisplayFrame(r)
+            val screenHeight =  coordinatorlayout.rootView.height
+            val keypadHeight = screenHeight - r.bottom
+            if (keypadHeight > screenHeight * 0.15) { // 0.15 ratio is perhaps enough to determine keypad height.
+                // keyboard is opened
+                if (!isKeyBoardShowing) {
+                    isKeyBoardShowing = true
+                    onKeyboardVisibilityChanged(true)
+                }
+            }
+            else {
+                // keyboard is closed
+                if (isKeyBoardShowing) {
+
+                    isKeyBoardShowing = false
+                    onKeyboardVisibilityChanged(false)
+                }
+            }
+
+        } }
     }
 
     private fun alertSheetDialog() {

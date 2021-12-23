@@ -36,11 +36,11 @@
         android:id="@+id/pinButton"
         android:src="@drawable/ic_outline_push_pin_24"
         android:background="?attr/selectableItemBackgroundBorderless"
-        app:layout_constraintEnd_toStartOf="@+id/deleteButton"
+        app:layout_constraintEnd_toStartOf="@+id/archiveButton"
         app:layout_constraintTop_toTopOf="parent"
         android:visibility="visible"
+        android:layout_marginEnd="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginEnd="54dp"
         />
 
     <ImageButton
@@ -49,11 +49,11 @@
         android:id="@+id/archiveButton"
         android:src="@drawable/ic_baseline_archive_24"
         android:background="?attr/selectableItemBackgroundBorderless"
-        app:layout_constraintEnd_toStartOf="@id/deleteButton"
+        app:layout_constraintEnd_toStartOf="@id/restoreButton"
         app:layout_constraintTop_toTopOf="parent"
         android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginEnd="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         />
 
     <ImageButton

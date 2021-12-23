@@ -40,13 +40,13 @@ interface NotesDao {
     fun getTags(): LiveData<List<Tag>>
 
 
-    @Query("Select * from NotesTable where not exists (select * from ArchivedNotesTable where ArchivedNotesTable.id = NotesTable.noteID) and not exists (select * from PinnedNotesTable where PinnedNotesTable.id= NotesTable.noteID) order by timeStamp DESC")
+    @Query("Select * from NotesTable where not exists (select * from ArchivedNotesTable where ArchivedNotesTable.noteID = NotesTable.noteID) and not exists (select * from PinnedNotesTable where PinnedNotesTable.noteID= NotesTable.noteID) order by timeStamp DESC")
     fun getAllNotes(): LiveData<List<Note>>
 
-    @Query("Select * from ArchivedNotesTable join NotesTable on ArchivedNotesTable.id = NotesTable.noteID ")
+    @Query("Select * from ArchivedNotesTable join NotesTable on ArchivedNotesTable.noteID = NotesTable.noteID ")
     fun getArchivedNotes() : LiveData<List<Note>>
 
-    @Query("Select * from PinnedNotesTable join NotesTable on PinnedNotesTable.id = NotesTable.noteID")
+    @Query("Select * from PinnedNotesTable  join NotesTable on PinnedNotesTable.noteID = NotesTable.noteID where not exists (select * from ArchivedNotesTable where ArchivedNotesTable.noteID = PinnedNotesTable.noteID ) ")
     fun getPinnedNotes() : LiveData<List<Note>>
 
 

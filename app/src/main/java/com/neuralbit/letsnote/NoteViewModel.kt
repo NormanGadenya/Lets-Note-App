@@ -119,20 +119,20 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     }fun addNote(note: Note)= viewModelScope.launch(Dispatchers.IO){
         repo.insert(note)
     }
-    fun archiveNote(id: ArchivedNote) = viewModelScope.launch(Dispatchers.IO){
-        repo.insertArchive(id)
+    fun archiveNote(archivedNote: ArchivedNote) = viewModelScope.launch(Dispatchers.IO){
+        repo.insertArchive(archivedNote)
     }
 
-    fun removeArchive(id: ArchivedNote) = viewModelScope.launch(Dispatchers.IO){
-        repo.deleteArchive(id)
+    fun removeArchive(archivedNote: ArchivedNote) = viewModelScope.launch(Dispatchers.IO){
+        repo.deleteArchive(archivedNote)
     }
 
-    fun pinNote(id: PinnedNote) = viewModelScope.launch(Dispatchers.IO){
-        repo.insertPinned(id)
+    fun pinNote(pinnedNote: PinnedNote) = viewModelScope.launch(Dispatchers.IO){
+        repo.insertPinned(pinnedNote)
     }
 
-    fun removePin(id: PinnedNote) = viewModelScope.launch(Dispatchers.IO){
-        repo.deletePinned(id)
+    fun removePin(pinnedNote: PinnedNote) = viewModelScope.launch(Dispatchers.IO){
+        repo.deletePinned(pinnedNote)
     }
 
     fun addTag(tag : Tag) = viewModelScope.launch(Dispatchers.IO){
