@@ -10,14 +10,14 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
+
         android:layout_height="match_parent">
 
         <EditText
             android:id="@+id/noteEditTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/activity_horizontal_margin"
-            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:layout_margin="@dimen/activity_horizontal_margin"
             android:background="@android:color/transparent"
             android:hint="@string/title"
             android:inputType="textAutoComplete"
@@ -30,58 +30,74 @@
 
         <com.teamwork.autocomplete.view.MultiAutoCompleteEditText
             android:id="@+id/noteEditDesc"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/activity_horizontal_margin"
             android:background="@android:color/transparent"
             android:completionHint="Create new Tag"
             android:completionThreshold="1"
             android:hint="@string/note_content"
             android:importantForAutofill="no"
+            android:layout_margin="@dimen/activity_horizontal_margin"
             android:inputType="textMultiLine"
             android:paddingTop="8dp"
             android:paddingBottom="8dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/noteEditTitle" />
 
-        <ImageView
-            android:id="@+id/imageView6"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:src="@drawable/price_tag"
-            android:layout_marginStart="@dimen/activity_horizontal_margin"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/tagListRV" />
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_baseline_add_24"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:id="@+id/addTagBtn"
-            app:layout_constraintTop_toBottomOf="@id/imageView6"
-            app:layout_constraintBottom_toTopOf="@id/tvTimeStamp"
-            app:layout_constraintStart_toStartOf="@id/imageView6"/>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/tagListRV"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginStart="8dp"
-            tools:itemCount="1"
-            app:layout_constraintBottom_toTopOf="@id/addTagBtn"
-            app:layout_constraintStart_toEndOf="@+id/imageView6" />
 
 
-        <TextView
-            android:id="@+id/tvTimeStamp"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/activity_horizontal_margin"
-            android:layout_marginEnd="@dimen/activity_horizontal_margin"
-            android:padding="8dp"
-            android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:background="@color/Celadon"
+            android:padding="@dimen/activity_horizontal_margin"
+            >
+            <ImageButton
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:foreground="@drawable/ic_baseline_local_offer_24"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:id="@+id/addTagBtn"
+                android:visibility="visible"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <ImageButton
+                android:id="@+id/labelBtn"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginTop="@dimen/activity_horizontal_margin"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:foreground="@drawable/ic_baseline_bookmark_add_24"
+                android:visibility="visible"
+                app:layout_constraintTop_toBottomOf="@id/addTagBtn"
+                app:layout_constraintStart_toStartOf="parent" />
+
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/tagListRV"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/addTagBtn"
+                app:layout_constraintTop_toTopOf="@id/addTagBtn"
+                tools:itemCount="1" />
+
+
+            <TextView
+                android:id="@+id/tvTimeStamp"
+                android:layout_width="wrap_content"
+                app:layout_constraintStart_toEndOf="@id/addTagBtn"
+                android:layout_marginStart="8dp"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

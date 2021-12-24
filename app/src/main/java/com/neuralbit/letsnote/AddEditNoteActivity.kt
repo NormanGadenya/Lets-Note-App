@@ -73,8 +73,10 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
     private var deletedTag = ArrayList<String>()
     private var tagDeleted = false
     private lateinit var tagListAdapter : TagRVAdapter
-    private lateinit var bottomSheet : BottomSheetDialog
+    private lateinit var alertBottomSheet : BottomSheetDialog
+    private lateinit var labelBottomSheet : BottomSheetDialog
     private var pinBtnClicked = false
+    private lateinit var labelBtn : ImageButton
 
 
     override fun onCreate(savedInstanceState: Bundle?)  {
@@ -89,13 +91,14 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
         noteDescriptionEdit = findViewById(R.id.noteEditDesc)
         tvTimeStamp = findViewById(R.id.tvTimeStamp)
         tagListRV = findViewById(R.id.tagListRV)
+        labelBtn = findViewById(R.id.labelBtn)
         coordinatorlayout = findViewById(R.id.coordinatorlayout)
         alertButton = findViewById(R.id.alertButton)
         addTagBtn = findViewById(R.id.addTagBtn)
         val layoutManager = LinearLayoutManager(applicationContext,LinearLayoutManager.HORIZONTAL,false)
 
         layoutManager.orientation = HORIZONTAL
-         tagListAdapter= TagRVAdapter(applicationContext,this)
+        tagListAdapter= TagRVAdapter(applicationContext,this)
         tagListRV.layoutManager= layoutManager
         tagListRV.adapter = tagListAdapter
 
@@ -126,23 +129,15 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
         backButton = findViewById(R.id.backButton)
         archiveButton = findViewById(R.id.archiveButton)
         restoreButton = findViewById(R.id.restoreButton)
-        bottomSheet =  BottomSheetDialog(this)
+        alertBottomSheet =  BottomSheetDialog(this)
+        labelBottomSheet = BottomSheetDialog(this)
         
         addTagBtn.setOnClickListener {
             val addTagDialog = AddTagDialog(this)
             addTagDialog.show(supportFragmentManager,"addTagDialog")
             
         }
-//        newTagButton = findViewById(R.id.newTagBtn)
-//        tagSpinner = findViewById(R.id.tagSpinner)
-//        tagSpinner.onItemSelectedListener = this
 
-//        val evColor = findViewById<ImageButton>(R.id.evBackground)
-//        val woColor = findViewById<ImageButton>(R.id.wOrchidBackground)
-//        val cColor = findViewById<ImageButton>(R.id.celadonBackground)
-//        val hdColor = findViewById<ImageButton>(R.id.HoneydrewBackground)
-//        val aColor = findViewById<ImageButton>(R.id.apricotBackground)
-//        val whColor = findViewById<ImageButton>(R.id.whiteBackground)
         coordinatorlayout = findViewById(R.id.coordinatorlayout)
         pinButton = findViewById(R.id.pinButton)
 
@@ -285,10 +280,13 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
         alertButton.setOnClickListener {
             showAlertSheetDialog()
         }
-        bottomSheet.setOnDismissListener {
+        alertBottomSheet.setOnDismissListener {
             //TODO set bottom sheet On dismiss behaviour
         }
 
+        labelBtn.setOnClickListener {
+            showLabelBottomSheetDialog()
+        }
         noteTitleEdit.addTextChangedListener(object : TextWatcher{
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
             }
@@ -443,6 +441,53 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
         }
     }
 
+    private fun showLabelBottomSheetDialog() {
+        labelBottomSheet.setContentView(R.layout.note_label_bottom_sheet)
+        labelBottomSheet.show()
+        val whiteLabel = labelBottomSheet.findViewById<ImageButton>(R.id.whiteBtn)
+        val wildLabel = labelBottomSheet.findViewById<ImageButton>(R.id.wildBtn)
+        val hdLabel = labelBottomSheet.findViewById<ImageButton>(R.id.hdBtn)
+        val evLabel = labelBottomSheet.findViewById<ImageButton>(R.id.evBtn)
+        val celLabel = labelBottomSheet.findViewById<ImageButton>(R.id.celadonBtn)
+        val aprBtn = labelBottomSheet.findViewById<ImageButton>(R.id.apricotBtn)
+
+        whiteLabel?.setOnClickListener {
+            coordinatorlayout.setBackgroundColor(resources.getColor(R.color.white))
+            labelBottomSheet.dismiss()
+        }
+
+        wildLabel?.setOnClickListener {
+            coordinatorlayout.setBackgroundColor(resources.getColor(R.color.Wild_orchid))
+
+            labelBottomSheet.dismiss()
+
+        }
+        hdLabel?.setOnClickListener {
+            coordinatorlayout.setBackgroundColor(resources.getColor(R.color.Honeydew))
+
+            labelBottomSheet.dismiss()
+
+        }
+
+        evLabel?.setOnClickListener {
+            coordinatorlayout.setBackgroundColor(resources.getColor(R.color.English_violet))
+
+            labelBottomSheet.dismiss()
+
+        }
+        celLabel?.setOnClickListener {
+            coordinatorlayout.setBackgroundColor(resources.getColor(R.color.Celadon))
+
+            labelBottomSheet.dismiss()
+
+        }
+        aprBtn?.setOnClickListener {
+            coordinatorlayout.setBackgroundColor(resources.getColor(R.color.Apricot))
+
+            labelBottomSheet.dismiss()
+        }
+    }
+
     private fun manipulateNoteDescLines() {
         coordinatorlayout.viewTreeObserver.addOnGlobalLayoutListener { ViewTreeObserver.OnGlobalLayoutListener {
             val r = Rect()
@@ -469,12 +514,12 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
     }
 
     private fun showAlertSheetDialog() {
-        bottomSheet.setContentView(R.layout.alert_bottom_sheet)
-        bottomSheet.show()
-        val opt1 = bottomSheet.findViewById<View>(R.id.auto1)
-        val opt2 = bottomSheet.findViewById<View>(R.id.auto2)
-        val opt3 = bottomSheet.findViewById<View>(R.id.auto3)
-        val customDT = bottomSheet.findViewById<View>(R.id.customDateTime)
+        alertBottomSheet.setContentView(R.layout.alert_bottom_sheet)
+        alertBottomSheet.show()
+        val opt1 = alertBottomSheet.findViewById<View>(R.id.auto1)
+        val opt2 = alertBottomSheet.findViewById<View>(R.id.auto2)
+        val opt3 = alertBottomSheet.findViewById<View>(R.id.auto3)
+        val customDT = alertBottomSheet.findViewById<View>(R.id.customDateTime)
         customDT?.setOnClickListener {
             openDateTimeDialog()
         }

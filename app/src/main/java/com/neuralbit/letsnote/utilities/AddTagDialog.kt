@@ -20,7 +20,7 @@ class AddTagDialog(val getTagFromDialog: GetTagFromDialog): AppCompatDialogFragm
         builder.setView(view)
             .setTitle("Add new tag")
             .setNegativeButton("cancel"
-            ) { p0, p1 -> TODO("Not yet implemented") }
+            ) { p0, p1 -> dismiss() }
             .setPositiveButton("ok"){p0, p1 ->
                 run {
                     var tagTitle = addTagET?.text.toString()
