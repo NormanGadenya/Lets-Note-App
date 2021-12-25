@@ -14,7 +14,7 @@ class ReminderRepo (private val reminderDao: ReminderDao){
         reminderDao.delete(reminder)
     }
 
-    fun getReminder(noteID : Long): LiveData<Reminder> {
+    fun fetchReminder(noteID : Long): LiveData<Reminder> {
         return reminderDao.getReminder(noteID)
     }
 }

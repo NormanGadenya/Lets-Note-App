@@ -2,6 +2,8 @@
     <string name="app_name">Lets note</string>
     <string name="timeStamp"> Edited on %1$s at %2$s</string>
     <string name="reminder">Reminder set on %1$s at %2$s</string>
+    <string name="opt1Desc">Later today at %1$s</string>
+    <string name="opt2n3Desc">Tomorrow in the %1$s at %2$s</string>
     <string name="tagTitle">#%1$s</string>
     <string name="createNewTag">Create #%1$s</string>
     <string name="title_activity_main2">MainActivity2</string>

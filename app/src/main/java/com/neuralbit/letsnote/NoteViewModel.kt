@@ -179,7 +179,7 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         reminderRepo.delete(reminder)
     }
     fun getReminder(noteID : Long): LiveData<Reminder>  {
-        return reminderRepo.getReminder(noteID)
+        return reminderRepo.fetchReminder(noteID)
     }
 
     fun insertLabel(label: Label) = viewModelScope.launch(Dispatchers.IO){

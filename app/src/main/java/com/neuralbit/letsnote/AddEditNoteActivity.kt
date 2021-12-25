@@ -87,8 +87,6 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
     private var pinBtnClicked = false
     private lateinit var labelBtn : ImageButton
     private  var reminder: Reminder? = null
-    private var reminderDate: Long = 0
-    private var reminderTime : Long = 0
     private lateinit var lifecycleOwner : LifecycleOwner
     private lateinit var calendar: Calendar
     private lateinit var timeTitleTV :TextView
@@ -126,13 +124,11 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
             this,
             ViewModelProvider.AndroidViewModelFactory.getInstance(application)
         ).get(NoteViewModel::class.java)
-        viewModal.allNotes.observe(this) { list ->
-            list?.let {
-                allNotes = it
-                if(noteType != "Edit"){
-                    noteID = it.size.toLong() + 1
+        viewModal.allNotes.observe(this) {
+            allNotes = it
+            if(noteType != "Edit"){
+                noteID = it.size.toLong() + 1
 
-                }
             }
         }
 
@@ -248,14 +244,14 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
         }
 
 
-        viewModal.getReminder(noteID).observe(lifecycleOwner) {r->
-
-            if(r!=null){
+        viewModal.getReminder(noteID).observe(this) {
+            Log.d(TAG, "onCreate: $it")
+            if(it!=null){
                 alertButton.setBackgroundResource(R.drawable.ic_baseline_add_alert_24)
-                reminder = r
+                reminder = it
                 reminderTV.visibility =  VISIBLE
                 reminderIcon.visibility = VISIBLE
-                reminderTV.text = resources.getString(R.string.reminder,cm.convertLongToTime(r.dateTime)[0],cm.convertLongToTime(r.dateTime)[1])
+                reminderTV.text = resources.getString(R.string.reminder,cm.convertLongToTime(it.dateTime)[0],cm.convertLongToTime(it.dateTime)[1])
 
             }else{
                 alertButton.setBackgroundResource(R.drawable.ic_outline_add_alert_24)
@@ -271,6 +267,7 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
 
             }else{
                 viewModal.deleteReminder(reminder!!)
+                reminder = null
             }
         }
 
@@ -490,46 +487,47 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
     private fun showLabelBottomSheetDialog() {
         labelBottomSheet.setContentView(R.layout.note_label_bottom_sheet)
         labelBottomSheet.show()
-        val whiteLabel = labelBottomSheet.findViewById<ImageButton>(R.id.whiteBtn)
-        val wildLabel = labelBottomSheet.findViewById<ImageButton>(R.id.wildBtn)
-        val hdLabel = labelBottomSheet.findViewById<ImageButton>(R.id.hdBtn)
-        val evLabel = labelBottomSheet.findViewById<ImageButton>(R.id.evBtn)
-        val celLabel = labelBottomSheet.findViewById<ImageButton>(R.id.celadonBtn)
-        val aprBtn = labelBottomSheet.findViewById<ImageButton>(R.id.apricotBtn)
+        val l1Btn = labelBottomSheet.findViewById<ImageButton>(R.id.l1Btn)
+        val l2Btn = labelBottomSheet.findViewById<ImageButton>(R.id.l2Btn)
+        val l3Btn = labelBottomSheet.findViewById<ImageButton>(R.id.l3Btn)
+        val l4Btn = labelBottomSheet.findViewById<ImageButton>(R.id.l4Btn)
+        val l5Btn = labelBottomSheet.findViewById<ImageButton>(R.id.l5Btn)
+        val l6Btn = labelBottomSheet.findViewById<ImageButton>(R.id.l6Btn)
 
-        whiteLabel?.setOnClickListener {
+        l1Btn?.setOnClickListener {
             coordinatorlayout.setBackgroundColor(resources.getColor(R.color.white))
+            viewModal.insertLabel(Label(noteID,1))
             labelBottomSheet.dismiss()
         }
 
-        wildLabel?.setOnClickListener {
+        l2Btn?.setOnClickListener {
             coordinatorlayout.setBackgroundColor(resources.getColor(R.color.Wild_orchid))
-
+            viewModal.insertLabel(Label(noteID,2))
             labelBottomSheet.dismiss()
 
         }
-        hdLabel?.setOnClickListener {
+        l3Btn?.setOnClickListener {
             coordinatorlayout.setBackgroundColor(resources.getColor(R.color.Honeydew))
-
+            viewModal.insertLabel(Label(noteID,3))
             labelBottomSheet.dismiss()
 
         }
 
-        evLabel?.setOnClickListener {
+        l4Btn?.setOnClickListener {
             coordinatorlayout.setBackgroundColor(resources.getColor(R.color.English_violet))
-
+            viewModal.insertLabel(Label(noteID,4))
             labelBottomSheet.dismiss()
 
         }
-        celLabel?.setOnClickListener {
+        l5Btn?.setOnClickListener {
             coordinatorlayout.setBackgroundColor(resources.getColor(R.color.Celadon))
-
+            viewModal.insertLabel(Label(noteID,5))
             labelBottomSheet.dismiss()
 
         }
-        aprBtn?.setOnClickListener {
+        l6Btn?.setOnClickListener {
             coordinatorlayout.setBackgroundColor(resources.getColor(R.color.Apricot))
-
+            viewModal.insertLabel(Label(noteID,6))
             labelBottomSheet.dismiss()
         }
     }
@@ -562,17 +560,129 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
     private fun showAlertSheetDialog() {
         alertBottomSheet.setContentView(R.layout.alert_bottom_sheet)
         alertBottomSheet.show()
+        val c = Calendar.getInstance()
+        var currentHr = c.get(Calendar.HOUR_OF_DAY)
         val opt1 = alertBottomSheet.findViewById<View>(R.id.auto1)
         val opt2 = alertBottomSheet.findViewById<View>(R.id.auto2)
         val opt3 = alertBottomSheet.findViewById<View>(R.id.auto3)
+        val opt1Desc = alertBottomSheet.findViewById<TextView>(R.id.date1)
+        val opt2Desc = alertBottomSheet.findViewById<TextView>(R.id.date2)
+        val opt3Desc = alertBottomSheet.findViewById<TextView>(R.id.date3)
         val customDT = alertBottomSheet.findViewById<View>(R.id.customDateTime)
+        opt2Desc?.text = resources.getString(R.string.opt2n3Desc,"morning","8:00am")
+        opt3Desc?.text = resources.getString(R.string.opt2n3Desc,"evening","6:00pm")
+
+
         customDT?.setOnClickListener {
             openDateTimeDialog()
         }
+        when(currentHr){
+            in 0..4 -> {
+                opt1Desc?.text = resources.getString(R.string.opt1Desc,"8:00am")
+                opt1?.visibility = VISIBLE
 
-//        opt1.setOnClickListener { }
-//        opt2.setOnClickListener {  }
-//        opt3.setOnClickListener {  }
+            }
+            in 5..8 -> {
+                opt1Desc?.text = resources.getString(R.string.opt1Desc,"2:00pm")
+
+                opt1?.visibility = VISIBLE
+
+            }
+            in 9..14 ->{
+                opt1Desc?.text = resources.getString(R.string.opt1Desc,"6:00pm")
+                opt1?.visibility = VISIBLE
+
+            }
+            in 15..18 -> {
+                opt1Desc?.text = resources.getString(R.string.opt1Desc,"8:00pm")
+                opt1?.visibility = VISIBLE
+
+            }
+            in 19..23->  opt1?.visibility = GONE
+
+        }
+
+        opt1?.setOnClickListener {
+            if(noteDescriptionEdit.length() > 0 || noteTitleEdit.length() >0 ){
+                viewModal.texChanged.value = true
+
+            }
+            alertBottomSheet.dismiss()
+            when(currentHr){
+                in 0..4 -> {
+                    c[Calendar.HOUR_OF_DAY] = 8
+                    c[Calendar.MINUTE] = 0
+                    Toast.makeText(this, "Reminder set for today at 8:00 am", Toast.LENGTH_SHORT).show()
+
+                }
+                in 5..8 -> {
+                    c[Calendar.HOUR_OF_DAY] = 14
+                    c[Calendar.MINUTE] = 0
+                    Toast.makeText(this, "Reminder set for today at 2:00 pm", Toast.LENGTH_SHORT).show()
+
+                }
+                in 9..14 ->{
+                    c[Calendar.HOUR_OF_DAY] = 18
+                    c[Calendar.MINUTE] = 0
+                    Toast.makeText(this, "Reminder set for today at 6:00 pm", Toast.LENGTH_SHORT).show()
+
+                }
+                in 15..18 -> {
+                    c[Calendar.HOUR_OF_DAY] = 20
+                    c[Calendar.MINUTE] = 0
+                    Toast.makeText(this, "Reminder set for today at 8:00 pm", Toast.LENGTH_SHORT).show()
+
+                }
+            }
+            viewModal.insertReminder(Reminder(noteID, c.timeInMillis))
+            startAlarm(c)
+        }
+
+        opt2?.setOnClickListener {
+            alertBottomSheet.dismiss()
+            opt2Desc?.text = resources.getString(R.string.opt2n3Desc,"morning","8:00am")
+            c.add(Calendar.DAY_OF_MONTH,1)
+            c[Calendar.HOUR_OF_DAY] = 8
+            c[Calendar.MINUTE] = 0
+            if(noteDescriptionEdit.length() > 0 || noteTitleEdit.length() >0 ){
+                viewModal.texChanged.value = true
+
+            }
+            Toast.makeText(this, "Reminder set for tomorrow at 8:00am", Toast.LENGTH_SHORT).show()
+
+            viewModal.insertReminder(Reminder(noteID, c.timeInMillis))
+            startAlarm(c)
+            viewModal.getReminder(noteID).observe(this) {r->
+                Log.d(TAG, "onCreate: $r")
+                if(r!=null){
+                    alertButton.setBackgroundResource(R.drawable.ic_baseline_add_alert_24)
+                    reminder = r
+                    reminderTV.visibility =  VISIBLE
+                    reminderIcon.visibility = VISIBLE
+                    reminderTV.text = resources.getString(R.string.reminder,cm.convertLongToTime(r.dateTime)[0],cm.convertLongToTime(r.dateTime)[1])
+
+                }else{
+                    alertButton.setBackgroundResource(R.drawable.ic_outline_add_alert_24)
+                    reminderTV.visibility =  GONE
+                    reminderIcon.visibility = GONE
+                }
+
+            }
+        }
+        opt3?.setOnClickListener {
+            alertBottomSheet.dismiss()
+            c.add(Calendar.DAY_OF_MONTH,1)
+            c[Calendar.HOUR_OF_DAY] = 18
+            c[Calendar.MINUTE] = 0
+            if(noteDescriptionEdit.length() > 0 || noteTitleEdit.length() >0 ){
+                viewModal.texChanged.value = true
+
+            }
+            viewModal.insertReminder(Reminder(noteID, c.timeInMillis))
+            startAlarm(c)
+            Toast.makeText(this, "Reminder set for tomorrow at 6:00pm", Toast.LENGTH_SHORT).show()
+
+        }
     }
 
     private fun onKeyboardVisibilityChanged(b: Boolean) {
@@ -623,14 +733,19 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
         val alertDialog: AlertDialog? = this?.let {
             val builder = AlertDialog.Builder(it)
             builder.apply {
-                setPositiveButton("ok",
-                    DialogInterface.OnClickListener { dialog, id ->
-                        // User clicked OK button
+                setPositiveButton("ok"
+                ) { _, _ ->
+                    // User clicked OK button
+                    if(noteDescriptionEdit.length() > 0 || noteTitleEdit.length() >0 ){
+                        viewModal.texChanged.value = true
 
-                        viewModal.insertReminder(Reminder(noteID,calendar.timeInMillis))
-                        startAlarm()
+                    }
+                    Toast.makeText(context, "Reminder set", Toast.LENGTH_SHORT).show()
 
-                    })
+                    viewModal.insertReminder(Reminder(noteID, calendar.timeInMillis))
+                    startAlarm(calendar)
+
+                }
                 setNegativeButton("cancel",
                     DialogInterface.OnClickListener { dialog, id ->
                         // User cancelled the dialog
@@ -638,10 +753,6 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
                 setView(R.layout.custom_datetime_dialog)
                 setTitle("Choose date and time")
             }
-            // Set other dialog properties
-
-
-            // Create the AlertDialog
             builder.create()
         }
         alertDialog?.show()
@@ -662,7 +773,7 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
 
     }
 
-    private fun startAlarm() {
+    private fun startAlarm(calendar: Calendar) {
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(this, AlertReceiver::class.java)
         val pendingIntent = PendingIntent.getBroadcast(this, 1, intent, 0)

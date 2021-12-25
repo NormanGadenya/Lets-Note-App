@@ -28,7 +28,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:id="@+id/apricotBtn"
+            android:id="@+id/l1Btn"
             android:src="@drawable/ic_apricot_24"
             android:background="?attr/selectableItemBackgroundBorderless"/>
 
@@ -36,7 +36,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:id="@+id/whiteBtn"
+            android:id="@+id/l2Btn"
             android:src="@drawable/white_tag"
             android:background="?attr/selectableItemBackgroundBorderless"/>
 
@@ -44,7 +44,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:id="@+id/celadonBtn"
+            android:id="@+id/l3Btn"
             android:src="@drawable/celadon_tag"
             android:background="?attr/selectableItemBackgroundBorderless"/>
 
@@ -52,7 +52,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:id="@+id/evBtn"
+            android:id="@+id/l4Btn"
             android:src="@drawable/eng_violet_tag"
             android:background="?attr/selectableItemBackgroundBorderless"/>
 
@@ -60,7 +60,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:id="@+id/hdBtn"
+            android:id="@+id/l5Btn"
             android:src="@drawable/honey_dew_tag"
             android:background="?attr/selectableItemBackgroundBorderless"/>
 
@@ -68,7 +68,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:id="@+id/wildBtn"
+            android:id="@+id/l6Btn"
             android:src="@drawable/wild_orchid_tag"
             android:background="?attr/selectableItemBackgroundBorderless"/>
     </LinearLayout>
