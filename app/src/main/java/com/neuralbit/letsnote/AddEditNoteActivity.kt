@@ -236,24 +236,25 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
                     }
                     tagListAdapter.updateList(viewModal.tagList)
 
-//                    (viewModal.getTagsWithNote(noteID).first().tags)
                 }
             }
             else -> {
-
                 tvTimeStamp.visibility =GONE
-
             }
         }
 
         lifecycleScope.launch {
-            viewModal.getReminder(noteID).observe(lifecycleOwner) {
-                if(it!=null){
+            viewModal.getReminder(noteID).observe(lifecycleOwner) {r->
+                if(r!=null){
                     alertButton.setBackgroundResource(R.drawable.ic_baseline_add_alert_24)
+                    alertButton.setOnClickListener { viewModal.deleteReminder(r) }
+                    reminder = r
 
                 }else{
                     alertButton.setBackgroundResource(R.drawable.ic_outline_add_alert_24)
-
+                    alertButton.setOnClickListener {
+                        showAlertSheetDialog()
+                    }
                 }
 
             }
@@ -311,9 +312,7 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
             }
 
         }
-        alertButton.setOnClickListener {
-            showAlertSheetDialog()
-        }
+
         alertBottomSheet.setOnDismissListener {
             //TODO set bottom sheet On dismiss behaviour
         }
@@ -346,36 +345,7 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
             }
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                if(p3>0){
-                    viewModal.noteChanged(true)
-                    if(!tagListAdapter.deleteIgnored){
-                        tagListAdapter.deleteIgnored = true
-                        tagListAdapter.notifyDataSetChanged()
-
-                    }
-
-                }
-                var str : List<String> = ArrayList<String>()
-                if(!backPressed){
-                    tagDeleted = false
-                    if(p0?.get(p0.length - 1) == '#'){
-                        viewModal.wordStart.value = p0.length
-                        viewModal.newTagTyped.value = true
-                    }
-
-                    if(wordStart> 0) {
-                        viewModal.wordEnd.value = p0?.length
-                        viewModal.getTagString(p0.toString())
-
-                        if(p0?.get(p0.length - 1) == ' '){
-                            viewModal.newTagTyped.value = false
-                        }
-
-
-                    }
-
-                }
-
+                getTagFromString(p0,p3)
 
             }
 
@@ -473,6 +443,37 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
             viewModal.archived.value = false
             Toast.makeText(this,"Note Unarchived", Toast.LENGTH_SHORT).show()
 
+
+        }
+    }
+
+    private fun getTagFromString(p0: CharSequence?, p3: Int) {
+        if(p3>0){
+            viewModal.noteChanged(true)
+            if(!tagListAdapter.deleteIgnored){
+                tagListAdapter.deleteIgnored = true
+                tagListAdapter.notifyDataSetChanged()
+
+            }
+
+        }
+        if(!backPressed){
+            tagDeleted = false
+            if(p0?.get(p0.length - 1) == '#'){
+                viewModal.wordStart.value = p0.length
+                viewModal.newTagTyped.value = true
+            }
+
+            if(wordStart> 0) {
+                viewModal.wordEnd.value = p0?.length
+                viewModal.getTagString(p0.toString())
+
+                if(p0?.get(p0.length - 1) == ' '){
+                    viewModal.newTagTyped.value = false
+                }
+
+
+            }
 
         }
     }

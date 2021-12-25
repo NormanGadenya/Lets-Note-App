@@ -9,7 +9,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Choose the date"
-        android:textSize="16sp"
+        android:textSize="20sp"
         android:layout_marginStart="16dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -17,8 +17,8 @@
 
     <ImageButton
         android:id="@+id/datePickButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:src="@drawable/ic_baseline_date_range_24"
         android:layout_marginEnd="@dimen/activity_horizontal_margin"
@@ -28,8 +28,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Choose the time"
-        android:textSize="16sp"
-        android:layout_marginTop="16dp"
+        android:textSize="20sp"
+        android:layout_marginTop="20dp"
         android:layout_marginStart="16dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/dateTitle"
@@ -37,8 +37,8 @@
 
     <ImageButton
         android:id="@+id/timePickButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:src="@drawable/ic_baseline_access_time_24"
         android:layout_marginEnd="@dimen/activity_horizontal_margin"
