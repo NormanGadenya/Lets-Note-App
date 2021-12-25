@@ -5,10 +5,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.neuralbit.letsnote.daos.NoteTagDao
-import com.neuralbit.letsnote.daos.NotesDao
-import com.neuralbit.letsnote.daos.ReminderDao
-import com.neuralbit.letsnote.daos.TagDao
+import com.neuralbit.letsnote.daos.*
 import com.neuralbit.letsnote.entities.*
 
 @Database(
@@ -18,13 +15,15 @@ import com.neuralbit.letsnote.entities.*
         ArchivedNote::class,
         PinnedNote::class,
         NoteTagCrossRef::class,
-        Reminder::class
+        Reminder::class,
+        Label::class
                ],version =5 , exportSchema = true)
 abstract class NoteDatabase : RoomDatabase(){
     abstract fun getNotesDao() : NotesDao
     abstract fun getTagDao() : TagDao
     abstract fun getNoteTagDao() : NoteTagDao
     abstract fun getReminderDao() : ReminderDao
+    abstract fun getLabelDao() : LabelDao
 
 
     companion object {

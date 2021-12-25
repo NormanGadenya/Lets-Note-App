@@ -14,7 +14,7 @@ class ReminderRepo (private val reminderDao: ReminderDao){
         reminderDao.delete(reminder)
     }
 
-    suspend fun getReminder(noteID : Long): Reminder {
+    fun getReminder(noteID : Long): LiveData<Reminder> {
         return reminderDao.getReminder(noteID)
     }
 }

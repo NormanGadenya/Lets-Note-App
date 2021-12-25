@@ -15,5 +15,5 @@ interface ReminderDao {
 
     @Transaction
     @Query("select * from Reminder where noteID = :noteID")
-    suspend fun getReminder(noteID :Long): Reminder
+    fun getReminder(noteID :Long): LiveData<Reminder>
 }

@@ -54,6 +54,8 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
     private lateinit var noteTitleEdit : EditText
     private lateinit var noteDescriptionEdit : MultiAutoCompleteEditText
     private lateinit var addTagBtn : ImageButton
+    private lateinit var reminderIcon : ImageView
+    private lateinit var reminderTV : TextView
     private var noteID : Long= -1
     private var tagID = -1
     private lateinit var viewModal :NoteViewModel
@@ -84,7 +86,7 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
     private lateinit var labelBottomSheet : BottomSheetDialog
     private var pinBtnClicked = false
     private lateinit var labelBtn : ImageButton
-    private lateinit var reminder: Reminder
+    private  var reminder: Reminder? = null
     private var reminderDate: Long = 0
     private var reminderTime : Long = 0
     private lateinit var lifecycleOwner : LifecycleOwner
@@ -110,6 +112,8 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
         coordinatorlayout = findViewById(R.id.coordinatorlayout)
         alertButton = findViewById(R.id.alertButton)
         addTagBtn = findViewById(R.id.addTagBtn)
+        reminderTV = findViewById(R.id.reminderTV)
+        reminderIcon = findViewById(R.id.reminderIcon)
         val layoutManager = LinearLayoutManager(applicationContext,LinearLayoutManager.HORIZONTAL,false)
         calendar = Calendar.getInstance()
         layoutManager.orientation = HORIZONTAL
@@ -243,28 +247,33 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
             }
         }
 
-        lifecycleScope.launch {
-            viewModal.getReminder(noteID).observe(lifecycleOwner) {r->
-                if(r!=null){
-                    alertButton.setBackgroundResource(R.drawable.ic_baseline_add_alert_24)
-                    alertButton.setOnClickListener { viewModal.deleteReminder(r) }
-                    reminder = r
 
-                }else{
-                    alertButton.setBackgroundResource(R.drawable.ic_outline_add_alert_24)
-                    alertButton.setOnClickListener {
-                        showAlertSheetDialog()
-                    }
-                }
+        viewModal.getReminder(noteID).observe(lifecycleOwner) {r->
 
+            if(r!=null){
+                alertButton.setBackgroundResource(R.drawable.ic_baseline_add_alert_24)
+                reminder = r
+                reminderTV.visibility =  VISIBLE
+                reminderIcon.visibility = VISIBLE
+                reminderTV.text = resources.getString(R.string.reminder,cm.convertLongToTime(r.dateTime)[0],cm.convertLongToTime(r.dateTime)[1])
+
+            }else{
+                alertButton.setBackgroundResource(R.drawable.ic_outline_add_alert_24)
+                reminderTV.visibility =  GONE
+                reminderIcon.visibility = GONE
+            }
+
+        }
+
+        alertButton.setOnClickListener {
+            if (reminder==null){
+                showAlertSheetDialog()
+
+            }else{
+                viewModal.deleteReminder(reminder!!)
             }
         }
 
-
-
-
-
-        viewModal.newTagTyped.observe(this) { newTagTyped = it }
 
         viewModal.wordEnd.observe(this) { wordEnd = it }
 

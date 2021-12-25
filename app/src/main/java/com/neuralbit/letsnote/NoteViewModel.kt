@@ -4,12 +4,10 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
 import com.neuralbit.letsnote.entities.*
+import com.neuralbit.letsnote.relationships.LabelWIthNotes
 import com.neuralbit.letsnote.relationships.NotesWithTag
 import com.neuralbit.letsnote.relationships.TagsWithNote
-import com.neuralbit.letsnote.repos.NoteRepo
-import com.neuralbit.letsnote.repos.NoteTagRepo
-import com.neuralbit.letsnote.repos.ReminderRepo
-import com.neuralbit.letsnote.repos.TagRepo
+import com.neuralbit.letsnote.repos.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.sql.Date
@@ -25,6 +23,7 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     private val tagRepo : TagRepo
     private val noteTagRepo : NoteTagRepo
     private val reminderRepo : ReminderRepo
+    private val labelRepo : LabelRepo
     var texChange = false
     var texChanged = MutableLiveData<Boolean>()
     var deleted = MutableLiveData<Boolean>()
@@ -50,10 +49,12 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         val tagDao = NoteDatabase.getDatabase(application).getTagDao()
         val noteTagDao = NoteDatabase.getDatabase(application).getNoteTagDao()
         val reminderDao = NoteDatabase.getDatabase(application).getReminderDao()
+        val labelDao = NoteDatabase.getDatabase(application).getLabelDao()
         noteRepo= NoteRepo(dao)
         tagRepo = TagRepo(tagDao)
         noteTagRepo = NoteTagRepo(noteTagDao)
         reminderRepo = ReminderRepo(reminderDao)
+        labelRepo = LabelRepo(labelDao)
         allNotes = noteRepo.allNotes
         archivedNote = noteRepo.archivedNotes
         pinnedNotes = noteRepo.pinnedNotes
@@ -177,11 +178,21 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     fun deleteReminder(reminder: Reminder) = viewModelScope.launch(Dispatchers.IO){
         reminderRepo.delete(reminder)
     }
-
-    suspend fun getReminder(noteID : Long): MutableLiveData<Reminder>  {
-        return MutableLiveData(reminderRepo.getReminder(noteID))
+    fun getReminder(noteID : Long): LiveData<Reminder>  {
+        return reminderRepo.getReminder(noteID)
     }
 
+    fun insertLabel(label: Label) = viewModelScope.launch(Dispatchers.IO){
+        labelRepo.insert(label)
+    }
+
+    fun deleteLabel(label: Label) = viewModelScope.launch(Dispatchers.IO){
+        labelRepo.delete(label)
+    }
+
+    fun getNotesWithLabel ( labelID : Int) : LiveData<List<LabelWIthNotes>>{
+        return labelRepo.getNotesWithLabel(labelID)
+    }
 
 
 }

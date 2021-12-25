@@ -47,7 +47,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/archiveButton"
-        android:src="@drawable/ic_baseline_archive_24"
+        android:src="@drawable/ic_outline_archive_24"
         android:background="?attr/selectableItemBackgroundBorderless"
         app:layout_constraintEnd_toStartOf="@id/restoreButton"
         app:layout_constraintTop_toTopOf="parent"
@@ -75,7 +75,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:src="@drawable/ic_baseline_delete_24"
+        android:src="@drawable/ic_outline_delete_24"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
