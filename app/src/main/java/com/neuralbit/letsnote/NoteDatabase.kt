@@ -7,6 +7,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.neuralbit.letsnote.daos.NoteTagDao
 import com.neuralbit.letsnote.daos.NotesDao
+import com.neuralbit.letsnote.daos.ReminderDao
 import com.neuralbit.letsnote.daos.TagDao
 import com.neuralbit.letsnote.entities.*
 
@@ -16,12 +17,14 @@ import com.neuralbit.letsnote.entities.*
         Tag::class,
         ArchivedNote::class,
         PinnedNote::class,
-        NoteTagCrossRef::class
+        NoteTagCrossRef::class,
+        Reminder::class
                ],version =5 , exportSchema = true)
 abstract class NoteDatabase : RoomDatabase(){
     abstract fun getNotesDao() : NotesDao
     abstract fun getTagDao() : TagDao
     abstract fun getNoteTagDao() : NoteTagDao
+    abstract fun getReminderDao() : ReminderDao
 
 
     companion object {
@@ -32,7 +35,7 @@ abstract class NoteDatabase : RoomDatabase(){
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     NoteDatabase::class.java,
-                    "note_database20"
+                    "note_database22"
                 ).build()
                 INSTANCE = instance
                 instance

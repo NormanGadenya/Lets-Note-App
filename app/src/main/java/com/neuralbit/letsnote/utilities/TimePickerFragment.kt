@@ -4,17 +4,18 @@ import android.app.Dialog
 import android.app.TimePickerDialog
 import android.os.Bundle
 import android.text.format.DateFormat.is24HourFormat
-import android.util.Log
 import android.widget.TimePicker
 import androidx.fragment.app.DialogFragment
-import java.text.DateFormat
-import com.google.android.material.timepicker.TimeFormat
 import java.util.*
 
 class TimePickerFragment(private val getTimeFromPicker : GetTimeFromPicker ) : DialogFragment() , TimePickerDialog.OnTimeSetListener {
 
     override fun onTimeSet(p0: TimePicker?, p1: Int, p2: Int) {
-        getTimeFromPicker.getTimeInfo(p1,p2)
+        val c = Calendar.getInstance()
+        c[Calendar.HOUR_OF_DAY] = p1
+        c[Calendar.MINUTE] = p2
+        c[Calendar.SECOND] = 0
+        getTimeFromPicker.getTimeInfo(c)
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -28,5 +29,5 @@ class TimePickerFragment(private val getTimeFromPicker : GetTimeFromPicker ) : D
 }
 
 interface GetTimeFromPicker{
-    fun getTimeInfo( hour:Int, min:Int)
+    fun getTimeInfo( calendar: Calendar)
 }

@@ -1,6 +1,9 @@
 package com.neuralbit.letsnote
 
+import android.app.AlarmManager
 import android.app.AlertDialog
+import android.app.PendingIntent
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Color
@@ -8,6 +11,7 @@ import android.graphics.Rect
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.text.format.DateFormat
 import android.util.Log
 import android.view.KeyEvent
 import android.view.View
@@ -20,6 +24,7 @@ import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -34,6 +39,8 @@ import com.teamwork.autocomplete.adapter.AutoCompleteTypeAdapter
 import com.teamwork.autocomplete.tokenizer.PrefixTokenizer
 import com.teamwork.autocomplete.view.MultiAutoCompleteEditText
 import kotlinx.coroutines.launch
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicker, GetDateFromPicker, GetTagFromDialog{
@@ -77,6 +84,14 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
     private lateinit var labelBottomSheet : BottomSheetDialog
     private var pinBtnClicked = false
     private lateinit var labelBtn : ImageButton
+    private lateinit var reminder: Reminder
+    private var reminderDate: Long = 0
+    private var reminderTime : Long = 0
+    private lateinit var lifecycleOwner : LifecycleOwner
+    private lateinit var calendar: Calendar
+    private lateinit var timeTitleTV :TextView
+    private lateinit var dateTitleTV :TextView
+
 
 
     override fun onCreate(savedInstanceState: Bundle?)  {
@@ -96,12 +111,13 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
         alertButton = findViewById(R.id.alertButton)
         addTagBtn = findViewById(R.id.addTagBtn)
         val layoutManager = LinearLayoutManager(applicationContext,LinearLayoutManager.HORIZONTAL,false)
-
+        calendar = Calendar.getInstance()
         layoutManager.orientation = HORIZONTAL
         tagListAdapter= TagRVAdapter(applicationContext,this)
         tagListRV.layoutManager= layoutManager
         tagListRV.adapter = tagListAdapter
-
+        noteType = intent.getStringExtra("noteType").toString()
+        lifecycleOwner = this
         viewModal = ViewModelProvider(
             this,
             ViewModelProvider.AndroidViewModelFactory.getInstance(application)
@@ -109,7 +125,10 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
         viewModal.allNotes.observe(this) { list ->
             list?.let {
                 allNotes = it
-                
+                if(noteType != "Edit"){
+                    noteID = it.size.toLong() + 1
+
+                }
             }
         }
 
@@ -141,7 +160,6 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
         coordinatorlayout = findViewById(R.id.coordinatorlayout)
         pinButton = findViewById(R.id.pinButton)
 
-        noteType = intent.getStringExtra("noteType").toString()
         archived = intent.getBooleanExtra("archivedNote",false)
         viewModal.archived.value = archived
         var pinnedNote = intent.getBooleanExtra("pinnedNote",false)
@@ -227,6 +245,22 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
 
             }
         }
+
+        lifecycleScope.launch {
+            viewModal.getReminder(noteID).observe(lifecycleOwner) {
+                if(it!=null){
+                    alertButton.setBackgroundResource(R.drawable.ic_baseline_add_alert_24)
+
+                }else{
+                    alertButton.setBackgroundResource(R.drawable.ic_outline_add_alert_24)
+
+                }
+
+            }
+        }
+
+
+
 
 
         viewModal.newTagTyped.observe(this) { newTagTyped = it }
@@ -375,6 +409,8 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
                 restoreButton.visibility = GONE
             }
         }
+
+
 
 
         backButton.setOnClickListener {
@@ -580,6 +616,10 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
                 setPositiveButton("ok",
                     DialogInterface.OnClickListener { dialog, id ->
                         // User clicked OK button
+
+                        viewModal.insertReminder(Reminder(noteID,calendar.timeInMillis))
+                        startAlarm()
+
                     })
                 setNegativeButton("cancel",
                     DialogInterface.OnClickListener { dialog, id ->
@@ -597,8 +637,9 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
         alertDialog?.show()
         val timePickerBtn=alertDialog?.findViewById<View>(R.id.timePickButton)
         val datePickerBtn = alertDialog?.findViewById<ImageButton>(R.id.datePickButton)
-        val timeTitleTV = alertDialog?.findViewById<TextView>(R.id.timeTitle)
-        val dateTitleTV = alertDialog?.findViewById<TextView>(R.id.dateTitle)
+        timeTitleTV = alertDialog?.findViewById(R.id.timeTitle)!!
+        dateTitleTV = alertDialog.findViewById(R.id.dateTitle)
+
         timePickerBtn?.setOnClickListener {
             TimePickerFragment(this).show(supportFragmentManager,"timePicker")
         }
@@ -609,6 +650,13 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
 
 
 
+    }
+
+    private fun startAlarm() {
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(this, AlertReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(this, 1, intent, 0)
+        alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
     }
 
     private fun changeIconColor(iconColorID : Int, drawable : Int){
@@ -632,7 +680,6 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
                         Toast.makeText(this,"Note updated .. " , Toast.LENGTH_SHORT).show()
 
                     }else{
-                        noteID = allNotes.size.toLong() + 1
                         viewModal.addNote(note)
                         Toast.makeText(this,"Note added .. " , Toast.LENGTH_SHORT).show()
                         
@@ -680,12 +727,23 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
 
     }
 
-    override fun getTimeInfo(hour: Int, min: Int) {
-        Log.d(TAG, "getTimeInfo: $hour and $min")
+    override fun getTimeInfo(calendar : Calendar) {
+        val timeConverter = DateTimeConverter()
+//        reminderTime = timeConverter.fromTime(Time(hour,min,0))!!
+        this.calendar[Calendar.HOUR]= calendar[Calendar.HOUR]
+        this.calendar[Calendar.MINUTE]= calendar[Calendar.MINUTE]
+        this.calendar[Calendar.SECOND]= calendar[Calendar.SECOND]
+        timeTitleTV.text="Time set:" + DateFormat.getTimeFormat(this).format(calendar.time)
     }
 
-    override fun getDateInfo(year: Int, month: Int, day: Int) {
-        Log.d(TAG, "getDateInfo: $year $month $day")
+    override fun getDateInfo(calendar : Calendar) {
+        this.calendar[Calendar.DAY_OF_MONTH] = calendar[Calendar.DAY_OF_MONTH]
+        this.calendar[Calendar.MONTH] = calendar[Calendar.MONTH]
+        this.calendar[Calendar.YEAR] = calendar[Calendar.YEAR]
+        dateTitleTV.text="Date set:" + DateFormat.getDateFormat(this).format(calendar.time)
+
+//        reminderDate =dateConverter.fromDate(Date(year, month, day))!!
+
     }
 
     override fun getTag(tag: Tag) {

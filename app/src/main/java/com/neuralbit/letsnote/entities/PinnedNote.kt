@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 
 
 @Entity
-class PinnedNote(
+data class PinnedNote(
     @PrimaryKey (autoGenerate = false)
     @ColumnInfo(name = "noteID") val noteID: Long
 )

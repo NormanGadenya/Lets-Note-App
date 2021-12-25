@@ -26,10 +26,15 @@ class DatePickerFragment (
     }
 
     override fun onDateSet(view: DatePicker, year: Int, month: Int, day: Int) {
-        getDateFromPicker.getDateInfo(year,month,day)
+        val c = Calendar.getInstance()
+
+        c.set(Calendar.YEAR, year);
+        c.set(Calendar.MONTH, month);
+        c.set(Calendar.DAY_OF_MONTH, day);
+        getDateFromPicker.getDateInfo(c)
     }
 }
 
 interface GetDateFromPicker{
-    fun getDateInfo( year:Int,month: Int, day: Int )
+    fun getDateInfo( calendar : Calendar)
 }

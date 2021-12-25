@@ -22,7 +22,7 @@
         <activity
             android:name=".AddEditNoteActivity"
             android:parentActivityName=".MainActivity" />
-        <receiver android:name=".utilities.AlarmReceiver"/>
+        <receiver android:name=".utilities.AlertReceiver"/>
     </application>
 
 </manifest>
