@@ -29,6 +29,14 @@ class NoteRepo(
         return notesDao.getNote(noteID)
     }
 
+    fun getArchivedNote(noteID: Long) : LiveData<ArchivedNote>{
+        return notesDao.getArchivedNote(noteID)
+    }
+
+    fun getPinnedNote(noteID: Long) : LiveData<PinnedNote>{
+        return notesDao.getPinnedNote(noteID)
+    }
+
     suspend fun insertArchive(archivedNote: ArchivedNote){
         notesDao.insertArchive(archivedNote)
     }

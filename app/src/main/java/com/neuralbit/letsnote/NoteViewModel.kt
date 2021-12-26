@@ -173,6 +173,14 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         return noteTagRepo.getTagsWithNote(noteID)
     }
 
+    fun getArchivedNote(noteID: Long):LiveData<ArchivedNote> {
+        return noteRepo.getArchivedNote(noteID)
+    }
+
+    fun getPinnedNote(noteID: Long):LiveData<PinnedNote> {
+        return noteRepo.getPinnedNote(noteID)
+    }
+
     fun insertReminder(reminder: Reminder) = viewModelScope.launch(Dispatchers.IO){
         reminderRepo.insert(reminder)
     }

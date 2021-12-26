@@ -115,13 +115,15 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
         addTagBtn = findViewById(R.id.addTagBtn)
         reminderTV = findViewById(R.id.reminderTV)
         reminderIcon = findViewById(R.id.reminderIcon)
+        noteID = intent.getLongExtra("noteID",-1)
+        noteType = intent.getStringExtra("noteType").toString()
+
         val layoutManager = LinearLayoutManager(applicationContext,LinearLayoutManager.HORIZONTAL,false)
         calendar = Calendar.getInstance()
         layoutManager.orientation = HORIZONTAL
         tagListAdapter= TagRVAdapter(applicationContext,this)
         tagListRV.layoutManager= layoutManager
         tagListRV.adapter = tagListAdapter
-        noteType = intent.getStringExtra("noteType").toString()
         lifecycleOwner = this
         viewModal = ViewModelProvider(
             this,
@@ -133,13 +135,54 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
             allNotes = it
             if(noteType != "Edit"){
                 noteID = it.size.toLong() + 1
-//                noteDesc = it[noteID.toInt()].description!!
-//                noteTitle = it[noteID.toInt()].title!!
 
             }
         }
 
         manipulateNoteDescLines()
+        viewModal.getArchivedNote(noteID).observe(this){
+            archived = it!=null
+            Log.d(TAG, "onCreate: $it")
+        }
+        viewModal.getPinnedNote(noteID).observe(this){ pN->
+            viewModal.pinned.value = pN!=null
+            val snackbar = Snackbar.make(coordinatorlayout, "Note pinned", Snackbar.LENGTH_LONG)
+
+            if (pN==null){
+                pinButton.setImageResource(R.drawable.ic_outline_push_pin_24)
+                if(pinBtnClicked){
+                    val pinnedNote = PinnedNote(noteID)
+                    snackbar.setText("Note unpinned")
+
+                    snackbar.setAction(
+                        "UNDO"
+                    ) {
+                        pinBtnClicked = false
+                        viewModal.removePin(pinnedNote)
+                    }
+                    snackbar.show()
+                }
+
+
+            }else{
+
+                pinButton.setImageResource(R.drawable.ic_baseline_push_pin_24)
+                if(pinBtnClicked){
+                    snackbar.setText("Note pinned")
+
+                    snackbar.setAction(
+                        "UNDO"
+                    ) {
+                        viewModal.pinNote(PinnedNote(noteID))
+
+                        pinBtnClicked = false
+                    }
+                    snackbar.show()
+                }
+
+            }
+
+        }
 
         viewModal.archivedNote.observe(this) {
             archivedNotes = it
@@ -175,46 +218,7 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
         if(noteColor!=null){
             setBgColor()
          }
-        viewModal.pinned.observe(this){
-            pinnedNote = it
-            val pN= PinnedNote(noteID)
-            var snackbar = Snackbar.make(coordinatorlayout, "Note pinned", Snackbar.LENGTH_LONG)
 
-            if (it){
-                pinButton.setImageResource(R.drawable.ic_baseline_push_pin_24)
-                viewModal.pinNote(pN)
-                if(pinBtnClicked){
-                    snackbar.setAction(
-                        "UNDO"
-                    ) {
-                        pinBtnClicked = false
-                        viewModal.pinned.value = !pinnedNote
-                        viewModal.removePin(PinnedNote(noteID))
-                        Toast.makeText(this, "Note unpinned", Toast.LENGTH_SHORT).show()
-                    }
-                    snackbar.show()
-                }
-
-
-            }else{
-                viewModal.removePin(pN)
-                pinButton.setImageResource(R.drawable.ic_outline_push_pin_24)
-                if(pinBtnClicked){
-                    snackbar = Snackbar.make(coordinatorlayout, "Note unpinned", Snackbar.LENGTH_LONG)
-
-                    snackbar.setAction(
-                        "UNDO"
-                    ) {
-                        pinBtnClicked = false
-                        viewModal.pinned.value = !pinnedNote
-                        viewModal.pinNote(PinnedNote(noteID))
-                        Toast.makeText(this, "Note unpinned", Toast.LENGTH_SHORT).show()
-                    }
-                    snackbar.show()
-                }
-
-            }
-        }
         viewModal.archived.observe(this){
             if (it){
                 archiveButton.setImageResource(R.drawable.ic_baseline_unarchive_24)
@@ -225,7 +229,6 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
 
         when (noteType) {
             "Edit" -> {
-                noteID = intent.getLongExtra("noteID",-1)
                 viewModal.getNote(noteID).observe(this){
                     if(it!=null){
                         noteTitle = it.title!!
@@ -450,12 +453,18 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
         }
         pinButton.setOnClickListener {
             pinBtnClicked = true
-
-            viewModal.pinned.value = !pinnedNote
             Log.d(TAG, "onCreate: $pinnedNote")
+            val pN = PinnedNote(noteID)
+            if(pinnedNote){
+                viewModal.removePin(pN)
+            }else{
+                viewModal.pinNote(pN)
+            }
 
             
         }
+
+
 
         restoreButton.setOnClickListener {
             val archivedNote = ArchivedNote(noteID)

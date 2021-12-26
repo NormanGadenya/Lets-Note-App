@@ -30,16 +30,6 @@ interface NotesDao {
     @Delete
     suspend fun deletePinned(noteId : PinnedNote)
 
-    @Insert(onConflict= OnConflictStrategy.IGNORE )
-    suspend fun insertTag(tag: Tag)
-
-    @Delete
-    suspend fun deleteTag(tag: Tag)
-
-    @Transaction
-    @Query("select * from Tag")
-    fun getTags(): LiveData<List<Tag>>
-
     @Transaction
     @Query("select * from Note where noteID = :noteID")
     fun getNote(noteID : Long) : LiveData<Note>
@@ -55,6 +45,14 @@ interface NotesDao {
     @Transaction
     @Query("Select * from PinnedNote  join Note on PinnedNote.noteID = Note.noteID where not exists (select * from ArchivedNote where ArchivedNote.noteID = PinnedNote.noteID ) ")
     fun getPinnedNotes() : LiveData<List<Note>>
+
+    @Transaction
+    @Query("Select * from PinnedNote where noteID = :noteID")
+    fun getPinnedNote(noteID : Long) : LiveData<PinnedNote>
+
+    @Transaction
+    @Query("Select * from ArchivedNote where noteID = :noteID")
+    fun getArchivedNote(noteID : Long) : LiveData<ArchivedNote>
 
 
 }
