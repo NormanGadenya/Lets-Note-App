@@ -1,23 +1,35 @@
-package com.neuralbit.letsnote.utilities;
+package com.neuralbit.letsnote.utilities
 
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
+import android.app.PendingIntent
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.util.Log
+import com.neuralbit.letsnote.AddEditNoteActivity
+import com.neuralbit.letsnote.utilities.NotificationHelper
 
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
+class AlertReceiver : BroadcastReceiver() {
+    val TAG = "tag"
+    override fun onReceive(context: Context, intent: Intent) {
+        val noteTitle = intent.getStringExtra("noteTitle")
+        val notificationHelper = NotificationHelper(context,noteTitle)
 
-import com.neuralbit.letsnote.AddEditNoteActivity;
-import com.neuralbit.letsnote.MainActivity;
-import com.neuralbit.letsnote.R;
-
-public class AlertReceiver extends BroadcastReceiver {
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        NotificationHelper notificationHelper = new NotificationHelper(context);
-        NotificationCompat.Builder nb = notificationHelper.getChannelNotification();
-        notificationHelper.getManager().notify(1, nb.build());
-
+        val noteDesc = intent.getStringExtra("noteDescription")
+        val noteTimeStamp = intent.getLongExtra("noteTimeStamp", -1)
+        val pinnedNote = intent.getBooleanExtra("pinnedNote", false)
+        val noteType = intent.getStringExtra("noteType")
+        val noteID = intent.getIntExtra("noteID", -1)
+        val nb = notificationHelper.channelNotification
+        Log.d(TAG, "onReceive: $noteTitle ")
+        val i = Intent(context, AddEditNoteActivity::class.java)
+        i.putExtra("noteTitle",noteTitle)
+        i.putExtra("noteDescription",noteDesc)
+        i.putExtra("noteTimeStamp",noteTimeStamp)
+        i.putExtra("pinnedNote",pinnedNote)
+        i.putExtra("noteType",noteType)
+        i.putExtra("noteID",noteID)
+        val pendingIntent = PendingIntent.getActivity(context, 1, i, PendingIntent.FLAG_ONE_SHOT)
+        nb.setContentIntent(pendingIntent)
+        notificationHelper.manager.notify(1, nb.build())
     }
 }

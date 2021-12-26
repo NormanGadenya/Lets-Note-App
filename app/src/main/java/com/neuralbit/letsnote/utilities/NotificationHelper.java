@@ -15,11 +15,12 @@ import com.neuralbit.letsnote.R;
 public class NotificationHelper extends ContextWrapper {
     public static final String channelID = "channelID";
     public static final String channelName = "Channel Name";
-
+    private String noteTitle;
     private NotificationManager mManager;
 
-    public NotificationHelper(Context base) {
+    public NotificationHelper(Context base,String noteTitle) {
         super(base);
+        this.noteTitle = noteTitle;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createChannel();
         }
@@ -42,8 +43,8 @@ public class NotificationHelper extends ContextWrapper {
 
     public NotificationCompat.Builder getChannelNotification() {
         return new NotificationCompat.Builder(getApplicationContext(), channelID)
-                .setContentTitle("Alarm!")
-                .setContentText("Your AlarmManager is working.")
+                .setContentTitle(getResources().getString(R.string.app_name))
+                .setContentText(noteTitle)
                 .setSmallIcon(R.mipmap.ic_launcher_round);
     }
 }

@@ -71,6 +71,8 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
     private var archived = false
     private lateinit var cm : Common
     private lateinit var noteDesc : String
+    private lateinit var noteTitle : String
+    private var noteTimeStamp : Long = 0
     private lateinit var coordinatorlayout : View
     private var wordStart = 0
     private var wordEnd = 0
@@ -91,6 +93,7 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
     private lateinit var calendar: Calendar
     private lateinit var timeTitleTV :TextView
     private lateinit var dateTitleTV :TextView
+    private var pinnedNote = false
 
 
 
@@ -128,6 +131,8 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
             allNotes = it
             if(noteType != "Edit"){
                 noteID = it.size.toLong() + 1
+//                noteDesc = it[noteID.toInt()].description!!
+//                noteTitle = it[noteID.toInt()].title!!
 
             }
         }
@@ -162,7 +167,7 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
 
         archived = intent.getBooleanExtra("archivedNote",false)
         viewModal.archived.value = archived
-        var pinnedNote = intent.getBooleanExtra("pinnedNote",false)
+        pinnedNote = intent.getBooleanExtra("pinnedNote",false)
         viewModal.pinned.value = pinnedNote
         noteColor = intent.getStringExtra("noteColor")
         if(noteColor!=null){
@@ -218,7 +223,7 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
 
         when (noteType) {
             "Edit" -> {
-                val noteTitle = intent.getStringExtra("noteTitle")
+                noteTitle = intent.getStringExtra("noteTitle")!!
                 noteDesc = intent.getStringExtra("noteDescription").toString()
                 val noteTimeStamp = intent.getLongExtra("noteTimeStamp",0)
                 tvTimeStamp.text= getString(R.string.timeStamp,cm.convertLongToTime(noteTimeStamp)[0],cm.convertLongToTime(noteTimeStamp)[1])
@@ -776,6 +781,16 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
     private fun startAlarm(calendar: Calendar) {
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(this, AlertReceiver::class.java)
+        intent.putExtra("noteTitle",noteTitleEdit.text)
+        intent.putExtra("noteDescription",noteDescriptionEdit.text)
+        intent.putExtra("noteTimeStamp",noteTimeStamp)
+        intent.putExtra("pinnedNote",pinnedNote)
+        intent.putExtra("noteType",noteType)
+        intent.putExtra("noteID",noteID)
+        //TODO fix notification issue
+        //TODO fix labels problem
+        tvTimeStamp.text= getString(R.string.timeStamp,cm.convertLongToTime(noteTimeStamp)[0],cm.convertLongToTime(noteTimeStamp)[1])
+        tvTimeStamp.visibility =VISIBLE
         val pendingIntent = PendingIntent.getBroadcast(this, 1, intent, 0)
         alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
     }
