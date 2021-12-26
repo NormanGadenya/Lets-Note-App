@@ -24,11 +24,11 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     private val noteTagRepo : NoteTagRepo
     private val reminderRepo : ReminderRepo
     private val labelRepo : LabelRepo
-    var texChange = false
+    var texChange : Boolean
     var texChanged = MutableLiveData<Boolean>()
     var deleted = MutableLiveData<Boolean>()
-    var archived = MutableLiveData<Boolean>()
-    var pinned = MutableLiveData<Boolean>()
+    var archived : Boolean
+    var pinned : Boolean
     var pin = MutableLiveData<Boolean>()
     lateinit var list : List<Note>
     var notes : List<Note> = listOf()
@@ -59,6 +59,7 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         archivedNote = noteRepo.archivedNotes
         pinnedNotes = noteRepo.pinnedNotes
         allTags = tagRepo.allTags
+        texChange = false
         searchQurery = MutableLiveData<String>()
         wordStart = MutableLiveData()
         wordEnd = MutableLiveData()
@@ -66,8 +67,9 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         newTagTyped = MutableLiveData()
         backPressed = MutableLiveData()
         tagList = ArrayList<Tag>()
-        pinned = MutableLiveData()
-        archived = MutableLiveData()
+        pinned = false
+        archived = false
+
         deleted = MutableLiveData()
         reminderDate = MutableLiveData()
         reminderTime = MutableLiveData()
@@ -202,6 +204,10 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
 
     fun getNotesWithLabel ( labelID : Int) : LiveData<List<LabelWIthNotes>>{
         return labelRepo.getNotesWithLabel(labelID)
+    }
+
+    fun getNoteLabel( noteID : Long) : LiveData <Label> {
+        return labelRepo.getNoteLabel(noteID)
     }
 
 

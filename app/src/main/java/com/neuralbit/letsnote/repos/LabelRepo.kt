@@ -20,4 +20,9 @@ class LabelRepo(
     fun getNotesWithLabel(labelID : Int): LiveData<List<LabelWIthNotes>> {
         return labelDao.getNotesWithLabel(  labelID )
     }
+
+    fun getNoteLabel(noteID : Long): LiveData<Label> {
+        return labelDao.getNoteLabel(noteID)
+    }
+
 }

@@ -18,5 +18,9 @@ interface LabelDao {
     @Query("select * from Label where labelID = :labelID ")
     fun getNotesWithLabel(labelID :Int): LiveData<List<LabelWIthNotes>>
 
+    @Transaction
+    @Query("select * from Label where noteID = :noteID ")
+    fun getNoteLabel(noteID :Long): LiveData<Label>
+
 
 }
