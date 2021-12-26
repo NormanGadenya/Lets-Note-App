@@ -122,7 +122,9 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
 
     }
 
-
+    fun  getNote(noteID: Long) : LiveData<Note>{
+        return noteRepo.getNote(noteID)
+    }
 
     fun deleteNote(note: Note)= viewModelScope.launch(Dispatchers.IO){
         noteRepo.delete(note)

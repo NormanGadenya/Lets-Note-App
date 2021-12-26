@@ -127,6 +127,8 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
             this,
             ViewModelProvider.AndroidViewModelFactory.getInstance(application)
         ).get(NoteViewModel::class.java)
+
+
         viewModal.allNotes.observe(this) {
             allNotes = it
             if(noteType != "Edit"){
@@ -223,25 +225,32 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
 
         when (noteType) {
             "Edit" -> {
-                noteTitle = intent.getStringExtra("noteTitle")!!
-                noteDesc = intent.getStringExtra("noteDescription").toString()
-                val noteTimeStamp = intent.getLongExtra("noteTimeStamp",0)
-                tvTimeStamp.text= getString(R.string.timeStamp,cm.convertLongToTime(noteTimeStamp)[0],cm.convertLongToTime(noteTimeStamp)[1])
-                tvTimeStamp.visibility =VISIBLE
-                noteID = intent.getLongExtra("noteID", -1)
-                noteTitleEdit.setText(noteTitle)
-                noteDescriptionEdit.setText(noteDesc)
-                if(archived) {
-                    archiveButton.visibility = GONE
-                    restoreButton.visibility = VISIBLE
-                }
-                lifecycleScope.launch {
-                    for (tag in viewModal.getTagsWithNote(noteID).last().tags){
-                        viewModal.addTagToList(tag)
+                noteID = intent.getLongExtra("noteID",-1)
+                viewModal.getNote(noteID).observe(this){
+                    if(it!=null){
+                        noteTitle = it.title!!
+                        noteDesc = it.description!!
+                        noteTimeStamp = it.timeStamp
+                        tvTimeStamp.text= getString(R.string.timeStamp,cm.convertLongToTime(noteTimeStamp)[0],cm.convertLongToTime(noteTimeStamp)[1])
+                        tvTimeStamp.visibility =VISIBLE
+                        noteTitleEdit.setText(noteTitle)
+                        noteDescriptionEdit.setText(noteDesc)
+                        if(archived) {
+                            archiveButton.visibility = GONE
+                            restoreButton.visibility = VISIBLE
+                        }
+                        lifecycleScope.launch {
+                            for (tag in viewModal.getTagsWithNote(noteID).last().tags){
+                                viewModal.addTagToList(tag)
+                            }
+                            tagListAdapter.updateList(viewModal.tagList)
+
+                        }
                     }
-                    tagListAdapter.updateList(viewModal.tagList)
 
                 }
+
+
             }
             else -> {
                 tvTimeStamp.visibility =GONE

@@ -41,6 +41,10 @@ interface NotesDao {
     fun getTags(): LiveData<List<Tag>>
 
     @Transaction
+    @Query("select * from Note where noteID = :noteID")
+    fun getNote(noteID : Long) : LiveData<Note>
+
+    @Transaction
     @Query("Select * from Note where not exists (select * from ArchivedNote where ArchivedNote.noteID = Note.noteID) and not exists (select * from PinnedNote where PinnedNote.noteID= Note.noteID) order by timeStamp DESC")
     fun getAllNotes(): LiveData<List<Note>>
 
