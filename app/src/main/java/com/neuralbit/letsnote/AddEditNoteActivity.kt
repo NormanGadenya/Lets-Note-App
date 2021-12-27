@@ -23,6 +23,7 @@ import android.widget.*
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
@@ -145,7 +146,8 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
 
         viewModal.getNoteLabel(noteID).observe(this){
             if (it != null){
-                getLabelColor(it.labelID)
+                label = it
+                coordinatorlayout.setBackgroundColor(resources.getColor(cm.getLabelColor(it.labelID)))
 
             }
         }
@@ -252,6 +254,8 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
                 showAlertSheetDialog()
 
             }else{
+                cancelAlarm()
+
                 viewModal.deleteReminder(reminder!!)
                 reminder = null
             }
@@ -384,13 +388,18 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
 
                 label?.let { l -> viewModal.deleteLabel(l) }
 
-                reminder?.let { r -> viewModal.deleteReminder(r) }
+                reminder?.let { r ->
+                    cancelAlarm()
+                    viewModal.deleteReminder(r) }
 
                 for(tag in viewModal.tagList){
                     viewModal.deleteNoteTagCrossRef(NoteTagCrossRef(noteID,tag.tagTitle))
                 }
                 viewModal.getNote(noteID).observe(this){
-                    viewModal.deleteNote(it)
+                    if (it!=null){
+                        viewModal.deleteNote(it)
+
+                    }
                 }
 
                 Toast.makeText(this,"Note deleted",Toast.LENGTH_SHORT).show()
@@ -427,6 +436,7 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
         Toast.makeText(this,"Note Unarchived", Toast.LENGTH_SHORT).show()
 
     }
+
     private fun pinOrUnPinNote(){
         val pN = PinnedNote(noteID)
         if(viewModal.pinned){
@@ -454,6 +464,7 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
         }
 
     }
+
     private fun getTagFromString(p0: CharSequence?, p3: Int) {
         if(p3>0){
             if(!tagListAdapter.deleteIgnored){
@@ -483,17 +494,10 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
 
         }
     }
-    private fun getLabelColor(labelID : Int){
-        when (labelID){
-            1 -> coordinatorlayout.setBackgroundColor(resources.getColor(R.color.white))
-            2 -> coordinatorlayout.setBackgroundColor(resources.getColor(R.color.Wild_orchid))
-            3 -> coordinatorlayout.setBackgroundColor(resources.getColor(R.color.Honeydew))
-            4 -> coordinatorlayout.setBackgroundColor(resources.getColor(R.color.English_violet))
-            5 -> coordinatorlayout.setBackgroundColor(resources.getColor(R.color.Celadon))
-            6 -> coordinatorlayout.setBackgroundColor(resources.getColor(R.color.Apricot))
 
-        }
-    }
+
+
+
     private fun showLabelBottomSheetDialog() {
         labelBottomSheet.setContentView(R.layout.note_label_bottom_sheet)
         labelBottomSheet.show()
@@ -565,7 +569,7 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
         alertBottomSheet.setContentView(R.layout.alert_bottom_sheet)
         alertBottomSheet.show()
         val c = Calendar.getInstance()
-        var currentHr = c.get(Calendar.HOUR_OF_DAY)
+        val currentHr = c.get(Calendar.HOUR_OF_DAY)
         val opt1 = alertBottomSheet.findViewById<View>(R.id.auto1)
         val opt2 = alertBottomSheet.findViewById<View>(R.id.auto2)
         val opt3 = alertBottomSheet.findViewById<View>(R.id.auto3)
@@ -748,11 +752,13 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
 
                     viewModal.insertReminder(Reminder(noteID, calendar.timeInMillis))
                     startAlarm(calendar)
+                    alertBottomSheet.dismiss()
 
                 }
                 setNegativeButton("cancel",
-                    DialogInterface.OnClickListener { dialog, id ->
-                        // User cancelled the dialog
+                    DialogInterface.OnClickListener { _,_  ->
+                        alertBottomSheet.dismiss()
+
                     })
                 setView(R.layout.custom_datetime_dialog)
                 setTitle("Choose date and time")
@@ -780,20 +786,21 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
     private fun startAlarm(calendar: Calendar) {
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(this, AlertReceiver::class.java)
-        intent.putExtra("noteTitle",noteTitleEdit.text)
-        intent.putExtra("noteDescription",noteDescriptionEdit.text)
-        intent.putExtra("noteTimeStamp",noteTimeStamp)
-        intent.putExtra("pinnedNote",pinnedNote)
         intent.putExtra("noteType",noteType)
         intent.putExtra("noteID",noteID)
+        intent.putExtra("noteTitle",noteTitle)
         //TODO fix notification issue
-        //TODO fix labels problem
         tvTimeStamp.text= getString(R.string.timeStamp,cm.convertLongToTime(noteTimeStamp)[0],cm.convertLongToTime(noteTimeStamp)[1])
         tvTimeStamp.visibility =VISIBLE
         val pendingIntent = PendingIntent.getBroadcast(this, 1, intent, 0)
         alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
     }
-
+    private fun cancelAlarm(){
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(this, AlertReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(this, 1, intent, 0)
+        alarmManager.cancel(pendingIntent)
+    }
     private fun changeIconColor(iconColorID : Int, drawable : Int){
         val unwrappedDrawable = AppCompatResources.getDrawable(applicationContext, drawable)
         val wrappedDrawable = DrawableCompat.wrap(unwrappedDrawable!!)

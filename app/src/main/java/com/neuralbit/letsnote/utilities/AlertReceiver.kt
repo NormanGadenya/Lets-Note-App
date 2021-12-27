@@ -13,21 +13,14 @@ class AlertReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val noteTitle = intent.getStringExtra("noteTitle")
         val notificationHelper = NotificationHelper(context,noteTitle)
-
-        val noteDesc = intent.getStringExtra("noteDescription")
-        val noteTimeStamp = intent.getLongExtra("noteTimeStamp", -1)
-        val pinnedNote = intent.getBooleanExtra("pinnedNote", false)
-        val noteType = intent.getStringExtra("noteType")
-        val noteID = intent.getIntExtra("noteID", -1)
+//        val noteType = intent.getStringExtra("noteType")
+        val noteID = intent.getLongExtra("noteID", -1)
         val nb = notificationHelper.channelNotification
-        Log.d(TAG, "onReceive: $noteTitle ")
+        Log.d(TAG, "onReceive: $noteID ")
         val i = Intent(context, AddEditNoteActivity::class.java)
-        i.putExtra("noteTitle",noteTitle)
-        i.putExtra("noteDescription",noteDesc)
-        i.putExtra("noteTimeStamp",noteTimeStamp)
-        i.putExtra("pinnedNote",pinnedNote)
-        i.putExtra("noteType",noteType)
-        i.putExtra("noteID",noteID)
+//
+//        i.putExtra("noteType",noteType)
+//        i.putExtra("noteID",noteID)
         val pendingIntent = PendingIntent.getActivity(context, 1, i, PendingIntent.FLAG_ONE_SHOT)
         nb.setContentIntent(pendingIntent)
         notificationHelper.manager.notify(1, nb.build())
