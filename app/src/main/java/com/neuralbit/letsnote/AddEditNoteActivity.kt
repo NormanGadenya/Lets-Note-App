@@ -240,7 +240,11 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
                 reminderTV.visibility =  VISIBLE
                 reminderIcon.visibility = VISIBLE
                 reminderTV.text = resources.getString(R.string.reminder,cm.convertLongToTime(it.dateTime)[0],cm.convertLongToTime(it.dateTime)[1])
-
+                val c = Calendar.getInstance()
+                if (c.timeInMillis > it.dateTime){
+                    cancelAlarm()
+                    viewModal.deleteReminder(it)
+                }
             }else{
                 alertButton.setBackgroundResource(R.drawable.ic_outline_add_alert_24)
                 reminderTV.visibility =  GONE
