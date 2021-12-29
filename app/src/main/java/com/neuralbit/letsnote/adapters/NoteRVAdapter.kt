@@ -1,12 +1,14 @@
 package com.neuralbit.letsnote
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.neuralbit.letsnote.entities.Note
+import com.neuralbit.letsnote.utilities.Common
 
 class NoteRVAdapter (
     val context: Context,
@@ -16,6 +18,10 @@ class NoteRVAdapter (
     ): RecyclerView.Adapter<NoteRVAdapter.ViewHolder>(){
 
     private val allNotes = ArrayList<Note>()
+    var searchString: String? =null
+    val TAG = "NoteRVAdapter"
+
+
     inner class ViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView){
         val noteTitleTV: TextView = itemView.findViewById(R.id.tvNoteTitle)
         val noteTextTV: TextView = itemView.findViewById(R.id.tvNoteDesc)
@@ -31,7 +37,7 @@ class NoteRVAdapter (
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         var title = allNotes[position].title
         var desc = allNotes[position].description
-//        var noteColor : String? = allNotes[position].tagColor
+        val cm = Common()
         if (title?.length!! >20 ){
             title = title.substring(0,15)+"..."
         }
@@ -41,27 +47,13 @@ class NoteRVAdapter (
 
         holder.noteTitleTV.text = title
         holder.noteTextTV.text = desc
+        Log.d(TAG, "onBindViewHolder: $searchString")
+        searchString?.let { cm.setHighLightedText(holder.noteTextTV, it) }
+
         var colorID= R.color.white
         var textColorID =R.color.black
-//        if (noteColor !=null){
-//            when(noteColor) {
-//                "White" -> {
-//                    colorID = R.color.white
-//                }
-//                "English_violet" -> {
-//                    colorID = R.color.English_violet
-//                    textColorID = Color.WHITE
-//                }
-//                "Wild_orchid" -> { colorID = R.color.Wild_orchid }
-//                "Celadon" -> { colorID = R.color.Celadon }
-//                "Honeydew" -> { colorID = R.color.Honeydew }
-//                "Apricot" -> { colorID = R.color.Apricot }
-//            }
-//            Log.d("TAG", "onBindViewHolder: $noteColor")
-//            holder.noteCard.setBackgroundColor(context.resources.getColor(colorID))
-//            holder.noteTitleTV.setTextColor(textColorID)
-//            holder.noteTextTV.setTextColor(textColorID)
-//        }
+
+
 
         holder.itemView.setOnClickListener{
             noteClickInterface.onNoteClick(allNotes.get(position))

@@ -45,7 +45,6 @@ import kotlin.collections.ArrayList
 
 
 class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicker, GetDateFromPicker, GetTagFromDialog{
-    private lateinit var actionBarIcons: List<Int>
     private lateinit var restoreButton: ImageButton
     private lateinit var archiveButton: ImageButton
     private lateinit var deleteButton: ImageButton
@@ -58,12 +57,9 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
     private lateinit var reminderIcon : ImageView
     private lateinit var reminderTV : TextView
     private var noteID : Long= -1
-    private var tagID = -1
     private lateinit var viewModal :NoteViewModel
     private lateinit var noteType : String
     private lateinit var allNotes : List<Note>
-//    private lateinit var archivedNotes : List<Note>
-//    private lateinit var pinnedNotes : List<Note>
     private var noteColor : String ? = null
     private val TAG = "AddNoteActivity"
     private var deletable : Boolean = false
@@ -96,43 +92,15 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
     private lateinit var timeTitleTV :TextView
     private lateinit var dateTitleTV :TextView
     private var pinnedNote = false
+    private lateinit var layoutManager : LinearLayoutManager
 
 
 
     override fun onCreate(savedInstanceState: Bundle?)  {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_edit_note)
-        noteTitleEdit = findViewById(R.id.noteEditTitle)
-        supportActionBar?.displayOptions = ActionBar.DISPLAY_SHOW_CUSTOM
-        supportActionBar?.setDisplayShowCustomEnabled(true)
-        actionBarIcons = listOf(R.drawable.ic_baseline_arrow_back_24,R.drawable.ic_baseline_archive_24,R.drawable.ic_baseline_restore_24)
-        cm= Common()
-        supportActionBar?.setCustomView(R.layout.note_action_bar)
-        noteDescriptionEdit = findViewById(R.id.noteEditDesc)
-        tvTimeStamp = findViewById(R.id.tvTimeStamp)
-        tagListRV = findViewById(R.id.tagListRV)
-        labelBtn = findViewById(R.id.labelBtn)
-        coordinatorlayout = findViewById(R.id.coordinatorlayout)
-        alertButton = findViewById(R.id.alertButton)
-        addTagBtn = findViewById(R.id.addTagBtn)
-        reminderTV = findViewById(R.id.reminderTV)
-        reminderIcon = findViewById(R.id.reminderIcon)
-        noteID = intent.getLongExtra("noteID",-1)
-        noteType = intent.getStringExtra("noteType").toString()
 
-        val layoutManager = LinearLayoutManager(applicationContext,LinearLayoutManager.HORIZONTAL,false)
-        calendar = Calendar.getInstance()
-        layoutManager.orientation = HORIZONTAL
-        tagListAdapter= TagRVAdapter(applicationContext,this)
-        tagListRV.layoutManager= layoutManager
-        tagListRV.adapter = tagListAdapter
-        lifecycleOwner = this
-        viewModal = ViewModelProvider(
-            this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(application)
-        ).get(NoteViewModel::class.java)
-
-
+        initControllers()
         viewModal.allNotes.observe(this) {
             allNotes = it
             if(noteType != "Edit"){
@@ -176,25 +144,15 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
 
         }
 
-        KeyboardUtils.addKeyboardToggleListener(this, KeyboardUtils.SoftKeyboardToggleListener {
-            onKeyboardVisibilityChanged(it)
-        })
+        KeyboardUtils.addKeyboardToggleListener(this) { onKeyboardVisibilityChanged(it) }
 
-        deleteButton = findViewById(R.id.deleteButton)
-        backButton = findViewById(R.id.backButton)
-        archiveButton = findViewById(R.id.archiveButton)
-        restoreButton = findViewById(R.id.restoreButton)
-        alertBottomSheet =  BottomSheetDialog(this)
-        labelBottomSheet = BottomSheetDialog(this)
-        
+
         addTagBtn.setOnClickListener {
             val addTagDialog = AddTagDialog(this)
             addTagDialog.show(supportFragmentManager,"addTagDialog")
-            
         }
 
-        coordinatorlayout = findViewById(R.id.coordinatorlayout)
-        pinButton = findViewById(R.id.pinButton)
+
 
 
 
@@ -317,6 +275,7 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
         labelBtn.setOnClickListener {
             showLabelBottomSheetDialog()
         }
+
         noteTitleEdit.addTextChangedListener(object : TextWatcher{
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
             }
@@ -336,6 +295,7 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
             }
 
         })
+
         noteDescriptionEdit.addTextChangedListener(object : TextWatcher{
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
 
@@ -354,17 +314,17 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
             }
         })
 
-        noteDescriptionEdit.setOnKeyListener { p0, p1, p2 ->
+        noteDescriptionEdit.setOnKeyListener { _, p1, _ ->
             viewModal.noteChanged(true)
             viewModal.backPressed.value = p1 == KeyEvent.KEYCODE_DEL
             false
         }
-        noteTitleEdit.setOnKeyListener { view, i, keyEvent ->
+
+        noteTitleEdit.setOnKeyListener { _, _, _ ->
             viewModal.noteChanged(true)
 
             false
         }
-
 
         viewModal.texChanged.observe(this) {
             textChanged = it
@@ -438,6 +398,45 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
         viewModal.removeArchive(archivedNote)
         viewModal.archived = false
         Toast.makeText(this,"Note Unarchived", Toast.LENGTH_SHORT).show()
+
+    }
+
+    private fun initControllers(){
+        cm= Common()
+        noteTitleEdit = findViewById(R.id.noteEditTitle)
+        supportActionBar?.displayOptions = ActionBar.DISPLAY_SHOW_CUSTOM
+        supportActionBar?.setDisplayShowCustomEnabled(true)
+        supportActionBar?.setCustomView(R.layout.note_action_bar)
+        layoutManager = LinearLayoutManager(applicationContext,LinearLayoutManager.HORIZONTAL,false)
+        calendar = Calendar.getInstance()
+        noteDescriptionEdit = findViewById(R.id.noteEditDesc)
+        tvTimeStamp = findViewById(R.id.tvTimeStamp)
+        tagListRV = findViewById(R.id.tagListRV)
+        labelBtn = findViewById(R.id.labelBtn)
+        coordinatorlayout = findViewById(R.id.coordinatorlayout)
+        alertButton = findViewById(R.id.alertButton)
+        addTagBtn = findViewById(R.id.addTagBtn)
+        reminderTV = findViewById(R.id.reminderTV)
+        reminderIcon = findViewById(R.id.reminderIcon)
+        noteID = intent.getLongExtra("noteID",-1)
+        noteType = intent.getStringExtra("noteType").toString()
+        deleteButton = findViewById(R.id.deleteButton)
+        backButton = findViewById(R.id.backButton)
+        archiveButton = findViewById(R.id.archiveButton)
+        restoreButton = findViewById(R.id.restoreButton)
+        alertBottomSheet =  BottomSheetDialog(this)
+        labelBottomSheet = BottomSheetDialog(this)
+        coordinatorlayout = findViewById(R.id.coordinatorlayout)
+        pinButton = findViewById(R.id.pinButton)
+        layoutManager.orientation = HORIZONTAL
+        tagListAdapter= TagRVAdapter(applicationContext,this)
+        tagListRV.layoutManager= layoutManager
+        tagListRV.adapter = tagListAdapter
+        lifecycleOwner = this
+        viewModal = ViewModelProvider(
+            this,
+            ViewModelProvider.AndroidViewModelFactory.getInstance(application)
+        ).get(NoteViewModel::class.java)
 
     }
 

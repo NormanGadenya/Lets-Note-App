@@ -2,6 +2,7 @@ package com.neuralbit.letsnote.ui.allNotes
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -52,40 +53,44 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
         notesRV.adapter= noteRVAdapter
         pinnedNotesRV.adapter = pinnedNoteRVAdapter
         //TODO introduce new pinned list fragment
-        allNotesViewModel.allNotes.observe(viewLifecycleOwner,{
+        allNotesViewModel.allNotes.observe(viewLifecycleOwner) {
             allNotes = it
             noteRVAdapter?.updateList(it)
-        })
-        allNotesViewModel.pinnedNotes.observe(viewLifecycleOwner,{
+        }
+        allNotesViewModel.pinnedNotes.observe(viewLifecycleOwner) {
             pinnedNoteRVAdapter?.updateList(it)
             pinnedNotes = it
-            if(it.isNotEmpty()){
-                allNotesViewModel.allNotes.observe(viewLifecycleOwner,{allNotes->
-                    if (allNotes.isNotEmpty()){
-                        otherNotesTV.visibility= VISIBLE
-                    }else{
-                        otherNotesTV.visibility= GONE
+            if (it.isNotEmpty()) {
+                allNotesViewModel.allNotes.observe(viewLifecycleOwner) { allNotes ->
+                    if (allNotes.isNotEmpty()) {
+                        otherNotesTV.visibility = VISIBLE
+                    } else {
+                        otherNotesTV.visibility = GONE
                     }
-                })
+                }
 
-                pinnedNotesTV.visibility=VISIBLE
-            }else{
+                pinnedNotesTV.visibility = VISIBLE
+            } else {
                 otherNotesTV.visibility = GONE
                 pinnedNotesTV.visibility = GONE
             }
-        })
+        }
 
-        allNotesViewModel.searchQuery.observe(viewLifecycleOwner,{ s ->
-            allNotesViewModel.filterList().observe(viewLifecycleOwner,{
-                noteRVAdapter?.updateList(it)
-
-            })
-            allNotesViewModel.filterPinnedList().observe(viewLifecycleOwner,{
+        allNotesViewModel.searchQuery.observe(viewLifecycleOwner) { str->
+            allNotesViewModel.filterPinnedList().observe(viewLifecycleOwner) {
+                pinnedNoteRVAdapter?.searchString = str
                 pinnedNoteRVAdapter?.updateList(it)
-            })
-        })
 
-        
+            }
+            allNotesViewModel.filterList().observe(viewLifecycleOwner) {
+                noteRVAdapter?.updateList(it)
+                noteRVAdapter?.searchString = str
+
+            }
+
+        }
+
+
         addFAB.setOnClickListener{
             val intent = Intent( context,AddEditNoteActivity::class.java)
             intent.putExtra("noteType","NewNote")

@@ -1,12 +1,16 @@
 package com.neuralbit.letsnote.utilities
 
-import android.util.Log
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.BackgroundColorSpan
+import android.widget.TextView
 import androidx.core.graphics.ColorUtils
 import androidx.room.TypeConverter
 import com.neuralbit.letsnote.R
 import java.sql.Time
 import java.text.SimpleDateFormat
 import java.util.*
+
 
 class Common (){
 
@@ -34,6 +38,27 @@ class Common (){
     fun isDark(color : Int):Boolean{
         return ColorUtils.calculateLuminance(color) < 0.5;
 
+    }
+
+    fun setHighLightedText(tv: TextView, textToHighlight: String) {
+        val tvt = tv.text.toString()
+        var ofe = tvt.indexOf(textToHighlight, 0)
+        val wordToSpan: Spannable = SpannableString(tv.text)
+        var ofs = 0
+        while (ofs < tvt.length && ofe != -1) {
+            ofe = tvt.indexOf(textToHighlight, ofs)
+            if (ofe == -1) break else {
+                // set color here
+                wordToSpan.setSpan(
+                    BackgroundColorSpan(-0x100),
+                    ofe,
+                    ofe + textToHighlight.length,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                tv.setText(wordToSpan, TextView.BufferType.SPANNABLE)
+            }
+            ofs = ofe + 1
+        }
     }
 
 
