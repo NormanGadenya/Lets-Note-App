@@ -40,6 +40,7 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     var noteDescString : MutableLiveData<String>
     var newTagTyped : MutableLiveData<Boolean>
     var backPressed : MutableLiveData<Boolean>
+    var enterPressed : MutableLiveData<Boolean>
     var tagList : ArrayList<Tag>
     val reminderDate : MutableLiveData<Long>
     val reminderTime : MutableLiveData<Long>
@@ -66,6 +67,7 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         noteDescString = MutableLiveData()
         newTagTyped = MutableLiveData()
         backPressed = MutableLiveData()
+        enterPressed = MutableLiveData()
         tagList = ArrayList<Tag>()
         pinned = false
         archived = false

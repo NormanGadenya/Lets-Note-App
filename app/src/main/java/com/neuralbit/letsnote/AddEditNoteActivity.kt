@@ -91,7 +91,7 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
     private lateinit var timeTitleTV :TextView
     private lateinit var dateTitleTV :TextView
     private lateinit var layoutManager : LinearLayoutManager
-    private var dashTyped = false
+    private var enterCount = 0
 
 
     override fun onCreate(savedInstanceState: Bundle?)  {
@@ -275,8 +275,7 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
         }
 
         noteTitleEdit.addTextChangedListener(object : TextWatcher{
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-            }
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 if(p3>0){
 
@@ -296,18 +295,6 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
 
         noteDescriptionEdit.addTextChangedListener(object : TextWatcher{
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-//                if(dashTyped){
-                    noteDescriptionEdit.append("+")
-//                    dashTyped = false
-//                }
-                if (p0?.length !! >0){
-                    val str = p0.toString().split("\n")
-
-                    dashTyped = str[str.lastIndex - 1].startsWith("-")
-                    //TODO fix dash typed error
-
-                }
-
 
             }
 
@@ -315,10 +302,6 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
 
                 if(p0?.length!! > 0){
 //
-
-                        if (dashTyped){
-                            noteDescriptionEdit.append("+")
-                        }
 
 
 
@@ -337,6 +320,12 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
         noteDescriptionEdit.setOnKeyListener { _, p1, _ ->
             viewModal.noteChanged(true)
             viewModal.backPressed.value = p1 == KeyEvent.KEYCODE_DEL
+            viewModal.enterPressed.value = p1 == KeyEvent.KEYCODE_ENTER
+
+            enterCount ++
+
+
+
             
             false
         }
@@ -354,7 +343,31 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
             deletable = it
         }
 
+        viewModal.enterPressed.observe(this){
+            val noteContent = noteDescriptionEdit.text
+            val noteContentSplit = noteContent.split("\n")
+            var lineIndex = 0
+            if (noteContentSplit.size>2){
+                lineIndex = noteContentSplit.lastIndex - 1
+            }
+            if (it){
 
+                    if(noteContentSplit.isNotEmpty()){
+
+                            if (noteContentSplit[lineIndex].startsWith("-")){
+                                noteDescriptionEdit.append("-")
+
+
+                            }
+
+
+                    }
+
+
+               
+                Log.d(TAG, "on enter pressed: $noteContentSplit")
+            }
+        }
 
 
 
@@ -719,7 +732,7 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
 
     private fun onKeyboardVisibilityChanged(b: Boolean) {
         if(b){
-            noteDescriptionEdit.maxLines = 11
+            noteDescriptionEdit.maxLines = 10
         }else{
             noteDescriptionEdit.maxLines = 23
 
