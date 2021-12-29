@@ -110,14 +110,9 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
     override fun onNoteClick(note: Note) {
         val intent = Intent( context, AddEditNoteActivity::class.java)
         intent.putExtra("noteType","Edit")
-        intent.putExtra("noteTitle",note.title)
-        intent.putExtra("noteDescription",note.description)
+
         intent.putExtra("noteID",note.noteID)
-//        intent.putExtra("noteColor",note.tagColor)
-        intent.putExtra("noteTimeStamp",note.timeStamp )
-        if(note in pinnedNotes ){
-            intent.putExtra("pinnedNote",true)
-        }
+
         startActivity(intent)
 
 

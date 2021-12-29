@@ -47,7 +47,6 @@ class NoteRVAdapter (
 
         holder.noteTitleTV.text = title
         holder.noteTextTV.text = desc
-        Log.d(TAG, "onBindViewHolder: $searchString")
         searchString?.let { cm.setHighLightedText(holder.noteTextTV, it) }
 
         var colorID= R.color.white

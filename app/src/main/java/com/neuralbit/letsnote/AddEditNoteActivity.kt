@@ -1,4 +1,4 @@
-package com.neuralbit.letsnote
+package com.neuralbit. letsnote
 
 import android.app.AlarmManager
 import android.app.AlertDialog
@@ -83,7 +83,6 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
     private lateinit var tagListAdapter : TagRVAdapter
     private lateinit var alertBottomSheet : BottomSheetDialog
     private lateinit var labelBottomSheet : BottomSheetDialog
-    private var pinBtnClicked = false
     private lateinit var labelBtn : ImageButton
     private  var reminder: Reminder? = null
     private  var label: Label? = null
@@ -91,9 +90,8 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
     private lateinit var calendar: Calendar
     private lateinit var timeTitleTV :TextView
     private lateinit var dateTitleTV :TextView
-    private var pinnedNote = false
     private lateinit var layoutManager : LinearLayoutManager
-
+    private var dashTyped = false
 
 
     override fun onCreate(savedInstanceState: Bundle?)  {
@@ -298,11 +296,32 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
 
         noteDescriptionEdit.addTextChangedListener(object : TextWatcher{
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+//                if(dashTyped){
+                    noteDescriptionEdit.append("+")
+//                    dashTyped = false
+//                }
+                if (p0?.length !! >0){
+                    val str = p0.toString().split("\n")
+
+                    dashTyped = str[str.lastIndex - 1].startsWith("-")
+                    //TODO fix dash typed error
+
+                }
+
 
             }
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
                 if(p0?.length!! > 0){
+//
+
+                        if (dashTyped){
+                            noteDescriptionEdit.append("+")
+                        }
+
+
+
                     getTagFromString(p0,p3)
 
                 }
@@ -314,9 +333,11 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
             }
         })
 
+
         noteDescriptionEdit.setOnKeyListener { _, p1, _ ->
             viewModal.noteChanged(true)
             viewModal.backPressed.value = p1 == KeyEvent.KEYCODE_DEL
+            
             false
         }
 
