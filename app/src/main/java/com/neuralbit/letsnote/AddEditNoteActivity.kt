@@ -322,11 +322,6 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
             viewModal.backPressed.value = p1 == KeyEvent.KEYCODE_DEL
             viewModal.enterPressed.value = p1 == KeyEvent.KEYCODE_ENTER
 
-            enterCount ++
-
-
-
-            
             false
         }
 
@@ -348,14 +343,18 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
             val noteContentSplit = noteContent.split("\n")
             var lineIndex = 0
             if (noteContentSplit.size>2){
-                lineIndex = noteContentSplit.lastIndex - 1
+                lineIndex = noteContentSplit.lastIndex-1
             }
             if (it){
 
                     if(noteContentSplit.isNotEmpty()){
 
                             if (noteContentSplit[lineIndex].startsWith("-")){
-                                noteDescriptionEdit.append("-")
+                                if(noteContent.endsWith("\n")){
+                                    noteDescriptionEdit.append("-")
+                                }
+
+                                Log.d(TAG, "onCreate: $noteContentSplit")
 
 
                             }

@@ -4,6 +4,8 @@ import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
@@ -46,6 +48,17 @@ class NoteRVAdapter (
          }
 
         holder.noteTitleTV.text = title
+        if(title.isEmpty()){
+            holder.noteTitleTV.visibility = GONE
+        }else{
+            holder.noteTitleTV.visibility = VISIBLE
+
+        }
+        if(desc.isEmpty()){
+            holder.noteTextTV.visibility = GONE
+        }else{
+            holder.noteTextTV.visibility = VISIBLE
+        }
         holder.noteTextTV.text = desc
         searchString?.let { cm.setHighLightedText(holder.noteTextTV, it) }
 
