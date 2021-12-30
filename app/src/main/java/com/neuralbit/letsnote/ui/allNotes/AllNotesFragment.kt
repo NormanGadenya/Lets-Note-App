@@ -9,6 +9,7 @@ import android.view.View.VISIBLE
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
@@ -52,9 +53,16 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
         val pinnedNoteRVAdapter = context?.let { NoteRVAdapter(it,this) }
         notesRV.adapter= noteRVAdapter
         pinnedNotesRV.adapter = pinnedNoteRVAdapter
-        //TODO introduce new pinned list fragment
+        noteRVAdapter?.viewModel = allNotesViewModel
+        noteRVAdapter?.lifecycleScope = lifecycleScope
+        noteRVAdapter?.lifecycleOwner = this
+        pinnedNoteRVAdapter?.viewModel = allNotesViewModel
+        pinnedNoteRVAdapter?.lifecycleScope = lifecycleScope
+        pinnedNoteRVAdapter?.lifecycleOwner = this
+
         allNotesViewModel.allNotes.observe(viewLifecycleOwner) {
             allNotes = it
+
             noteRVAdapter?.updateList(it)
         }
         allNotesViewModel.pinnedNotes.observe(viewLifecycleOwner) {
@@ -75,6 +83,7 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
                 pinnedNotesTV.visibility = GONE
             }
         }
+
 
         allNotesViewModel.searchQuery.observe(viewLifecycleOwner) { str->
             allNotesViewModel.filterPinnedList().observe(viewLifecycleOwner) {

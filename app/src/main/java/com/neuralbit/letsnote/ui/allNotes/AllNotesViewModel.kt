@@ -5,28 +5,43 @@ import android.util.Log
 import androidx.lifecycle.*
 import com.neuralbit.letsnote.entities.Note
 import com.neuralbit.letsnote.NoteDatabase
-import com.neuralbit.letsnote.repos.NoteRepo
+import com.neuralbit.letsnote.daos.LabelDao
+import com.neuralbit.letsnote.entities.Label
+import com.neuralbit.letsnote.entities.Reminder
+import com.neuralbit.letsnote.relationships.TagsWithNote
+import com.neuralbit.letsnote.repos.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.ArrayList
 
 class AllNotesViewModel (application : Application) : AndroidViewModel(application) {
     var allNotes: LiveData<List<Note>>
-    val repo : NoteRepo
+    private val noteRepo : NoteRepo
+    private val noteTagRepo : NoteTagRepo
+    private val reminderRepo : ReminderRepo
+    private val labelRepo : LabelRepo
+
     var pinnedNotes: LiveData<List<Note>>
     var searchQuery : MutableLiveData<String> = MutableLiveData()
 
     init{
 
-        val dao = NoteDatabase.getDatabase(application).getNotesDao()
-        repo= NoteRepo(dao)
-        allNotes = repo.allNotes
-        pinnedNotes = repo.pinnedNotes
+        val noteDao = NoteDatabase.getDatabase(application).getNotesDao()
+        val noteTagDao = NoteDatabase.getDatabase(application).getNoteTagDao()
+        val reminderDao = NoteDatabase.getDatabase(application).getReminderDao()
+        val labelDao = NoteDatabase.getDatabase(application).getLabelDao()
+
+        noteRepo= NoteRepo(noteDao)
+        noteTagRepo = NoteTagRepo(noteTagDao)
+        reminderRepo = ReminderRepo(reminderDao)
+        labelRepo = LabelRepo(labelDao)
+        allNotes = noteRepo.allNotes
+        pinnedNotes = noteRepo.pinnedNotes
 
     }
 
     fun deleteNote(note: Note)= viewModelScope.launch(Dispatchers.IO){
-        repo.delete(note)
+        noteRepo.delete(note)
     }
 
     fun filterList( ) : LiveData<List<Note>>{
@@ -76,4 +91,15 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
 
     }
 
+    fun getNoteLabel( noteID : Long) : LiveData <Label> {
+        return labelRepo.getNoteLabel(noteID)
+    }
+
+    fun getReminder(noteID : Long): LiveData<Reminder>  {
+        return reminderRepo.fetchReminder(noteID)
+    }
+
+    suspend fun getTagsWithNote(noteID: Long):List<TagsWithNote> {
+        return noteTagRepo.getTagsWithNote(noteID)
+    }
 }
