@@ -38,19 +38,19 @@ class ArchivedFragment : Fragment() , NoteClickInterface {
         val noteRVAdapter = context?.let { NoteRVAdapter(it,this) }
         notesRV.adapter= noteRVAdapter
 
-        archivedViewModel.archivedNotes.observe(viewLifecycleOwner,{
+        archivedViewModel.archivedNotes.observe(viewLifecycleOwner) {
             noteRVAdapter?.updateList(it)
 
-        })
-        allNotesViewModel.pinnedNotes.observe(viewLifecycleOwner,{
+        }
+        allNotesViewModel.pinnedNotes.observe(viewLifecycleOwner) {
             pinnedNotes = it
-        })
+        }
 
-        archivedViewModel.searchQuery.observe(viewLifecycleOwner,{
-            archivedViewModel.filterList().observe(viewLifecycleOwner,{
+        archivedViewModel.searchQuery.observe(viewLifecycleOwner) {
+            archivedViewModel.filterList().observe(viewLifecycleOwner) {
                 noteRVAdapter?.updateList(it)
-            })
-        })
+            }
+        }
 
         return root
     }
@@ -62,16 +62,8 @@ class ArchivedFragment : Fragment() , NoteClickInterface {
 
     override fun onNoteClick(note: Note) {
         val intent = Intent( context, AddEditNoteActivity::class.java)
-        intent.putExtra("archivedNote",true)
         intent.putExtra("noteType","Edit")
-//        intent.putExtra("noteColor",note.tagColor)
-        intent.putExtra("noteTitle",note.title)
-        intent.putExtra("noteDescription",note.description)
         intent.putExtra("noteID",note.noteID)
-        intent.putExtra("noteTimeStamp",note.timeStamp )
-        if(note in pinnedNotes ){
-            intent.putExtra("pinnedNote",true)
-        }
         startActivity(intent)
 
 
