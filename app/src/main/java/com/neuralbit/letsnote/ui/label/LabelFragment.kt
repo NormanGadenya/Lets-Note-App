@@ -18,12 +18,6 @@ import com.neuralbit.letsnote.ui.archived.ArchivedViewModel
 
 class LabelFragment : Fragment() {
     private val labelViewModel: LabelViewModel by activityViewModels()
-    private var label1Count = 0
-    private var label2Count = 0
-    private var label3Count = 0
-    private var label4Count = 0
-    private var label5Count = 0
-    private var label6Count = 0
     private var labelCount = HashMap<Int,Int>()
     private var _binding:LabelFragmentBinding ? = null
     lateinit var labelRV:RecyclerView
@@ -32,7 +26,6 @@ class LabelFragment : Fragment() {
     val TAG = "LabelFragment"
 
 
-    private lateinit var viewModel: LabelViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -49,19 +42,11 @@ class LabelFragment : Fragment() {
 
         for (labelID in 1..6){
             labelViewModel.getNotesWithLabel(labelID).observe(viewLifecycleOwner){
-//                val notesCount=it.last().notes.size
-//
-//                labelCount[labelID] = notesCount
-//
-//                labelRVAdapter?.updateLabelCount(labelCount)
-//                if (it.isNotEmpty()){
-//                    Log.d(TAG, "onCreateView: ${it.last()}")
-//
-//                }
+                labelCount[labelID] = it.size
+                labelRVAdapter?.updateLabelCount(labelCount)
+
+
             }
-            Log.d(TAG, "onCreateView: $labelID")
-            labelCount.put(labelID,labelID)
-            labelRVAdapter?.updateLabelCount(labelCount)
         }
 
 

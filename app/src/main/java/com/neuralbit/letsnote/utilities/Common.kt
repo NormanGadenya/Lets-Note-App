@@ -27,6 +27,7 @@ class Common (){
 
     fun getLabelColor(labelID : Int) : Int{
         return when (labelID){
+            1-> R.color.white
             2 -> R.color.Wild_orchid
             3 -> R.color.Honeydew
             4 -> R.color.English_violet

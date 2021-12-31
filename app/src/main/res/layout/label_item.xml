@@ -3,14 +3,15 @@
     android:layout_width="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:padding="@dimen/activity_horizontal_margin"
+    android:layout_margin="@dimen/activity_horizontal_margin"
     android:layout_height="wrap_content">
     <androidx.cardview.widget.CardView
         android:layout_width="160dp"
         android:layout_height="160dp"
-        app:cardCornerRadius="48dp"
+        app:cardCornerRadius="20dp"
         android:elevation="5dp"
-        android:id="@+id/tagCard"
+        app:cardBackgroundColor="@color/teal_200"
+        android:id="@+id/labelCard"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -37,17 +38,16 @@
                 android:layout_height="wrap_content"
                 android:text="@string/notes"
                 android:textSize="@dimen/cardNoteTVSize"
-                app:layout_constraintBottom_toTopOf="@+id/tagButton"
+                app:layout_constraintBottom_toTopOf="@+id/imgView"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/noteCount" />
 
-            <ImageButton
-                android:id="@+id/tagButton"
+            <ImageView
+                android:id="@+id/imgView"
                 android:layout_width="@dimen/tagButtonSize"
                 android:layout_height="@dimen/tagButtonSize"
-                android:background="?attr/selectableItemBackgroundBorderless"
                 android:foreground="@drawable/ic_baseline_arrow_forward_24"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
