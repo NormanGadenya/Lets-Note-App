@@ -25,5 +25,6 @@
     <string name="title">Title</string>
     <string name="tags">Tags</string>
     <string name="notes">Notes</string>
+    <string name="labels">Labels</string>
     <string name="note_content">Note content</string>
 </resources>
