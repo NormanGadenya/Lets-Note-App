@@ -33,6 +33,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.HORIZONTAL
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
+import com.neuralbit.letsnote.*
 import com.neuralbit.letsnote.entities.*
 import com.neuralbit.letsnote.utilities.*
 import com.teamwork.autocomplete.MultiAutoComplete
@@ -44,7 +45,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicker, GetDateFromPicker, GetTagFromDialog{
+class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPicker, GetDateFromPicker, GetTagFromDialog{
     private lateinit var restoreButton: ImageButton
     private lateinit var archiveButton: ImageButton
     private lateinit var deleteButton: ImageButton
@@ -57,7 +58,7 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
     private lateinit var reminderIcon : ImageView
     private lateinit var reminderTV : TextView
     private var noteID : Long= -1
-    private lateinit var viewModal :NoteViewModel
+    private lateinit var viewModal : NoteViewModel
     private lateinit var noteType : String
     private lateinit var allNotes : List<Note>
     private var noteColor : String ? = null
@@ -80,7 +81,7 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
     private var isKeyBoardShowing = false
     private var deletedTag = ArrayList<String>()
     private var tagDeleted = false
-    private lateinit var tagListAdapter : TagRVAdapter
+    private lateinit var tagListAdapter : AddEditTagRVAdapter
     private lateinit var alertBottomSheet : BottomSheetDialog
     private lateinit var labelBottomSheet : BottomSheetDialog
     private lateinit var labelBtn : ImageButton
@@ -462,7 +463,7 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
         coordinatorlayout = findViewById(R.id.coordinatorlayout)
         pinButton = findViewById(R.id.pinButton)
         layoutManager.orientation = HORIZONTAL
-        tagListAdapter= TagRVAdapter(applicationContext,this)
+        tagListAdapter= AddEditTagRVAdapter(applicationContext,this)
         tagListRV.layoutManager= layoutManager
         tagListRV.adapter = tagListAdapter
         lifecycleOwner = this
@@ -890,7 +891,7 @@ class AddEditNoteActivity : AppCompatActivity() ,TagRVInterface,GetTimeFromPicke
     private fun goToMain() {
         saveNote()
 
-        val intent = Intent(this@AddEditNoteActivity,MainActivity::class.java)
+        val intent = Intent(this@AddEditNoteActivity, MainActivity::class.java)
         startActivity(intent)
     }
 

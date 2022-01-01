@@ -11,6 +11,8 @@
         app:cardCornerRadius="20dp"
         android:elevation="5dp"
         android:id="@+id/labelCard"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 

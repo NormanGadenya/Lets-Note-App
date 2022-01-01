@@ -43,7 +43,9 @@ class LabelFragment : Fragment() {
         for (labelID in 1..6){
             labelViewModel.getNotesWithLabel(labelID).observe(viewLifecycleOwner){
                 labelCount[labelID] = it.size
+
                 labelRVAdapter?.updateLabelCount(labelCount)
+                Log.d(TAG, "onCreateView: $it")
 
 
             }

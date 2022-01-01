@@ -12,11 +12,11 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.neuralbit.letsnote.entities.Tag
 
-class TagRVAdapter (
+class AddEditTagRVAdapter (
     val context: Context,
     private val tagRVInterface :TagRVInterface
 
-    ) : RecyclerView.Adapter<TagRVAdapter.ViewHolder>(){
+    ) : RecyclerView.Adapter<AddEditTagRVAdapter.ViewHolder>(){
     var deleteIgnored = false
     private val allTags = ArrayList<Tag>()
     val TAG = " TAG "

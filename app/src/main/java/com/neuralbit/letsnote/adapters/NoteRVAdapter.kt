@@ -26,6 +26,7 @@ class NoteRVAdapter (
 
     ): RecyclerView.Adapter<NoteRVAdapter.ViewHolder>(){
     var viewModel : AllNotesViewModel ? = null
+    var labelViewModel : LabelNotesViewModel ? = null
     var lifecycleScope : LifecycleCoroutineScope? = null
     var lifecycleOwner: LifecycleOwner ? = null
     private val allNotes = ArrayList<Note>()
@@ -54,65 +55,92 @@ class NoteRVAdapter (
         var desc = allNotes[position].description
         val cm = Common()
         val noteID = allNotes[position].noteID
-        if (title?.length!! >20 ){
-            title = title.substring(0,15)+"..."
+        if (title?.length!! > 20) {
+            title = title.substring(0, 15) + "..."
         }
-         if ( desc?.length !!> 250){
-             desc= desc.substring(0,250) + "..."
-         }
+        if (desc?.length!! > 250) {
+            desc = desc.substring(0, 250) + "..."
+        }
 
-        if(title.isEmpty()){
+        if (title.isEmpty()) {
             holder.noteTitleTV.visibility = GONE
-        }else{
+        } else {
             holder.noteTitleTV.text = title
             holder.noteTitleTV.visibility = VISIBLE
 
         }
-        lifecycleScope?.launch{
+        lifecycleScope?.launch {
             val tagList = viewModel?.getTagsWithNote(noteID)?.last()
-            if (tagList?.tags?.isNotEmpty()!!){
-                holder.tagsTV.visibility = VISIBLE
+//            if (tagList?.tags?.isNotEmpty()!!) {
+//                holder.tagsTV.visibility = VISIBLE
+//
+//            }
+//            for (t in tagList.tags) {
+//                val tagStr = "#" + t.tagTitle + " "
+//                holder.tagsTV.append(tagStr)
+//            }
+        }
 
-            }
-            for (t in tagList.tags){
-                val tagStr = "#"+t.tagTitle+ " "
-                holder.tagsTV.append(tagStr)
+        lifecycleOwner?.let {
+            viewModel?.getReminder(noteID)?.observe(it) { r ->
+                if (r != null) {
+                    holder.reminderIcon.visibility = VISIBLE
+                    holder.reminderTV.visibility = VISIBLE
+                    holder.reminderTV.text = context.resources.getString(
+                        R.string.reminder,
+                        cm.convertLongToTime(r.dateTime)[0],
+                        cm.convertLongToTime(r.dateTime)[1]
+                    )
+
+                } else {
+                    holder.reminderIcon.visibility = GONE
+                    holder.reminderTV.visibility = GONE
+                }
             }
         }
 
-        lifecycleOwner?.let { viewModel?.getReminder(noteID)?.observe(it){r->
-            if(r!=null){
-                holder.reminderIcon.visibility = VISIBLE
-                holder.reminderTV.visibility = VISIBLE
-                holder.reminderTV.text = context.resources.getString(R.string.reminder,cm.convertLongToTime(r.dateTime)[0],cm.convertLongToTime(r.dateTime)[1])
+        lifecycleOwner?.let { owner ->
+            if (viewModel != null) {
+                viewModel?.getNoteLabel(noteID)?.observe(owner) {
+                    if(it!=null){
+                        Log.d(TAG, "onBindViewHolder: $it")
 
-            }else{
-                holder.reminderIcon.visibility = GONE
-                holder.reminderTV.visibility = GONE
+                        val noteCardColor = context.getColor(cm.getLabelColor(it.labelID))
+                        holder.noteCard.setBackgroundColor(noteCardColor)
+                        holder.noteTitleTV.setTextColor(context.getColor(cm.getFontColor(noteCardColor)))
+                        holder.noteTextTV.setTextColor(context.getColor(cm.getFontColor(noteCardColor)))
+                    }
+
+                }
+            } else if(labelViewModel!=null) {
+                labelViewModel?.getNoteLabel(noteID)?.observe(owner) {
+                    val noteCardColor = context.getColor(cm.getLabelColor(it.labelID))
+                    holder.noteCard.setBackgroundColor(noteCardColor)
+                    holder.noteTitleTV.setTextColor(context.getColor(cm.getFontColor(noteCardColor)))
+                    holder.noteTextTV.setTextColor(context.getColor(cm.getFontColor(noteCardColor)))
+                }
+
             }
-        } }
+
+            if (desc.isEmpty()) {
+                holder.noteTextTV.visibility = GONE
+            } else {
+                holder.noteTextTV.text = desc
+                holder.noteTextTV.visibility = VISIBLE
+            }
 
 
-        if(desc.isEmpty()){
-            holder.noteTextTV.visibility = GONE
-        }else{
-            holder.noteTextTV.text = desc
-            holder.noteTextTV.visibility = VISIBLE
-        }
-
-
-        searchString?.let { cm.setHighLightedText(holder.noteTextTV, it) }
-
-        var colorID= R.color.white
-        var textColorID =R.color.black
+            searchString?.let { cm.setHighLightedText(holder.noteTextTV, it) }
 
 
 
-        holder.itemView.setOnClickListener{
-            noteClickInterface.onNoteClick(allNotes.get(position))
+
+
+            holder.itemView.setOnClickListener {
+                noteClickInterface.onNoteClick(allNotes.get(position))
+            }
         }
     }
-
     override fun getItemCount(): Int {
         return allNotes.size
     }

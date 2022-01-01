@@ -10,9 +10,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.LetsNote">
         <activity
+            android:name=".LabelNotesActivity"
+            android:parentActivityName=".MainActivity"
+            android:exported="true" />
+        <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.LetsNote.NoActionBar" >
+            android:theme="@style/Theme.LetsNote.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -22,7 +26,8 @@
         <activity
             android:name=".AddEditNoteActivity"
             android:parentActivityName=".MainActivity" />
-        <receiver android:name=".utilities.AlertReceiver"/>
+
+        <receiver android:name=".utilities.AlertReceiver" />
     </application>
 
 </manifest>
