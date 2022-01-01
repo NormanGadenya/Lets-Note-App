@@ -12,4 +12,7 @@
     <color name="Celadon"> #bee5bf </color>
     <color name="Honeydew">#dff3e3 </color>
     <color name ="Apricot"> #ffd1ba </color>
+    <color name ="lightGrey">#DBDCDD</color>
+    <color name="darkGrey">#3B3C3C</color>
+
 </resources>

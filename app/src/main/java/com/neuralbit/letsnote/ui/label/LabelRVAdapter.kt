@@ -20,6 +20,8 @@ class LabelRVAdapter(
 
         val noteCountTV: TextView = itemView.findViewById(R.id.noteCount)
         val labelCard : CardView = itemView.findViewById(R.id.labelCard)
+        val noteTV : TextView = itemView.findViewById(R.id.textView2)
+
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -31,11 +33,15 @@ class LabelRVAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val cm = Common()
-        holder.labelCard.setCardBackgroundColor(context.getColor(cm.getLabelColor(position)))
-        holder.noteCountTV.text = labelCount[position+1].toString()
-            Log.d(TAG, "onBindViewHolder: $position")
-
-
+        val labelCountVal = labelCount[position+1]
+        val labelCardColor = context.getColor(cm.getLabelColor(position) )
+        holder.labelCard.setCardBackgroundColor(labelCardColor)
+        holder.noteCountTV.text = labelCountVal.toString()
+        holder.noteCountTV.setTextColor(context.getColor(cm.getFontColor(labelCardColor)))
+        holder.noteTV.setTextColor(context.getColor(cm.getFontColor(labelCardColor)))
+        if (labelCountVal==1){
+            holder.noteTV.text = "note"
+        }
     }
 
     override fun getItemCount(): Int {

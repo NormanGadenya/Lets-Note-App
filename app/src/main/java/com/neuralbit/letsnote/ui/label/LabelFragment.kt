@@ -3,10 +3,9 @@ package com.neuralbit.letsnote.ui.label
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import android.util.Log
+import android.view.*
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -30,7 +29,8 @@ class LabelFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
+        setHasOptionsMenu(true)
         _binding = LabelFragmentBinding.inflate(inflater,container,false)
         val root: View = binding.root
         labelRV = binding.noteLabelRV
@@ -51,6 +51,12 @@ class LabelFragment : Fragment() {
 
 
         return root
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        super.onPrepareOptionsMenu(menu)
+        val searchViewMenuItem = menu.findItem(R.id.search)
+        searchViewMenuItem.isVisible = false
     }
 
 

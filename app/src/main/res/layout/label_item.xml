@@ -10,13 +10,13 @@
         android:layout_height="160dp"
         app:cardCornerRadius="20dp"
         android:elevation="5dp"
-        app:cardBackgroundColor="@color/teal_200"
         android:id="@+id/labelCard"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
 
             android:layout_height="match_parent">
 

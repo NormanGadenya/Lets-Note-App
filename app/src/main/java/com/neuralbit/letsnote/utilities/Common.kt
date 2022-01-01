@@ -36,8 +36,13 @@ class Common (){
             else-> R.color.white
         }
     }
-    fun isDark(color : Int):Boolean{
-        return ColorUtils.calculateLuminance(color) < 0.5;
+    fun getFontColor(color : Int):Int{
+        return if(ColorUtils.calculateLuminance(color) < 0.5){
+            R.color.lightGrey
+        }else{
+            R.color.darkGrey
+        }
+
 
     }
 
