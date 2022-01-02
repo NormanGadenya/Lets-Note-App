@@ -2,6 +2,8 @@ package com.neuralbit.letsnote.ui.label
 
 import android.content.Context
 import android.content.Intent
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.neuralbit.letsnote.LabelNotesActivity
 import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.utilities.Common
+import kotlinx.coroutines.*
 
 class LabelRVAdapter(
     val context: Context
@@ -32,14 +35,28 @@ class LabelRVAdapter(
         return ViewHolder(itemView)
 
     }
-
+    private suspend fun updateNoteCountTV(value : Int, textView: TextView){
+        withContext(Dispatchers.Main){
+            for (i in 0..value!!){
+                textView.text= i.toString()
+                delay(100L)
+            }
+        }
+    }
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val cm = Common()
         val labelID = position+1
         val labelCountVal = labelCount[labelID]
         val labelCardColor = context.getColor(cm.getLabelColor(labelID) )
         holder.labelCard.setCardBackgroundColor(labelCardColor)
-        holder.noteCountTV.text = labelCountVal.toString()
+
+
+        GlobalScope.launch {
+            if (labelCountVal != null) {
+                updateNoteCountTV(labelCountVal,holder.noteCountTV)
+            }
+        }
+
         holder.noteCountTV.setTextColor(context.getColor(cm.getFontColor(labelCardColor)))
         holder.noteTV.setTextColor(context.getColor(cm.getFontColor(labelCardColor)))
         if (labelCountVal==1){
