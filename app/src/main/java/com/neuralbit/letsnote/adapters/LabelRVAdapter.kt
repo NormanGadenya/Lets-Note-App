@@ -1,10 +1,7 @@
-package com.neuralbit.letsnote.ui.label
+package com.neuralbit.letsnote.adapters
 
 import android.content.Context
 import android.content.Intent
-import android.os.Handler
-import android.os.Looper
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -31,18 +28,20 @@ class LabelRVAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.label_item,parent,false)
-
         return ViewHolder(itemView)
 
     }
     private suspend fun updateNoteCountTV(value : Int, textView: TextView){
         withContext(Dispatchers.Main){
-            for (i in 0..value!!){
-                textView.text= i.toString()
+            for (i in 0..value){
                 delay(100L)
+
+                textView.text= i.toString()
             }
         }
     }
+
+
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val cm = Common()
         val labelID = position+1
@@ -72,6 +71,7 @@ class LabelRVAdapter(
     override fun getItemCount(): Int {
         return labelCount.size
     }
+
     fun updateLabelCount(labelCountMap : Map<Int,Int>){
         labelCount = labelCountMap
         notifyDataSetChanged()

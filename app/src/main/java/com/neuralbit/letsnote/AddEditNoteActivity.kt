@@ -115,6 +115,7 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
             if (it != null){
                 label = it
                 coordinatorlayout.setBackgroundColor(resources.getColor(cm.getLabelColor(it.labelID)))
+                supportActionBar?.setBackgroundDrawable(AppCompatResources.getDrawable(this,cm.getToolBarDrawable(it.labelID)))
 
             }
         }
@@ -349,23 +350,14 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
             if (it){
 
                     if(noteContentSplit.isNotEmpty()){
-
-                            if (noteContentSplit[lineIndex].startsWith("-")){
-                                if(noteContent.endsWith("\n")){
-                                    noteDescriptionEdit.append("-")
-                                }
-
-                                Log.d(TAG, "onCreate: $noteContentSplit")
-
-
-                            }
+                        val prefix = listOf(" ","->","-","+","*",">")
+                        for (p in prefix){
+                            addBulletin(noteContentSplit,lineIndex,noteContent, p)
+                        }
 
 
                     }
 
-
-               
-                Log.d(TAG, "on enter pressed: $noteContentSplit")
             }
         }
 
@@ -426,6 +418,14 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
         snackbar.show()
 
 
+    }
+
+    private fun addBulletin(noteContentSplit : List<String>, lineIndex : Int ,noteContent : Editable, prefix: String){
+        if (noteContentSplit[lineIndex].startsWith(prefix)){
+            if(noteContent.endsWith("\n")){
+                noteDescriptionEdit.append(prefix)
+            }
+        }
     }
     private fun unArchiveNote(){
         val archivedNote = ArchivedNote(noteID)

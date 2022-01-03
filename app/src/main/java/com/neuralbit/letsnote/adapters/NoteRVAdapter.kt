@@ -1,4 +1,4 @@
-package com.neuralbit.letsnote
+package com.neuralbit.letsnote.adapters
 
 import android.content.Context
 import android.util.Log
@@ -11,6 +11,8 @@ import android.widget.TextView
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
+import com.neuralbit.letsnote.LabelNotesViewModel
+import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.entities.Note
 import com.neuralbit.letsnote.entities.Reminder
 import com.neuralbit.letsnote.entities.Tag
@@ -26,7 +28,7 @@ class NoteRVAdapter (
 
     ): RecyclerView.Adapter<NoteRVAdapter.ViewHolder>(){
     var viewModel : AllNotesViewModel ? = null
-    var labelViewModel : LabelNotesViewModel ? = null
+    var labelViewModel : LabelNotesViewModel? = null
     var lifecycleScope : LifecycleCoroutineScope? = null
     var lifecycleOwner: LifecycleOwner ? = null
     private val allNotes = ArrayList<Note>()
@@ -70,15 +72,19 @@ class NoteRVAdapter (
 
         }
         lifecycleScope?.launch {
-            val tagList = viewModel?.getTagsWithNote(noteID)?.last()
-//            if (tagList?.tags?.isNotEmpty()!!) {
-//                holder.tagsTV.visibility = VISIBLE
-//
-//            }
-//            for (t in tagList.tags) {
-//                val tagStr = "#" + t.tagTitle + " "
-//                holder.tagsTV.append(tagStr)
-//            }
+            if (viewModel!=null){
+                val tagList = viewModel?.getTagsWithNote(noteID)?.last()
+
+                if (tagList?.tags?.isNotEmpty()!!) {
+                    holder.tagsTV.visibility = VISIBLE
+
+                }
+                for (t in tagList.tags) {
+                    val tagStr = "#" + t.tagTitle + " "
+                    holder.tagsTV.append(tagStr)
+                }
+            }
+
         }
 
         lifecycleOwner?.let {
@@ -103,7 +109,6 @@ class NoteRVAdapter (
             if (viewModel != null) {
                 viewModel?.getNoteLabel(noteID)?.observe(owner) {
                     if(it!=null){
-                        Log.d(TAG, "onBindViewHolder: $it")
 
                         val noteCardColor = context.getColor(cm.getLabelColor(it.labelID))
                         holder.noteCard.setBackgroundColor(noteCardColor)
@@ -130,7 +135,11 @@ class NoteRVAdapter (
             }
 
 
-            searchString?.let { cm.setHighLightedText(holder.noteTextTV, it) }
+            searchString?.let {
+                cm.setHighLightedText(holder.noteTextTV, it)
+                cm.setHighLightedText(holder.noteTitleTV, it)
+
+            }
 
 
 

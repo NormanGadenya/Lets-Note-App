@@ -10,7 +10,7 @@
         android:layout_height="160dp"
         app:cardCornerRadius="20dp"
         android:elevation="5dp"
-        android:id="@+id/labelCard"
+        android:id="@+id/tagCard"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -23,28 +23,29 @@
             android:layout_height="match_parent">
 
             <TextView
-                android:id="@+id/noteCount"
+                android:id="@+id/tagName"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="@dimen/noteCountSize"
+                android:layout_height="@dimen/noteCountSize"
+                android:textSize="@dimen/cardNoteTVSize"
+
                 app:layout_constraintBottom_toTopOf="@+id/textView2"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:text="25" />
+                tools:text="#James" />
 
             <TextView
-                android:id="@+id/textView2"
+                android:id="@+id/noteCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/notes"
-                android:textSize="@dimen/cardNoteTVSize"
+                android:textSize="20sp"
                 app:layout_constraintBottom_toTopOf="@+id/imgView"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/noteCount" />
+                app:layout_constraintTop_toBottomOf="@+id/tagName" />
 
             <ImageView
                 android:id="@+id/imgView"

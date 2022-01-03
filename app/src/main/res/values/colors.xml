@@ -6,13 +6,13 @@
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
-    <color name="English_violet">#493657</color>
-    <color name="Wild_orchid"> #ce7da5 </color>
-    <color name="Celadon"> #bee5bf </color>
-    <color name="Honeydew">#dff3e3 </color>
-    <color name ="Apricot"> #ffd1ba </color>
-    <color name ="lightGrey">#DBDCDD</color>
-    <color name="darkGrey">#3B3C3C</color>
+    <color name="white">#B3FFFFFF</color>
+    <color name="English_violet">#B3493657</color>
+    <color name="Wild_orchid">#B3CE7DA5</color>
+    <color name="Celadon">#B3BEE5BF</color>
+    <color name="Honeydew">#B3DFF3E3</color>
+    <color name ="Apricot">#B3FFD1BA</color>
+    <color name ="lightGrey">#C8F1F1F1</color>
+    <color name="darkGrey">#D33B3C3C</color>
 
 </resources>

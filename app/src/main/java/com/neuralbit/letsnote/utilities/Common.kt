@@ -36,6 +36,18 @@ class Common (){
             else-> R.color.white
         }
     }
+
+    fun getToolBarDrawable (labelID: Int) : Int{
+        return when (labelID){
+            1-> R.drawable.white_toolbar
+            2 -> R.drawable.wild_orchid_toolbar
+            3 -> R.drawable.honey_drew_toolbar
+            4 -> R.drawable.ev_toolbar
+            5 -> R.drawable.celadon_toolbar
+            6 -> R.drawable.apricot_toolbar
+            else-> R.color.white
+        }
+    }
     fun getFontColor(color : Int):Int{
         return if(ColorUtils.calculateLuminance(color) < 0.5){
             R.color.lightGrey

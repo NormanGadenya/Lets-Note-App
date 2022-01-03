@@ -1,19 +1,16 @@
 package com.neuralbit.letsnote.ui.label
 
-import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.neuralbit.letsnote.NoteRVAdapter
 import com.neuralbit.letsnote.R
+import com.neuralbit.letsnote.adapters.LabelRVAdapter
 import com.neuralbit.letsnote.databinding.LabelFragmentBinding
-import com.neuralbit.letsnote.ui.archived.ArchivedViewModel
 
 class LabelFragment : Fragment() {
     private val labelViewModel: LabelViewModel by activityViewModels()

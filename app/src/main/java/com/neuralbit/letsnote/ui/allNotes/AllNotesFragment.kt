@@ -15,6 +15,8 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.neuralbit.letsnote.*
+import com.neuralbit.letsnote.adapters.NoteClickInterface
+import com.neuralbit.letsnote.adapters.NoteRVAdapter
 import com.neuralbit.letsnote.databinding.FragmentAllNotesBinding
 import com.neuralbit.letsnote.entities.Note
 
