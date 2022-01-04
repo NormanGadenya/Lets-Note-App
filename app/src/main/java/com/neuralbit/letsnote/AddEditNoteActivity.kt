@@ -107,15 +107,15 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
 
             }
         }
-        viewModal.getNotesWithLabel(1).observe(this){
-            Log.d(TAG, "onCreate: $it")
-        }
+
 
         viewModal.getNoteLabel(noteID).observe(this){
             if (it != null){
                 label = it
                 coordinatorlayout.setBackgroundColor(resources.getColor(cm.getLabelColor(it.labelID)))
                 supportActionBar?.setBackgroundDrawable(AppCompatResources.getDrawable(this,cm.getToolBarDrawable(it.labelID)))
+                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+                window.statusBarColor = resources.getColor(cm.getStatusBarColor(it.labelID))
 
             }
         }
@@ -347,12 +347,18 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
             if (noteContentSplit.size>2){
                 lineIndex = noteContentSplit.lastIndex-1
             }
+
             if (it){
 
-                    if(noteContentSplit.isNotEmpty()){
+                if(noteContentSplit.isNotEmpty()){
                         val prefix = listOf(" ","->","-","+","*",">")
                         for (p in prefix){
                             addBulletin(noteContentSplit,lineIndex,noteContent, p)
+                        }
+                        if (noteContentSplit[lineIndex].endsWith(":")) {
+                            if (noteContent.endsWith("\n")) {
+                                noteDescriptionEdit.append("-> ")
+                            }
                         }
 
 
@@ -366,8 +372,6 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
         backButton.setOnClickListener {
             goToMain()
         }
-
-
 
         deleteButton.setOnClickListener {
             if(noteType == "Edit"){
@@ -398,10 +402,10 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
             }
 
         }
+
         archiveButton.setOnClickListener { archiveNote() }
+
         pinButton.setOnClickListener { pinOrUnPinNote() }
-
-
 
         restoreButton.setOnClickListener { unArchiveNote() }
     }
@@ -907,8 +911,7 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
     }
 
     override fun getTimeInfo(calendar : Calendar) {
-        val timeConverter = DateTimeConverter()
-//        reminderTime = timeConverter.fromTime(Time(hour,min,0))!!
+
         this.calendar[Calendar.HOUR]= calendar[Calendar.HOUR]
         this.calendar[Calendar.MINUTE]= calendar[Calendar.MINUTE]
         this.calendar[Calendar.SECOND]= calendar[Calendar.SECOND]

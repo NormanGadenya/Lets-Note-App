@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">Lets note</string>
     <string name="timeStamp"> Edited on %1$s at %2$s</string>
+    <string name="noteTagCountSingle"> %1$s Note</string>
+    <string name="noteTagCountMultiple"> %1$s Notes</string>
     <string name="reminder">Reminder set on %1$s at %2$s</string>
     <string name="opt1Desc">Later today at %1$s</string>
     <string name="opt2n3Desc">Tomorrow in the %1$s at %2$s</string>
@@ -16,7 +18,8 @@
 
     <string name="menu_allNotes">All Notes</string>
     <string name="menu_archived">Archived Notes</string>
-    <string name="menu_slideshow">#tag</string>
+    <string name="menu_tag">Tags</string>
+    <string name="menu_label">Labels</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="search">search</string>

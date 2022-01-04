@@ -46,7 +46,6 @@ class LabelNotesActivity : AppCompatActivity() , NoteClickInterface {
             notesList= ArrayList()
             for(i in it){
                 notesList.add(i.notes)
-
             }
             noteRVAdapter.updateList(notesList)
 

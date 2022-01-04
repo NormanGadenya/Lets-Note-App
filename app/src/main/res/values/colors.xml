@@ -7,11 +7,18 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#B3FFFFFF</color>
+    <color name="whiteDark">#B3F0F0F0</color>
+
     <color name="English_violet">#B3493657</color>
+    <color name="English_violet_Dark">#B3362840</color>
     <color name="Wild_orchid">#B3CE7DA5</color>
+    <color name="Wild_orchid_Dark">#B3AA6888</color>
     <color name="Celadon">#B3BEE5BF</color>
+    <color name="Celadon_Dark">#B3A5C6A6</color>
     <color name="Honeydew">#B3DFF3E3</color>
+    <color name="Honeydew_Dark">#B3C2D3C5</color>
     <color name ="Apricot">#B3FFD1BA</color>
+    <color name ="Apricot_Dark">#B3DFB6A2</color>
     <color name ="lightGrey">#C8F1F1F1</color>
     <color name="darkGrey">#D33B3C3C</color>
 

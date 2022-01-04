@@ -20,11 +20,11 @@
     <fragment
         android:id="@+id/nav_tags"
         android:name="com.neuralbit.letsnote.ui.tag.TagFragment"
-        android:label="@string/menu_slideshow"
+        android:label="@string/menu_tag"
         tools:layout="@layout/fragment_tag" />
     <fragment
         android:id="@+id/nav_labels"
         android:name="com.neuralbit.letsnote.ui.label.LabelFragment"
-        android:label="@string/labels"
+        android:label="@string/menu_label"
         tools:layout="@layout/label_fragment" />
 </navigation>

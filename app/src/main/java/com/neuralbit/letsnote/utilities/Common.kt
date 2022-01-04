@@ -48,6 +48,17 @@ class Common (){
             else-> R.color.white
         }
     }
+    fun getStatusBarColor (labelID: Int) : Int{
+        return when (labelID){
+            1-> R.color.whiteDark
+            2 -> R.color.Wild_orchid_Dark
+            3 -> R.color.Honeydew_Dark
+            4 -> R.color.English_violet_Dark
+            5 -> R.color.Celadon_Dark
+            6 -> R.color.Apricot_Dark
+            else-> R.color.whiteDark
+        }
+    }
     fun getFontColor(color : Int):Int{
         return if(ColorUtils.calculateLuminance(color) < 0.5){
             R.color.lightGrey

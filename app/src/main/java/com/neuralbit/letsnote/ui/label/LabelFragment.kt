@@ -18,7 +18,6 @@ class LabelFragment : Fragment() {
     private var _binding:LabelFragmentBinding ? = null
     lateinit var labelRV:RecyclerView
     private val binding get() = _binding!!
-
     val TAG = "LabelFragment"
 
 
@@ -42,8 +41,6 @@ class LabelFragment : Fragment() {
                 labelCount[labelID] = it.size
 
                 labelRVAdapter?.updateLabelCount(labelCount)
-                Log.d(TAG, "onCreateView: $it")
-
 
             }
         }
