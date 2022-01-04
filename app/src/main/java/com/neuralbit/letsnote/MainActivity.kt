@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.neuralbit.letsnote.databinding.ActivityMainBinding
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import com.neuralbit.letsnote.ui.archived.ArchivedViewModel
+import com.neuralbit.letsnote.ui.tag.TagViewModel
 
 class MainActivity : AppCompatActivity() {
 
@@ -23,6 +24,7 @@ class MainActivity : AppCompatActivity() {
     private val TAG = "MainActivity"
     private val allNotesViewModal : AllNotesViewModel by viewModels()
     private val archivedViewModel : ArchivedViewModel by viewModels()
+    private val tagViewModel : TagViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,6 +58,7 @@ class MainActivity : AppCompatActivity() {
                 if (p0 != null) {
                     allNotesViewModal.searchQuery.value = p0
                     archivedViewModel.searchQuery.value = p0
+                    tagViewModel.searchQuery.value = p0
                 }
                 return false
             }
@@ -64,6 +67,7 @@ class MainActivity : AppCompatActivity() {
                 if (p0 != null) {
                     allNotesViewModal.searchQuery.value = p0
                     archivedViewModel.searchQuery.value = p0
+                    tagViewModel.searchQuery.value = p0
 
                 }
                 return false

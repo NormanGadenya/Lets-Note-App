@@ -79,10 +79,19 @@ class NoteRVAdapter (
                     holder.tagsTV.visibility = VISIBLE
 
                 }
+                var tagStr : String? = null
                 for (t in tagList.tags) {
-                    val tagStr = "#" + t.tagTitle + " "
-                    holder.tagsTV.append(tagStr)
+                    tagStr = "#" + t.tagTitle + " "
                 }
+                if (tagStr!=null){
+                    holder.tagsTV.text = tagStr
+                    holder.tagsTV.visibility = VISIBLE
+
+                }else{
+                    holder.tagsTV.visibility = GONE
+
+                }
+
             }
 
         }

@@ -18,13 +18,14 @@ class TagViewModel (application: Application): AndroidViewModel(application) {
     var allTags: LiveData<List<Tag>>
     val noteTagRepo : NoteTagRepo
     val tagRepo : TagRepo
-
+    var searchQuery : MutableLiveData <String>
     init {
         val noteTagDao = NoteDatabase.getDatabase(application).getNoteTagDao()
         val tagDao = NoteDatabase.getDatabase(application).getTagDao()
         noteTagRepo = NoteTagRepo(noteTagDao)
         tagRepo = TagRepo(tagDao)
         allTags = tagRepo.allTags
+        searchQuery = MutableLiveData()
     }
     suspend fun getNotesWithTag(tagTitle : String) : List<NotesWithTag> {
         return noteTagRepo.getNotesWithTag(tagTitle)
