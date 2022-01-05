@@ -40,7 +40,10 @@ import com.teamwork.autocomplete.MultiAutoComplete
 import com.teamwork.autocomplete.adapter.AutoCompleteTypeAdapter
 import com.teamwork.autocomplete.tokenizer.PrefixTokenizer
 import com.teamwork.autocomplete.view.MultiAutoCompleteEditText
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -92,7 +95,7 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
     private lateinit var timeTitleTV :TextView
     private lateinit var dateTitleTV :TextView
     private lateinit var layoutManager : LinearLayoutManager
-    private var enterCount = 0
+    private var tagList = ArrayList<String>()
 
 
     override fun onCreate(savedInstanceState: Bundle?)  {
@@ -146,10 +149,20 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
 
         KeyboardUtils.addKeyboardToggleListener(this) { onKeyboardVisibilityChanged(it) }
 
+        viewModal.allTags.observe(lifecycleOwner){
+            for (tag in it){
+                if (!tagList.contains(tag.tagTitle)){
+                    tagList.add(tag.tagTitle)
 
+                }
+            }
+
+        }
         addTagBtn.setOnClickListener {
-            val addTagDialog = AddTagDialog(this)
+            val addTagDialog = AddTagDialog(this,applicationContext)
+            addTagDialog.tagList = tagList
             addTagDialog.show(supportFragmentManager,"addTagDialog")
+
         }
 
 
@@ -470,6 +483,7 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
         tagListAdapter= AddEditTagRVAdapter(applicationContext,this)
         tagListRV.layoutManager= layoutManager
         tagListRV.adapter = tagListAdapter
+
         lifecycleOwner = this
         viewModal = ViewModelProvider(
             this,
@@ -796,11 +810,11 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
                     alertBottomSheet.dismiss()
 
                 }
-                setNegativeButton("cancel",
-                    DialogInterface.OnClickListener { _,_  ->
-                        alertBottomSheet.dismiss()
+                setNegativeButton("cancel"
+                ) { _, _ ->
+                    alertBottomSheet.dismiss()
 
-                    })
+                }
                 setView(R.layout.custom_datetime_dialog)
                 setTitle("Choose date and time")
             }
@@ -887,9 +901,11 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
 
     override fun onBackPressed() {
         super.onBackPressed()
+        Log.d(TAG, "onBackPressed: ")
         goToMain()
 
     }
+
 
 
     private fun goToMain() {
