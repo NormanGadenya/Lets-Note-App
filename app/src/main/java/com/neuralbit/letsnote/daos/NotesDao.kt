@@ -9,7 +9,7 @@ import com.neuralbit.letsnote.entities.Tag
 
 @Dao
 interface NotesDao {
-    @Insert(onConflict= OnConflictStrategy.IGNORE )
+    @Insert(onConflict= OnConflictStrategy.REPLACE )
     suspend fun insert(note: Note)
 
     @Update
@@ -18,13 +18,13 @@ interface NotesDao {
     @Delete
     suspend fun delete(note: Note)
 
-    @Insert(onConflict= OnConflictStrategy.IGNORE )
+    @Insert(onConflict= OnConflictStrategy.REPLACE )
     suspend fun insertArchive(noteId : ArchivedNote)
 
     @Delete
     suspend fun deleteArchive(noteId : ArchivedNote)
 
-    @Insert(onConflict= OnConflictStrategy.IGNORE )
+    @Insert(onConflict= OnConflictStrategy.REPLACE )
     suspend fun insertPinned(noteId : PinnedNote)
 
     @Delete

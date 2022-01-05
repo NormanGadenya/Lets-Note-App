@@ -136,16 +136,6 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
                 restoreButton.visibility = GONE
             }
         }
-        viewModal.getPinnedNote(noteID).observe(this){ pN->
-            viewModal.pinned = pN!=null
-
-            if (pN==null){
-                pinButton.setImageResource(R.drawable.ic_outline_push_pin_24)
-            }else{
-                pinButton.setImageResource(R.drawable.ic_baseline_push_pin_24)
-            }
-
-        }
 
         KeyboardUtils.addKeyboardToggleListener(this) { onKeyboardVisibilityChanged(it) }
 
@@ -223,6 +213,19 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
             }
 
         }
+
+        viewModal.getPinnedNote(noteID).observe(this){ pN->
+            viewModal.pinned = pN!=null
+            Log.d(TAG, "onCreate: $pN")
+
+            if (pN==null){
+                pinButton.setImageResource(R.drawable.ic_outline_push_pin_24)
+            }else{
+                pinButton.setImageResource(R.drawable.ic_baseline_push_pin_24)
+            }
+
+        }
+
 
         alertButton.setOnClickListener {
             if (reminder==null){
@@ -440,7 +443,7 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
     private fun addBulletin(noteContentSplit : List<String>, lineIndex : Int ,noteContent : Editable, prefix: String){
         if (noteContentSplit[lineIndex].startsWith(prefix)){
             if(noteContent.endsWith("\n")){
-                noteDescriptionEdit.append(prefix)
+                noteDescriptionEdit.append("$prefix ")
             }
         }
     }
@@ -495,6 +498,7 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
     private fun pinOrUnPinNote(){
         val pN = PinnedNote(noteID)
         if(viewModal.pinned){
+
             viewModal.removePin(pN)
             var snackbar = Snackbar.make(coordinatorlayout,"Note unpinned",Snackbar.LENGTH_LONG)
             snackbar.setAction("UNDO"
@@ -841,9 +845,9 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
     private fun startAlarm(calendar: Calendar) {
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(this, AlertReceiver::class.java)
-        intent.putExtra("noteType",noteType)
-        intent.putExtra("noteID",noteID)
-        intent.putExtra("noteTitle",noteTitle)
+//        intent.putExtra("noteType",noteType)
+//        intent.putExtra("noteID",noteID)
+//        intent.putExtra("noteTitle",noteTitle)
         //TODO fix notification issue
         tvTimeStamp.text= getString(R.string.timeStamp,cm.convertLongToTime(noteTimeStamp)[0],cm.convertLongToTime(noteTimeStamp)[1])
         tvTimeStamp.visibility =VISIBLE

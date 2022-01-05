@@ -29,9 +29,7 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     var deleted = MutableLiveData<Boolean>()
     var archived : Boolean
     var pinned : Boolean
-    var pin = MutableLiveData<Boolean>()
     lateinit var list : List<Note>
-    var notes : List<Note> = listOf()
     var searchQurery : MutableLiveData<String>
     var archivedNote : LiveData<List<Note>>
     var pinnedNotes : LiveData<List<Note>>

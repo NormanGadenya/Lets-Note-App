@@ -24,8 +24,7 @@ class AddTagDialog(val getTagFromDialog: GetTagFromDialog,val ctx: Context): App
 
         val adapter: ArrayAdapter<String> = ArrayAdapter<String>(ctx, android.R.layout.select_dialog_item, tagList)
         addTagET?.setAdapter(adapter)
-        Log.d(TAG, "onCreate: $tagList")
-
+        addTagET?.threshold = 1
         builder.setView(view)
             .setTitle("Add new tag")
             .setNegativeButton("cancel"
