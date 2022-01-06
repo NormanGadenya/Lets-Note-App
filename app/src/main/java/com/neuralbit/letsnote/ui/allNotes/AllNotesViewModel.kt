@@ -35,7 +35,7 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
         noteTagRepo = NoteTagRepo(noteTagDao)
         reminderRepo = ReminderRepo(reminderDao)
         labelRepo = LabelRepo(labelDao)
-        allNotes = noteRepo.allNotes
+        allNotes = noteRepo.notesWithoutPinArc
         pinnedNotes = noteRepo.pinnedNotes
 
     }

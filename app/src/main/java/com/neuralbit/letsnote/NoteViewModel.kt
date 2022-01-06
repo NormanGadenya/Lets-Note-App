@@ -17,7 +17,6 @@ import kotlin.collections.ArrayList
 class NoteViewModel(application : Application) : AndroidViewModel(application) {
     var allNotes: LiveData<List<Note>>
     var allTags: LiveData<List<Tag>>
-
     val TAG = "NoteViewModel"
     private val noteRepo : NoteRepo
     private val tagRepo : TagRepo
@@ -27,8 +26,10 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     var texChange : Boolean
     var texChanged = MutableLiveData<Boolean>()
     var deleted = MutableLiveData<Boolean>()
-    var archived : Boolean
-    var pinned : Boolean
+    var archived : MutableLiveData<Boolean>
+    var pinned : MutableLiveData<Boolean>
+    var reminderSet : MutableLiveData<Boolean>
+    var labelSet : MutableLiveData<Boolean>
     lateinit var list : List<Note>
     var searchQurery : MutableLiveData<String>
     var archivedNote : LiveData<List<Note>>
@@ -67,8 +68,10 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         backPressed = MutableLiveData()
         enterPressed = MutableLiveData()
         tagList = ArrayList<Tag>()
-        pinned = false
-        archived = false
+        pinned = MutableLiveData()
+        archived = MutableLiveData()
+        reminderSet = MutableLiveData()
+        labelSet = MutableLiveData()
 
         deleted = MutableLiveData()
         reminderDate = MutableLiveData()

@@ -25,6 +25,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -35,6 +36,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import com.neuralbit.letsnote.*
 import com.neuralbit.letsnote.entities.*
+import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import com.neuralbit.letsnote.utilities.*
 import com.teamwork.autocomplete.MultiAutoComplete
 import com.teamwork.autocomplete.adapter.AutoCompleteTypeAdapter
@@ -96,6 +98,11 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
     private lateinit var dateTitleTV :TextView
     private lateinit var layoutManager : LinearLayoutManager
     private var tagList = ArrayList<String>()
+    private var pinnedNote : PinnedNote ? = null
+    private var archivedNote : ArchivedNote ? = null
+    private var notePinned = false
+    private var reminderNoteSet = false
+    private var labelNoteSet = false
 
 
     override fun onCreate(savedInstanceState: Bundle?)  {
@@ -103,7 +110,9 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
         setContentView(R.layout.activity_add_edit_note)
 
         initControllers()
-        viewModal.allNotes.observe(this) {
+
+
+        viewModal.allNotes.observe(lifecycleOwner) {
             allNotes = it
             if(noteType != "Edit"){
                 noteID = it.size.toLong() + 1
@@ -111,35 +120,24 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
             }
         }
 
-
         viewModal.getNoteLabel(noteID).observe(this){
-            if (it != null){
-                label = it
-                coordinatorlayout.setBackgroundColor(resources.getColor(cm.getLabelColor(it.labelID)))
-                supportActionBar?.setBackgroundDrawable(AppCompatResources.getDrawable(this,cm.getToolBarDrawable(it.labelID)))
-                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
-                window.statusBarColor = resources.getColor(cm.getStatusBarColor(it.labelID))
 
-            }
+            viewModal.labelSet.value = it !=null
+            label = it
         }
+
         manipulateNoteDescLines()
+
         viewModal.getArchivedNote(noteID).observe(this){
-            if (it!=null) {
-                pinButton.visibility = GONE
-                archiveButton.visibility = GONE
-                alertButton.visibility = GONE
-                restoreButton.visibility = VISIBLE
-            } else {
-                pinButton.visibility = VISIBLE
-                archiveButton.visibility = VISIBLE
-                alertButton.visibility = VISIBLE
-                restoreButton.visibility = GONE
-            }
+            viewModal.archived.value = it!=null
+            archivedNote = it
+
         }
 
         KeyboardUtils.addKeyboardToggleListener(this) { onKeyboardVisibilityChanged(it) }
 
         viewModal.allTags.observe(lifecycleOwner){
+            
             for (tag in it){
                 if (!tagList.contains(tag.tagTitle)){
                     tagList.add(tag.tagTitle)
@@ -148,17 +146,13 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
             }
 
         }
+
         addTagBtn.setOnClickListener {
             val addTagDialog = AddTagDialog(this,applicationContext)
             addTagDialog.tagList = tagList
             addTagDialog.show(supportFragmentManager,"addTagDialog")
 
         }
-
-
-
-
-
 
         when (noteType) {
             "Edit" -> {
@@ -186,7 +180,6 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
 
                 }
 
-
             }
             else -> {
                 tvTimeStamp.visibility =GONE
@@ -195,37 +188,69 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
 
 
         viewModal.getReminder(noteID).observe(this) {
-            if(it!=null){
+            reminder = it
+            viewModal.reminderSet.value = it !=null
+        }
+
+        viewModal.labelSet.observe(lifecycleOwner){
+            labelNoteSet = it
+            if (label != null){
+                coordinatorlayout.setBackgroundColor(resources.getColor(cm.getLabelColor(label?.labelID!!)))
+                supportActionBar?.setBackgroundDrawable(AppCompatResources.getDrawable(this,cm.getToolBarDrawable(label?.labelID!!)))
+                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+                window.statusBarColor = resources.getColor(cm.getStatusBarColor(label?.labelID!!))
+
+            }
+        }
+
+        viewModal.reminderSet.observe(lifecycleOwner){
+            reminderNoteSet = it
+            if(it){
                 alertButton.setBackgroundResource(R.drawable.ic_baseline_add_alert_24)
-                reminder = it
                 reminderTV.visibility =  VISIBLE
                 reminderIcon.visibility = VISIBLE
-                reminderTV.text = resources.getString(R.string.reminder,cm.convertLongToTime(it.dateTime)[0],cm.convertLongToTime(it.dateTime)[1])
+                reminderTV.text = resources.getString(R.string.reminder,cm.convertLongToTime(reminder?.dateTime!!)[0],cm.convertLongToTime(reminder?.dateTime!!)[1])
                 val c = Calendar.getInstance()
-                if (c.timeInMillis > it.dateTime){
+                if (c.timeInMillis > reminder?.dateTime!!){
                     cancelAlarm()
-                    viewModal.deleteReminder(it)
+                    viewModal.deleteReminder(reminder!!)
                 }
             }else{
                 alertButton.setBackgroundResource(R.drawable.ic_outline_add_alert_24)
                 reminderTV.visibility =  GONE
                 reminderIcon.visibility = GONE
             }
-
         }
 
         viewModal.getPinnedNote(noteID).observe(this){ pN->
-            viewModal.pinned = pN!=null
-            Log.d(TAG, "onCreate: $pN")
+            viewModal.pinned.value = pN!=null
+            pinnedNote = pN
 
-            if (pN==null){
+        }
+        viewModal.pinned.observe(lifecycleOwner){
+            notePinned = it
+
+            if (!it){
                 pinButton.setImageResource(R.drawable.ic_outline_push_pin_24)
             }else{
                 pinButton.setImageResource(R.drawable.ic_baseline_push_pin_24)
             }
-
         }
 
+        viewModal.archived.observe(lifecycleOwner){
+            archived = it
+            if (it) {
+                pinButton.visibility = GONE
+                archiveButton.visibility = GONE
+                alertButton.visibility = GONE
+                restoreButton.visibility = VISIBLE
+            } else {
+                pinButton.visibility = VISIBLE
+                archiveButton.visibility = VISIBLE
+                alertButton.visibility = VISIBLE
+                restoreButton.visibility = GONE
+            }
+        }
 
         alertButton.setOnClickListener {
             if (reminder==null){
@@ -412,12 +437,14 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
                     }
                 }
 
+
                 Toast.makeText(this,"Note deleted",Toast.LENGTH_SHORT).show()
                 viewModal.deleted.value = true
                 goToMain()
             }
 
         }
+        
 
         archiveButton.setOnClickListener { archiveNote() }
 
@@ -426,13 +453,14 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
         restoreButton.setOnClickListener { unArchiveNote() }
     }
     private fun archiveNote(){
-        val archivedNote = ArchivedNote(noteID)
-        viewModal.archiveNote(archivedNote)
+        archivedNote = ArchivedNote(noteID)
+        viewModal.texChanged.value = true
+
+        viewModal.archived.value = true
         var snackbar = Snackbar.make(coordinatorlayout,"Note Achieved",Snackbar.LENGTH_LONG)
         snackbar.setAction("UNDO"
         ) {
-            viewModal.archived= false
-            viewModal.removeArchive(archivedNote)
+            viewModal.archived.value= false
             snackbar = Snackbar.make(coordinatorlayout,"Note unarchived",Snackbar.LENGTH_SHORT)
         }
         snackbar.show()
@@ -447,11 +475,18 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
             }
         }
     }
+
     private fun unArchiveNote(){
-        val archivedNote = ArchivedNote(noteID)
-        viewModal.removeArchive(archivedNote)
-        viewModal.archived = false
-        Toast.makeText(this,"Note Unarchived", Toast.LENGTH_SHORT).show()
+        viewModal.texChanged.value = true
+
+        viewModal.archived.value = false
+        var snackbar = Snackbar.make(coordinatorlayout,"Note unarchived",Snackbar.LENGTH_LONG)
+        snackbar.setAction("UNDO"
+        ) {
+            viewModal.archived.value= true
+            snackbar = Snackbar.make(coordinatorlayout,"Note archived",Snackbar.LENGTH_SHORT)
+        }
+        snackbar.show()
 
     }
 
@@ -496,31 +531,39 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
     }
 
     private fun pinOrUnPinNote(){
-        val pN = PinnedNote(noteID)
-        if(viewModal.pinned){
+        pinnedNote = PinnedNote(noteID)
+        viewModal.texChanged.value = true
+            if(notePinned){
+                viewModal.pinned.value = false
+                var snackbar = Snackbar.make(coordinatorlayout,"Note unpinned",Snackbar.LENGTH_LONG)
+                snackbar.setAction("UNDO"
+                ) {
+                    pinnedNote = PinnedNote(noteID)
+                    viewModal.pinned.value = true
 
-            viewModal.removePin(pN)
-            var snackbar = Snackbar.make(coordinatorlayout,"Note unpinned",Snackbar.LENGTH_LONG)
-            snackbar.setAction("UNDO"
-            ) {
+                    snackbar = Snackbar.make(coordinatorlayout,"Note pinned",Snackbar.LENGTH_SHORT)
+                    snackbar.show()
+                }
+                snackbar.show()
+            }else{
+                pinnedNote = PinnedNote(noteID)
+                viewModal.pinned.value = true
 
-                viewModal.pinNote(pN)
-                snackbar = Snackbar.make(coordinatorlayout,"Note pinned",Snackbar.LENGTH_SHORT)
+                var snackbar = Snackbar.make(coordinatorlayout,"Note pinned",Snackbar.LENGTH_LONG)
+                snackbar.setAction("UNDO"
+                ) {
+                    viewModal.pinned.value = false
+
+                    snackbar = Snackbar.make(coordinatorlayout,"Note unpinned",Snackbar.LENGTH_SHORT)
+                    snackbar.show()
+                }
                 snackbar.show()
             }
-            snackbar.show()
-        }else{
-            viewModal.pinNote(pN)
-            var snackbar = Snackbar.make(coordinatorlayout,"Note pinned",Snackbar.LENGTH_LONG)
-            snackbar.setAction("UNDO"
-            ) {
 
-                viewModal.removePin(pN)
-                snackbar = Snackbar.make(coordinatorlayout,"Note unpinned",Snackbar.LENGTH_SHORT)
-                snackbar.show()
-            }
-            snackbar.show()
+        viewModal.pinned.observe(lifecycleOwner){
+
         }
+
 
     }
 
@@ -568,33 +611,45 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
         val l6Btn = labelBottomSheet.findViewById<ImageButton>(R.id.l6Btn)
 
         l1Btn?.setOnClickListener {
-            viewModal.insertLabel(Label(noteID,1))
+            label = Label(noteID,1)
+            viewModal.labelSet.value = true
+            viewModal.texChanged.value = true
             labelBottomSheet.dismiss()
         }
 
         l2Btn?.setOnClickListener {
-            viewModal.insertLabel(Label(noteID,2))
+            label = Label(noteID,2)
+            viewModal.labelSet.value = true
+            viewModal.texChanged.value = true
             labelBottomSheet.dismiss()
 
         }
         l3Btn?.setOnClickListener {
-            viewModal.insertLabel(Label(noteID,3))
+            label = Label(noteID,3)
+            viewModal.labelSet.value = true
+            viewModal.texChanged.value = true
             labelBottomSheet.dismiss()
 
         }
 
         l4Btn?.setOnClickListener {
-            viewModal.insertLabel(Label(noteID,4))
+            label = Label(noteID,4)
+            viewModal.labelSet.value = true
+            viewModal.texChanged.value = true
             labelBottomSheet.dismiss()
 
         }
         l5Btn?.setOnClickListener {
-            viewModal.insertLabel(Label(noteID,5))
+            label = Label(noteID,5)
+            viewModal.labelSet.value = true
+            viewModal.texChanged.value = true
             labelBottomSheet.dismiss()
 
         }
         l6Btn?.setOnClickListener {
-            viewModal.insertLabel(Label(noteID,6))
+            label = Label(noteID,6)
+            viewModal.labelSet.value = true
+            viewModal.texChanged.value = true
             labelBottomSheet.dismiss()
         }
     }
@@ -701,7 +756,10 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
 
                 }
             }
-            viewModal.insertReminder(Reminder(noteID, c.timeInMillis))
+            reminder = Reminder(noteID, c.timeInMillis)
+            viewModal.reminderSet.value = true
+
+//            viewModal.insertReminder(Reminder(noteID, c.timeInMillis))
             startAlarm(c)
         }
 
@@ -717,7 +775,10 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
             }
             Toast.makeText(this, "Reminder set for tomorrow at 8:00am", Toast.LENGTH_SHORT).show()
 
-            viewModal.insertReminder(Reminder(noteID, c.timeInMillis))
+//            viewModal.insertReminder(Reminder(noteID, c.timeInMillis))
+            reminder = Reminder(noteID, c.timeInMillis)
+            viewModal.reminderSet.value = true
+
             startAlarm(c)
             viewModal.getReminder(noteID).observe(this) {r->
                 Log.d(TAG, "onCreate: $r")
@@ -745,7 +806,10 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
                 viewModal.texChanged.value = true
 
             }
-            viewModal.insertReminder(Reminder(noteID, c.timeInMillis))
+            reminder = Reminder(noteID, c.timeInMillis)
+            viewModal.reminderSet.value = true
+
+//            viewModal.insertReminder(Reminder(noteID, c.timeInMillis))
             startAlarm(c)
             Toast.makeText(this, "Reminder set for tomorrow at 6:00pm", Toast.LENGTH_SHORT).show()
 
@@ -808,8 +872,9 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
 
                     }
                     Toast.makeText(context, "Reminder set", Toast.LENGTH_SHORT).show()
-
-                    viewModal.insertReminder(Reminder(noteID, calendar.timeInMillis))
+                    reminder = Reminder(noteID, calendar.timeInMillis)
+                    viewModal.reminderSet.value = true
+//                    viewModal.insertReminder(Reminder(noteID, calendar.timeInMillis))
                     startAlarm(calendar)
                     alertBottomSheet.dismiss()
 
@@ -845,6 +910,7 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
     private fun startAlarm(calendar: Calendar) {
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(this, AlertReceiver::class.java)
+        viewModal.texChanged.value = true
 //        intent.putExtra("noteType",noteType)
 //        intent.putExtra("noteID",noteID)
 //        intent.putExtra("noteTitle",noteTitle)
@@ -860,20 +926,16 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
         val pendingIntent = PendingIntent.getBroadcast(this, 1, intent, 0)
         alarmManager.cancel(pendingIntent)
     }
-    private fun changeIconColor(iconColorID : Int, drawable : Int){
-        val unwrappedDrawable = AppCompatResources.getDrawable(applicationContext, drawable)
-        val wrappedDrawable = DrawableCompat.wrap(unwrappedDrawable!!)
-        DrawableCompat.setTint(wrappedDrawable, iconColorID)
-    }
 
     private fun saveNote(){
         val noteTitle = noteTitleEdit.text.toString()
         val noteDescription = noteDescriptionEdit.text.toString()
-
+        
         val currentDate= cm.currentTimeToLong()
         if(!deletable){
             if(textChanged){
                 if (noteTitle.isNotEmpty() || noteDescription.isNotEmpty()){
+
                     val note = Note(noteTitle,noteDescription,currentDate)
                     if(noteType == "Edit"){
                         note.noteID = noteID
@@ -882,9 +944,42 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
 
                     }else{
                         viewModal.addNote(note)
+                        Log.d(TAG, "saveNote: ${note.noteID}")
+
                         Toast.makeText(this,"Note added .. " , Toast.LENGTH_SHORT).show()
                         
                     }
+
+                    if (pinnedNote!=null){
+                        if (notePinned){
+                            viewModal.pinNote(pinnedNote!!)
+                        }else{
+                            viewModal.removePin(pinnedNote!!)
+                        }
+                    }
+                    if (label!=null){
+                        if (labelNoteSet){
+                            viewModal.insertLabel(label!!)
+                        }else{
+                            viewModal.deleteLabel(label!!)
+                        }
+                    }
+                    if (archivedNote!=null){
+                        if (archived){
+                            viewModal.archiveNote(archivedNote!!)
+                        }else{
+                            viewModal.removeArchive(archivedNote!!)
+                        }
+                    }
+                    if (reminder!=null){
+                        if (reminderNoteSet){
+                            viewModal.insertReminder(reminder!!)
+                        }else{
+                            viewModal.deleteReminder(reminder!!)
+                            cancelAlarm()
+                        }
+                    }
+
                     for(tag in viewModal.tagList){
 
                         val crossRef = NoteTagCrossRef(noteID,tag.tagTitle)
@@ -900,8 +995,6 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
         }
 
     }
-
-
 
     override fun onBackPressed() {
         super.onBackPressed()
@@ -944,7 +1037,6 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
         this.calendar[Calendar.YEAR] = calendar[Calendar.YEAR]
         dateTitleTV.text="Date set:" + DateFormat.getDateFormat(this).format(calendar.time)
 
-//        reminderDate =dateConverter.fromDate(Date(year, month, day))!!
 
     }
 

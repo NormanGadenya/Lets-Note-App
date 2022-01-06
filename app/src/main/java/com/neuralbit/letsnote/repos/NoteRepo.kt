@@ -9,6 +9,7 @@ import com.neuralbit.letsnote.entities.PinnedNote
 class NoteRepo(
     private val notesDao : NotesDao
     ) {
+    val notesWithoutPinArc: LiveData<List<Note>> = notesDao.getNotesWithoutPinArc()
     val allNotes: LiveData<List<Note>> = notesDao.getAllNotes()
     val archivedNotes : LiveData<List<Note>> = notesDao.getArchivedNotes()
     val pinnedNotes : LiveData<List<Note>> = notesDao.getPinnedNotes()

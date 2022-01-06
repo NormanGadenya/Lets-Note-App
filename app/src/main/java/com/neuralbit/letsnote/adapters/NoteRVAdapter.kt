@@ -123,6 +123,7 @@ class NoteRVAdapter (
                         holder.noteCard.setBackgroundColor(noteCardColor)
                         holder.noteTitleTV.setTextColor(context.getColor(cm.getFontColor(noteCardColor)))
                         holder.noteTextTV.setTextColor(context.getColor(cm.getFontColor(noteCardColor)))
+                        holder.reminderTV.setTextColor(context.getColor(cm.getFontColor(noteCardColor)))
                     }
 
                 }

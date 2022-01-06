@@ -9,7 +9,6 @@
     android:focusableInTouchMode="true"
     android:id="@+id/alert_actions"
 
-    android:background="@color/white"
     android:layout_height="300dp">
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

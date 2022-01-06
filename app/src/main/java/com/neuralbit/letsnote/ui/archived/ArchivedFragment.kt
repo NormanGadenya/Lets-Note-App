@@ -2,11 +2,13 @@ package com.neuralbit.letsnote.ui.archived
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.neuralbit.letsnote.*
@@ -24,7 +26,7 @@ class ArchivedFragment : Fragment() , NoteClickInterface {
     lateinit var  notesRV: RecyclerView
     private val binding get() = _binding!!
     private lateinit var pinnedNotes: List<Note>
-
+    val TAG = "HSBD"
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -32,17 +34,17 @@ class ArchivedFragment : Fragment() , NoteClickInterface {
         savedInstanceState: Bundle?
     ): View {
 
-
         _binding = FragmentArchivedNotesBinding.inflate(inflater, container, false)
         val root: View = binding.root
         notesRV = binding.archivedRV
         notesRV.layoutManager = LinearLayoutManager(context)
         val noteRVAdapter = context?.let { NoteRVAdapter(it,this) }
         notesRV.adapter= noteRVAdapter
-
+        noteRVAdapter?.viewModel = allNotesViewModel
+        noteRVAdapter?.lifecycleScope = lifecycleScope
+        noteRVAdapter?.lifecycleOwner = this
         archivedViewModel.archivedNotes.observe(viewLifecycleOwner) {
             noteRVAdapter?.updateList(it)
-
         }
         allNotesViewModel.pinnedNotes.observe(viewLifecycleOwner) {
             pinnedNotes = it

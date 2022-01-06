@@ -121,7 +121,6 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
     override fun onNoteClick(note: Note) {
         val intent = Intent( context, AddEditNoteActivity::class.java)
         intent.putExtra("noteType","Edit")
-
         intent.putExtra("noteID",note.noteID)
 
         startActivity(intent)
