@@ -31,91 +31,24 @@
         <com.teamwork.autocomplete.view.MultiAutoCompleteEditText
             android:id="@+id/noteEditDesc"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            android:layout_margin="@dimen/activity_horizontal_margin"
             android:background="@android:color/transparent"
             android:completionHint="Create new Tag"
             android:completionThreshold="1"
+            android:gravity="top"
             android:hint="@string/note_content"
             android:importantForAutofill="no"
-            android:layout_margin="@dimen/activity_horizontal_margin"
             android:inputType="textMultiLine"
             android:paddingTop="8dp"
-            android:paddingBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/noteEditTitle" />
 
 
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:background="#43808080"
-            android:padding="@dimen/activity_horizontal_margin"
-            >
-
-            <ImageButton
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:foreground="@drawable/ic_baseline_local_offer_24"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:id="@+id/addTagBtn"
-                android:visibility="visible"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"/>
-
-            <ImageButton
-                android:id="@+id/labelBtn"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_marginTop="@dimen/activity_horizontal_margin"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:foreground="@drawable/ic_baseline_bookmark_add_24"
-                android:visibility="visible"
-                app:layout_constraintTop_toBottomOf="@id/reminderIcon"
-                app:layout_constraintStart_toStartOf="parent" />
-
-            <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_marginTop="@dimen/activity_horizontal_margin"
-                android:src="@drawable/ic_baseline_access_alarm_24"
-                app:layout_constraintTop_toBottomOf="@id/addTagBtn"
-                app:layout_constraintStart_toStartOf="parent"
-                android:id="@+id/reminderIcon"
-                />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:id="@+id/reminderTV"
-                app:layout_constraintStart_toEndOf="@id/reminderIcon"
-                app:layout_constraintTop_toTopOf="@id/reminderIcon"/>
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/tagListRV"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/addTagBtn"
-                app:layout_constraintTop_toTopOf="@id/addTagBtn"
-                tools:itemCount="1" />
-
-
-            <TextView
-                android:id="@+id/tvTimeStamp"
-                android:layout_width="wrap_content"
-                app:layout_constraintStart_toEndOf="@id/addTagBtn"
-                android:layout_marginStart="8dp"
-                android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:text="Edite on sjjsndjncjdjcnjndjcjd"
-                android:visibility="visible"
-                app:layout_constraintBottom_toBottomOf="parent" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
     </androidx.constraintlayout.widget.ConstraintLayout>
+    <include layout="@layout/info_container"/>
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

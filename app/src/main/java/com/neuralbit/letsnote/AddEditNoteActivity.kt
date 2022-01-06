@@ -4,7 +4,6 @@ import android.app.AlarmManager
 import android.app.AlertDialog
 import android.app.PendingIntent
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.Rect
@@ -23,31 +22,26 @@ import android.widget.*
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.graphics.ColorUtils
-import androidx.core.graphics.drawable.DrawableCompat
-import androidx.fragment.app.activityViewModels
+import androidx.core.view.marginBottom
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.HORIZONTAL
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import com.neuralbit.letsnote.*
 import com.neuralbit.letsnote.entities.*
-import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import com.neuralbit.letsnote.utilities.*
 import com.teamwork.autocomplete.MultiAutoComplete
 import com.teamwork.autocomplete.adapter.AutoCompleteTypeAdapter
 import com.teamwork.autocomplete.tokenizer.PrefixTokenizer
 import com.teamwork.autocomplete.view.MultiAutoCompleteEditText
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPicker, GetDateFromPicker, GetTagFromDialog{
@@ -103,6 +97,9 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
     private var notePinned = false
     private var reminderNoteSet = false
     private var labelNoteSet = false
+    private lateinit var infoContainer : View
+    private lateinit var bottomSheet : BottomSheetBehavior<View>
+
 
 
     override fun onCreate(savedInstanceState: Bundle?)  {
@@ -121,9 +118,10 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
         }
 
         viewModal.getNoteLabel(noteID).observe(this){
+            Log.d(TAG, "onCreate: $it")
+            label = it
 
             viewModal.labelSet.value = it !=null
-            label = it
         }
 
         manipulateNoteDescLines()
@@ -476,6 +474,11 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
         }
     }
 
+    private fun showInfoBottomSheet() {
+        bottomSheet.state = BottomSheetBehavior.STATE_EXPANDED
+        bottomSheet.peekHeight = 112
+
+    }
     private fun unArchiveNote(){
         viewModal.texChanged.value = true
 
@@ -513,6 +516,10 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
         backButton = findViewById(R.id.backButton)
         archiveButton = findViewById(R.id.archiveButton)
         restoreButton = findViewById(R.id.restoreButton)
+
+        infoContainer = findViewById(R.id.infoContainer)
+        bottomSheet= BottomSheetBehavior.from(infoContainer)
+
         alertBottomSheet =  BottomSheetDialog(this)
         labelBottomSheet = BottomSheetDialog(this)
         coordinatorlayout = findViewById(R.id.coordinatorlayout)
@@ -661,14 +668,12 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
             val screenHeight =  coordinatorlayout.rootView.height
             val keypadHeight = screenHeight - r.bottom
             if (keypadHeight > screenHeight * 0.15) { // 0.15 ratio is perhaps enough to determine keypad height.
-                // keyboard is opened
                 if (!isKeyBoardShowing) {
                     isKeyBoardShowing = true
                     onKeyboardVisibilityChanged(true)
                 }
             }
             else {
-                // keyboard is closed
                 if (isKeyBoardShowing) {
 
                     isKeyBoardShowing = false
@@ -818,9 +823,15 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
 
     private fun onKeyboardVisibilityChanged(b: Boolean) {
         if(b){
+
             noteDescriptionEdit.maxLines = 10
+            bottomSheet.state = BottomSheetBehavior.STATE_COLLAPSED
+
         }else{
-            noteDescriptionEdit.maxLines = 23
+            noteDescriptionEdit.maxLines = 18
+
+            showInfoBottomSheet()
+            infoContainer.visibility = VISIBLE
 
         }
     }

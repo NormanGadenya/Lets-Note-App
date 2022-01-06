@@ -71,6 +71,15 @@ class NoteRVAdapter (
             holder.noteTitleTV.visibility = VISIBLE
 
         }
+        
+        holder.itemView.setOnLongClickListener {
+            holder.itemView.setOnDragListener { view, dragEvent ->
+                Log.d(TAG, "onBindViewHolder: sdc")
+                return@setOnDragListener true
+            }
+
+            return@setOnLongClickListener true
+        }
         lifecycleScope?.launch {
             if (viewModel!=null){
                 val tagList = viewModel?.getTagsWithNote(noteID)?.last()
