@@ -10,8 +10,8 @@ interface ReminderDao {
     @Insert(onConflict =OnConflictStrategy.REPLACE)
     suspend fun insert(reminder: Reminder)
 
-    @Delete
-    suspend fun delete(reminder: Reminder)
+    @Query("delete from Reminder where noteID = :noteID")
+    suspend fun delete(noteID: Long)
 
     @Transaction
     @Query("select * from Reminder where noteID = :noteID")

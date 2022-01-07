@@ -213,7 +213,7 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
                 val c = Calendar.getInstance()
                 if (c.timeInMillis > reminder?.dateTime!!){
                     cancelAlarm()
-                    viewModal.deleteReminder(reminder!!)
+                    viewModal.deleteReminder(noteID)
                 }
             }else{
                 alertButton.setBackgroundResource(R.drawable.ic_outline_add_alert_24)
@@ -259,7 +259,7 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
             }else{
                 cancelAlarm()
 
-                viewModal.deleteReminder(reminder!!)
+                viewModal.deleteReminder(noteID)
                 reminder = null
             }
         }
@@ -421,11 +421,11 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
 
                 viewModal.removePin(PinnedNote(noteID))
 
-                label?.let { l -> viewModal.deleteLabel(l) }
+                label?.let { l -> viewModal.deleteLabel(noteID) }
 
                 reminder?.let { r ->
                     cancelAlarm()
-                    viewModal.deleteReminder(r) }
+                    viewModal.deleteReminder(noteID) }
 
                 for(tag in viewModal.tagList){
                     viewModal.deleteNoteTagCrossRef(NoteTagCrossRef(noteID,tag.tagTitle))
@@ -974,7 +974,7 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
                         if (labelNoteSet){
                             viewModal.insertLabel(label!!)
                         }else{
-                            viewModal.deleteLabel(label!!)
+                            viewModal.deleteLabel(noteID)
                         }
                     }
                     if (archivedNote!=null){
@@ -988,7 +988,7 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
                         if (reminderNoteSet){
                             viewModal.insertReminder(reminder!!)
                         }else{
-                            viewModal.deleteReminder(reminder!!)
+                            viewModal.deleteReminder(noteID)
                             cancelAlarm()
                         }
                     }

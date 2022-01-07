@@ -12,6 +12,7 @@
         android:id="@+id/noteTagRV"
         tools:listitem="@layout/tag_frag_item"
         tools:itemCount="10"
+        android:padding="32dp"
         />
 
 

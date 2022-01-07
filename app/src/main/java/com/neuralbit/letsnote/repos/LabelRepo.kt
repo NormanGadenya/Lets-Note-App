@@ -13,8 +13,8 @@ class LabelRepo(
         labelDao.insert(label)
     }
 
-    suspend fun delete(label: Label){
-        labelDao.delete(label)
+    suspend fun delete(noteID: Long){
+        labelDao.delete(noteID)
     }
 
     fun getNotesWithLabel(labelID : Int): LiveData<List<LabelWIthNotes>> {

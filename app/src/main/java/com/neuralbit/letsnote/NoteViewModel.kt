@@ -190,8 +190,8 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         reminderRepo.insert(reminder)
     }
 
-    fun deleteReminder(reminder: Reminder) = viewModelScope.launch(Dispatchers.IO){
-        reminderRepo.delete(reminder)
+    fun deleteReminder(noteID: Long) = viewModelScope.launch(Dispatchers.IO){
+        reminderRepo.delete(noteID)
     }
     fun getReminder(noteID : Long): LiveData<Reminder>  {
         return reminderRepo.fetchReminder(noteID)
@@ -201,8 +201,8 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         labelRepo.insert(label)
     }
 
-    fun deleteLabel(label: Label) = viewModelScope.launch(Dispatchers.IO){
-        labelRepo.delete(label)
+    fun deleteLabel(noteID: Long) = viewModelScope.launch(Dispatchers.IO){
+        labelRepo.delete(noteID)
     }
 
     fun getNotesWithLabel ( labelID : Int) : LiveData<List<LabelWIthNotes>>{

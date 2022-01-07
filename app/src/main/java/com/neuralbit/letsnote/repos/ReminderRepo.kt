@@ -10,8 +10,8 @@ class ReminderRepo (private val reminderDao: ReminderDao){
         reminderDao.insert(reminder)
     }
 
-    suspend fun delete(reminder: Reminder){
-        reminderDao.delete(reminder)
+    suspend fun delete(noteID: Long){
+        reminderDao.delete(noteID)
     }
 
     fun fetchReminder(noteID : Long): LiveData<Reminder> {

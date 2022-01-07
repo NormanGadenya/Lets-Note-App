@@ -5,7 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     app:cardCornerRadius="10dp"
-    android:layout_margin="4dp"
+    android:layout_margin="16dp"
     android:maxHeight="50dp"
     android:padding="8dp"
     android:outlineSpotShadowColor="@color/def_Card_Color"

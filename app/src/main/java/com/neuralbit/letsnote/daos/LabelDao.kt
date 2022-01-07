@@ -11,8 +11,8 @@ interface LabelDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(label: Label)
 
-    @Delete
-    suspend fun delete(label: Label)
+    @Query("delete from Label where noteID = :noteID")
+    suspend fun delete(noteID: Long)
 
     @Transaction
     @Query("select * from Label where labelID = :labelID ")

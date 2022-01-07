@@ -109,13 +109,8 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
                 allNotesViewModel.removeArchive(ArchivedNote(note.noteID))
 
                 allNotesViewModel.removePin(PinnedNote(note.noteID))
-                allNotesViewModel.getNoteLabel(note.noteID).observe(viewLifecycleOwner){
-                    it?.let { l -> allNotesViewModel.deleteLabel(l) }
-                }
-                allNotesViewModel.getReminder(note.noteID).observe(viewLifecycleOwner){
-                    it?.let { r ->
-                        allNotesViewModel.deleteReminder(r) }
-                }
+                allNotesViewModel.deleteLabel(note.noteID)
+                allNotesViewModel.deleteReminder(note.noteID)
                 lifecycleScope.launch {
                     val allTags = allNotesViewModel.getTagsWithNote(note.noteID)
 
@@ -166,7 +161,79 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
 //                viewHolder.itemView.setBackgroundColor(Color.TRANSPARENT)
             }
         })
+        val touchHelperOther = ItemTouchHelper(object  : ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.RIGHT){
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+
+                return true
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val note = allNotes[viewHolder.adapterPosition]
+                allNotesViewModel.removeArchive(ArchivedNote(note.noteID))
+
+                allNotesViewModel.removePin(PinnedNote(note.noteID))
+
+                allNotesViewModel.deleteLabel(note.noteID)
+
+                allNotesViewModel.deleteReminder(note.noteID)
+                lifecycleScope.launch {
+                    val allTags = allNotesViewModel.getTagsWithNote(note.noteID)
+
+                    for(tag in allTags.first().tags){
+                        allNotesViewModel.deleteNoteTagCrossRef(NoteTagCrossRef( note.noteID,tag.tagTitle))
+                    }
+                    allNotesViewModel.deleteNote(note)
+                    noteRVAdapter?.notifyItemRemoved(viewHolder.adapterPosition)
+                }
+
+
+
+            }
+
+            override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
+                super.onSelectedChanged(viewHolder, actionState)
+                if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE){
+                    val iView = viewHolder?.itemView as CardView
+                    iView.setCardBackgroundColor(resources.getColor(R.color.Red))
+
+                }
+            }
+
+            override fun clearView(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder
+            ) {
+                super.clearView(recyclerView, viewHolder)
+                val iView = viewHolder.itemView as CardView
+
+                iView.setCardBackgroundColor(resources.getColor(R.color.def_Card_Color))
+                try{
+                    val note = allNotes[viewHolder.adapterPosition]
+                    val cm = Common()
+                    allNotesViewModel.getNoteLabel(note.noteID).observe(viewLifecycleOwner){
+                        if(it!=null) {
+                            iView.setCardBackgroundColor(resources.getColor(cm.getLabelColor(it.labelID)))
+                        }else{
+                            iView.setCardBackgroundColor(resources.getColor(R.color.def_Card_Color))
+
+                        }
+                    }
+                }catch (e : Exception){
+                    e.printStackTrace()
+                }
+
+
+//                viewHolder.itemView.setBackgroundColor(Color.TRANSPARENT)
+            }
+        })
         touchHelperPinned.attachToRecyclerView(pinnedNotesRV)
+        touchHelperOther.attachToRecyclerView(notesRV)
+
+
         allNotesViewModel.searchQuery.observe(viewLifecycleOwner) { str->
             allNotesViewModel.filterPinnedList().observe(viewLifecycleOwner) {
                 pinnedNoteRVAdapter?.searchString = str
