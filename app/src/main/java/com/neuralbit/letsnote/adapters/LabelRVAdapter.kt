@@ -2,11 +2,15 @@ package com.neuralbit.letsnote.adapters
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.cardview.widget.CardView
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.neuralbit.letsnote.LabelNotesActivity
 import com.neuralbit.letsnote.R
@@ -23,6 +27,7 @@ class LabelRVAdapter(
         val noteCountTV: TextView = itemView.findViewById(R.id.noteCount)
         val labelCard : CardView = itemView.findViewById(R.id.labelCard)
         val noteTV : TextView = itemView.findViewById(R.id.textView2)
+        val arrow : ImageView = itemView.findViewById(R.id.imgView)
 
     }
 
@@ -47,6 +52,7 @@ class LabelRVAdapter(
         val labelID = position+1
         val labelCountVal = labelCount[labelID]
         val labelCardColor = context.getColor(cm.getLabelColor(labelID) )
+
         holder.labelCard.setCardBackgroundColor(labelCardColor)
 
 
@@ -58,6 +64,7 @@ class LabelRVAdapter(
 
         holder.noteCountTV.setTextColor(context.getColor(cm.getFontColor(labelCardColor)))
         holder.noteTV.setTextColor(context.getColor(cm.getFontColor(labelCardColor)))
+
         if (labelCountVal==1){
             holder.noteTV.text = "note"
         }

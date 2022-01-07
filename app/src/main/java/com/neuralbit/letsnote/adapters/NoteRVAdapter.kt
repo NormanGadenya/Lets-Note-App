@@ -56,6 +56,7 @@ class NoteRVAdapter (
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        Log.d(TAG, "onBindViewHolder: $allNotes")
         var title = allNotes[position].title
         var desc = allNotes[position].description
         val cm = Common()
@@ -77,7 +78,7 @@ class NoteRVAdapter (
         
         holder.itemView.setOnLongClickListener {
             holder.itemView.setOnDragListener { view, dragEvent ->
-                Log.d(TAG, "onBindViewHolder: sdc")
+                Log.d(TAG, "onBindViewHolder: $allNotes")
                 return@setOnDragListener true
             }
 
@@ -180,6 +181,11 @@ class NoteRVAdapter (
         allNotes.clear()
         allNotes.addAll(newList)
         notifyDataSetChanged()
+    }
+    fun undoDelete( swipedNote: Note,oldPosition : Int){
+//        allNotes.clear()
+        allNotes.add(oldPosition,swipedNote)
+        notifyItemInserted(oldPosition)
     }
 
     fun restoreItemColor (){

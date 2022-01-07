@@ -5,7 +5,6 @@ import android.app.AlertDialog
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
 import android.text.Editable
@@ -22,19 +21,15 @@ import android.widget.*
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.view.marginBottom
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.HORIZONTAL
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
-import com.neuralbit.letsnote.*
 import com.neuralbit.letsnote.entities.*
 import com.neuralbit.letsnote.utilities.*
 import com.teamwork.autocomplete.MultiAutoComplete
@@ -61,7 +56,6 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
     private lateinit var viewModal : NoteViewModel
     private lateinit var noteType : String
     private lateinit var allNotes : List<Note>
-    private var noteColor : String ? = null
     private val TAG = "AddNoteActivity"
     private var deletable : Boolean = false
     private lateinit var tvTimeStamp : TextView
@@ -79,7 +73,6 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
     private var backPressed  = false
     private lateinit var tagListRV : RecyclerView
     private var isKeyBoardShowing = false
-    private var deletedTag = ArrayList<String>()
     private var tagDeleted = false
     private lateinit var tagListAdapter : AddEditTagRVAdapter
     private lateinit var alertBottomSheet : BottomSheetDialog
@@ -87,6 +80,7 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
     private lateinit var labelBtn : ImageButton
     private  var reminder: Reminder? = null
     private  var label: Label? = null
+
     private lateinit var lifecycleOwner : LifecycleOwner
     private lateinit var calendar: Calendar
     private lateinit var timeTitleTV :TextView
@@ -119,7 +113,6 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
         }
 
         viewModal.getNoteLabel(noteID).observe(this){
-            Log.d(TAG, "onCreate: $it")
             label = it
 
             viewModal.labelSet.value = it !=null
@@ -206,9 +199,12 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
         viewModal.reminderSet.observe(lifecycleOwner){
             reminderNoteSet = it
             if(it){
-                alertButton.setBackgroundResource(R.drawable.ic_baseline_add_alert_24)
+                bottomSheet.state = BottomSheetBehavior.STATE_EXPANDED
+
+                alertButton.setImageResource(R.drawable.ic_baseline_add_alert_24)
                 reminderTV.visibility =  VISIBLE
                 reminderIcon.visibility = VISIBLE
+
                 reminderTV.text = resources.getString(R.string.reminder,cm.convertLongToTime(reminder?.dateTime!!)[0],cm.convertLongToTime(reminder?.dateTime!!)[1])
                 val c = Calendar.getInstance()
                 if (c.timeInMillis > reminder?.dateTime!!){
@@ -421,9 +417,9 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
 
                 viewModal.removePin(PinnedNote(noteID))
 
-                label?.let { l -> viewModal.deleteLabel(noteID) }
+                label?.let { viewModal.deleteLabel(noteID) }
 
-                reminder?.let { r ->
+                reminder?.let {
                     cancelAlarm()
                     viewModal.deleteReminder(noteID) }
 
@@ -476,11 +472,6 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
         }
     }
 
-    private fun showInfoBottomSheet() {
-        bottomSheet.state = BottomSheetBehavior.STATE_EXPANDED
-        bottomSheet.peekHeight = 112
-
-    }
     private fun unArchiveNote(){
         viewModal.texChanged.value = true
 
@@ -521,7 +512,8 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
 
         infoContainer = findViewById(R.id.infoContainer)
         bottomSheet= BottomSheetBehavior.from(infoContainer)
-
+        bottomSheet.state = BottomSheetBehavior.STATE_COLLAPSED
+        bottomSheet.peekHeight = 112
         alertBottomSheet =  BottomSheetDialog(this)
         labelBottomSheet = BottomSheetDialog(this)
         coordinatorlayout = findViewById(R.id.coordinatorlayout)
@@ -689,8 +681,7 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
     private fun showAlertSheetDialog() {
         alertBottomSheet.setContentView(R.layout.alert_bottom_sheet)
         alertBottomSheet.show()
-        val c = Calendar.getInstance()
-        val currentHr = c.get(Calendar.HOUR_OF_DAY)
+        val currentHr = calendar.get(Calendar.HOUR_OF_DAY)
         val opt1 = alertBottomSheet.findViewById<View>(R.id.auto1)
         val opt2 = alertBottomSheet.findViewById<View>(R.id.auto2)
         val opt3 = alertBottomSheet.findViewById<View>(R.id.auto3)
@@ -739,43 +730,42 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
             alertBottomSheet.dismiss()
             when(currentHr){
                 in 0..4 -> {
-                    c[Calendar.HOUR_OF_DAY] = 8
-                    c[Calendar.MINUTE] = 0
+                    calendar[Calendar.HOUR_OF_DAY] = 8
+                    calendar[Calendar.MINUTE] = 0
                     Toast.makeText(this, "Reminder set for today at 8:00 am", Toast.LENGTH_SHORT).show()
 
                 }
                 in 5..8 -> {
-                    c[Calendar.HOUR_OF_DAY] = 14
-                    c[Calendar.MINUTE] = 0
+                    calendar[Calendar.HOUR_OF_DAY] = 14
+                    calendar[Calendar.MINUTE] = 0
                     Toast.makeText(this, "Reminder set for today at 2:00 pm", Toast.LENGTH_SHORT).show()
 
                 }
                 in 9..14 ->{
-                    c[Calendar.HOUR_OF_DAY] = 18
-                    c[Calendar.MINUTE] = 0
+                    calendar[Calendar.HOUR_OF_DAY] = 18
+                    calendar[Calendar.MINUTE] = 0
                     Toast.makeText(this, "Reminder set for today at 6:00 pm", Toast.LENGTH_SHORT).show()
 
                 }
                 in 15..18 -> {
-                    c[Calendar.HOUR_OF_DAY] = 20
-                    c[Calendar.MINUTE] = 0
+                    calendar[Calendar.HOUR_OF_DAY] = 20
+                    calendar[Calendar.MINUTE] = 0
                     Toast.makeText(this, "Reminder set for today at 8:00 pm", Toast.LENGTH_SHORT).show()
 
                 }
             }
-            reminder = Reminder(noteID, c.timeInMillis)
+            reminder = Reminder(noteID, calendar.timeInMillis)
             viewModal.reminderSet.value = true
 
 //            viewModal.insertReminder(Reminder(noteID, c.timeInMillis))
-            startAlarm(c)
         }
 
         opt2?.setOnClickListener {
             alertBottomSheet.dismiss()
             opt2Desc?.text = resources.getString(R.string.opt2n3Desc,"morning","8:00am")
-            c.add(Calendar.DAY_OF_MONTH,1)
-            c[Calendar.HOUR_OF_DAY] = 8
-            c[Calendar.MINUTE] = 0
+            calendar.add(Calendar.DAY_OF_MONTH,1)
+            calendar[Calendar.HOUR_OF_DAY] = 8
+            calendar[Calendar.MINUTE] = 0
             if(noteDescriptionEdit.length() > 0 || noteTitleEdit.length() >0 ){
                 viewModal.texChanged.value = true
 
@@ -783,41 +773,23 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
             Toast.makeText(this, "Reminder set for tomorrow at 8:00am", Toast.LENGTH_SHORT).show()
 
 //            viewModal.insertReminder(Reminder(noteID, c.timeInMillis))
-            reminder = Reminder(noteID, c.timeInMillis)
+            reminder = Reminder(noteID, calendar.timeInMillis)
             viewModal.reminderSet.value = true
 
-            startAlarm(c)
-            viewModal.getReminder(noteID).observe(this) {r->
-                Log.d(TAG, "onCreate: $r")
-                if(r!=null){
-                    alertButton.setBackgroundResource(R.drawable.ic_baseline_add_alert_24)
-                    reminder = r
-                    reminderTV.visibility =  VISIBLE
-                    reminderIcon.visibility = VISIBLE
-                    reminderTV.text = resources.getString(R.string.reminder,cm.convertLongToTime(r.dateTime)[0],cm.convertLongToTime(r.dateTime)[1])
 
-                }else{
-                    alertButton.setBackgroundResource(R.drawable.ic_outline_add_alert_24)
-                    reminderTV.visibility =  GONE
-                    reminderIcon.visibility = GONE
-                }
-
-            }
         }
         opt3?.setOnClickListener {
             alertBottomSheet.dismiss()
-            c.add(Calendar.DAY_OF_MONTH,1)
-            c[Calendar.HOUR_OF_DAY] = 18
-            c[Calendar.MINUTE] = 0
+            calendar.add(Calendar.DAY_OF_MONTH,1)
+            calendar[Calendar.HOUR_OF_DAY] = 18
+            calendar[Calendar.MINUTE] = 0
             if(noteDescriptionEdit.length() > 0 || noteTitleEdit.length() >0 ){
                 viewModal.texChanged.value = true
 
             }
-            reminder = Reminder(noteID, c.timeInMillis)
+            reminder = Reminder(noteID, calendar.timeInMillis)
             viewModal.reminderSet.value = true
 
-//            viewModal.insertReminder(Reminder(noteID, c.timeInMillis))
-            startAlarm(c)
             Toast.makeText(this, "Reminder set for tomorrow at 6:00pm", Toast.LENGTH_SHORT).show()
 
         }
@@ -827,51 +799,15 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
         if(b){
 
             noteDescriptionEdit.maxLines = 10
-            bottomSheet.state = BottomSheetBehavior.STATE_COLLAPSED
 
         }else{
             noteDescriptionEdit.maxLines = 18
 
-            showInfoBottomSheet()
             infoContainer.visibility = VISIBLE
 
         }
     }
 
-
-    private fun setBgColor(){
-        val window = window
-
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-        var colorID= R.color.white
-        var textColorID =R.color.black
-        var buttonColorID = R.color.white
-        when(noteColor) {
-            "White" -> {
-                colorID = R.color.white
-                buttonColorID = Color.BLACK
-            }
-            "English_violet" -> {
-                colorID = R.color.English_violet
-                textColorID = Color.WHITE
-
-            }
-            "Wild_orchid" -> { colorID = R.color.Wild_orchid }
-            "Celadon" -> { colorID = R.color.Celadon }
-            "Honeydew" -> { colorID = R.color.Honeydew }
-            "Apricot" -> { colorID = R.color.Apricot }
-        }
-
-        noteTitleEdit.setTextColor(textColorID)
-        noteDescriptionEdit.setTextColor(textColorID)
-        tvTimeStamp.setTextColor(textColorID)
-//            for ( drawable in actionBarIcons){
-//                changeIconColor(buttonColorID,drawable)
-//            }
-//            window.statusBarColor = resources.getColor(colorID)
-//            supportActionBar?.setBackgroundDrawable(ColorDrawable(resources.getColor(colorID)))
-        coordinatorlayout.setBackgroundColor(resources.getColor(colorID))
-    }
 
     private fun openDateTimeDialog(){
         val alertDialog: AlertDialog? = this?.let {
@@ -887,8 +823,6 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
                     Toast.makeText(context, "Reminder set", Toast.LENGTH_SHORT).show()
                     reminder = Reminder(noteID, calendar.timeInMillis)
                     viewModal.reminderSet.value = true
-//                    viewModal.insertReminder(Reminder(noteID, calendar.timeInMillis))
-                    startAlarm(calendar)
                     alertBottomSheet.dismiss()
 
                 }
@@ -924,12 +858,17 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(this, AlertReceiver::class.java)
         viewModal.texChanged.value = true
-//        intent.putExtra("noteType",noteType)
-//        intent.putExtra("noteID",noteID)
-//        intent.putExtra("noteTitle",noteTitle)
+
         //TODO fix notification issue
-        tvTimeStamp.text= getString(R.string.timeStamp,cm.convertLongToTime(noteTimeStamp)[0],cm.convertLongToTime(noteTimeStamp)[1])
-        tvTimeStamp.visibility =VISIBLE
+        noteDesc = noteDescriptionEdit.text.toString()
+        noteTitle = noteTitleEdit.text.toString()
+
+        if (noteTitle.isNotEmpty()){
+            intent.putExtra("noteTitle",noteTitle)
+        }
+        if (noteDesc.isNotEmpty()){
+            intent.putExtra("noteDesc",noteDesc)
+        }
         val pendingIntent = PendingIntent.getBroadcast(this, 1, intent, 0)
         alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
     }
@@ -957,7 +896,6 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
 
                     }else{
                         viewModal.addNote(note)
-                        Log.d(TAG, "saveNote: ${note.noteID}")
 
                         Toast.makeText(this,"Note added .. " , Toast.LENGTH_SHORT).show()
                         
@@ -986,6 +924,8 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
                     }
                     if (reminder!=null){
                         if (reminderNoteSet){
+                            Log.d(TAG, "saveNote: Reminder set")
+                            startAlarm(calendar)
                             viewModal.insertReminder(reminder!!)
                         }else{
                             viewModal.deleteReminder(noteID)
@@ -999,7 +939,6 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
                         viewModal.insertNoteTagCrossRef(crossRef)
                     }
 
-                    Log.d(TAG, "saveNote: $deletedTag")
 
                 }
 
@@ -1011,7 +950,6 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
 
     override fun onBackPressed() {
         super.onBackPressed()
-        Log.d(TAG, "onBackPressed: ")
         goToMain()
 
     }
@@ -1054,7 +992,6 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
     }
 
     override fun getTag(tag: Tag) {
-        Log.d(TAG, "getTag: $tag")
         viewModal.addTag(tag)
         viewModal.addTagToList(tag)
         tagListAdapter.updateList(viewModal.tagList)

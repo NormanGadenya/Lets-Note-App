@@ -33,7 +33,7 @@
         <entry key="app/src/main/res/layout/activity_main2.xml" value="0.3697916666666667" />
         <entry key="app/src/main/res/layout/add_tag_dialog.xml" value="0.22644927536231885" />
         <entry key="app/src/main/res/layout/alert_bottom_sheet.xml" value="0.25" />
-        <entry key="app/src/main/res/layout/app_bar_main.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/app_bar_main.xml" value="0.3089887640449438" />
         <entry key="app/src/main/res/layout/content_main.xml" value="0.25" />
         <entry key="app/src/main/res/layout/custom_datetime_dialog.xml" value="0.18" />
         <entry key="app/src/main/res/layout/fragment_add_edit.xml" value="0.2625" />
@@ -45,7 +45,7 @@
         <entry key="app/src/main/res/layout/fragment_slideshow.xml" value="0.33645833333333336" />
         <entry key="app/src/main/res/layout/fragment_tag.xml" value="0.2631578947368421" />
         <entry key="app/src/main/res/layout/fragment_time.xml" value="0.3333333333333333" />
-        <entry key="app/src/main/res/layout/info_container.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/info_container.xml" value="0.25" />
         <entry key="app/src/main/res/layout/label_fragment.xml" value="0.1286231884057971" />
         <entry key="app/src/main/res/layout/label_item.xml" value="0.26666666666666666" />
         <entry key="app/src/main/res/layout/main_action_bar.xml" value="0.22" />
@@ -54,7 +54,7 @@
         <entry key="app/src/main/res/layout/note_action_bar.xml" value="0.5" />
         <entry key="app/src/main/res/layout/note_back_bottom_sheet.xml" value="0.47232472324723246" />
         <entry key="app/src/main/res/layout/note_label_bottom_sheet.xml" value="0.340625" />
-        <entry key="app/src/main/res/layout/note_rv_item.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/note_rv_item.xml" value="0.39959839357429716" />
         <entry key="app/src/main/res/layout/spinner_tag_row.xml" value="0.3328125" />
         <entry key="app/src/main/res/layout/tag_adapter_item.xml" value="0.75" />
         <entry key="app/src/main/res/layout/tag_frag_item.xml" value="0.33" />

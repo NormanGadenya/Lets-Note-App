@@ -12,4 +12,12 @@
         <!-- Status bar color. -->
         <!-- Customize your theme here. -->
     </style>
+    <style name = "BottomSheetBehaviour" parent="ThemeOverlay.MaterialComponents">
+        <item name="android:background">@color/gunmetal</item>
+    </style>
+    <style name="noteCardTheme" parent="ThemeOverlay.MaterialComponents">
+        <item name="android:background">@color/gunmetal</item>
+        <item name="android:textColor">@color/timberwolf</item>
+
+    </style>
 </resources>
