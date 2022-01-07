@@ -16,7 +16,7 @@ class AlertReceiver : BroadcastReceiver() {
 //        val noteType = intent.getStringExtra("noteType")
         val noteID = intent.getLongExtra("noteID", -1)
         val nb = notificationHelper.channelNotification
-        Log.d(TAG, "onReceive: $noteID ")
+        Log.d(TAG, "onReceive: $noteTitle ")
         val i = Intent(context, AddEditNoteActivity::class.java)
 //
 //        i.putExtra("noteType",noteType)

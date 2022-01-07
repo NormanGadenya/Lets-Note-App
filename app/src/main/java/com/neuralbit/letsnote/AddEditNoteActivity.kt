@@ -888,7 +888,7 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
             if(textChanged){
                 if (noteTitle.isNotEmpty() || noteDescription.isNotEmpty()){
 
-                    val note = Note(noteTitle,noteDescription,currentDate)
+                    val note = Note(noteTitle,noteDescription,currentDate,noteID)
                     if(noteType == "Edit"){
                         note.noteID = noteID
                         viewModal.updateNote(note)
