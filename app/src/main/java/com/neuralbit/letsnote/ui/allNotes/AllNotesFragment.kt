@@ -1,15 +1,18 @@
 package com.neuralbit.letsnote.ui.allNotes
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
@@ -18,7 +21,12 @@ import com.neuralbit.letsnote.*
 import com.neuralbit.letsnote.adapters.NoteClickInterface
 import com.neuralbit.letsnote.adapters.NoteRVAdapter
 import com.neuralbit.letsnote.databinding.FragmentAllNotesBinding
+import com.neuralbit.letsnote.entities.ArchivedNote
 import com.neuralbit.letsnote.entities.Note
+import com.neuralbit.letsnote.entities.NoteTagCrossRef
+import com.neuralbit.letsnote.entities.PinnedNote
+import com.neuralbit.letsnote.utilities.Common
+import kotlinx.coroutines.launch
 
 class AllNotesFragment : Fragment() , NoteClickInterface {
 
@@ -86,7 +94,79 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
             }
         }
 
+        val touchHelperPinned = ItemTouchHelper(object  : ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.RIGHT){
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
 
+                return true
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val note = pinnedNotes[viewHolder.adapterPosition]
+                allNotesViewModel.removeArchive(ArchivedNote(note.noteID))
+
+                allNotesViewModel.removePin(PinnedNote(note.noteID))
+                allNotesViewModel.getNoteLabel(note.noteID).observe(viewLifecycleOwner){
+                    it?.let { l -> allNotesViewModel.deleteLabel(l) }
+                }
+                allNotesViewModel.getReminder(note.noteID).observe(viewLifecycleOwner){
+                    it?.let { r ->
+                        allNotesViewModel.deleteReminder(r) }
+                }
+                lifecycleScope.launch {
+                    val allTags = allNotesViewModel.getTagsWithNote(note.noteID)
+
+                    for(tag in allTags.first().tags){
+                        allNotesViewModel.deleteNoteTagCrossRef(NoteTagCrossRef( note.noteID,tag.tagTitle))
+                    }
+                    allNotesViewModel.deleteNote(note)
+                    noteRVAdapter?.notifyItemRemoved(viewHolder.adapterPosition)
+                }
+
+
+
+            }
+
+            override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
+                super.onSelectedChanged(viewHolder, actionState)
+                if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE){
+                    val iView = viewHolder?.itemView as CardView
+                    iView.setCardBackgroundColor(resources.getColor(R.color.Red))
+
+                }
+            }
+
+            override fun clearView(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder
+            ) {
+                super.clearView(recyclerView, viewHolder)
+                val iView = viewHolder.itemView as CardView
+
+                iView.setCardBackgroundColor(resources.getColor(R.color.def_Card_Color))
+                try{
+                    val note = pinnedNotes[viewHolder.adapterPosition]
+                    val cm = Common()
+                    allNotesViewModel.getNoteLabel(note.noteID).observe(viewLifecycleOwner){
+                        if(it!=null) {
+                            iView.setCardBackgroundColor(resources.getColor(cm.getLabelColor(it.labelID)))
+                        }else{
+                            iView.setCardBackgroundColor(resources.getColor(R.color.def_Card_Color))
+
+                        }
+                    }
+                }catch (e : Exception){
+                    e.printStackTrace()
+                }
+
+
+//                viewHolder.itemView.setBackgroundColor(Color.TRANSPARENT)
+            }
+        })
+        touchHelperPinned.attachToRecyclerView(pinnedNotesRV)
         allNotesViewModel.searchQuery.observe(viewLifecycleOwner) { str->
             allNotesViewModel.filterPinnedList().observe(viewLifecycleOwner) {
                 pinnedNoteRVAdapter?.searchString = str

@@ -8,6 +8,11 @@
     android:layout_margin="4dp"
     android:maxHeight="50dp"
     android:padding="8dp"
+    android:outlineSpotShadowColor="@color/def_Card_Color"
+    android:outlineAmbientShadowColor="@color/def_Card_Color"
+    app:cardBackgroundColor="@color/def_Card_Color"
+    android:focusable="true"
+    android:clickable="true"
     app:cardElevation="4dp">
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

@@ -1,6 +1,7 @@
 package com.neuralbit.letsnote.adapters
 
 import android.content.Context
+import android.graphics.Color
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -8,6 +9,7 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
@@ -31,6 +33,7 @@ class NoteRVAdapter (
     var labelViewModel : LabelNotesViewModel? = null
     var lifecycleScope : LifecycleCoroutineScope? = null
     var lifecycleOwner: LifecycleOwner ? = null
+    lateinit var itemView: View
     private val allNotes = ArrayList<Note>()
     private val tags : String? = null
     private var reminder : Reminder? = null
@@ -48,7 +51,7 @@ class NoteRVAdapter (
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.note_rv_item,parent,false)
+        itemView = LayoutInflater.from(parent.context).inflate(R.layout.note_rv_item,parent,false)
         return ViewHolder(itemView)
     }
 
@@ -179,7 +182,10 @@ class NoteRVAdapter (
         notifyDataSetChanged()
     }
 
-
+    fun restoreItemColor (){
+        val c = ViewHolder(itemView)
+        c.noteCard.setBackgroundColor(0)
+    }
     fun updateReminder(r: Reminder){
         reminder = r
     }

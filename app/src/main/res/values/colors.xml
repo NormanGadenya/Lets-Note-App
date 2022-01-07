@@ -21,5 +21,7 @@
     <color name ="Apricot_Dark">#B3DFB6A2</color>
     <color name ="lightGrey">#C8F1F1F1</color>
     <color name="darkGrey">#D33B3C3C</color>
+    <color name="Red">#B3F01302</color>
+    <color name="def_Card_Color">#80EBF0F4</color>
 
 </resources>

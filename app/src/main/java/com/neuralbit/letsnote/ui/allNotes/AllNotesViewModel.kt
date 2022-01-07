@@ -3,11 +3,9 @@ package com.neuralbit.letsnote.ui.allNotes
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
-import com.neuralbit.letsnote.entities.Note
 import com.neuralbit.letsnote.NoteDatabase
 import com.neuralbit.letsnote.daos.LabelDao
-import com.neuralbit.letsnote.entities.Label
-import com.neuralbit.letsnote.entities.Reminder
+import com.neuralbit.letsnote.entities.*
 import com.neuralbit.letsnote.relationships.TagsWithNote
 import com.neuralbit.letsnote.repos.*
 import kotlinx.coroutines.Dispatchers
@@ -20,6 +18,9 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
     private val noteTagRepo : NoteTagRepo
     private val reminderRepo : ReminderRepo
     private val labelRepo : LabelRepo
+    private val tagRepo : TagRepo
+    var allTags: LiveData<List<Tag>>
+
 
     var pinnedNotes: LiveData<List<Note>>
     var searchQuery : MutableLiveData<String> = MutableLiveData()
@@ -30,13 +31,17 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
         val noteTagDao = NoteDatabase.getDatabase(application).getNoteTagDao()
         val reminderDao = NoteDatabase.getDatabase(application).getReminderDao()
         val labelDao = NoteDatabase.getDatabase(application).getLabelDao()
+        val tagDao = NoteDatabase.getDatabase(application).getTagDao()
 
         noteRepo= NoteRepo(noteDao)
         noteTagRepo = NoteTagRepo(noteTagDao)
         reminderRepo = ReminderRepo(reminderDao)
         labelRepo = LabelRepo(labelDao)
+        tagRepo = TagRepo(tagDao)
         allNotes = noteRepo.notesWithoutPinArc
         pinnedNotes = noteRepo.pinnedNotes
+        allTags = tagRepo.allTags
+
 
     }
 
@@ -101,5 +106,25 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
 
     suspend fun getTagsWithNote(noteID: Long):List<TagsWithNote> {
         return noteTagRepo.getTagsWithNote(noteID)
+    }
+
+    fun deleteNoteTagCrossRef(crossRef: NoteTagCrossRef) = viewModelScope.launch(Dispatchers.IO){
+        noteTagRepo.deleteNoteTagCrossRef(crossRef)
+    }
+
+    fun deleteLabel(label: Label) = viewModelScope.launch(Dispatchers.IO){
+        labelRepo.delete(label)
+    }
+
+    fun deleteReminder(reminder: Reminder) = viewModelScope.launch(Dispatchers.IO){
+        reminderRepo.delete(reminder)
+    }
+
+    fun removePin(pinnedNote: PinnedNote) = viewModelScope.launch(Dispatchers.IO){
+        noteRepo.deletePinned(pinnedNote)
+    }
+
+    fun removeArchive(archivedNote: ArchivedNote) = viewModelScope.launch(Dispatchers.IO){
+        noteRepo.deleteArchive(archivedNote)
     }
 }
