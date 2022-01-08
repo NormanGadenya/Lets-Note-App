@@ -520,7 +520,7 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
         infoContainer = findViewById(R.id.infoContainer)
         bottomSheet= BottomSheetBehavior.from(infoContainer)
         bottomSheet.state = BottomSheetBehavior.STATE_COLLAPSED
-        bottomSheet.peekHeight = 112
+        bottomSheet.peekHeight = 72
         alertBottomSheet =  BottomSheetDialog(this)
         labelBottomSheet = BottomSheetDialog(this)
         coordinatorlayout = findViewById(R.id.coordinatorlayout)
@@ -804,13 +804,11 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
 
     private fun onKeyboardVisibilityChanged(b: Boolean) {
         if(b){
-
-            noteDescriptionEdit.maxLines = 10
+            bottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
 
         }else{
-            noteDescriptionEdit.maxLines = 18
+            bottomSheet.state = BottomSheetBehavior.STATE_COLLAPSED
 
-            infoContainer.visibility = VISIBLE
 
         }
     }
@@ -926,11 +924,7 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
 
     }
 
-    override fun onBackPressed() {
-        super.onBackPressed()
-        goToMain()
 
-    }
     private fun saveOtherEntities(){
         if (pinnedNote!=null){
             pinnedNote?.noteID = noteID
@@ -983,11 +977,20 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
     private fun goToMain() {
         saveNote()
 
-        val intent = Intent(this@AddEditNoteActivity, MainActivity::class.java)
+        val intent = Intent(this@AddEditNoteActivity, MainActivity::class.java,)
+        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
         startActivity(intent)
+
+        finish()
     }
 
-    
+    override fun onBackPressed() {
+
+        super.onBackPressed()
+        goToMain()
+
+    }
 
     override fun deleteTag(tag: Tag) {
         viewModal.tagList.remove(tag)

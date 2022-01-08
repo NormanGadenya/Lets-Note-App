@@ -27,23 +27,30 @@
             android:textSize="32sp"
             android:textStyle="bold"
             app:layout_constraintTop_toTopOf="parent" />
-
-        <com.teamwork.autocomplete.view.MultiAutoCompleteEditText
-            android:id="@+id/noteEditDesc"
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_margin="@dimen/activity_horizontal_margin"
-            android:background="@android:color/transparent"
-            android:completionHint="Create new Tag"
-            android:completionThreshold="1"
-            android:gravity="top"
-            android:hint="@string/note_content"
-            android:importantForAutofill="no"
-            android:inputType="textMultiLine"
-            android:paddingTop="8dp"
+            android:layout_marginTop="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:layout_marginBottom="32dp"
+            app:layout_constraintTop_toBottomOf="@id/noteEditTitle"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/noteEditTitle" />
+            >
+            <com.teamwork.autocomplete.view.MultiAutoCompleteEditText
+                android:id="@+id/noteEditDesc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:completionHint="Create new Tag"
+                android:completionThreshold="1"
+                android:gravity="top"
+                android:hint="@string/note_content"
+                android:importantForAutofill="no"
+                android:inputType="textMultiLine"
+                />
+
+        </ScrollView>
 
 
 

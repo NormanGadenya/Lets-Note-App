@@ -10,11 +10,13 @@
     android:theme="@style/BottomSheetBehaviour"
     app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
     app:behavior_hideable="true"
-    android:padding="@dimen/activity_horizontal_margin"
+
+    android:padding="8dp"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <ImageView
+        android:layout_marginBottom="4dp"
         android:layout_width="100dp"
-        android:layout_height="10dp"
+        android:layout_height="8dp"
         android:src="@drawable/drawer_handler"
         android:id="@+id/drawer_handler"
         app:layout_constraintTop_toTopOf="parent"
@@ -55,6 +57,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="8dp"
+        android:layout_marginStart="8dp"
+
         android:id="@+id/reminderTV"
         app:layout_constraintStart_toEndOf="@id/reminderIcon"
         app:layout_constraintTop_toTopOf="@id/reminderIcon"/>
