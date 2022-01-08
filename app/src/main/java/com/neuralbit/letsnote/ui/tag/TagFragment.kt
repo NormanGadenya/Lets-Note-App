@@ -1,9 +1,11 @@
 package com.neuralbit.letsnote.ui.tag
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.TextView
+import android.widget.Toast
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -85,18 +87,36 @@ class TagFragment : Fragment() {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val tag = tagList[viewHolder.adapterPosition]
                 lifecycleScope.launch {
-                   val notes =  tagViewModel.getNotesWithTag(tag.tagTitle)
-                    for (note in notes.first().notes){
-//                        tagViewModel.removeArchive(ArchivedNote(note.noteID))
-//                        tagViewModel.removePin(PinnedNote(note.noteID))
-//                        tagViewModel.deleteLabel(note.noteID)
-//                        tagViewModel.deleteReminder(note.noteID)
+                    val notes =  tagViewModel.getNotesWithTag(tag.tagTitle)
 
-                        tagViewModel.deleteNoteTagCrossRef(NoteTagCrossRef(note.noteID,tag.tagTitle))
-//                        tagViewModel.deleteNote(note)
+                    val deleteDialog: AlertDialog? = this.let {
+                        val builder = AlertDialog.Builder(context)
+                        builder.apply {
+                            setPositiveButton("ok"
+                            ) { _, _ ->
+                                for (note in notes.first().notes){
+
+                                    tagViewModel.deleteNoteTagCrossRef(NoteTagCrossRef(note.noteID,tag.tagTitle))
+                                }
+                                tagViewModel.deleteTag(tag)
+                                tagRVAdapter?.notifyItemRemoved(viewHolder.adapterPosition)
+                                Toast.makeText(context, "#${tag.tagTitle} Deleted", Toast.LENGTH_SHORT).show()
+
+
+                            }
+                            setNegativeButton("cancel"
+                            ) { _, _ ->
+                                tagRVAdapter?.updateTagList(tagList)
+
+                            }
+
+                            setTitle("Delete ${tag.tagTitle}")
+
+                        }
+                        builder.create()
                     }
-                    tagViewModel.deleteTag(tag)
-                    tagRVAdapter?.notifyItemRemoved(viewHolder.adapterPosition)
+                    deleteDialog?.show()
+
 
                 }
 
