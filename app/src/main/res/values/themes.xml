@@ -27,7 +27,11 @@
     <style name="noteCardTheme" parent="ThemeOverlay.MaterialComponents">
         <item name="android:background">@color/timberwolf</item>
         <item name="android:textColor">@color/gunmetal</item>
+    </style>
+    <style name="tagTheme" parent="ThemeOverlay.MaterialComponents">
 
+        <item name="android:textColor">@color/gunmetal</item>
+        <item name="android:background">@color/Apricot</item>
     </style>
     <style name="Theme.LetsNote.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
