@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
+import android.os.SystemClock
 import android.text.Editable
 import android.text.TextWatcher
 import android.text.format.DateFormat
@@ -450,6 +451,10 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
 
         restoreButton.setOnClickListener { unArchiveNote() }
     }
+
+
+
+
     private fun archiveNote(){
         archivedNote = ArchivedNote(noteID)
         viewModal.texChanged.value = true
@@ -856,7 +861,7 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
 
     }
 
-    private fun startAlarm(calendar: Calendar) {
+    private fun startAlarm() {
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(this, AlertReceiver::class.java)
         viewModal.texChanged.value = true
@@ -870,13 +875,17 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
         if (noteDescription.isNotEmpty()){
             intent.putExtra("noteDesc",noteDescription)
         }
-        val pendingIntent = PendingIntent.getBroadcast(this, 1, intent, 0)
+        intent.putExtra("noteID",noteID)
+        intent.putExtra("noteType","Edit")
+
+        val pendingIntent = PendingIntent.getBroadcast(this, noteID.toInt(), intent, PendingIntent.FLAG_UPDATE_CURRENT)
         alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
     }
+
     private fun cancelAlarm(){
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(this, AlertReceiver::class.java)
-        val pendingIntent = PendingIntent.getBroadcast(this, 1, intent, 0)
+        val pendingIntent = PendingIntent.getBroadcast(this, noteID.toInt(), intent, PendingIntent.FLAG_UPDATE_CURRENT)
         alarmManager.cancel(pendingIntent)
     }
 
@@ -953,7 +962,7 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
 
             if (reminderNoteSet){
                 Log.d(TAG, "saveNote: Reminder set")
-                startAlarm(calendar)
+                startAlarm()
                 viewModal.insertReminder(reminder!!)
             }else{
                 viewModal.deleteReminder(noteID)

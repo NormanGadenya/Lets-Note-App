@@ -1,6 +1,9 @@
 package com.neuralbit.letsnote.adapters
 
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.util.Log
 import android.view.LayoutInflater
@@ -20,8 +23,11 @@ import com.neuralbit.letsnote.entities.Reminder
 import com.neuralbit.letsnote.entities.Tag
 import com.neuralbit.letsnote.relationships.TagsWithNote
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
+import com.neuralbit.letsnote.utilities.AlertReceiver
 import com.neuralbit.letsnote.utilities.Common
 import kotlinx.coroutines.launch
+import java.util.*
+import kotlin.collections.ArrayList
 
 class NoteRVAdapter (
     val context: Context,
@@ -38,6 +44,7 @@ class NoteRVAdapter (
     private val tags : String? = null
     private var reminder : Reminder? = null
     var searchString: String? =null
+
     val TAG = "NoteRVAdapter"
 
 
@@ -67,6 +74,8 @@ class NoteRVAdapter (
         if (desc?.length!! > 250) {
             desc = desc.substring(0, 250) + "..."
         }
+        val c = Calendar.getInstance()
+
 
         if (title.isEmpty()) {
             holder.noteTitleTV.visibility = GONE
@@ -112,13 +121,21 @@ class NoteRVAdapter (
         lifecycleOwner?.let {
             viewModel?.getReminder(noteID)?.observe(it) { r ->
                 if (r != null) {
-                    holder.reminderIcon.visibility = VISIBLE
-                    holder.reminderTV.visibility = VISIBLE
-                    holder.reminderTV.text = context.resources.getString(
-                        R.string.reminder,
-                        cm.convertLongToTime(r.dateTime)[0],
-                        cm.convertLongToTime(r.dateTime)[1]
-                    )
+
+                    if(c.timeInMillis > r.dateTime){
+                        cancelAlarm(noteID.toInt())
+                        viewModel?.deleteReminder(noteID)
+                    }else{
+                        holder.reminderIcon.visibility = VISIBLE
+                        holder.reminderTV.visibility = VISIBLE
+                        holder.reminderTV.text = context.resources.getString(
+                            R.string.reminder,
+                            cm.convertLongToTime(r.dateTime)[0],
+                            cm.convertLongToTime(r.dateTime)[1]
+                        )
+
+                    }
+
 
                 } else {
                     holder.reminderIcon.visibility = GONE
@@ -196,7 +213,14 @@ class NoteRVAdapter (
         reminder = r
     }
 
+    private fun cancelAlarm(noteID : Int){
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(context, AlertReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(context, noteID, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+        alarmManager.cancel(pendingIntent)
+    }
 }
+
 
 
 
