@@ -9,5 +9,5 @@ import androidx.room.PrimaryKey
 class ArchivedNote(
 
     @PrimaryKey (autoGenerate = false)
-    @ColumnInfo(name = "noteID") val noteID: Long
+    @ColumnInfo(name = "noteID") var noteID: Long
 )

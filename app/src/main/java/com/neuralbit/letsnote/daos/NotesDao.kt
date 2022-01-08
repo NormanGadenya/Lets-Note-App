@@ -10,7 +10,7 @@ import com.neuralbit.letsnote.entities.Tag
 @Dao
 interface NotesDao {
     @Insert(onConflict= OnConflictStrategy.REPLACE )
-    suspend fun insert(note: Note)
+    suspend fun insert(note: Note) : Long
 
     @Update
     suspend fun update(note: Note)

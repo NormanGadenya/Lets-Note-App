@@ -30,6 +30,7 @@ import androidx.recyclerview.widget.RecyclerView.HORIZONTAL
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
+import com.neuralbit.letsnote.*
 import com.neuralbit.letsnote.entities.*
 import com.neuralbit.letsnote.utilities.*
 import com.teamwork.autocomplete.MultiAutoComplete
@@ -104,13 +105,14 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
         initControllers()
 
 
-        viewModal.allNotes.observe(lifecycleOwner) {
-            allNotes = it
-            if(noteType != "Edit"){
-                noteID = it.size.toLong() + 1
-
-            }
-        }
+//        viewModal.allNotes.observe(lifecycleOwner) {
+//            allNotes = it
+//            if(noteType != "Edit"){
+//                noteID = it.size.toLong() + 1
+//
+//            }
+//            Log.d(TAG, "onCreate: $allNotes")
+//        }
 
         viewModal.getNoteLabel(noteID).observe(this){
             label = it
@@ -860,14 +862,13 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
         viewModal.texChanged.value = true
 
         //TODO fix notification issue
-        noteDesc = noteDescriptionEdit.text.toString()
-        noteTitle = noteTitleEdit.text.toString()
-
+        val noteTitle = noteTitleEdit.text.toString()
+        val noteDescription = noteDescriptionEdit.text.toString()
         if (noteTitle.isNotEmpty()){
             intent.putExtra("noteTitle",noteTitle)
         }
-        if (noteDesc.isNotEmpty()){
-            intent.putExtra("noteDesc",noteDesc)
+        if (noteDescription.isNotEmpty()){
+            intent.putExtra("noteDesc",noteDescription)
         }
         val pendingIntent = PendingIntent.getBroadcast(this, 1, intent, 0)
         alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
@@ -887,56 +888,24 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
         if(!deletable){
             if(textChanged){
                 if (noteTitle.isNotEmpty() || noteDescription.isNotEmpty()){
-
-                    val note = Note(noteTitle,noteDescription,currentDate,noteID)
+                    Log.d(TAG, "saveNote: $noteID")
+                    val note = Note(noteTitle,noteDescription,currentDate)
                     if(noteType == "Edit"){
                         note.noteID = noteID
                         viewModal.updateNote(note)
+                        saveOtherEntities()
                         Toast.makeText(this,"Note updated .. " , Toast.LENGTH_SHORT).show()
 
                     }else{
-                        viewModal.addNote(note)
+                        lifecycleScope.launch {
+                           noteID =  viewModal.addNote(note)
+                            saveOtherEntities()
+
+                        }
+
 
                         Toast.makeText(this,"Note added .. " , Toast.LENGTH_SHORT).show()
                         
-                    }
-
-                    if (pinnedNote!=null){
-                        if (notePinned){
-                            viewModal.pinNote(pinnedNote!!)
-                        }else{
-                            viewModal.removePin(pinnedNote!!)
-                        }
-                    }
-                    if (label!=null){
-                        if (labelNoteSet){
-                            viewModal.insertLabel(label!!)
-                        }else{
-                            viewModal.deleteLabel(noteID)
-                        }
-                    }
-                    if (archivedNote!=null){
-                        if (archived){
-                            viewModal.archiveNote(archivedNote!!)
-                        }else{
-                            viewModal.removeArchive(archivedNote!!)
-                        }
-                    }
-                    if (reminder!=null){
-                        if (reminderNoteSet){
-                            Log.d(TAG, "saveNote: Reminder set")
-                            startAlarm(calendar)
-                            viewModal.insertReminder(reminder!!)
-                        }else{
-                            viewModal.deleteReminder(noteID)
-                            cancelAlarm()
-                        }
-                    }
-
-                    for(tag in viewModal.tagList){
-
-                        val crossRef = NoteTagCrossRef(noteID,tag.tagTitle)
-                        viewModal.insertNoteTagCrossRef(crossRef)
                     }
 
 
@@ -953,7 +922,53 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
         goToMain()
 
     }
+    private fun saveOtherEntities(){
+        if (pinnedNote!=null){
+            pinnedNote?.noteID = noteID
+            if (notePinned){
+                viewModal.pinNote(pinnedNote!!)
+            }else{
+                viewModal.removePin(pinnedNote!!)
+            }
+        }
+        if (label!=null){
+            label?.noteID = noteID
+            if (labelNoteSet){
+                viewModal.insertLabel(label!!)
+            }else{
+                viewModal.deleteLabel(noteID)
+            }
+        }
+        if (archivedNote!=null){
+            archivedNote?.noteID = noteID
 
+            if (archived){
+                viewModal.archiveNote(archivedNote!!)
+            }else{
+                viewModal.removeArchive(archivedNote!!)
+            }
+        }
+        if (reminder!=null){
+            reminder?.noteID = noteID
+
+            if (reminderNoteSet){
+                Log.d(TAG, "saveNote: Reminder set")
+                startAlarm(calendar)
+                viewModal.insertReminder(reminder!!)
+            }else{
+                viewModal.deleteReminder(noteID)
+                cancelAlarm()
+            }
+        }
+
+        for(tag in viewModal.tagList){
+
+            val crossRef = NoteTagCrossRef(noteID,tag.tagTitle)
+            viewModal.insertNoteTagCrossRef(crossRef)
+        }
+
+
+    }
 
 
     private fun goToMain() {

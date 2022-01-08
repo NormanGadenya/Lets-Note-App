@@ -8,5 +8,5 @@ import androidx.room.PrimaryKey
 @Entity
 data class PinnedNote(
     @PrimaryKey (autoGenerate = false)
-    @ColumnInfo(name = "noteID") val noteID: Long
+    @ColumnInfo(name = "noteID") var noteID: Long
 )

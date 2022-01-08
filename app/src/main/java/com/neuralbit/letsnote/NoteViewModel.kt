@@ -136,8 +136,9 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     }
     fun updateNote(note: Note)= viewModelScope.launch(Dispatchers.IO){
         noteRepo.update(note)
-    }fun addNote(note: Note)= viewModelScope.launch(Dispatchers.IO){
-        noteRepo.insert(note)
+    }
+    suspend fun addNote(note: Note) : Long{
+        return noteRepo.insert(note)
     }
     fun archiveNote(archivedNote: ArchivedNote) = viewModelScope.launch(Dispatchers.IO){
         noteRepo.insertArchive(archivedNote)

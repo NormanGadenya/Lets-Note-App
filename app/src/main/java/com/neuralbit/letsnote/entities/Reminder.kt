@@ -9,7 +9,7 @@ import java.sql.Time
 @Entity
 data class Reminder(
     @PrimaryKey ( autoGenerate = false)
-    @ColumnInfo val noteID: Long,
+    @ColumnInfo var noteID: Long,
     @ColumnInfo val dateTime : Long
 
     )

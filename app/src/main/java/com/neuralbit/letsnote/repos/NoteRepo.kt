@@ -13,8 +13,8 @@ class NoteRepo(
     val allNotes: LiveData<List<Note>> = notesDao.getAllNotes()
     val archivedNotes : LiveData<List<Note>> = notesDao.getArchivedNotes()
     val pinnedNotes : LiveData<List<Note>> = notesDao.getPinnedNotes()
-    suspend fun  insert(note: Note){
-        notesDao.insert(note)
+    suspend fun  insert(note: Note) : Long{
+        return notesDao.insert(note)
     }
 
 
