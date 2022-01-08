@@ -36,6 +36,7 @@
             android:theme="@style/Base.Theme.AppCompat"/>
         <activity
             android:name=".AddEditNoteActivity"
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"
             android:parentActivityName=".MainActivity" />
 
         <receiver android:name=".utilities.AlertReceiver" />

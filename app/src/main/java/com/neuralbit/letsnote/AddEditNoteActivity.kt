@@ -1,4 +1,4 @@
-package com.neuralbit. letsnote
+package com.neuralbit.letsnote
 
 import android.Manifest
 import android.app.AlarmManager
@@ -25,7 +25,6 @@ import android.view.View.VISIBLE
 import android.view.ViewTreeObserver
 import android.view.WindowManager
 import android.widget.*
-import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.app.ActivityCompat
@@ -41,8 +40,8 @@ import com.google.android.gms.vision.text.TextBlock
 import com.google.android.gms.vision.text.TextRecognizer
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
-import com.neuralbit.letsnote.*
 import com.neuralbit.letsnote.entities.*
 import com.neuralbit.letsnote.utilities.*
 import com.teamwork.autocomplete.MultiAutoComplete
@@ -59,6 +58,7 @@ import java.util.*
 class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPicker, GetDateFromPicker, GetTagFromDialog{
     private lateinit var restoreButton: ImageButton
     private lateinit var archiveButton: ImageButton
+    private lateinit var optionsButton: FloatingActionButton
     private lateinit var deleteButton: ImageButton
     private lateinit var backButton: ImageButton
     private lateinit var pinButton: ImageButton
@@ -121,15 +121,7 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
         initControllers()
 
 
-//        viewModal.allNotes.observe(lifecycleOwner) {
-//            allNotes = it
-//            if(noteType != "Edit"){
-//                noteID = it.size.toLong() + 1
-//
-//            }
-//            Log.d(TAG, "onCreate: $allNotes")
-//        }
-
+        checkCameraPermission()
         viewModal.getNoteLabel(noteID).observe(this){
             label = it
 
@@ -212,6 +204,10 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
                 window.statusBarColor = resources.getColor(cm.getStatusBarColor(label?.labelID!!))
 
             }
+        }
+
+        optionsButton.setOnClickListener {
+            bottomSheet.state = BottomSheetBehavior.STATE_EXPANDED
         }
 
         viewModal.reminderSet.observe(lifecycleOwner){
@@ -394,7 +390,27 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
         viewModal.deleted.observe(this) {
             deletable = it
         }
+        if (bottomSheet.state == BottomSheetBehavior.STATE_HIDDEN){
+            optionsButton.visibility = VISIBLE
+        }else{
+            optionsButton.visibility = GONE
 
+        }
+        bottomSheet.addBottomSheetCallback(object :
+            BottomSheetBehavior.BottomSheetCallback() {
+
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                // handle onSlide
+            }
+
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                when (newState) {
+                    BottomSheetBehavior.STATE_HIDDEN -> optionsButton.visibility = VISIBLE
+                    BottomSheetBehavior.STATE_EXPANDED -> optionsButton.visibility = GONE
+                    BottomSheetBehavior.STATE_COLLAPSED -> optionsButton.visibility = GONE
+                }
+            }
+        })
         viewModal.enterPressed.observe(this){
             val noteContent = noteDescriptionEdit.text
             val noteContentSplit = noteContent.split("\n")
@@ -473,11 +489,24 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
             }
         }
 
+
+
         archiveButton.setOnClickListener { archiveNote() }
 
         pinButton.setOnClickListener { pinOrUnPinNote() }
 
         restoreButton.setOnClickListener { unArchiveNote() }
+    }
+
+    private fun checkCameraPermission() {
+        if (ContextCompat.checkSelfPermission(
+                this@AddEditNoteActivity,
+                Manifest.permission.CAMERA
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestCameraPermission()
+
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -586,9 +615,9 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
     private fun initControllers(){
         cm= Common()
         noteTitleEdit = findViewById(R.id.noteEditTitle)
-        supportActionBar?.displayOptions = ActionBar.DISPLAY_SHOW_CUSTOM
-        supportActionBar?.setDisplayShowCustomEnabled(true)
-        supportActionBar?.setCustomView(R.layout.note_action_bar)
+//        supportActionBar?.displayOptions = ActionBar.DISPLAY_SHOW_CUSTOM
+//        supportActionBar?.setDisplayShowCustomEnabled(true)
+//        supportActionBar?.setCustomView(R.layout.note_action_bar)
         layoutManager = LinearLayoutManager(applicationContext,LinearLayoutManager.HORIZONTAL,false)
         calendar = Calendar.getInstance()
         noteDescriptionEdit = findViewById(R.id.noteEditDesc)
@@ -611,6 +640,7 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
         bottomSheet= BottomSheetBehavior.from(infoContainer)
         bottomSheet.state = BottomSheetBehavior.STATE_COLLAPSED
         bottomSheet.peekHeight = 72
+        optionsButton = findViewById(R.id.optionsFB)
         alertBottomSheet =  BottomSheetDialog(this)
         labelBottomSheet = BottomSheetDialog(this)
         coordinatorlayout = findViewById(R.id.coordinatorlayout)

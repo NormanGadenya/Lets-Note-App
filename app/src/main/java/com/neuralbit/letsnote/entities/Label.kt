@@ -8,5 +8,6 @@ import androidx.room.PrimaryKey
 data class Label(
     @PrimaryKey(autoGenerate = false)
     @ColumnInfo var noteID : Long,
-    @ColumnInfo val labelID : Int
+    @ColumnInfo val labelID : Int,
+    @ColumnInfo val colorCode : String
 )

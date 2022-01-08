@@ -32,6 +32,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
+        android:visibility="gone"
         android:text="@string/other_notes"
         android:textSize="32sp"
         app:layout_constraintStart_toStartOf="parent"
@@ -40,10 +41,12 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/notesRV"
         android:layout_marginTop="8dp"
+        android:visibility="visible"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/otherNotesTV"
         />
+
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/FABAddNote"
@@ -55,6 +58,6 @@
         android:src="@drawable/ic_baseline_note_add_24"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

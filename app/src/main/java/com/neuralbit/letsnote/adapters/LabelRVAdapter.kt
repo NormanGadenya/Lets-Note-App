@@ -33,6 +33,7 @@ class LabelRVAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.label_item,parent,false)
+
         return ViewHolder(itemView)
 
     }

@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
 
         android:layout_height="match_parent">
-
+        <include layout="@layout/note_action_bar" android:id="@+id/actionBar"/>
         <EditText
             android:id="@+id/noteEditTitle"
             android:layout_width="match_parent"
@@ -26,7 +26,7 @@
             android:paddingBottom="8dp"
             android:textSize="32sp"
             android:textStyle="bold"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/actionBar" />
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -52,10 +52,19 @@
 
         </ScrollView>
 
-
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/optionsFB"
+            android:src="@drawable/ic_baseline_more_vert_24"
+            android:backgroundTint="@color/gunmetal"
+            android:tint="@color/laurelgreen"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_margin="@dimen/activity_horizontal_margin"
+            />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
     <include layout="@layout/info_container"/>
-
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
