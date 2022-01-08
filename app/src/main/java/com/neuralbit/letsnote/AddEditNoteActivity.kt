@@ -1,17 +1,23 @@
 package com.neuralbit. letsnote
 
+import android.Manifest
 import android.app.AlarmManager
 import android.app.AlertDialog
 import android.app.PendingIntent
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.graphics.Rect
+import android.net.Uri
 import android.os.Bundle
-import android.os.SystemClock
+import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
 import android.text.format.DateFormat
 import android.util.Log
+import android.util.SparseArray
 import android.view.KeyEvent
 import android.view.View
 import android.view.View.GONE
@@ -22,12 +28,17 @@ import android.widget.*
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.HORIZONTAL
+import com.google.android.gms.vision.Frame
+import com.google.android.gms.vision.text.TextBlock
+import com.google.android.gms.vision.text.TextRecognizer
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
@@ -38,7 +49,10 @@ import com.teamwork.autocomplete.MultiAutoComplete
 import com.teamwork.autocomplete.adapter.AutoCompleteTypeAdapter
 import com.teamwork.autocomplete.tokenizer.PrefixTokenizer
 import com.teamwork.autocomplete.view.MultiAutoCompleteEditText
+import com.theartofdev.edmodo.cropper.CropImage
+import com.theartofdev.edmodo.cropper.CropImageView
 import kotlinx.coroutines.launch
+import java.io.IOException
 import java.util.*
 
 
@@ -49,6 +63,7 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
     private lateinit var backButton: ImageButton
     private lateinit var pinButton: ImageButton
     private lateinit var alertButton: ImageButton
+    private lateinit var ocrButton: ImageButton
     private lateinit var noteTitleEdit : EditText
     private lateinit var noteDescriptionEdit : MultiAutoCompleteEditText
     private lateinit var addTagBtn : ImageButton
@@ -82,7 +97,7 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
     private lateinit var labelBtn : ImageButton
     private  var reminder: Reminder? = null
     private  var label: Label? = null
-
+    private val REQUEST_CAMERA_CODE = 100
     private lateinit var lifecycleOwner : LifecycleOwner
     private lateinit var calendar: Calendar
     private lateinit var timeTitleTV :TextView
@@ -97,7 +112,7 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
     private lateinit var infoContainer : View
     private lateinit var bottomSheet : BottomSheetBehavior<View>
 
-
+    private var bitmap : Bitmap? = null
 
     override fun onCreate(savedInstanceState: Bundle?)  {
         super.onCreate(savedInstanceState)
@@ -443,7 +458,20 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
             }
 
         }
-        
+
+        ocrButton.setOnClickListener {
+            if (ContextCompat.checkSelfPermission(
+                    this@AddEditNoteActivity,
+                    Manifest.permission.CAMERA
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                requestCameraPermission()
+
+            } else {
+                CropImage.activity().setGuidelines(CropImageView.Guidelines.ON).start(this@AddEditNoteActivity)
+
+            }
+        }
 
         archiveButton.setOnClickListener { archiveNote() }
 
@@ -452,8 +480,70 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
         restoreButton.setOnClickListener { unArchiveNote() }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE){
+            val result = CropImage.getActivityResult(data)
+            if(resultCode == RESULT_OK){
+                val resultUri : Uri = result.uri
+                try {
+                    bitmap = MediaStore.Images.Media.getBitmap(contentResolver,resultUri)
+                    recognizeText()
+                }catch (e : IOException){
+                    e.printStackTrace()
+                }
+            }
+        }
 
+    }
+    private fun requestCameraPermission() {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(
+                this,
+                Manifest.permission.CAMERA
+            )
+        ) {
+            androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Permission needed")
+                .setMessage("This permission is needed because we need to access your camera")
+                .setPositiveButton(
+                    "ok"
+                ) { _: DialogInterface?, _: Int ->
+                    ActivityCompat.requestPermissions(
+                        this@AddEditNoteActivity, arrayOf(Manifest.permission.CAMERA), REQUEST_CAMERA_CODE)
+                    CropImage.activity().setGuidelines(CropImageView.Guidelines.ON).start(this@AddEditNoteActivity)
 
+                }
+                .setNegativeButton(
+                    "cancel"
+                ) { dialog: DialogInterface, _: Int -> dialog.dismiss() }
+                .create().show()
+        } else {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.CAMERA),
+                REQUEST_CAMERA_CODE
+            )
+        }
+    }
+
+    private fun recognizeText(){
+        val recognizer = TextRecognizer.Builder(applicationContext).build()
+        if (!recognizer.isOperational){
+            Toast.makeText(applicationContext,"Sorry recognizer is unavailable",Toast.LENGTH_SHORT).show()
+        }else{
+            if (bitmap!=null){
+                val frame = Frame.Builder().setBitmap(bitmap).build()
+                val sparseArray = recognizer.detect(frame) as SparseArray<TextBlock>
+                val stringBuilder = StringBuilder()
+                for (i in 0 until sparseArray.size()){
+                    var textBlock = sparseArray.valueAt(i)
+                    stringBuilder.append(textBlock.value)
+                    stringBuilder.append("\n")
+                }
+                noteDescriptionEdit.append(stringBuilder.toString())
+            }
+        }
+    }
 
     private fun archiveNote(){
         archivedNote = ArchivedNote(noteID)
@@ -516,7 +606,7 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
         backButton = findViewById(R.id.backButton)
         archiveButton = findViewById(R.id.archiveButton)
         restoreButton = findViewById(R.id.restoreButton)
-
+        ocrButton = findViewById(R.id.ocrButton)
         infoContainer = findViewById(R.id.infoContainer)
         bottomSheet= BottomSheetBehavior.from(infoContainer)
         bottomSheet.state = BottomSheetBehavior.STATE_COLLAPSED
@@ -977,7 +1067,7 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
     private fun goToMain() {
         saveNote()
 
-        val intent = Intent(this@AddEditNoteActivity, MainActivity::class.java,)
+        val intent = Intent(this@AddEditNoteActivity, MainActivity::class.java)
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
         startActivity(intent)

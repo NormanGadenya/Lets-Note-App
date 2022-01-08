@@ -45,7 +45,8 @@ dependencies {
     implementation "androidx.appcompat:appcompat:$rootProject.appCompatVersion"
     implementation "androidx.activity:activity-ktx:$rootProject.activityVersion"
     implementation 'de.hdodenhof:circleimageview:3.1.0'
-    implementation 'com.google.android.gms:play-services-mlkit-text-recognition:17.0.1'
+    implementation 'com.google.android.gms:play-services-vision:19.0.0'
+    api 'com.theartofdev.edmodo:android-image-cropper:2.8.0'
 
     // Dependencies for working with Architecture components
     // You'll probably have to update the version numbers in build.gradle (Project)
@@ -55,6 +56,7 @@ dependencies {
     implementation 'androidx.navigation:navigation-fragment-ktx:2.3.5'
     implementation 'androidx.navigation:navigation-ui-ktx:2.3.5'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'com.google.android.gms:play-services-mlkit-text-recognition-common:16.1.0'
     kapt "androidx.room:room-compiler:$rootProject.roomVersion"
     androidTestImplementation "androidx.room:room-testing:$rootProject.roomVersion"
 
