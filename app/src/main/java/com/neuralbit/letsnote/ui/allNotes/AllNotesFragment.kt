@@ -1,13 +1,16 @@
 package com.neuralbit.letsnote.ui.allNotes
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.TextView
+import android.widget.Toast
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -21,10 +24,7 @@ import com.neuralbit.letsnote.*
 import com.neuralbit.letsnote.adapters.NoteClickInterface
 import com.neuralbit.letsnote.adapters.NoteRVAdapter
 import com.neuralbit.letsnote.databinding.FragmentAllNotesBinding
-import com.neuralbit.letsnote.entities.ArchivedNote
-import com.neuralbit.letsnote.entities.Note
-import com.neuralbit.letsnote.entities.NoteTagCrossRef
-import com.neuralbit.letsnote.entities.PinnedNote
+import com.neuralbit.letsnote.entities.*
 import com.neuralbit.letsnote.utilities.Common
 import kotlinx.coroutines.launch
 
@@ -106,21 +106,28 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val note = pinnedNotes[viewHolder.adapterPosition]
-                allNotesViewModel.removeArchive(ArchivedNote(note.noteID))
+                val alertDialog: AlertDialog? = this.let {
+                    val builder = AlertDialog.Builder(context)
+                    builder.apply {
+                        setPositiveButton("ok"
+                        ) { _, _ ->
+                            deletePinnedNote(viewHolder, noteRVAdapter)
 
-                allNotesViewModel.removePin(PinnedNote(note.noteID))
-                allNotesViewModel.deleteLabel(note.noteID)
-                allNotesViewModel.deleteReminder(note.noteID)
-                lifecycleScope.launch {
-                    val allTags = allNotesViewModel.getTagsWithNote(note.noteID)
+                            Toast.makeText(context, "Note Deleted", Toast.LENGTH_SHORT).show()
 
-                    for(tag in allTags.first().tags){
-                        allNotesViewModel.deleteNoteTagCrossRef(NoteTagCrossRef( note.noteID,tag.tagTitle))
+
+                        }
+                        setNegativeButton("cancel"
+                        ) { _, _ ->
+                            pinnedNoteRVAdapter?.updateList(pinnedNotes)
+                        }
+                        if ((note.title?.isNotEmpty())==true){
+                            setTitle("Delete ${note.title}")
+                        }
                     }
-                    allNotesViewModel.deleteNote(note)
-                    noteRVAdapter?.notifyItemRemoved(viewHolder.adapterPosition)
+                    builder.create()
                 }
-
+                alertDialog?.show()
 
 
             }
@@ -173,23 +180,28 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val note = allNotes[viewHolder.adapterPosition]
-                allNotesViewModel.removeArchive(ArchivedNote(note.noteID))
+                val alertDialog: AlertDialog? = this.let {
+                    val builder = AlertDialog.Builder(context)
+                    builder.apply {
+                        setPositiveButton("ok"
+                        ) { _, _ ->
+                            deleteOtherNotes(viewHolder, noteRVAdapter)
 
-                allNotesViewModel.removePin(PinnedNote(note.noteID))
+                            Toast.makeText(context, "Note Deleted", Toast.LENGTH_SHORT).show()
 
-                allNotesViewModel.deleteLabel(note.noteID)
 
-                allNotesViewModel.deleteReminder(note.noteID)
-                lifecycleScope.launch {
-                    val allTags = allNotesViewModel.getTagsWithNote(note.noteID)
-
-                    for(tag in allTags.first().tags){
-                        allNotesViewModel.deleteNoteTagCrossRef(NoteTagCrossRef( note.noteID,tag.tagTitle))
+                        }
+                        setNegativeButton("cancel"
+                        ) { _, _ ->
+                            noteRVAdapter?.updateList(allNotes)
+                        }
+                        if ((note.title?.isNotEmpty())==true){
+                            setTitle("Delete ${note.title}")
+                        }
                     }
-                    allNotesViewModel.deleteNote(note)
-                    noteRVAdapter?.notifyItemRemoved(viewHolder.adapterPosition)
+                    builder.create()
                 }
-
+                alertDialog?.show()
 
 
             }
@@ -219,6 +231,9 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
                             iView.setCardBackgroundColor(resources.getColor(cm.getLabelColor(it.labelID)))
                         }else{
                             iView.setCardBackgroundColor(resources.getColor(R.color.def_Card_Color))
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                                iView.outlineSpotShadowColor = resources.getColor(R.color.def_Card_Color)
+                            }
 
                         }
                     }
@@ -227,7 +242,6 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
                 }
 
 
-//                viewHolder.itemView.setBackgroundColor(Color.TRANSPARENT)
             }
         })
         touchHelperPinned.attachToRecyclerView(pinnedNotesRV)
@@ -256,6 +270,50 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
         }
        
         return root
+    }
+
+    private fun deleteOtherNotes(
+        viewHolder: RecyclerView.ViewHolder,
+        noteRVAdapter: NoteRVAdapter?
+    ) {
+        val note = allNotes[viewHolder.adapterPosition]
+        allNotesViewModel.removeArchive(ArchivedNote(note.noteID))
+
+        allNotesViewModel.removePin(PinnedNote(note.noteID))
+
+        allNotesViewModel.deleteLabel(note.noteID)
+
+        allNotesViewModel.deleteReminder(note.noteID)
+        lifecycleScope.launch {
+            val allTags = allNotesViewModel.getTagsWithNote(note.noteID)
+
+            for (tag in allTags.first().tags) {
+                allNotesViewModel.deleteNoteTagCrossRef(NoteTagCrossRef(note.noteID, tag.tagTitle))
+            }
+            allNotesViewModel.deleteNote(note)
+            noteRVAdapter?.notifyItemRemoved(viewHolder.adapterPosition)
+        }
+    }
+
+    private fun deletePinnedNote(
+        viewHolder: RecyclerView.ViewHolder,
+        noteRVAdapter: NoteRVAdapter?
+    ) {
+        val note = pinnedNotes[viewHolder.adapterPosition]
+        allNotesViewModel.removeArchive(ArchivedNote(note.noteID))
+
+        allNotesViewModel.removePin(PinnedNote(note.noteID))
+        allNotesViewModel.deleteLabel(note.noteID)
+        allNotesViewModel.deleteReminder(note.noteID)
+        lifecycleScope.launch {
+            val allTags = allNotesViewModel.getTagsWithNote(note.noteID)
+
+            for (tag in allTags.first().tags) {
+                allNotesViewModel.deleteNoteTagCrossRef(NoteTagCrossRef(note.noteID, tag.tagTitle))
+            }
+            allNotesViewModel.deleteNote(note)
+            noteRVAdapter?.notifyItemRemoved(viewHolder.adapterPosition)
+        }
     }
 
     override fun onDestroyView() {

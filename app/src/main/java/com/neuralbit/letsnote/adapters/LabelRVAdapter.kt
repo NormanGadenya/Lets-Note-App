@@ -25,7 +25,7 @@ class LabelRVAdapter(
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         val noteCountTV: TextView = itemView.findViewById(R.id.noteCount)
-        val labelCard : CardView = itemView.findViewById(R.id.labelCard)
+        val labelCard : View = itemView.findViewById(R.id.labelCard)
         val noteTV : TextView = itemView.findViewById(R.id.textView2)
         val arrow : ImageView = itemView.findViewById(R.id.imgView)
 
@@ -53,7 +53,7 @@ class LabelRVAdapter(
         val labelCountVal = labelCount[labelID]
         val labelCardColor = context.getColor(cm.getLabelColor(labelID) )
 
-        holder.labelCard.setCardBackgroundColor(labelCardColor)
+        holder.labelCard.setBackgroundColor(labelCardColor)
 
 
         GlobalScope.launch {

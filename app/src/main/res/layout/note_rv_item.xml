@@ -7,14 +7,17 @@
     app:cardCornerRadius="10dp"
     android:layout_margin="16dp"
     android:maxHeight="50dp"
+    app:cardBackgroundColor="@color/def_Card_Color"
+
     android:padding="8dp"
     android:focusable="true"
     android:clickable="true"
-    app:cardElevation="4dp">
+    app:cardElevation="0dp">
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="8dp"
+        android:background="@android:color/transparent"
         android:id="@+id/noteCard"
 
         >

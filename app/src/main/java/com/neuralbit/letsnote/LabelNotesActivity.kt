@@ -33,6 +33,7 @@ class LabelNotesActivity : AppCompatActivity() , NoteClickInterface {
             this,
             ViewModelProvider.AndroidViewModelFactory.getInstance(application)
         ).get(AllNotesViewModel::class.java)
+        supportActionBar?.title = "Label"
         setContentView(R.layout.activity_label_notes)
         recyclerView = findViewById(R.id.notesRV)
         val labelID = intent.getIntExtra("labelID",1)
