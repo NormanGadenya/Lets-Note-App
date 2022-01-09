@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.adapters.LabelRVAdapter
 import com.neuralbit.letsnote.databinding.LabelFragmentBinding
+import com.neuralbit.letsnote.entities.Label
 
 class LabelFragment : Fragment() {
     private val labelViewModel: LabelViewModel by activityViewModels()
@@ -19,6 +20,7 @@ class LabelFragment : Fragment() {
     lateinit var labelRV:RecyclerView
     private val binding get() = _binding!!
     val TAG = "LabelFragment"
+    private val labelIDs = HashSet<Int>()
 
 
 
@@ -37,17 +39,14 @@ class LabelFragment : Fragment() {
 
 
         labelViewModel.getAllNotes().observe(viewLifecycleOwner){ list ->
+            for (lwn in list){
+                val label = lwn.label.labelID
+                labelIDs.add(label)
+                labelViewModel.getNotesWithLabel(label).observe(viewLifecycleOwner){
+                    labelCount[label] = it.size
 
-            for ( lWN in list){
-                val k = lWN.label
-                Log.d(TAG, "onCreateView: ")
-
-                val labelID = lWN.label.labelID
-//                labelViewModel.getNotesWithLabel(labelID).observe(viewLifecycleOwner){
-//                    labelCount[labelID] = it.size
-//                    labelRVAdapter?.updateLabelCount(labelCount)
-//
-//                }
+                    labelRVAdapter?.updateLabelCount(labelCount,labelIDs)
+                }
             }
 
         }

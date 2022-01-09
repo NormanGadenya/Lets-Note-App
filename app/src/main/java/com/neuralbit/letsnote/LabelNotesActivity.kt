@@ -43,14 +43,15 @@ class LabelNotesActivity : AppCompatActivity() , NoteClickInterface {
         noteRVAdapter.viewModel = allNotesViewModel
         noteRVAdapter.lifecycleScope = lifecycleScope
         noteRVAdapter.lifecycleOwner = this
-//        viewModel.getNotesWithLabel(labelID).observe(this){
-//            notesList= ArrayList()
-//            for(i in it){
-//                notesList.add(i.notes)
-//            }
-//            noteRVAdapter.updateList(notesList)
-//
-//        }
+        viewModel.getNotesWithLabel(labelID).observe(this){
+            notesList= ArrayList()
+            for (lwn in it){
+                notesList.add(lwn.notes.first())
+            }
+            noteRVAdapter.updateList(notesList)
+
+
+        }
 
         viewModel.searchQuery.observe(this){
 

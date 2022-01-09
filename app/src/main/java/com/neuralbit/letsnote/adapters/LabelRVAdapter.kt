@@ -22,8 +22,8 @@ class LabelRVAdapter(
     val context: Context
     ): RecyclerView.Adapter<LabelRVAdapter.ViewHolder>() {
     val TAG = "LabelRV"
-    val labels : ArrayList<Label> = ArrayList()
-    var labelCount : Map<Int,Int> = HashMap()
+    private var labelIDs = ArrayList<Int>()
+    private var labelCount : Map<Int,Int> = HashMap()
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         val noteCountTV: TextView = itemView.findViewById(R.id.noteCount)
@@ -52,7 +52,7 @@ class LabelRVAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val cm = Common()
-        val labelID = labels[position].labelID
+        val labelID = labelIDs[position]
         val labelCountVal = labelCount[labelID]
 
         holder.labelCard.setBackgroundColor(labelID)
@@ -64,8 +64,7 @@ class LabelRVAdapter(
             }
         }
 
-        holder.noteCountTV.setTextColor(context.getColor(cm.getFontColor(labelID)))
-        holder.noteTV.setTextColor(context.getColor(cm.getFontColor(labelID)))
+
 
         if (labelCountVal==1){
             holder.noteTV.text = "note"
@@ -81,8 +80,10 @@ class LabelRVAdapter(
         return labelCount.size
     }
 
-    fun updateLabelCount(labelCountMap : Map<Int,Int>){
+    fun updateLabelCount(labelCountMap : Map<Int,Int>, labelIDs : HashSet<Int>){
         labelCount = labelCountMap
+        val list = ArrayList<Int>(labelIDs)
+        this.labelIDs = list
         notifyDataSetChanged()
     }
 }

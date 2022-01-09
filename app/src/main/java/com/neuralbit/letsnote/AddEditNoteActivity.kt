@@ -140,7 +140,7 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
 
         }
 
-        KeyboardUtils.addKeyboardToggleListener(this) { onKeyboardVisibilityChanged(it) }
+//        KeyboardUtils.addKeyboardToggleListener(this) { onKeyboardVisibilityChanged(it) }
 
         viewModal.allTags.observe(lifecycleOwner){
             
@@ -445,7 +445,9 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
 
 
         backButton.setOnClickListener {
+            Log.d(TAG, "onCreate: presseed")
             goToMain()
+            
         }
 
         deleteButton.setOnClickListener {
@@ -640,7 +642,7 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
         ocrButton = findViewById(R.id.ocrButton)
         infoContainer = findViewById(R.id.infoContainer)
         bottomSheet= BottomSheetBehavior.from(infoContainer)
-        bottomSheet.state = BottomSheetBehavior.STATE_COLLAPSED
+        bottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
         bottomSheet.peekHeight = 72
         optionsButton = findViewById(R.id.optionsFB)
         alertBottomSheet =  BottomSheetDialog(this)
@@ -779,14 +781,14 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
             if (keypadHeight > screenHeight * 0.15) { // 0.15 ratio is perhaps enough to determine keypad height.
                 if (!isKeyBoardShowing) {
                     isKeyBoardShowing = true
-                    onKeyboardVisibilityChanged(true)
+//                    onKeyboardVisibilityChanged(true)
                 }
             }
             else {
                 if (isKeyBoardShowing) {
 
                     isKeyBoardShowing = false
-                    onKeyboardVisibilityChanged(false)
+//                    onKeyboardVisibilityChanged(false)
                 }
             }
 
@@ -910,16 +912,16 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
         }
     }
 
-    private fun onKeyboardVisibilityChanged(b: Boolean) {
-        if(b){
-            bottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
-
-        }else{
-            bottomSheet.state = BottomSheetBehavior.STATE_COLLAPSED
-
-
-        }
-    }
+//    private fun onKeyboardVisibilityChanged(b: Boolean) {
+//        if(b){
+//            bottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
+//
+//        }else{
+//            bottomSheet.state = BottomSheetBehavior.STATE_COLLAPSED
+//
+//
+//        }
+//    }
 
 
     private fun openDateTimeDialog(){
@@ -998,7 +1000,7 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
     private fun saveNote(){
         val noteTitle = noteTitleEdit.text.toString()
         val noteDescription = noteDescriptionEdit.text.toString()
-        
+        Log.d(TAG, "saveNote: ssssssss")
         val currentDate= cm.currentTimeToLong()
         if(!deletable){
             if(textChanged){
@@ -1029,7 +1031,12 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
 
             }
         }
+        val intent = Intent(this@AddEditNoteActivity, MainActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP;
 
+        startActivity(intent)
+
+        finish()
     }
 
 
@@ -1083,14 +1090,10 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
 
 
     private fun goToMain() {
+        
         saveNote()
 
-        val intent = Intent(this@AddEditNoteActivity, MainActivity::class.java)
-        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
-        startActivity(intent)
-
-        finish()
     }
 
     override fun onBackPressed() {
