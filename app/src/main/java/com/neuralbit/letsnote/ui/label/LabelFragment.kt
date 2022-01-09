@@ -36,14 +36,23 @@ class LabelFragment : Fragment() {
         labelRV.adapter= labelRVAdapter
 
 
-        for (labelID in 1..6){
-            labelViewModel.getNotesWithLabel(labelID).observe(viewLifecycleOwner){
-                labelCount[labelID] = it.size
+        labelViewModel.getAllNotes().observe(viewLifecycleOwner){ list ->
 
-                labelRVAdapter?.updateLabelCount(labelCount)
+            for ( lWN in list){
+                val k = lWN.label
+                Log.d(TAG, "onCreateView: ")
 
+                val labelID = lWN.label.labelID
+//                labelViewModel.getNotesWithLabel(labelID).observe(viewLifecycleOwner){
+//                    labelCount[labelID] = it.size
+//                    labelRVAdapter?.updateLabelCount(labelCount)
+//
+//                }
             }
+
         }
+            
+
 
 
         return root

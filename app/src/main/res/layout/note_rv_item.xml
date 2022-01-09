@@ -27,6 +27,7 @@
             android:id="@+id/tvNoteTitle"
             android:textSize="24sp"
             android:textStyle="bold"
+            android:textColor="@color/gunmetal"
             tools:text="@string/menu_archived"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -36,6 +37,8 @@
             android:layout_height="wrap_content"
             android:id="@+id/tvNoteDesc"
             android:textSize="16sp"
+            android:textColor="@color/gunmetal"
+
             android:maxLines="4"
             tools:text="Norman is thsssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss"
             app:layout_constraintStart_toStartOf="parent"

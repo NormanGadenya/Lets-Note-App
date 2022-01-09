@@ -23,4 +23,7 @@ class LabelViewModel (application: Application): AndroidViewModel(application)  
     fun getNoteLabel( noteID : Long) : LiveData<Label> {
         return labelRepo.getNoteLabel(noteID)
     }
+    fun getAllNotes() : LiveData<List<LabelWIthNotes>> {
+        return labelRepo.getAllNotes()
+    }
 }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="@dimen/activity_horizontal_margin"
@@ -8,67 +9,30 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <TextView
+        android:id="@+id/labelTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Pick a label"
-        app:layout_constraintTop_toTopOf="parent"
+        android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
-        android:id="@+id/labelTitle"
-        android:textSize="20sp"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <ImageButton
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:id="@+id/addNewLabel"
+        android:background="@drawable/ic_baseline_bookmark_add_24"
+        app:layout_constraintTop_toBottomOf="@id/labelTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="8dp"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="0dp"
+        android:layout_marginStart="8dp"
+        android:id="@+id/labelRV"
         android:layout_height="wrap_content"
-        android:weightSum="6"
-        android:layout_marginTop="@dimen/activity_horizontal_margin"
-        android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/labelTitle">
-        <ImageButton
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:id="@+id/l1Btn"
-            android:src="@drawable/white_tag"
-            android:background="?attr/selectableItemBackgroundBorderless"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/addNewLabel"
+        app:layout_constraintTop_toBottomOf="@+id/labelTitle" />
 
-        <ImageButton
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:id="@+id/l2Btn"
-            android:src="@drawable/wild_orchid_tag"
-            android:background="?attr/selectableItemBackgroundBorderless"/>
-
-        <ImageButton
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:id="@+id/l3Btn"
-            android:src="@drawable/honey_dew_tag"
-            android:background="?attr/selectableItemBackgroundBorderless"/>
-
-        <ImageButton
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:id="@+id/l4Btn"
-            android:src="@drawable/eng_violet_tag"
-            android:background="?attr/selectableItemBackgroundBorderless"/>
-
-        <ImageButton
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:id="@+id/l5Btn"
-            android:src="@drawable/celadon_tag"
-            android:background="?attr/selectableItemBackgroundBorderless"/>
-
-        <ImageButton
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:id="@+id/l6Btn"
-            android:src="@drawable/apricot_tag"
-            android:background="?attr/selectableItemBackgroundBorderless"/>
-    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

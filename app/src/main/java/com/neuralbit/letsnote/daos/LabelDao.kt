@@ -15,6 +15,10 @@ interface LabelDao {
     suspend fun delete(noteID: Long)
 
     @Transaction
+    @Query("select * from Label")
+    fun getAllNotes () : LiveData<List<LabelWIthNotes>>
+
+    @Transaction
     @Query("select * from Label where labelID = :labelID ")
     fun getNotesWithLabel(labelID :Int): LiveData<List<LabelWIthNotes>>
 

@@ -149,20 +149,20 @@ class NoteRVAdapter (
                 viewModel?.getNoteLabel(noteID)?.observe(owner) {
                     if(it!=null){
 
-                        val noteCardColor = context.getColor(cm.getLabelColor(it.labelID))
+                        val noteCardColor = it.labelID
                         holder.noteCard.setBackgroundColor(noteCardColor)
-                        holder.noteTitleTV.setTextColor(context.getColor(cm.getFontColor(noteCardColor)))
-                        holder.noteTextTV.setTextColor(context.getColor(cm.getFontColor(noteCardColor)))
-                        holder.reminderTV.setTextColor(context.getColor(cm.getFontColor(noteCardColor)))
+//                        holder.noteTitleTV.setTextColor(context.getColor(cm.getFontColor(noteCardColor)))
+//                        holder.noteTextTV.setTextColor(context.getColor(cm.getFontColor(noteCardColor)))
+//                        holder.reminderTV.setTextColor(context.getColor(cm.getFontColor(noteCardColor)))
                     }
 
                 }
             } else if(labelViewModel!=null) {
                 labelViewModel?.getNoteLabel(noteID)?.observe(owner) {
-                    val noteCardColor = context.getColor(cm.getLabelColor(it.labelID))
+                    val noteCardColor = context.getColor(it.labelID)
                     holder.noteCard.setBackgroundColor(noteCardColor)
-                    holder.noteTitleTV.setTextColor(context.getColor(cm.getFontColor(noteCardColor)))
-                    holder.noteTextTV.setTextColor(context.getColor(cm.getFontColor(noteCardColor)))
+//                    holder.noteTitleTV.setTextColor(context.getColor(cm.getFontColor(noteCardColor)))
+//                    holder.noteTextTV.setTextColor(context.getColor(cm.getFontColor(noteCardColor)))
                 }
 
             }

@@ -4,6 +4,7 @@ buildscript {
     repositories {
         google()
         mavenCentral()
+
     }
     dependencies {
         classpath "com.android.tools.build:gradle:4.2.0"
@@ -12,7 +13,9 @@ buildscript {
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
+
 }
+
 
 task clean(type: Delete) {
     delete rootProject.buildDir
@@ -32,3 +35,4 @@ ext {
     espressoVersion = '3.1.0'
     androidxJunitVersion = '1.1.2'
 }
+

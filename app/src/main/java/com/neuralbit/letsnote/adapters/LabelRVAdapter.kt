@@ -14,6 +14,7 @@ import androidx.core.graphics.drawable.DrawableCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.neuralbit.letsnote.LabelNotesActivity
 import com.neuralbit.letsnote.R
+import com.neuralbit.letsnote.entities.Label
 import com.neuralbit.letsnote.utilities.Common
 import kotlinx.coroutines.*
 
@@ -21,6 +22,7 @@ class LabelRVAdapter(
     val context: Context
     ): RecyclerView.Adapter<LabelRVAdapter.ViewHolder>() {
     val TAG = "LabelRV"
+    val labels : ArrayList<Label> = ArrayList()
     var labelCount : Map<Int,Int> = HashMap()
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
@@ -50,11 +52,10 @@ class LabelRVAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val cm = Common()
-        val labelID = position+1
+        val labelID = labels[position].labelID
         val labelCountVal = labelCount[labelID]
-        val labelCardColor = context.getColor(cm.getLabelColor(labelID) )
 
-        holder.labelCard.setBackgroundColor(labelCardColor)
+        holder.labelCard.setBackgroundColor(labelID)
 
 
         GlobalScope.launch {
@@ -63,8 +64,8 @@ class LabelRVAdapter(
             }
         }
 
-        holder.noteCountTV.setTextColor(context.getColor(cm.getFontColor(labelCardColor)))
-        holder.noteTV.setTextColor(context.getColor(cm.getFontColor(labelCardColor)))
+        holder.noteCountTV.setTextColor(context.getColor(cm.getFontColor(labelID)))
+        holder.noteTV.setTextColor(context.getColor(cm.getFontColor(labelID)))
 
         if (labelCountVal==1){
             holder.noteTV.text = "note"

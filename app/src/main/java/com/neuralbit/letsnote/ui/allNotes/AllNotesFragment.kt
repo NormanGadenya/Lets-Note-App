@@ -154,7 +154,7 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
                     val cm = Common()
                     allNotesViewModel.getNoteLabel(note.noteID).observe(viewLifecycleOwner){
                         if(it!=null) {
-                            iView.setCardBackgroundColor(resources.getColor(cm.getLabelColor(it.labelID)))
+                            iView.setCardBackgroundColor(it.labelID)
                         }else{
                             iView.setCardBackgroundColor(resources.getColor(R.color.def_Card_Color))
 
@@ -228,7 +228,7 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
                     val cm = Common()
                     allNotesViewModel.getNoteLabel(note.noteID).observe(viewLifecycleOwner){
                         if(it!=null) {
-                            iView.setCardBackgroundColor(resources.getColor(cm.getLabelColor(it.labelID)))
+                            iView.setCardBackgroundColor(it.labelID)
                         }else{
                             iView.setCardBackgroundColor(resources.getColor(R.color.def_Card_Color))
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {

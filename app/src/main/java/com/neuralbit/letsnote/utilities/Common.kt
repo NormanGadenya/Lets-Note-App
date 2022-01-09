@@ -25,40 +25,40 @@ class Common (){
         return System.currentTimeMillis()
     }
 
-    fun getLabelColor(labelID : Int) : Int{
-        return when (labelID){
-            1-> R.color.white
-            2 -> R.color.Wild_orchid
-            3 -> R.color.Honeydew
-            4 -> R.color.English_violet
-            5 -> R.color.Celadon
-            6 -> R.color.Apricot
-            else-> R.color.white
-        }
-    }
+//    fun getLabelColor(labelID : Int) : Int{
+//        return when (labelID){
+//            1-> R.color.white
+//            2 -> R.color.Wild_orchid
+//            3 -> R.color.Honeydew
+//            4 -> R.color.English_violet
+//            5 -> R.color.Celadon
+//            6 -> R.color.Apricot
+//            else-> R.color.white
+//        }
+//    }
 
-    fun getToolBarDrawable (labelID: Int) : Int{
-        return when (labelID){
-            1-> R.drawable.white_toolbar
-            2 -> R.drawable.wild_orchid_toolbar
-            3 -> R.drawable.honey_drew_toolbar
-            4 -> R.drawable.ev_toolbar
-            5 -> R.drawable.celadon_toolbar
-            6 -> R.drawable.apricot_toolbar
-            else-> R.color.white
-        }
-    }
-    fun getStatusBarColor (labelID: Int) : Int{
-        return when (labelID){
-            1-> R.color.whiteDark
-            2 -> R.color.Wild_orchid_Dark
-            3 -> R.color.Honeydew_Dark
-            4 -> R.color.English_violet_Dark
-            5 -> R.color.Celadon_Dark
-            6 -> R.color.Apricot_Dark
-            else-> R.color.whiteDark
-        }
-    }
+//    fun getToolBarDrawable (labelID: Int) : Int{
+//        return when (labelID){
+//            1-> R.drawable.white_toolbar
+//            2 -> R.drawable.wild_orchid_toolbar
+//            3 -> R.drawable.honey_drew_toolbar
+//            4 -> R.drawable.ev_toolbar
+//            5 -> R.drawable.celadon_toolbar
+//            6 -> R.drawable.apricot_toolbar
+//            else-> R.color.white
+//        }
+//    }
+//    fun getStatusBarColor (labelID: Int) : Int{
+//        return when (labelID){
+//            1-> R.color.whiteDark
+//            2 -> R.color.Wild_orchid_Dark
+//            3 -> R.color.Honeydew_Dark
+//            4 -> R.color.English_violet_Dark
+//            5 -> R.color.Celadon_Dark
+//            6 -> R.color.Apricot_Dark
+//            else-> R.color.whiteDark
+//        }
+//    }
     fun getFontColor(color : Int):Int{
         return if(ColorUtils.calculateLuminance(color) < 0.5){
             R.color.lightGrey

@@ -9,6 +9,8 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.Color
+import android.graphics.PorterDuff
 import android.graphics.Rect
 import android.net.Uri
 import android.os.Bundle
@@ -35,6 +37,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.HORIZONTAL
+import com.flask.colorpicker.ColorPickerView
+import com.flask.colorpicker.OnColorChangedListener
+import com.flask.colorpicker.OnColorSelectedListener
 import com.google.android.gms.vision.Frame
 import com.google.android.gms.vision.text.TextBlock
 import com.google.android.gms.vision.text.TextRecognizer
@@ -111,9 +116,8 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
     private var labelNoteSet = false
     private lateinit var infoContainer : View
     private lateinit var bottomSheet : BottomSheetBehavior<View>
-
     private var bitmap : Bitmap? = null
-
+    private lateinit var colorPickerView: ColorPickerView
     override fun onCreate(savedInstanceState: Bundle?)  {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_edit_note)
@@ -198,10 +202,10 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
         viewModal.labelSet.observe(lifecycleOwner){
             labelNoteSet = it
             if (label != null){
-                coordinatorlayout.setBackgroundColor(resources.getColor(cm.getLabelColor(label?.labelID!!)))
-                supportActionBar?.setBackgroundDrawable(AppCompatResources.getDrawable(this,cm.getToolBarDrawable(label?.labelID!!)))
+                coordinatorlayout.setBackgroundColor(label!!.labelID)
+//                supportActionBar?.setBackgroundDrawable(AppCompatResources.getDrawable(this,cm.getToolBarDrawable(label?.labelID!!)))
                 window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
-                window.statusBarColor = resources.getColor(cm.getStatusBarColor(label?.labelID!!))
+                window.statusBarColor = label!!.labelID
 
             }
         }
@@ -615,9 +619,7 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
     private fun initControllers(){
         cm= Common()
         noteTitleEdit = findViewById(R.id.noteEditTitle)
-//        supportActionBar?.displayOptions = ActionBar.DISPLAY_SHOW_CUSTOM
-//        supportActionBar?.setDisplayShowCustomEnabled(true)
-//        supportActionBar?.setCustomView(R.layout.note_action_bar)
+
         layoutManager = LinearLayoutManager(applicationContext,LinearLayoutManager.HORIZONTAL,false)
         calendar = Calendar.getInstance()
         noteDescriptionEdit = findViewById(R.id.noteEditDesc)
@@ -731,55 +733,41 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
     private fun showLabelBottomSheetDialog() {
         labelBottomSheet.setContentView(R.layout.note_label_bottom_sheet)
         labelBottomSheet.show()
-        val l1Btn = labelBottomSheet.findViewById<ImageButton>(R.id.l1Btn)
-        val l2Btn = labelBottomSheet.findViewById<ImageButton>(R.id.l2Btn)
-        val l3Btn = labelBottomSheet.findViewById<ImageButton>(R.id.l3Btn)
-        val l4Btn = labelBottomSheet.findViewById<ImageButton>(R.id.l4Btn)
-        val l5Btn = labelBottomSheet.findViewById<ImageButton>(R.id.l5Btn)
-        val l6Btn = labelBottomSheet.findViewById<ImageButton>(R.id.l6Btn)
+        val addNewLabelBtn = labelBottomSheet.findViewById<ImageButton>(R.id.addNewLabel)
+        addNewLabelBtn?.setOnClickListener {
+            val labelDialog: AlertDialog = this.let {
+                val builder = AlertDialog.Builder(it)
+                builder.apply {
+                    setPositiveButton("ok"
+                    ) { _, _ ->
 
-        l1Btn?.setOnClickListener {
-            label = Label(noteID,1)
-            viewModal.labelSet.value = true
-            viewModal.texChanged.value = true
-            labelBottomSheet.dismiss()
-        }
+                    }
+                    setNegativeButton("cancel"
+                    ) { _, _ ->
 
-        l2Btn?.setOnClickListener {
-            label = Label(noteID,2)
-            viewModal.labelSet.value = true
-            viewModal.texChanged.value = true
-            labelBottomSheet.dismiss()
+                    }
+                    setView(R.layout.add_label_dialog)
+                    setTitle("Choose date and time")
+                }
+                builder.create()
 
-        }
-        l3Btn?.setOnClickListener {
-            label = Label(noteID,3)
-            viewModal.labelSet.value = true
-            viewModal.texChanged.value = true
-            labelBottomSheet.dismiss()
+            }
 
-        }
+            labelDialog.show()
+            colorPickerView = labelDialog.findViewById<ColorPickerView>(R.id.colorPicker)
+            colorPickerView.addOnColorSelectedListener{
+                val hex = ColorTransparentUtils.transparentColor(it,50)
+                label = Label(noteID,Color.parseColor(hex))
+                viewModal.labelSet.value = true
+                viewModal.texChanged.value = true
+                coordinatorlayout.setBackgroundColor(Color.parseColor(hex))
+                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+                window.statusBarColor = Color.parseColor(hex)
+            }
 
-        l4Btn?.setOnClickListener {
-            label = Label(noteID,4)
-            viewModal.labelSet.value = true
-            viewModal.texChanged.value = true
-            labelBottomSheet.dismiss()
 
         }
-        l5Btn?.setOnClickListener {
-            label = Label(noteID,5)
-            viewModal.labelSet.value = true
-            viewModal.texChanged.value = true
-            labelBottomSheet.dismiss()
 
-        }
-        l6Btn?.setOnClickListener {
-            label = Label(noteID,6)
-            viewModal.labelSet.value = true
-            viewModal.texChanged.value = true
-            labelBottomSheet.dismiss()
-        }
     }
 
     private fun manipulateNoteDescLines() {

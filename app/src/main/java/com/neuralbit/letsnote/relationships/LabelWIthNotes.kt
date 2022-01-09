@@ -11,5 +11,5 @@ data class LabelWIthNotes(
         parentColumn = "noteID",
         entityColumn = "noteID"
     )
-    val notes : Note
+    val notes : List<Note>
 )
