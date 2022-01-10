@@ -1,6 +1,7 @@
 package com.neuralbit.letsnote
 
 import android.Manifest
+import android.R.attr
 import android.app.AlarmManager
 import android.app.AlertDialog
 import android.app.PendingIntent
@@ -10,11 +11,11 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Color
-import android.graphics.PorterDuff
 import android.graphics.Rect
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.speech.RecognizerIntent
 import android.text.Editable
 import android.text.TextWatcher
 import android.text.format.DateFormat
@@ -28,7 +29,6 @@ import android.view.ViewTreeObserver
 import android.view.WindowManager
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
@@ -38,8 +38,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.HORIZONTAL
 import com.flask.colorpicker.ColorPickerView
-import com.flask.colorpicker.OnColorChangedListener
-import com.flask.colorpicker.OnColorSelectedListener
 import com.google.android.gms.vision.Frame
 import com.google.android.gms.vision.text.TextBlock
 import com.google.android.gms.vision.text.TextRecognizer
@@ -61,7 +59,6 @@ import com.theartofdev.edmodo.cropper.CropImageView
 import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 class AddEditNoteActivity : AppCompatActivity() ,
@@ -79,6 +76,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private lateinit var pinButton: ImageButton
     private lateinit var alertButton: ImageButton
     private lateinit var ocrButton: ImageButton
+    private lateinit var sttButton: ImageButton
     private lateinit var noteTitleEdit : EditText
     private lateinit var noteDescriptionEdit : MultiAutoCompleteEditText
     private lateinit var addTagBtn : ImageButton
@@ -130,6 +128,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private lateinit var infoContainer : View
     private lateinit var bottomSheet : BottomSheetBehavior<View>
     private var bitmap : Bitmap? = null
+    private val REQUEST_CODE_SPEECH_INPUT = 1
     private lateinit var colorPickerView: ColorPickerView
 
     override fun onCreate(savedInstanceState: Bundle?)  {
@@ -140,6 +139,15 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
 
         checkCameraPermission()
+        if(intent?.action == Intent.ACTION_SEND){
+            if("text/plain" == intent.type){
+                intent.getStringExtra(Intent.EXTRA_TEXT)?.let {
+                    noteDesc = it
+                    viewModal.texChanged.value = true
+                    noteDescriptionEdit.setText(it)
+                }
+            }
+        }
         viewModal.getNoteLabel(noteID).observe(this){
             label = it
 
@@ -538,6 +546,25 @@ class AddEditNoteActivity : AppCompatActivity() ,
             }
         }
 
+        sttButton.setOnClickListener {
+            val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+            intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak to text")
+
+            try {
+                startActivityForResult(intent, REQUEST_CODE_SPEECH_INPUT)
+            } catch (e: Exception) {
+                Toast
+                    .makeText(
+                        this@AddEditNoteActivity, e.message,
+                        Toast.LENGTH_SHORT
+                    )
+                    .show()
+            }
+        }
+
 
 
         archiveButton.setOnClickListener { archiveNote() }
@@ -572,7 +599,17 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 }
             }
         }
+        else if (requestCode == REQUEST_CODE_SPEECH_INPUT) {
+            if (resultCode == RESULT_OK && data != null) {
+                val result: ArrayList<String> = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)!!
+                val noteDesc = result[0]
+                noteDescriptionEdit.append("\n")
 
+                noteDescriptionEdit.append(noteDesc)
+                viewModal.texChanged.value = true
+            }
+
+        }
     }
     private fun requestCameraPermission() {
         if (ActivityCompat.shouldShowRequestPermissionRationale(
@@ -683,6 +720,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         archiveButton = findViewById(R.id.archiveButton)
         restoreButton = findViewById(R.id.restoreButton)
         ocrButton = findViewById(R.id.ocrButton)
+        sttButton = findViewById(R.id.sttButton)
         infoContainer = findViewById(R.id.infoContainer)
         bottomSheet= BottomSheetBehavior.from(infoContainer)
         bottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
@@ -1044,7 +1082,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private fun saveNote(){
         val noteTitle = noteTitleEdit.text.toString()
         val noteDescription = noteDescriptionEdit.text.toString()
-        Log.d(TAG, "saveNote: ssssssss")
         val currentDate= cm.currentTimeToLong()
         if(!deletable){
             if(textChanged){
