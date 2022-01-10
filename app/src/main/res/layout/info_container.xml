@@ -78,6 +78,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/tagListRV"
         android:layout_width="0dp"
+        android:background="@android:color/transparent"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         app:layout_constraintEnd_toEndOf="parent"

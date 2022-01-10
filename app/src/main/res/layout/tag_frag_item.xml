@@ -25,6 +25,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/noteCountSize"
                 android:textSize="@dimen/cardNoteTVSize"
+                android:autoSizeTextType="uniform"
                 android:textColor="@color/gunmetal"
                 app:layout_constraintBottom_toTopOf="@+id/noteCount"
                 app:layout_constraintEnd_toEndOf="parent"

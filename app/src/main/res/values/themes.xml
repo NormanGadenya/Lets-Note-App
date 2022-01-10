@@ -22,7 +22,8 @@
     </style>
 
     <style name = "BottomSheetBehaviour" parent="ThemeOverlay.MaterialComponents">
-        <item name="android:background">@color/laurelgreen</item>
+        <item name="android:background">@color/darkGrey</item>
+        <item name="android:textColor">@color/timberwolf</item>
     </style>
     <style name="noteCardTheme" parent="ThemeOverlay.MaterialComponents">
         <item name="android:background">@color/timberwolf</item>

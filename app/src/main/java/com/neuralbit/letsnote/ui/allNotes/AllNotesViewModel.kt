@@ -130,4 +130,8 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
     fun removeArchive(archivedNote: ArchivedNote) = viewModelScope.launch(Dispatchers.IO){
         noteRepo.deleteArchive(archivedNote)
     }
+
+    fun archiveNote(archivedNote: ArchivedNote) = viewModelScope.launch(Dispatchers.IO){
+        noteRepo.insertArchive(archivedNote)
+    }
 }

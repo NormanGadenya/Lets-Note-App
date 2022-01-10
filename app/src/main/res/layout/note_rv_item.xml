@@ -8,7 +8,6 @@
     android:layout_margin="16dp"
     android:maxHeight="50dp"
     app:cardBackgroundColor="@color/def_Card_Color"
-
     android:padding="8dp"
     android:focusable="true"
     android:clickable="true"
@@ -38,7 +37,6 @@
             android:id="@+id/tvNoteDesc"
             android:textSize="16sp"
             android:textColor="@color/gunmetal"
-
             android:maxLines="4"
             tools:text="Norman is thsssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss"
             app:layout_constraintStart_toStartOf="parent"
@@ -48,12 +46,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/noteTagsTV"
+            android:maxWidth="200dp"
             android:layout_marginTop="4dp"
             app:layout_constraintTop_toBottomOf="@id/tvNoteDesc"
             app:layout_constraintStart_toStartOf="parent"
             android:background="@drawable/tag_background"
             android:padding="4dp"
-            android:visibility="gone"
+            android:textColor="@color/gunmetal"
+            android:visibility="visible"
             tools:text ="#tag #james #patric"/>
 
         <ImageView
@@ -72,6 +72,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/reminderTV"
             android:layout_marginTop="4dp"
+            android:textColor="@color/gunmetal"
             app:layout_constraintTop_toBottomOf="@id/noteTagsTV"
             app:layout_constraintStart_toEndOf="@id/reminderIcon"
             android:layout_marginStart="8dp"

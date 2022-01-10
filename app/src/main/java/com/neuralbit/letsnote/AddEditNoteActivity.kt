@@ -227,6 +227,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
             labelNoteSet = it
             if(labelNoteSet){
                 if (label != null){
+
                     coordinatorlayout.setBackgroundColor(label!!.labelID)
                     window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
                     window.statusBarColor = label!!.labelID
@@ -834,14 +835,12 @@ class AddEditNoteActivity : AppCompatActivity() ,
             if (keypadHeight > screenHeight * 0.15) { // 0.15 ratio is perhaps enough to determine keypad height.
                 if (!isKeyBoardShowing) {
                     isKeyBoardShowing = true
-//                    onKeyboardVisibilityChanged(true)
                 }
             }
             else {
                 if (isKeyBoardShowing) {
 
                     isKeyBoardShowing = false
-//                    onKeyboardVisibilityChanged(false)
                 }
             }
 
@@ -965,16 +964,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         }
     }
 
-//    private fun onKeyboardVisibilityChanged(b: Boolean) {
-//        if(b){
-//            bottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
-//
-//        }else{
-//            bottomSheet.state = BottomSheetBehavior.STATE_COLLAPSED
-//
-//
-//        }
-//    }
+
 
 
     private fun openDateTimeDialog(){

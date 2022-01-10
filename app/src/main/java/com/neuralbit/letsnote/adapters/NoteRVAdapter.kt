@@ -102,6 +102,7 @@ class NoteRVAdapter (
 
                 }
                 var tagStr : String? = null
+
                 for (t in tagList.tags) {
                     tagStr = "#" + t.tagTitle + " "
                 }

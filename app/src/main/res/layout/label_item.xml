@@ -49,6 +49,7 @@
                 android:id="@+id/imgView"
                 android:layout_width="@dimen/tagButtonSize"
                 android:layout_height="@dimen/tagButtonSize"
+
                 android:foreground="@drawable/ic_baseline_arrow_forward_24"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

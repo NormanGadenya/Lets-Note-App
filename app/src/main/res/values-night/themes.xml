@@ -11,11 +11,12 @@
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
         <!-- Customize your theme here. -->
-        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimary</item>
+
 
     </style>
     <style name = "BottomSheetBehaviour" parent="ThemeOverlay.MaterialComponents">
-        <item name="android:background">@color/gunmetal</item>
+        <item name="android:background">@color/darkGrey</item>
+        <item name="android:textColor">@color/timberwolf</item>
     </style>
     <style name="noteCardTheme" parent="ThemeOverlay.MaterialComponents">
         <item name="android:background">@color/gunmetal</item>
@@ -26,5 +27,8 @@
         <item name="android:textColor">@color/gunmetal</item>
         <item name="android:background">@color/Apricot</item>
     </style>
+
+
+
 
 </resources>
