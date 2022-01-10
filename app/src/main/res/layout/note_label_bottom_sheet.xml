@@ -31,8 +31,20 @@
         android:layout_marginStart="8dp"
         android:id="@+id/labelRV"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintEnd_toStartOf="@id/delLabel"
         app:layout_constraintStart_toEndOf="@+id/addNewLabel"
         app:layout_constraintTop_toBottomOf="@+id/labelTitle" />
 
+    <ImageButton
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:id="@+id/delLabel"
+        android:visibility="gone"
+        android:background="@drawable/ic_baseline_bookmark_remove_24"
+        app:layout_constraintTop_toBottomOf="@id/labelTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp"
+        android:backgroundTint="@color/Red"
+         />
 </androidx.constraintlayout.widget.ConstraintLayout>

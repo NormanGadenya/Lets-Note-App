@@ -9,14 +9,17 @@ import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.entities.Label
+import com.neuralbit.letsnote.entities.Note
 
 
 class AddEditLabelAdapter(
 
-    val context : Context
+    val context : Context,
+    val labelClickInterface: LabelClickInterface
 
 ): RecyclerView.Adapter<AddEditLabelAdapter.ViewHolder>() {
-    var labels : ArrayList<Label> = ArrayList()
+    private var labelIDs = ArrayList<Int>()
+
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
 
@@ -29,11 +32,24 @@ class AddEditLabelAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val labelColor = labels[position].labelID
-        holder.labelView.setColorFilter(labelColor);
+        val labelID = labelIDs[position]
+        holder.labelView.setColorFilter(labelID)
+        holder.labelView.setOnClickListener{
+            labelClickInterface.onLabelItemClick(labelID)
+        }
     }
 
     override fun getItemCount(): Int {
-        return labels.size
+        return labelIDs.size
     }
+
+    fun updateLabelIDList(labelIDs : HashSet<Int>){
+        val list = ArrayList<Int>(labelIDs)
+        this.labelIDs = list
+        notifyDataSetChanged()
+    }
+}
+
+interface  LabelClickInterface{
+    fun onLabelItemClick(labelID: Int)
 }

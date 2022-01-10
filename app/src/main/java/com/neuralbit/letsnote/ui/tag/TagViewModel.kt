@@ -44,9 +44,13 @@ class TagViewModel (application: Application): AndroidViewModel(application) {
         noteTagRepo.deleteNoteTagCrossRef(crossRef)
     }
 
-    fun deleteLabel(noteID: Long) = viewModelScope.launch(Dispatchers.IO){
-        labelRepo.delete(noteID)
+    fun deleteNoteLabel(noteID: Long) = viewModelScope.launch(Dispatchers.IO){
+        labelRepo.deleteNoteLabel(noteID)
     }
+    fun deleteLabel(labelID: Int) = viewModelScope.launch(Dispatchers.IO){
+        labelRepo.deleteLabel(labelID)
+    }
+
     fun deleteTag(tag: Tag) = viewModelScope.launch(Dispatchers.IO){
         tagRepo.delete(tag)
     }

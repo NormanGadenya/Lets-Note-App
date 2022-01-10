@@ -202,8 +202,11 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         labelRepo.insert(label)
     }
 
-    fun deleteLabel(noteID: Long) = viewModelScope.launch(Dispatchers.IO){
-        labelRepo.delete(noteID)
+    fun deleteNoteLabel(noteID: Long) = viewModelScope.launch(Dispatchers.IO){
+        labelRepo.deleteNoteLabel(noteID)
+    }
+    fun deleteLabel(labelID: Int) = viewModelScope.launch(Dispatchers.IO){
+        labelRepo.deleteLabel(labelID)
     }
 
     fun getNotesWithLabel ( labelID : Int) : LiveData<List<LabelWIthNotes>>{

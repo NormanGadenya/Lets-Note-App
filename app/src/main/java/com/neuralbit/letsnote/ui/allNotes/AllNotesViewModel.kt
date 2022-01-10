@@ -112,8 +112,11 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
         noteTagRepo.deleteNoteTagCrossRef(crossRef)
     }
 
-    fun deleteLabel(noteID: Long) = viewModelScope.launch(Dispatchers.IO){
-        labelRepo.delete(noteID)
+    fun deleteNoteLabel(noteID: Long) = viewModelScope.launch(Dispatchers.IO){
+        labelRepo.deleteNoteLabel(noteID)
+    }
+    fun deleteLabel(labelID: Int) = viewModelScope.launch(Dispatchers.IO){
+        labelRepo.deleteLabel(labelID)
     }
 
     fun deleteReminder(noteID: Long) = viewModelScope.launch(Dispatchers.IO){

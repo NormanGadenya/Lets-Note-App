@@ -51,7 +51,6 @@ class LabelRVAdapter(
 
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val cm = Common()
         val labelID = labelIDs[position]
         val labelCountVal = labelCount[labelID]
 
@@ -67,7 +66,7 @@ class LabelRVAdapter(
 
 
         if (labelCountVal==1){
-            holder.noteTV.text = "note"
+            holder.noteTV.text = "Note"
         }
         holder.labelCard.setOnClickListener {
             val intent = Intent(context,LabelNotesActivity::class.java)

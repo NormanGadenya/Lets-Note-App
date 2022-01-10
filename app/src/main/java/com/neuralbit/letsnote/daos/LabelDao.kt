@@ -12,7 +12,11 @@ interface LabelDao {
     suspend fun insert(label: Label)
 
     @Query("delete from Label where noteID = :noteID")
-    suspend fun delete(noteID: Long)
+    suspend fun deleteNoteLabel(noteID: Long)
+
+    @Query("delete from Label where labelID = :labelID")
+    suspend fun deleteLabel(labelID: Int)
+
 
     @Transaction
     @Query("select * from Label")

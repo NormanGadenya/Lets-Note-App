@@ -281,7 +281,7 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
 
         allNotesViewModel.removePin(PinnedNote(note.noteID))
 
-        allNotesViewModel.deleteLabel(note.noteID)
+        allNotesViewModel.deleteNoteLabel(note.noteID)
 
         allNotesViewModel.deleteReminder(note.noteID)
         lifecycleScope.launch {
@@ -303,7 +303,7 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
         allNotesViewModel.removeArchive(ArchivedNote(note.noteID))
 
         allNotesViewModel.removePin(PinnedNote(note.noteID))
-        allNotesViewModel.deleteLabel(note.noteID)
+        allNotesViewModel.deleteNoteLabel(note.noteID)
         allNotesViewModel.deleteReminder(note.noteID)
         lifecycleScope.launch {
             val allTags = allNotesViewModel.getTagsWithNote(note.noteID)

@@ -47,7 +47,10 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
+import com.neuralbit.letsnote.adapters.AddEditLabelAdapter
+import com.neuralbit.letsnote.adapters.LabelClickInterface
 import com.neuralbit.letsnote.entities.*
+import com.neuralbit.letsnote.ui.label.LabelViewModel
 import com.neuralbit.letsnote.utilities.*
 import com.teamwork.autocomplete.MultiAutoComplete
 import com.teamwork.autocomplete.adapter.AutoCompleteTypeAdapter
@@ -58,9 +61,16 @@ import com.theartofdev.edmodo.cropper.CropImageView
 import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.*
+import kotlin.collections.ArrayList
 
 
-class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPicker, GetDateFromPicker, GetTagFromDialog{
+class AddEditNoteActivity : AppCompatActivity() ,
+    TagRVInterface,
+    GetTimeFromPicker,
+    GetDateFromPicker,
+    GetTagFromDialog,
+    LabelClickInterface
+{
     private lateinit var restoreButton: ImageButton
     private lateinit var archiveButton: ImageButton
     private lateinit var optionsButton: FloatingActionButton
@@ -72,12 +82,13 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
     private lateinit var noteTitleEdit : EditText
     private lateinit var noteDescriptionEdit : MultiAutoCompleteEditText
     private lateinit var addTagBtn : ImageButton
+    private lateinit var delLabelBtn : ImageButton
     private lateinit var reminderIcon : ImageView
     private lateinit var reminderTV : TextView
     private var noteID : Long= -1
     private lateinit var viewModal : NoteViewModel
+    private lateinit var labelViewModel : LabelViewModel
     private lateinit var noteType : String
-    private lateinit var allNotes : List<Note>
     private val TAG = "AddNoteActivity"
     private var deletable : Boolean = false
     private lateinit var tvTimeStamp : TextView
@@ -94,9 +105,11 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
     private var newTagTyped = false
     private var backPressed  = false
     private lateinit var tagListRV : RecyclerView
+    private lateinit var labelListRV : RecyclerView
     private var isKeyBoardShowing = false
     private var tagDeleted = false
     private lateinit var tagListAdapter : AddEditTagRVAdapter
+    private lateinit var labelListAdapter : AddEditLabelAdapter
     private lateinit var alertBottomSheet : BottomSheetDialog
     private lateinit var labelBottomSheet : BottomSheetDialog
     private lateinit var labelBtn : ImageButton
@@ -118,6 +131,7 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
     private lateinit var bottomSheet : BottomSheetBehavior<View>
     private var bitmap : Bitmap? = null
     private lateinit var colorPickerView: ColorPickerView
+
     override fun onCreate(savedInstanceState: Bundle?)  {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_edit_note)
@@ -133,7 +147,17 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
         }
 
         manipulateNoteDescLines()
+        val labelIDs = HashSet<Int>()
 
+
+        labelViewModel.getAllNotes().observe(lifecycleOwner){ list ->
+            for (lwn in list){
+                val label = lwn.label.labelID
+                labelIDs.add(label)
+            }
+            labelListAdapter.updateLabelIDList(labelIDs)
+
+        }
         viewModal.getArchivedNote(noteID).observe(this){
             viewModal.archived.value = it!=null
             archivedNote = it
@@ -201,12 +225,30 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
 
         viewModal.labelSet.observe(lifecycleOwner){
             labelNoteSet = it
-            if (label != null){
-                coordinatorlayout.setBackgroundColor(label!!.labelID)
-//                supportActionBar?.setBackgroundDrawable(AppCompatResources.getDrawable(this,cm.getToolBarDrawable(label?.labelID!!)))
-                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
-                window.statusBarColor = label!!.labelID
+            if(labelNoteSet){
+                if (label != null){
+                    coordinatorlayout.setBackgroundColor(label!!.labelID)
+                    window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+                    window.statusBarColor = label!!.labelID
 
+                }
+                delLabelBtn.visibility = VISIBLE
+            }else{
+                coordinatorlayout.setBackgroundColor(Color.TRANSPARENT)
+                window.statusBarColor = getColor(R.color.gunmetal)
+                delLabelBtn.visibility = GONE
+
+            }
+
+        }
+
+        delLabelBtn.setOnClickListener {
+            viewModal.labelSet.value = false
+            viewModal.texChanged.value = true
+
+            if (label!=null && noteID>=0){
+
+                viewModal.deleteNoteLabel(noteID)
             }
         }
 
@@ -457,7 +499,7 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
 
                 viewModal.removePin(PinnedNote(noteID))
 
-                label?.let { viewModal.deleteLabel(noteID) }
+                label?.let { viewModal.deleteNoteLabel(noteID) }
 
                 reminder?.let {
                     cancelAlarm()
@@ -651,14 +693,21 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
         pinButton = findViewById(R.id.pinButton)
         layoutManager.orientation = HORIZONTAL
         tagListAdapter= AddEditTagRVAdapter(applicationContext,this)
+        labelListAdapter= AddEditLabelAdapter(applicationContext,this)
+        labelBottomSheet.setContentView(R.layout.note_label_bottom_sheet)
+        delLabelBtn = labelBottomSheet.findViewById(R.id.delLabel)!!
         tagListRV.layoutManager= layoutManager
         tagListRV.adapter = tagListAdapter
-
         lifecycleOwner = this
         viewModal = ViewModelProvider(
             this,
             ViewModelProvider.AndroidViewModelFactory.getInstance(application)
         ).get(NoteViewModel::class.java)
+
+        labelViewModel = ViewModelProvider(
+            this,
+            ViewModelProvider.AndroidViewModelFactory.getInstance(application)
+        ).get(LabelViewModel::class.java)
 
     }
 
@@ -733,9 +782,13 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
 
 
     private fun showLabelBottomSheetDialog() {
-        labelBottomSheet.setContentView(R.layout.note_label_bottom_sheet)
         labelBottomSheet.show()
         val addNewLabelBtn = labelBottomSheet.findViewById<ImageButton>(R.id.addNewLabel)
+        labelListRV = labelBottomSheet.findViewById(R.id.labelRV)!!
+        val layoutManager = LinearLayoutManager(applicationContext,LinearLayoutManager.HORIZONTAL,false)
+
+        labelListRV.layoutManager =layoutManager
+        labelListRV.adapter = labelListAdapter
         addNewLabelBtn?.setOnClickListener {
             val labelDialog: AlertDialog = this.let {
                 val builder = AlertDialog.Builder(it)
@@ -758,7 +811,7 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
             labelDialog.show()
             colorPickerView = labelDialog.findViewById<ColorPickerView>(R.id.colorPicker)
             colorPickerView.addOnColorSelectedListener{
-                val hex = ColorTransparentUtils.transparentColor(it,50)
+                val hex = ColorTransparentUtils.transparentColor(it,30)
                 label = Label(noteID,Color.parseColor(hex))
                 viewModal.labelSet.value = true
                 viewModal.texChanged.value = true
@@ -1054,7 +1107,7 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
             if (labelNoteSet){
                 viewModal.insertLabel(label!!)
             }else{
-                viewModal.deleteLabel(noteID)
+                viewModal.deleteNoteLabel(noteID)
             }
         }
         if (archivedNote!=null){
@@ -1135,6 +1188,15 @@ class AddEditNoteActivity : AppCompatActivity() , TagRVInterface,GetTimeFromPick
         tagListAdapter.updateList(viewModal.tagList)
         viewModal.noteChanged(true)
 
+    }
+
+    override fun onLabelItemClick(labelID: Int) {
+        label = Label(noteID,labelID)
+        viewModal.labelSet.value = true
+        viewModal.texChanged.value = true
+        coordinatorlayout.setBackgroundColor(labelID)
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+        window.statusBarColor = labelID
     }
 
 

@@ -1,6 +1,7 @@
 package com.neuralbit.letsnote.repos
 
 import androidx.lifecycle.LiveData
+import androidx.room.Query
 import com.neuralbit.letsnote.daos.LabelDao
 import com.neuralbit.letsnote.entities.Label
 import com.neuralbit.letsnote.entities.Reminder
@@ -13,9 +14,13 @@ class LabelRepo(
         labelDao.insert(label)
     }
 
-    suspend fun delete(noteID: Long){
-        labelDao.delete(noteID)
+    suspend fun deleteNoteLabel(noteID: Long){
+        labelDao.deleteNoteLabel(noteID)
     }
+    suspend fun deleteLabel(labelID: Int){
+        labelDao.deleteLabel(labelID)
+    }
+
 
     fun getNotesWithLabel(labelID : Int): LiveData<List<LabelWIthNotes>> {
         return labelDao.getNotesWithLabel(  labelID )
