@@ -6,6 +6,14 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        release {
+            storeFile file('/home/another-one/Documents/letsNoteKS.jks')
+            storePassword 'normaneg'
+            keyAlias 'letsNote'
+            keyPassword 'normaneg'
+        }
+    }
     compileSdk 31
 
     defaultConfig {
@@ -16,6 +24,7 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        signingConfig signingConfigs.release
     }
 
     buildTypes {
