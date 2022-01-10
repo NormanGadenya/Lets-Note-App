@@ -6,7 +6,7 @@
     android:weightSum="4"
 
     android:orientation="vertical"
-    android:padding="@dimen/activity_horizontal_margin"
+    android:padding="@dimen/margin"
     android:focusableInTouchMode="true"
     android:id="@+id/alert_actions"
 

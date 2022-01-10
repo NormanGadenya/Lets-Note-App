@@ -819,6 +819,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 coordinatorlayout.setBackgroundColor(Color.parseColor(hex))
                 window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
                 window.statusBarColor = Color.parseColor(hex)
+                bottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
             }
 
 
@@ -835,12 +836,14 @@ class AddEditNoteActivity : AppCompatActivity() ,
             if (keypadHeight > screenHeight * 0.15) { // 0.15 ratio is perhaps enough to determine keypad height.
                 if (!isKeyBoardShowing) {
                     isKeyBoardShowing = true
+                    bottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
                 }
             }
             else {
                 if (isKeyBoardShowing) {
 
                     isKeyBoardShowing = false
+
                 }
             }
 
