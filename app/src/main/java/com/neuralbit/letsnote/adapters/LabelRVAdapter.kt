@@ -51,6 +51,7 @@ class LabelRVAdapter(
 
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+
         val labelID = labelIDs[position]
         val labelCountVal = labelCount[labelID]
 
@@ -76,7 +77,7 @@ class LabelRVAdapter(
     }
 
     override fun getItemCount(): Int {
-        return labelCount.size
+        return labelIDs.size
     }
 
     fun updateLabelCount(labelCountMap : Map<Int,Int>, labelIDs : HashSet<Int>){

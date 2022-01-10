@@ -802,7 +802,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
                     }
                     setView(R.layout.add_label_dialog)
-                    setTitle("Choose date and time")
+                    setTitle("Choose a label color")
                 }
                 builder.create()
 
@@ -1026,8 +1026,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(this, AlertReceiver::class.java)
         viewModal.texChanged.value = true
-
-        //TODO fix notification issue
         val noteTitle = noteTitleEdit.text.toString()
         val noteDescription = noteDescriptionEdit.text.toString()
         if (noteTitle.isNotEmpty()){

@@ -225,7 +225,6 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
                 iView.setCardBackgroundColor(resources.getColor(R.color.def_Card_Color))
                 try{
                     val note = allNotes[viewHolder.adapterPosition]
-                    val cm = Common()
                     allNotesViewModel.getNoteLabel(note.noteID).observe(viewLifecycleOwner){
                         if(it!=null) {
                             iView.setCardBackgroundColor(it.labelID)

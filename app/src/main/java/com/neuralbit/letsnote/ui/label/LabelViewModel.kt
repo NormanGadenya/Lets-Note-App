@@ -4,10 +4,13 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.neuralbit.letsnote.NoteDatabase
 import com.neuralbit.letsnote.entities.Label
 import com.neuralbit.letsnote.relationships.LabelWIthNotes
 import com.neuralbit.letsnote.repos.LabelRepo
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class LabelViewModel (application: Application): AndroidViewModel(application)  {
     private val labelRepo : LabelRepo
@@ -25,5 +28,8 @@ class LabelViewModel (application: Application): AndroidViewModel(application)  
     }
     fun getAllNotes() : LiveData<List<LabelWIthNotes>> {
         return labelRepo.getAllNotes()
+    }
+    fun deleteLabel(labelID: Int) = viewModelScope.launch(Dispatchers.IO){
+        labelRepo.deleteLabel(labelID)
     }
 }

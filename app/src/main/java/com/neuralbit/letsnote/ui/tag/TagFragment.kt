@@ -1,6 +1,7 @@
 package com.neuralbit.letsnote.ui.tag
 
 import android.app.AlertDialog
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -140,17 +141,16 @@ class TagFragment : Fragment() {
                 super.clearView(recyclerView, viewHolder)
                 val iView = viewHolder.itemView as CardView
 
-                iView.setCardBackgroundColor(resources.getColor(R.color.def_Card_Color))
                 try{
-                    val cm = Common()
                     iView.setCardBackgroundColor(resources.getColor(R.color.Apricot))
-
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                        iView.outlineSpotShadowColor = resources.getColor(R.color.Apricot)
+                    }
                 }catch (e : Exception){
                     e.printStackTrace()
                 }
 
 
-//                viewHolder.itemView.setBackgroundColor(Color.TRANSPARENT)
             }
         })
 
