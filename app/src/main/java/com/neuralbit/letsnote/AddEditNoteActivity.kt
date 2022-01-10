@@ -780,9 +780,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 snackbar.show()
             }
 
-        viewModal.pinned.observe(lifecycleOwner){
-
-        }
 
 
     }

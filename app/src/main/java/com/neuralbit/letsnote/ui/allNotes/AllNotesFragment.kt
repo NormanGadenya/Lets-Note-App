@@ -10,6 +10,8 @@ import android.util.Log
 import android.view.*
 import android.view.View.GONE
 import android.view.View.VISIBLE
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.TextView
 import android.widget.Toast
 import androidx.cardview.widget.CardView
@@ -36,13 +38,19 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
     val TAG = "HOMEFRAGMENT"
     lateinit var  notesRV: RecyclerView
     lateinit var  pinnedNotesRV: RecyclerView
-    lateinit var addFAB : FloatingActionButton
+    lateinit var addNoteFAB : FloatingActionButton
+    lateinit var noteTypeFAB : FloatingActionButton
+    lateinit var addClistFAB : FloatingActionButton
     private val binding get() = _binding!!
     lateinit var pinnedNotesTV: TextView
     lateinit var otherNotesTV: TextView
     private lateinit var allNotes: List<Note>
     private lateinit var pinnedNotes: List<Note>
-
+    private val rotateOpen: Animation by lazy { AnimationUtils.loadAnimation(context,R.anim.rotate_open_anim)}
+    private val rotateClose: Animation by lazy { AnimationUtils.loadAnimation(context,R.anim.rotate_close_anim)}
+    private val fromBottom: Animation by lazy { AnimationUtils.loadAnimation(context,R.anim.from_bottom_anim)}
+    private val toBottom: Animation by lazy { AnimationUtils.loadAnimation(context,R.anim.to_bottom)}
+    private var clicked = false
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -51,7 +59,9 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
         _binding = FragmentAllNotesBinding.inflate(inflater, container, false)
 
         val root: View = binding.root
-        addFAB = binding.FABAddNote
+        addNoteFAB = binding.FABAddNote
+        addClistFAB = binding.FABAddCheckList
+        noteTypeFAB = binding.FABNoteType
         notesRV = binding.notesRV
         pinnedNotesRV = binding.pinnedNotesRV
         pinnedNotesTV = binding.pinnedNotesTV
@@ -363,13 +373,45 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
         }
 
 
-        addFAB.setOnClickListener{
+        addNoteFAB.setOnClickListener{
             val intent = Intent( context,AddEditNoteActivity::class.java)
             intent.putExtra("noteType","NewNote")
             startActivity(intent)
         }
+        addClistFAB.setOnClickListener{
+            val intent = Intent( context,AddEditCheckListActivity::class.java)
+            intent.putExtra("noteType","NewNote")
+            startActivity(intent)
+        }
+        noteTypeFAB.setOnClickListener{
+            setVisibility(clicked)
+            setAnimation(clicked)
+            clicked = !clicked
+        }
        
         return root
+    }
+
+    private fun setAnimation(clicked: Boolean) {
+        if (!clicked){
+            noteTypeFAB.startAnimation(rotateOpen)
+            addClistFAB.startAnimation(fromBottom)
+            addNoteFAB.startAnimation(fromBottom)
+        }else{
+            noteTypeFAB.startAnimation(rotateClose)
+            addClistFAB.startAnimation(toBottom)
+            addNoteFAB.startAnimation(toBottom)
+        }
+    }
+
+    private fun setVisibility(clicked : Boolean) {
+        if (!clicked){
+            addClistFAB.visibility = VISIBLE
+            addNoteFAB.visibility = VISIBLE
+        }else{
+            addClistFAB.visibility = GONE
+            addNoteFAB.visibility = GONE
+        }
     }
 
     private fun archiveNote(viewHolder: RecyclerView.ViewHolder, noteRVAdapter: NoteRVAdapter?) {

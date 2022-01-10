@@ -49,13 +49,37 @@
 
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/FABAddCheckList"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:layout_marginEnd="304dp"
+        android:backgroundTint="@color/purple_200"
+        android:src="@drawable/ic_baseline_checklist_rtl_24"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/FABAddNote"
+        app:layout_constraintEnd_toEndOf="parent"/>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/FABAddNote"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:layout_marginEnd="304dp"
+        android:backgroundTint="@color/Apricot"
         android:layout_marginBottom="596dp"
         android:src="@drawable/ic_baseline_note_add_24"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/FABNoteType"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/FABNoteType"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:layout_marginEnd="304dp"
+        android:layout_marginBottom="596dp"
+        android:src="@drawable/ic_baseline_add_24"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
