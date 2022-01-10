@@ -41,7 +41,7 @@ This is a simple note application that helps organize and store them locally on 
 Install my-project with git
 
 ```bash
-  git clone https://github.com/NormanGadenya/lets_note.git
+  git clone https://github.com/NormanGadenya/Lets-Note-App.git
 ```
 
 Enjoy 😊
