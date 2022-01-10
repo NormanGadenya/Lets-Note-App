@@ -35,6 +35,8 @@ This is a simple note application that helps organize and store them locally on 
 
 - Set reminders for notes
 
+- Speech recognition using Google Speech Recognizer api
+
 
 ## Installation
 
