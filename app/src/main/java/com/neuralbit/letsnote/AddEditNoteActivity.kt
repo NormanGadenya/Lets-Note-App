@@ -410,8 +410,36 @@ class AddEditNoteActivity : AppCompatActivity() ,
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 if(p0?.length!! > 0){
 
+                    val noteContent = noteDescriptionEdit.text
+                    val noteContentSplit = noteContent.split("\n")
+                    var lineIndex = 0
+                    if (noteContentSplit.size>2){
+                        lineIndex = noteContentSplit.lastIndex-1
+                    }
+
+                    if (noteContentSplit.size > 1){
+
+                        if(noteContentSplit.isNotEmpty()){
+                                val prefix = listOf(" ","->","-","+","*",">")
+                                for (p in prefix){
+                                    if (!backPressed){
+                                        addBulletin(noteContentSplit,lineIndex,noteContent, p)
+
+                                    }
+                                }
+                                if (noteContentSplit[lineIndex].endsWith(":")) {
+                                    if (noteContent.endsWith("\n")) {
+                                        if (!backPressed){
+                                            noteDescriptionEdit.append("-> ")
+
+                                        }
+                                    }
+                                }
 
 
+                            }
+
+                    }
 
                     getTagFromString(p0,p3)
 
@@ -427,7 +455,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
         noteDescriptionEdit.setOnKeyListener { _, p1, _ ->
             viewModal.noteChanged(true)
-            viewModal.backPressed.value = p1 == KeyEvent.KEYCODE_DEL
             viewModal.enterPressed.value = p1 == KeyEvent.KEYCODE_ENTER
             false
         }
@@ -465,35 +492,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 }
             }
         })
-        viewModal.enterPressed.observe(this){
-            
-            val noteContent = noteDescriptionEdit.text
-            val noteContentSplit = noteContent.split("\n")
-            var lineIndex = 0
-            if (noteContentSplit.size>2){
-                lineIndex = noteContentSplit.lastIndex-1
-            }
-            if (it){
-
-                if(noteContentSplit.isNotEmpty()){
-                        val prefix = listOf(" ","->","-","+","*",">")
-                        for (p in prefix){
-                            addBulletin(noteContentSplit,lineIndex,noteContent, p)
-                        }
-                        if (noteContentSplit[lineIndex].endsWith(":")) {
-                            if (noteContent.endsWith("\n")) {
-                                if (!backPressed){
-                                    noteDescriptionEdit.append("-> ")
-
-                                }
-                            }
-                        }
-
-
-                    }
-
-            }
-        }
 
 
 
