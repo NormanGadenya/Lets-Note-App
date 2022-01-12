@@ -127,7 +127,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private var reminderNoteSet = false
     private var labelNoteSet = false
     private lateinit var infoContainer : View
-    private lateinit var bottomSheet : BottomSheetBehavior<View>
     private var bitmap : Bitmap? = null
     private val REQUEST_CODE_SPEECH_INPUT = 1
     private lateinit var colorPickerView: ColorPickerView
@@ -262,15 +261,11 @@ class AddEditNoteActivity : AppCompatActivity() ,
             }
         }
 
-        optionsButton.setOnClickListener {
-            bottomSheet.state = BottomSheetBehavior.STATE_EXPANDED
-        }
+
 
         viewModal.reminderSet.observe(lifecycleOwner){
             reminderNoteSet = it
             if(it){
-                bottomSheet.state = BottomSheetBehavior.STATE_EXPANDED
-
                 alertButton.setImageResource(R.drawable.ic_baseline_add_alert_24)
                 reminderTV.visibility =  VISIBLE
                 reminderIcon.visibility = VISIBLE
@@ -471,27 +466,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
         viewModal.deleted.observe(this) {
             deletable = it
         }
-        if (bottomSheet.state == BottomSheetBehavior.STATE_HIDDEN){
-            optionsButton.visibility = VISIBLE
-        }else{
-            optionsButton.visibility = GONE
 
-        }
-        bottomSheet.addBottomSheetCallback(object :
-            BottomSheetBehavior.BottomSheetCallback() {
 
-            override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                // handle onSlide
-            }
-
-            override fun onStateChanged(bottomSheet: View, newState: Int) {
-                when (newState) {
-                    BottomSheetBehavior.STATE_HIDDEN -> optionsButton.visibility = VISIBLE
-                    BottomSheetBehavior.STATE_EXPANDED -> optionsButton.visibility = GONE
-                    BottomSheetBehavior.STATE_COLLAPSED -> optionsButton.visibility = GONE
-                }
-            }
-        })
 
 
 
@@ -722,10 +698,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
         ocrButton = findViewById(R.id.ocrButton)
         sttButton = findViewById(R.id.sttButton)
         infoContainer = findViewById(R.id.infoContainer)
-        bottomSheet= BottomSheetBehavior.from(infoContainer)
-        bottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
-        bottomSheet.peekHeight = 72
-        optionsButton = findViewById(R.id.optionsFB)
         alertBottomSheet =  BottomSheetDialog(this)
         labelBottomSheet = BottomSheetDialog(this)
         coordinatorlayout = findViewById(R.id.coordinatorlayout)
@@ -854,7 +826,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 coordinatorlayout.setBackgroundColor(Color.parseColor(hex))
                 window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
                 window.statusBarColor = Color.parseColor(hex)
-                bottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
             }
 
 
@@ -871,7 +842,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
             if (keypadHeight > screenHeight * 0.15) { // 0.15 ratio is perhaps enough to determine keypad height.
                 if (!isKeyBoardShowing) {
                     isKeyBoardShowing = true
-                    bottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
                 }
             }
             else {
