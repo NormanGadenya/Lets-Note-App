@@ -71,7 +71,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
 {
     private lateinit var restoreButton: ImageButton
     private lateinit var archiveButton: ImageButton
-    private lateinit var optionsButton: FloatingActionButton
     private lateinit var deleteButton: ImageButton
     private lateinit var backButton: ImageButton
     private lateinit var pinButton: ImageButton
@@ -88,7 +87,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private lateinit var viewModal : NoteViewModel
     private lateinit var labelViewModel : LabelViewModel
     private lateinit var noteType : String
-    private val TAG = "AddNoteActivity"
     private var deletable : Boolean = false
     private lateinit var tvTimeStamp : TextView
     private var textChanged : Boolean = false
@@ -157,7 +155,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
         manipulateNoteDescLines()
         val labelIDs = HashSet<Int>()
 
-
         labelViewModel.getAllNotes().observe(lifecycleOwner){ list ->
             for (lwn in list){
                 val label = lwn.label.labelID
@@ -171,8 +168,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
             archivedNote = it
 
         }
-
-//        KeyboardUtils.addKeyboardToggleListener(this) { onKeyboardVisibilityChanged(it) }
 
         viewModal.allTags.observe(lifecycleOwner){
             
@@ -350,7 +345,13 @@ class AddEditNoteActivity : AppCompatActivity() ,
                         if (noteDescStr.length >= 2) {
 
                             if (noteDescStr[noteDescStr.length - 1] == ' ') {
-                                val tag = Tag(noteDescStr.substring(0, noteDescStr.length - 1))
+                                val tagString = noteDescStr.substring(0,noteDescStr.length -1)
+                                var tag : Tag  = if(tagString.contains('#')){
+                                    Tag(noteDescStr.substring(0, noteDescStr.length - 1))
+                                }else{
+                                    Tag("#" +noteDescStr.substring(0, noteDescStr.length - 1))
+
+                                }
                                 if (tag !in it) {
                                     viewModal.addTag(tag)
                                 }
@@ -472,7 +473,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
 
         backButton.setOnClickListener {
-            Log.d(TAG, "onCreate: presseed")
             goToMain()
             
         }
@@ -677,7 +677,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private fun initControllers(){
         cm= Common()
         noteTitleEdit = findViewById(R.id.noteEditTitle)
-
         layoutManager = LinearLayoutManager(applicationContext,LinearLayoutManager.HORIZONTAL,false)
         calendar = Calendar.getInstance()
         noteDescriptionEdit = findViewById(R.id.noteEditDesc)
@@ -786,7 +785,10 @@ class AddEditNoteActivity : AppCompatActivity() ,
         }
     }
 
-
+    override fun onPause() {
+        super.onPause()
+        saveNote()
+    }
 
 
     private fun showLabelBottomSheetDialog() {
@@ -1053,7 +1055,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
         if(!deletable){
             if(textChanged){
                 if (noteTitle.isNotEmpty() || noteDescription.isNotEmpty()){
-                    Log.d(TAG, "saveNote: $noteID")
                     val note = Note(noteTitle,noteDescription,currentDate)
                     if(noteType == "Edit"){
                         note.noteID = noteID
@@ -1079,12 +1080,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
             }
         }
-        val intent = Intent(this@AddEditNoteActivity, MainActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP;
 
-        startActivity(intent)
-
-        finish()
     }
 
 
@@ -1118,7 +1114,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
             reminder?.noteID = noteID
 
             if (reminderNoteSet){
-                Log.d(TAG, "saveNote: Reminder set")
                 startAlarm()
                 viewModal.insertReminder(reminder!!)
             }else{
@@ -1140,8 +1135,17 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private fun goToMain() {
         
         saveNote()
+        val intent = Intent(this@AddEditNoteActivity, MainActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP;
 
+        startActivity(intent)
 
+        finish()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        noteType = "Edit"
     }
 
     override fun onBackPressed() {
@@ -1157,7 +1161,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
             viewModal.deleteNoteTagCrossRef(NoteTagCrossRef(noteID,tag.tagTitle))
         }
         tagListAdapter.updateList(viewModal.tagList)
-
     }
 
     override fun getTimeInfo(calendar : Calendar) {

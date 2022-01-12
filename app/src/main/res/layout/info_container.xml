@@ -25,17 +25,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/sttButton"/>
 
-    <TextView
-        android:id="@+id/tvTimeStamp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="3dp"
-        android:text="Edite on sjjsndjncjdjcnjndjcjd"
-        android:visibility="visible"
-        app:layout_constraintTop_toTopOf="@id/labelBtn"
-        app:layout_constraintEnd_toStartOf="@+id/addTagBtn"
-        app:layout_constraintStart_toEndOf="@+id/ocrButton" />
+
 
     <ImageButton
         android:id="@+id/addTagBtn"

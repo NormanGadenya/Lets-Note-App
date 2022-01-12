@@ -157,6 +157,8 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
                                 }
                                 if ((note.title?.isNotEmpty())==true){
                                     setTitle("Archive ${note.title} ?")
+                                }else{
+                                    setTitle("Archive note ?")
                                 }
                             }
                             builder.create()
@@ -232,7 +234,6 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
                     actionState,
                     isCurrentlyActive
                 )
-                Log.d(TAG, "onChildDraw: $dX")
                 val iView = viewHolder.itemView as CardView
                 when{
                     dX > 0 -> iView.setCardBackgroundColor(resources.getColor(R.color.Red))
@@ -281,7 +282,9 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
                                     noteRVAdapter?.updateList(allNotes)
                                 }
                                 if ((note.title?.isNotEmpty())==true){
-                                    setTitle("Delete ${note.title}")
+                                    setTitle("Delete ${note.title} ?")
+                                }else{
+                                    setTitle("Delete ?")
                                 }
                             }
                             builder.create()
@@ -305,6 +308,9 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
                                 }
                                 if ((note.title?.isNotEmpty())==true){
                                     setTitle("Archive ${note.title} ?")
+                                }else{
+                                    setTitle("Archive ?")
+
                                 }
                             }
                             builder.create()
