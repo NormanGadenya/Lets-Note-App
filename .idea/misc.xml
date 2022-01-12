@@ -22,6 +22,7 @@
         <entry key="app/src/main/res/drawable/ic_launcher1_foreground.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/main_tool_back.xml" value="0.33" />
         <entry key="app/src/main/res/drawable/note_wrapper.xml" value="0.3205" />
+        <entry key="app/src/main/res/drawable/save_shared_background.xml" value="0.2015" />
         <entry key="app/src/main/res/drawable/side_nav_bar.xml" value="0.1415" />
         <entry key="app/src/main/res/drawable/tag_background.xml" value="0.1975" />
         <entry key="app/src/main/res/drawable/tag_background_sel.xml" value="0.3205" />
@@ -29,7 +30,7 @@
         <entry key="app/src/main/res/drawable/white_tag.xml" value="0.353125" />
         <entry key="app/src/main/res/drawable/wild_orchid_tag.xml" value="0.22291666666666668" />
         <entry key="app/src/main/res/drawable/wild_orchid_toolbar.xml" value="0.1225" />
-        <entry key="app/src/main/res/layout/activity_add_edit_note.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/activity_add_edit_note.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_label_notes.xml" value="0.17" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_main2.xml" value="0.3697916666666667" />
@@ -37,13 +38,15 @@
         <entry key="app/src/main/res/layout/add_tag_dialog.xml" value="0.22644927536231885" />
         <entry key="app/src/main/res/layout/alert_bottom_sheet.xml" value="0.25" />
         <entry key="app/src/main/res/layout/app_bar_main.xml" value="0.3089887640449438" />
+        <entry key="app/src/main/res/layout/checklist_item.xml" value="0.5" />
         <entry key="app/src/main/res/layout/content_main.xml" value="0.25" />
         <entry key="app/src/main/res/layout/custom_datetime_dialog.xml" value="0.18" />
         <entry key="app/src/main/res/layout/fragment_add_edit.xml" value="0.2625" />
-        <entry key="app/src/main/res/layout/fragment_all_notes.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/fragment_all_notes.xml" value="0.12" />
         <entry key="app/src/main/res/layout/fragment_archived_notes.xml" value="0.3328125" />
         <entry key="app/src/main/res/layout/fragment_gallery.xml" value="0.33" />
         <entry key="app/src/main/res/layout/fragment_home.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/fragment_item_list.xml" value="0.19375" />
         <entry key="app/src/main/res/layout/fragment_place.xml" value="0.3333333333333333" />
         <entry key="app/src/main/res/layout/fragment_slideshow.xml" value="0.33645833333333336" />
         <entry key="app/src/main/res/layout/fragment_tag.xml" value="0.2631578947368421" />
@@ -59,6 +62,7 @@
         <entry key="app/src/main/res/layout/note_back_bottom_sheet.xml" value="0.47232472324723246" />
         <entry key="app/src/main/res/layout/note_label_bottom_sheet.xml" value="0.25" />
         <entry key="app/src/main/res/layout/note_rv_item.xml" value="0.39959839357429716" />
+        <entry key="app/src/main/res/layout/save_shared_note_fragment.xml" value="0.15" />
         <entry key="app/src/main/res/layout/spinner_tag_row.xml" value="0.3328125" />
         <entry key="app/src/main/res/layout/tag_adapter_item.xml" value="0.75" />
         <entry key="app/src/main/res/layout/tag_frag_item.xml" value="0.33" />

@@ -58,6 +58,7 @@ import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageView
 import kotlinx.coroutines.launch
 import java.io.IOException
+import java.security.Key
 import java.util.*
 
 
@@ -407,9 +408,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
             }
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-
                 if(p0?.length!! > 0){
-//
+
 
 
 
@@ -429,7 +429,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
             viewModal.noteChanged(true)
             viewModal.backPressed.value = p1 == KeyEvent.KEYCODE_DEL
             viewModal.enterPressed.value = p1 == KeyEvent.KEYCODE_ENTER
-
             false
         }
 
@@ -467,13 +466,13 @@ class AddEditNoteActivity : AppCompatActivity() ,
             }
         })
         viewModal.enterPressed.observe(this){
+            
             val noteContent = noteDescriptionEdit.text
             val noteContentSplit = noteContent.split("\n")
             var lineIndex = 0
             if (noteContentSplit.size>2){
                 lineIndex = noteContentSplit.lastIndex-1
             }
-
             if (it){
 
                 if(noteContentSplit.isNotEmpty()){
@@ -483,7 +482,10 @@ class AddEditNoteActivity : AppCompatActivity() ,
                         }
                         if (noteContentSplit[lineIndex].endsWith(":")) {
                             if (noteContent.endsWith("\n")) {
-                                noteDescriptionEdit.append("-> ")
+                                if (!backPressed){
+                                    noteDescriptionEdit.append("-> ")
+
+                                }
                             }
                         }
 

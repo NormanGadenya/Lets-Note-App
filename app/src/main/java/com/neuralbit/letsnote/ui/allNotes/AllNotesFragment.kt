@@ -60,8 +60,6 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
 
         val root: View = binding.root
         addNoteFAB = binding.FABAddNote
-        addClistFAB = binding.FABAddCheckList
-        noteTypeFAB = binding.FABNoteType
         notesRV = binding.notesRV
         pinnedNotesRV = binding.pinnedNotesRV
         pinnedNotesTV = binding.pinnedNotesTV
@@ -378,41 +376,11 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
             intent.putExtra("noteType","NewNote")
             startActivity(intent)
         }
-        addClistFAB.setOnClickListener{
-            val intent = Intent( context,AddEditCheckListActivity::class.java)
-            intent.putExtra("noteType","NewNote")
-            startActivity(intent)
-        }
-        noteTypeFAB.setOnClickListener{
-            setVisibility(clicked)
-            setAnimation(clicked)
-            clicked = !clicked
-        }
+
        
         return root
     }
 
-    private fun setAnimation(clicked: Boolean) {
-        if (!clicked){
-            noteTypeFAB.startAnimation(rotateOpen)
-            addClistFAB.startAnimation(fromBottom)
-            addNoteFAB.startAnimation(fromBottom)
-        }else{
-            noteTypeFAB.startAnimation(rotateClose)
-            addClistFAB.startAnimation(toBottom)
-            addNoteFAB.startAnimation(toBottom)
-        }
-    }
-
-    private fun setVisibility(clicked : Boolean) {
-        if (!clicked){
-            addClistFAB.visibility = VISIBLE
-            addNoteFAB.visibility = VISIBLE
-        }else{
-            addClistFAB.visibility = GONE
-            addNoteFAB.visibility = GONE
-        }
-    }
 
     private fun archiveNote(viewHolder: RecyclerView.ViewHolder, noteRVAdapter: NoteRVAdapter?) {
         val note = allNotes[viewHolder.adapterPosition]

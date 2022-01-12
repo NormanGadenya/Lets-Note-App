@@ -44,6 +44,7 @@
                 android:background="@android:color/transparent"
                 android:completionHint="Create new Tag"
                 android:completionThreshold="1"
+                android:lineSpacingMultiplier="1.1"
                 android:gravity="top"
                 android:hint="@string/note_content"
                 android:importantForAutofill="no"
