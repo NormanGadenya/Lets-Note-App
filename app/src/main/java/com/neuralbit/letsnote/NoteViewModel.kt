@@ -10,8 +10,6 @@ import com.neuralbit.letsnote.relationships.TagsWithNote
 import com.neuralbit.letsnote.repos.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.sql.Date
-import java.sql.Time
 import kotlin.collections.ArrayList
 
 class NoteViewModel(application : Application) : AndroidViewModel(application) {
@@ -23,26 +21,21 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     private val noteTagRepo : NoteTagRepo
     private val reminderRepo : ReminderRepo
     private val labelRepo : LabelRepo
-    var texChange : Boolean
-    var texChanged = MutableLiveData<Boolean>()
+    var noteChanged = MutableLiveData<Boolean>()
     var deleted = MutableLiveData<Boolean>()
     var archived : MutableLiveData<Boolean>
     var pinned : MutableLiveData<Boolean>
     var reminderSet : MutableLiveData<Boolean>
     var labelSet : MutableLiveData<Boolean>
-    lateinit var list : List<Note>
     var searchQurery : MutableLiveData<String>
     var archivedNote : LiveData<List<Note>>
     var pinnedNotes : LiveData<List<Note>>
-    var wordStart : MutableLiveData<Int>
-    var wordEnd : MutableLiveData<Int>
+
     var noteDescString : MutableLiveData<String>
     var newTagTyped : MutableLiveData<Boolean>
     var backPressed : MutableLiveData<Boolean>
-    var enterPressed : MutableLiveData<Boolean>
     var tagList : ArrayList<Tag>
-    val reminderDate : MutableLiveData<Long>
-    val reminderTime : MutableLiveData<Long>
+
     init{
 
         val dao = NoteDatabase.getDatabase(application).getNotesDao()
@@ -59,29 +52,20 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         archivedNote = noteRepo.archivedNotes
         pinnedNotes = noteRepo.pinnedNotes
         allTags = tagRepo.allTags
-        texChange = false
         searchQurery = MutableLiveData<String>()
-        wordStart = MutableLiveData()
-        wordEnd = MutableLiveData()
         noteDescString = MutableLiveData()
         newTagTyped = MutableLiveData()
         backPressed = MutableLiveData()
-        enterPressed = MutableLiveData()
         tagList = ArrayList<Tag>()
         pinned = MutableLiveData()
         archived = MutableLiveData()
         reminderSet = MutableLiveData()
         labelSet = MutableLiveData()
-
         deleted = MutableLiveData()
-        reminderDate = MutableLiveData()
-        reminderTime = MutableLiveData()
-    }
-
-    fun getTagString(text: String){
-        noteDescString.value = text.substring(wordStart.value!!, wordEnd.value!!)
 
     }
+
+
 
 
 
@@ -94,38 +78,7 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     }
 
 
-    fun noteChanged (b : Boolean){
-        texChange = b
-        texChanged.value= texChange
-    }
 
-    fun filterList( ) : LiveData<List<Tag>>  {
-        val textLower = noteDescString.value
-        Log.d(TAG, "filterList: ${noteDescString.value}")
-        return Transformations.map(allTags,){
-            filterLiveList(it,textLower)
-        }
-    }
-    private fun filterLiveList(list: List<Tag>, text : String? ): List<Tag>{
-        val newList = ArrayList<Tag>()
-
-        return if(text!=null){
-            val textLower= text.toLowerCase()
-            for ( tag in list){
-
-                if(tag.tagTitle.toLowerCase().contains(textLower)  ){
-                    newList.add(tag)
-
-                }
-            }
-
-            newList
-        }else{
-            list
-        }
-
-
-    }
 
     fun  getNote(noteID: Long) : LiveData<Note>{
         return noteRepo.getNote(noteID)
@@ -171,9 +124,7 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         noteTagRepo.deleteNoteTagCrossRef(crossRef)
     }
 
-    suspend fun  getNotesWithTag(tagTitle : String) : List<NotesWithTag> {
-       return noteTagRepo.getNotesWithTag(tagTitle)
-    }
+
 
     suspend fun getTagsWithNote(noteID: Long):List<TagsWithNote> {
         return noteTagRepo.getTagsWithNote(noteID)
@@ -205,13 +156,7 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     fun deleteNoteLabel(noteID: Long) = viewModelScope.launch(Dispatchers.IO){
         labelRepo.deleteNoteLabel(noteID)
     }
-    fun deleteLabel(labelID: Int) = viewModelScope.launch(Dispatchers.IO){
-        labelRepo.deleteLabel(labelID)
-    }
 
-    fun getNotesWithLabel ( labelID : Int) : LiveData<List<LabelWIthNotes>>{
-        return labelRepo.getNotesWithLabel(labelID)
-    }
 
     fun getNoteLabel( noteID : Long) : LiveData <Label> {
         return labelRepo.getNoteLabel(noteID)

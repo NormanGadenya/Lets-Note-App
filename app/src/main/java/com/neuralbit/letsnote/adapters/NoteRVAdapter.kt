@@ -104,7 +104,7 @@ class NoteRVAdapter (
                 var tagStr : String? = null
 
                 for (t in tagList.tags) {
-                    tagStr = "#" + t.tagTitle + " "
+                    tagStr = t.tagTitle + " "
                 }
                 if (tagStr!=null){
                     holder.tagsTV.text = tagStr

@@ -95,5 +95,4 @@ dependencies {
     })
     androidTestImplementation "androidx.test.ext:junit:$rootProject.androidxJunitVersion"
     implementation 'androidx.recyclerview:recyclerview-selection:1.0.0'
-    implementation 'com.teamwork.multiautocomplete:android-multiautocomplete:0.4.0'
 }

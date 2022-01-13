@@ -32,9 +32,9 @@ class AddTagDialog(val getTagFromDialog: GetTagFromDialog,val ctx: Context): App
             .setPositiveButton("ok"){_, _ ->
                 run {
                     var tagTitle = addTagET?.text.toString()
-                    if(tagTitle[0]=='#'){
-                        tagTitle= tagTitle.substring(1,tagTitle.length)
-                    }
+                    tagTitle = if(tagTitle[0]=='#'){
+                        tagTitle.substring(1,tagTitle.length)
+                    }else "#"+tagTitle.substring(1,tagTitle.length)
                     getTagFromDialog.getTag(Tag(tagTitle))
                 }
             }
