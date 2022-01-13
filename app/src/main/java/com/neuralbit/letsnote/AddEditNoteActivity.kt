@@ -20,7 +20,6 @@ import android.text.TextWatcher
 import android.text.format.DateFormat
 import android.util.Log
 import android.util.SparseArray
-import android.view.KeyEvent
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -50,7 +49,9 @@ import com.neuralbit.letsnote.utilities.*
 
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageView
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.util.*
 import kotlin.collections.ArrayList
@@ -400,10 +401,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
 
 
-                if (noteDescStr != null) {
-                    tagString = noteDescStr
-
-                }
+                if (noteDescStr != null) { tagString = noteDescStr }
             }
 
         }
@@ -483,7 +481,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         })
 
 
-        noteDescriptionEdit.setOnKeyListener { _, p1, _ ->
+        noteDescriptionEdit.setOnKeyListener { _, _, _ ->
             viewModal.noteChanged.value = true
             false
         }
@@ -508,42 +506,29 @@ class AddEditNoteActivity : AppCompatActivity() ,
         }
 
 
-
-
-
-        backButton.setOnClickListener {
-            goToMain()
-            
-        }
+        backButton.setOnClickListener { goToMain() }
 
         deleteButton.setOnClickListener {
-            if(noteType == "Edit"){
 
-                viewModal.removeArchive(ArchivedNote(noteID))
+            val alertDialog: AlertDialog? = this.let {
+                val builder = AlertDialog.Builder(this)
+                builder.apply {
+                    setPositiveButton("ok"
+                    ) { _, _ ->
+                        viewModal.deleted.value = true
+                        goToMain()
+                        }
 
-                viewModal.removePin(PinnedNote(noteID))
-
-                label?.let { viewModal.deleteNoteLabel(noteID) }
-
-                reminder?.let {
-                    cancelAlarm()
-                    viewModal.deleteReminder(noteID) }
-
-                for(tag in viewModal.tagList){
-                    viewModal.deleteNoteTagCrossRef(NoteTagCrossRef(noteID,tag.tagTitle))
-                }
-                viewModal.getNote(noteID).observe(this){
-                    if (it!=null){
-                        viewModal.deleteNote(it)
-
+                    setNegativeButton("cancel"
+                    ) { _, _ ->
                     }
+                    setTitle("Delete Note")
+
                 }
-
-
-                Toast.makeText(this,"Note deleted",Toast.LENGTH_SHORT).show()
-                viewModal.deleted.value = true
-                goToMain()
+                builder.create()
             }
+
+            alertDialog?.show()
 
         }
 
@@ -586,7 +571,10 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
         pinButton.setOnClickListener { pinOrUnPinNote() }
 
-        restoreButton.setOnClickListener { unArchiveNote() }
+        restoreButton.setOnClickListener {
+            unArchiveNote()
+            unDelete()
+        }
     }
 
     private fun checkCameraPermission() {
@@ -666,7 +654,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 val sparseArray = recognizer.detect(frame) as SparseArray<TextBlock>
                 val stringBuilder = StringBuilder()
                 for (i in 0 until sparseArray.size()){
-                    var textBlock = sparseArray.valueAt(i)
+                    val textBlock = sparseArray.valueAt(i)
                     stringBuilder.append(textBlock.value)
                     stringBuilder.append("\n")
                 }
@@ -701,16 +689,31 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
     private fun unArchiveNote(){
         viewModal.noteChanged.value = true
-
-        viewModal.archived.value = false
-        var snackbar = Snackbar.make(coordinatorlayout,"Note unarchived",Snackbar.LENGTH_LONG)
-        snackbar.setAction("UNDO"
-        ) {
-            viewModal.archived.value= true
-            snackbar = Snackbar.make(coordinatorlayout,"Note archived",Snackbar.LENGTH_SHORT)
+        if(viewModal.archived.value == true) {
+            viewModal.archived.value = false
+            var snackbar = Snackbar.make(coordinatorlayout, "Note unarchived", Snackbar.LENGTH_LONG)
+            snackbar.setAction(
+                "UNDO"
+            ) {
+                viewModal.archived.value = true
+                snackbar = Snackbar.make(coordinatorlayout, "Note archived", Snackbar.LENGTH_SHORT)
+            }
+            snackbar.show()
         }
-        snackbar.show()
-
+    }
+    private fun unDelete(){
+        viewModal.noteChanged.value = true
+        if(viewModal.deletedNote.value == true) {
+            viewModal.deletedNote.value = false
+            var snackbar = Snackbar.make(coordinatorlayout, "Note recovered", Snackbar.LENGTH_LONG)
+            snackbar.setAction(
+                "UNDO"
+            ) {
+                viewModal.deletedNote.value = true
+                snackbar = Snackbar.make(coordinatorlayout, "Note deleted", Snackbar.LENGTH_SHORT)
+            }
+            snackbar.show()
+        }
     }
 
     private fun initControllers(){
@@ -1069,15 +1072,18 @@ class AddEditNoteActivity : AppCompatActivity() ,
         val noteTitle = noteTitleEdit.text.toString()
         val noteDescription = noteDescriptionEdit.text.toString()
         val currentDate= cm.currentTimeToLong()
-        if(!deletable){
+
             if(textChanged){
                 if (noteTitle.isNotEmpty() || noteDescription.isNotEmpty()){
                     val note = Note(noteTitle,noteDescription,currentDate)
                     if(noteType == "Edit"){
                         note.noteID = noteID
                         viewModal.updateNote(note)
+
                         saveOtherEntities()
-                        Toast.makeText(this,"Note updated .. " , Toast.LENGTH_SHORT).show()
+                        if (!deletable){
+                            Toast.makeText(this,"Note updated .. " , Toast.LENGTH_SHORT).show()
+                        }
 
                     }else{
                         lifecycleScope.launch {
@@ -1086,9 +1092,11 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
                         }
 
+                        if(!deletable){
+                            Toast.makeText(this,"Note added .. " , Toast.LENGTH_SHORT).show()
 
-                        Toast.makeText(this,"Note added .. " , Toast.LENGTH_SHORT).show()
-                        
+                        }
+
                     }
 
 
@@ -1096,12 +1104,13 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
 
             }
-        }
-
     }
 
 
+
+
     private fun saveOtherEntities(){
+
         if (pinnedNote!=null){
             pinnedNote?.noteID = noteID
             if (notePinned){
@@ -1127,12 +1136,16 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 viewModal.removeArchive(archivedNote!!)
             }
         }
+
         if (reminder!=null){
             reminder?.noteID = noteID
 
             if (reminderNoteSet){
-                startAlarm()
-                viewModal.insertReminder(reminder!!)
+                if (!deletable){
+                    startAlarm()
+                    viewModal.insertReminder(reminder!!)
+                }
+
             }else{
                 viewModal.deleteReminder(noteID)
                 cancelAlarm()
@@ -1144,7 +1157,23 @@ class AddEditNoteActivity : AppCompatActivity() ,
             val crossRef = NoteTagCrossRef(noteID,tag.tagTitle)
             viewModal.insertNoteTagCrossRef(crossRef)
         }
+        if(deletable){
 
+            lifecycleScope.launch {
+                withContext(Dispatchers.IO) {
+                    viewModal.insertDeleted(DeletedNote(noteID))
+                }
+            }
+            Toast.makeText(this@AddEditNoteActivity,"Note Deleted",Toast.LENGTH_SHORT).show()
+
+        }else{
+            lifecycleScope.launch {
+                withContext(Dispatchers.IO) {
+                    viewModal.restoreDeleted(DeletedNote(noteID))
+                }
+            }
+
+        }
 
     }
 
