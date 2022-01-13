@@ -1,30 +1,62 @@
-<androidx.constraintlayout.widget.ConstraintLayout android:layout_width="match_parent"
-    android:layout_height="?attr/actionBarSize"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/infoContainer"
-    app:layout_constraintBottom_toBottomOf="parent"
-    xmlns:android="http://schemas.android.com/apk/res/android">
-    <ImageButton
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_margin="@dimen/margin"
-        android:foreground="@drawable/ic_baseline_keyboard_voice_24"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:id="@+id/sttButton"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
-    <ImageButton
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_margin="@dimen/margin"
-        android:foreground="@drawable/ic_baseline_document_scanner_24"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:id="@+id/ocrButton"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@id/sttButton"/>
+    android:layout_width="match_parent"
+    android:layout_height="?attr/actionBarSize"
+    app:layout_constraintBottom_toBottomOf="parent">
 
+    <ImageButton
+        android:id="@+id/sttButton"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_margin="@dimen/margin"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:foreground="@drawable/ic_baseline_keyboard_voice_24"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageButton
+        android:id="@+id/ocrButton"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_margin="@dimen/margin"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:foreground="@drawable/ic_baseline_document_scanner_24"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/sttButton" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:orientation="horizontal"
+        android:weightSum="2"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/addTagBtn"
+        app:layout_constraintStart_toEndOf="@+id/ocrButton">
+
+        <ImageButton
+            android:id="@+id/undoButton"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginEnd="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:foreground="@drawable/ic_baseline_undo_24"
+            android:visibility="visible"
+             />
+
+        <ImageButton
+            android:id="@+id/redoButton"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:foreground="@drawable/ic_baseline_redo_24"
+            android:visibility="visible"
+           />
+    </LinearLayout>
 
 
     <ImageButton
@@ -42,11 +74,11 @@
         android:id="@+id/labelBtn"
         android:layout_width="30dp"
         android:layout_height="30dp"
+        android:layout_margin="@dimen/margin"
         android:layout_marginTop="@dimen/margin"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:foreground="@drawable/ic_baseline_bookmark_add_24"
         android:visibility="visible"
-        android:layout_margin="@dimen/margin"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
