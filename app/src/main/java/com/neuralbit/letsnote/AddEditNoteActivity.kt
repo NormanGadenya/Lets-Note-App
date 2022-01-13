@@ -88,6 +88,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private lateinit var viewModal : NoteViewModel
     private lateinit var labelViewModel : LabelViewModel
     private var noteDescOrig : String? = null
+    var undoMode = false
     private lateinit var noteType : String
     private var deletable : Boolean = false
     private lateinit var tvTimeStamp : TextView
@@ -121,7 +122,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private var tagList = ArrayList<String>()
     private var pinnedNote : PinnedNote ? = null
     private var archivedNote : ArchivedNote ? = null
-    private var deletedNote : DeletedNote ? = null
     private var notePinned = false
     private var reminderNoteSet = false
     private var labelNoteSet = false
@@ -1019,7 +1019,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
             builder.apply {
                 setPositiveButton("ok"
                 ) { _, _ ->
-                    // User clicked OK button
                     if(noteDescriptionEdit.length() > 0 || noteTitleEdit.length() >0 ){
                         viewModal.noteChanged.value = true
 
@@ -1108,9 +1107,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                            noteID =  viewModal.addNote(note)
                             if (!deletable){
                                 saveOtherEntities()
-
                             }
-
 
                         }
 
