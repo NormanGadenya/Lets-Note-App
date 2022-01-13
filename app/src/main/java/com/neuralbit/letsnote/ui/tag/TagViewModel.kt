@@ -70,4 +70,7 @@ class TagViewModel (application: Application): AndroidViewModel(application) {
     fun removeArchive(archivedNote: ArchivedNote) = viewModelScope.launch(Dispatchers.IO){
         noteRepo.deleteArchive(archivedNote)
     }
+    fun getDeletedNote(noteID: Long):LiveData<DeletedNote> {
+        return noteRepo.getDeletedNote(noteID)
+    }
 }

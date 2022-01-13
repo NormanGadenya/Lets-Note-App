@@ -43,6 +43,8 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import com.neuralbit.letsnote.adapters.AddEditLabelAdapter
 import com.neuralbit.letsnote.adapters.LabelClickInterface
+import com.neuralbit.letsnote.databinding.ActivityAddEditNoteBinding
+import com.neuralbit.letsnote.databinding.FragmentAllNotesBinding
 import com.neuralbit.letsnote.entities.*
 import com.neuralbit.letsnote.ui.label.LabelViewModel
 import com.neuralbit.letsnote.utilities.*
@@ -75,6 +77,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private lateinit var ocrButton: ImageButton
     private lateinit var sttButton: ImageButton
     private lateinit var noteTitleEdit : EditText
+    private var _binding: ActivityAddEditNoteBinding? = null
+    private val binding get() = _binding!!
     private lateinit var noteDescriptionEdit : MultiAutoCompleteTextView
     private lateinit var addTagBtn : ImageButton
     private lateinit var delLabelBtn : ImageButton
@@ -130,6 +134,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
     override fun onCreate(savedInstanceState: Bundle?)  {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_edit_note)
+        _binding = ActivityAddEditNoteBinding.inflate(layoutInflater)
 
         initControllers()
 
@@ -718,6 +723,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
     private fun initControllers(){
         cm= Common()
+        noteTitleEdit = binding.noteEditTitle
         noteTitleEdit = findViewById(R.id.noteEditTitle)
         layoutManager = LinearLayoutManager(applicationContext,LinearLayoutManager.HORIZONTAL,false)
         calendar = Calendar.getInstance()
@@ -863,7 +869,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
             coordinatorlayout.getWindowVisibleDisplayFrame(r)
             val screenHeight =  coordinatorlayout.rootView.height
             val keypadHeight = screenHeight - r.bottom
-            if (keypadHeight > screenHeight * 0.15) { // 0.15 ratio is perhaps enough to determine keypad height.
+            if (keypadHeight > screenHeight * 0.15) {
                 if (!isKeyBoardShowing) {
                     isKeyBoardShowing = true
                 }

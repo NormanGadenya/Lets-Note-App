@@ -144,9 +144,7 @@ class NoteRVAdapter (
 
                         val noteCardColor = it.labelID
                         holder.noteCard.setBackgroundColor(noteCardColor)
-//                        holder.noteTitleTV.setTextColor(context.getColor(cm.getFontColor(noteCardColor)))
-//                        holder.noteTextTV.setTextColor(context.getColor(cm.getFontColor(noteCardColor)))
-//                        holder.reminderTV.setTextColor(context.getColor(cm.getFontColor(noteCardColor)))
+
                     }
 
                 }
@@ -154,8 +152,6 @@ class NoteRVAdapter (
                 labelViewModel?.getNoteLabel(noteID)?.observe(owner) {
                     val noteCardColor = context.getColor(it.labelID)
                     holder.noteCard.setBackgroundColor(noteCardColor)
-//                    holder.noteTitleTV.setTextColor(context.getColor(cm.getFontColor(noteCardColor)))
-//                    holder.noteTextTV.setTextColor(context.getColor(cm.getFontColor(noteCardColor)))
                 }
 
             }

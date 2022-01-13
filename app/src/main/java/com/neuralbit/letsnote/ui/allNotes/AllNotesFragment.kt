@@ -400,21 +400,21 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
         noteRVAdapter: NoteRVAdapter?
     ) {
         val note = allNotes[viewHolder.adapterPosition]
-//        allNotesViewModel.removeArchive(ArchivedNote(note.noteID))
-//
-//        allNotesViewModel.removePin(PinnedNote(note.noteID))
-//
-//        allNotesViewModel.deleteNoteLabel(note.noteID)
-//
-//        allNotesViewModel.deleteReminder(note.noteID)
+        allNotesViewModel.removeArchive(ArchivedNote(note.noteID))
+
+        allNotesViewModel.removePin(PinnedNote(note.noteID))
+
+        allNotesViewModel.deleteNoteLabel(note.noteID)
+
+        allNotesViewModel.deleteReminder(note.noteID)
         lifecycleScope.launch {
             allNotesViewModel.insertDeleted(DeletedNote(note.noteID))
 
-//            val allTags = allNotesViewModel.getTagsWithNote(note.noteID)
-//
-//            for (tag in allTags.first().tags) {
-//                allNotesViewModel.deleteNoteTagCrossRef(NoteTagCrossRef(note.noteID, tag.tagTitle))
-//            }
+            val allTags = allNotesViewModel.getTagsWithNote(note.noteID)
+
+            for (tag in allTags.first().tags) {
+                allNotesViewModel.deleteNoteTagCrossRef(NoteTagCrossRef(note.noteID, tag.tagTitle))
+            }
 //            allNotesViewModel.deleteNote(note)
             noteRVAdapter?.notifyItemRemoved(viewHolder.adapterPosition)
         }
@@ -425,19 +425,19 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
         noteRVAdapter: NoteRVAdapter?
     ) {
         val note = pinnedNotes[viewHolder.adapterPosition]
-//        allNotesViewModel.removeArchive(ArchivedNote(note.noteID))
-//
-//        allNotesViewModel.removePin(PinnedNote(note.noteID))
-//        allNotesViewModel.deleteNoteLabel(note.noteID)
-//        allNotesViewModel.deleteReminder(note.noteID)
+        allNotesViewModel.removeArchive(ArchivedNote(note.noteID))
+
+        allNotesViewModel.removePin(PinnedNote(note.noteID))
+        allNotesViewModel.deleteNoteLabel(note.noteID)
+        allNotesViewModel.deleteReminder(note.noteID)
         lifecycleScope.launch {
             allNotesViewModel.insertDeleted(DeletedNote(note.noteID))
 
-//            val allTags = allNotesViewModel.getTagsWithNote(note.noteID)
-//
-//            for (tag in allTags.first().tags) {
-//                allNotesViewModel.deleteNoteTagCrossRef(NoteTagCrossRef(note.noteID, tag.tagTitle))
-//            }
+            val allTags = allNotesViewModel.getTagsWithNote(note.noteID)
+
+            for (tag in allTags.first().tags) {
+                allNotesViewModel.deleteNoteTagCrossRef(NoteTagCrossRef(note.noteID, tag.tagTitle))
+            }
 //            allNotesViewModel.deleteNote(note)
             noteRVAdapter?.notifyItemRemoved(viewHolder.adapterPosition)
         }
