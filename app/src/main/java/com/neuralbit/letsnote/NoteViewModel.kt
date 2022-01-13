@@ -14,6 +14,7 @@ import kotlin.collections.ArrayList
 
 class NoteViewModel(application : Application) : AndroidViewModel(application) {
     var allNotes: LiveData<List<Note>>
+    var deletedNotes: LiveData<List<Note>>
     var allTags: LiveData<List<Tag>>
     val TAG = "NoteViewModel"
     private val noteRepo : NoteRepo
@@ -24,13 +25,13 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     var noteChanged = MutableLiveData<Boolean>()
     var deleted = MutableLiveData<Boolean>()
     var archived : MutableLiveData<Boolean>
+    var deletedNote : MutableLiveData<Boolean>
     var pinned : MutableLiveData<Boolean>
     var reminderSet : MutableLiveData<Boolean>
     var labelSet : MutableLiveData<Boolean>
     var searchQurery : MutableLiveData<String>
     var archivedNote : LiveData<List<Note>>
     var pinnedNotes : LiveData<List<Note>>
-
     var noteDescString : MutableLiveData<String>
     var newTagTyped : MutableLiveData<Boolean>
     var backPressed : MutableLiveData<Boolean>
@@ -51,6 +52,7 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         allNotes = noteRepo.allNotes
         archivedNote = noteRepo.archivedNotes
         pinnedNotes = noteRepo.pinnedNotes
+        deletedNotes = noteRepo.deletedNotes
         allTags = tagRepo.allTags
         searchQurery = MutableLiveData<String>()
         noteDescString = MutableLiveData()
@@ -59,6 +61,7 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         tagList = ArrayList<Tag>()
         pinned = MutableLiveData()
         archived = MutableLiveData()
+        deletedNote = MutableLiveData()
         reminderSet = MutableLiveData()
         labelSet = MutableLiveData()
         deleted = MutableLiveData()
@@ -93,6 +96,13 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     suspend fun addNote(note: Note) : Long{
         return noteRepo.insert(note)
     }
+    suspend fun insertDeleted(deletedNote: DeletedNote) {
+        return noteRepo.insertDeletedNote(deletedNote)
+    }
+    suspend fun restoreDeleted(deletedNote: DeletedNote) {
+        return noteRepo.restoreDeletedNote(deletedNote)
+    }
+
     fun archiveNote(archivedNote: ArchivedNote) = viewModelScope.launch(Dispatchers.IO){
         noteRepo.insertArchive(archivedNote)
     }
@@ -132,6 +142,9 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
 
     fun getArchivedNote(noteID: Long):LiveData<ArchivedNote> {
         return noteRepo.getArchivedNote(noteID)
+    }
+    fun getDeletedNote(noteID: Long):LiveData<DeletedNote> {
+        return noteRepo.getDeletedNote(noteID)
     }
 
     fun getPinnedNote(noteID: Long):LiveData<PinnedNote> {

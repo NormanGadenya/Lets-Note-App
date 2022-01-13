@@ -64,6 +64,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
     GetTagFromDialog,
     LabelClickInterface
 {
+    private var deleted: Boolean = false
     private lateinit var restoreButton: ImageButton
     private lateinit var archiveButton: ImageButton
     private lateinit var deleteButton: ImageButton
@@ -115,6 +116,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private var tagList = ArrayList<String>()
     private var pinnedNote : PinnedNote ? = null
     private var archivedNote : ArchivedNote ? = null
+    private var deletedNote : DeletedNote ? = null
     private var notePinned = false
     private var reminderNoteSet = false
     private var labelNoteSet = false
@@ -162,6 +164,10 @@ class AddEditNoteActivity : AppCompatActivity() ,
             viewModal.archived.value = it!=null
             archivedNote = it
 
+        }
+
+        viewModal.getDeletedNote(noteID).observe(this){
+            viewModal.deletedNote.value = it!=null
         }
 
         viewModal.allTags.observe(lifecycleOwner){
@@ -302,6 +308,20 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 restoreButton.visibility = GONE
             }
         }
+        viewModal.deletedNote.observe(lifecycleOwner){
+            deleted = it
+            if (it) {
+                pinButton.visibility = GONE
+                archiveButton.visibility = GONE
+                alertButton.visibility = GONE
+                restoreButton.visibility = VISIBLE
+            } else {
+                pinButton.visibility = VISIBLE
+                archiveButton.visibility = VISIBLE
+                alertButton.visibility = VISIBLE
+                restoreButton.visibility = GONE
+            }
+        }
 
         alertButton.setOnClickListener {
             if (reminder==null){
@@ -377,40 +397,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
                     }
                 }
-//                viewModal.allTags.observe(this) {
-//
-//                    val adapter: AutoCompleteTypeAdapter<Tag> =
-//                        AutoCompleteTypeAdapter.Build.from(TagViewBinder(), TagTokenFilter())
-//                    it?.let { adapter.setItems(it) }
-//                    val multiAutoComplete = MultiAutoComplete.Builder()
-//                        .tokenizer(PrefixTokenizer('#'))
-//                        .addTypeAdapter(adapter)
-//                        .build()
-//                    multiAutoComplete.onViewAttached(noteDescriptionEdit)
-//
-//                    if (noteDescStr.isNotEmpty()) {
-//                        if (noteDescStr.length >= 2) {
-//
-//                            if (noteDescStr[noteDescStr.length - 1] == ' ') {
-//                                val tagString = noteDescStr.substring(0,noteDescStr.length -1)
-//                                var tag : Tag  = if(tagString.contains('#')){
-//                                    Tag(noteDescStr.substring(0, noteDescStr.length - 1))
-//                                }else{
-//                                    Tag("#" +noteDescStr.substring(0, noteDescStr.length - 1))
-//
-//                                }
-//                                if (tag !in it) {
-//                                    viewModal.addTag(tag)
-//                                }
-//                                viewModal.addTagToList(tag)
-//                                tagListAdapter.updateList(viewModal.tagList)
-//                            }
-//
-//                        }
-//                    }
-//
-//
-//                }
+
 
 
                 if (noteDescStr != null) {

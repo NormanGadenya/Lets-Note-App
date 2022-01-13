@@ -63,7 +63,6 @@ class NoteRVAdapter (
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        Log.d(TAG, "onBindViewHolder: $allNotes")
         var title = allNotes[position].title
         var desc = allNotes[position].description
         val cm = Common()
@@ -85,14 +84,7 @@ class NoteRVAdapter (
 
         }
         
-        holder.itemView.setOnLongClickListener {
-            holder.itemView.setOnDragListener { view, dragEvent ->
-                Log.d(TAG, "onBindViewHolder: $allNotes")
-                return@setOnDragListener true
-            }
 
-            return@setOnLongClickListener true
-        }
         lifecycleScope?.launch {
             if (viewModel!=null){
                 val tagList = viewModel?.getTagsWithNote(noteID)?.last()
@@ -198,6 +190,7 @@ class NoteRVAdapter (
     fun updateList( newList: List<Note>){
         allNotes.clear()
         allNotes.addAll(newList)
+
         notifyDataSetChanged()
     }
     fun undoDelete( swipedNote: Note,oldPosition : Int){

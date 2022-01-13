@@ -20,6 +20,10 @@
             android:id="@+id/nav_labels"
             android:icon="@drawable/ic_baseline_bookmark_24"
             android:title="@string/labels"/>
+        <item
+            android:id="@+id/nav_deleted"
+            android:icon="@drawable/ic_baseline_delete_24"
+            android:title="@string/trash"/>
 
     </group>
 </menu>
