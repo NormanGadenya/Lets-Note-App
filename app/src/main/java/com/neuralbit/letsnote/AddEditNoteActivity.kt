@@ -81,6 +81,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private var noteID : Long= -1
     private lateinit var viewModal : NoteViewModel
     private lateinit var labelViewModel : LabelViewModel
+    private var noteDescOrig : String? = null
     private lateinit var noteType : String
     private var deletable : Boolean = false
     private lateinit var tvTimeStamp : TextView
@@ -446,7 +447,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
         noteDescriptionEdit.addTextChangedListener(object : TextWatcher{
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-
+                Log.d(TAG, "beforeTextChanged: $p0")
             }
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
@@ -508,6 +509,12 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
         viewModal.noteChanged.observe(this) {
             textChanged = it
+            if(it){
+                tvTimeStamp.visibility = GONE
+            }else{
+                tvTimeStamp.visibility = VISIBLE
+
+            }
         }
         viewModal.deleted.observe(this) {
             deletable = it
