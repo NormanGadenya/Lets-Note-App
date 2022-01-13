@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Lets note</string>
     <string name="timeStamp"> Edited on %1$s at %2$s</string>
+    <string name="deletedTime"> Deleted on %1$s at %2$s</string>
     <string name="noteTagCountSingle"> %1$s Note</string>
     <string name="noteTagCountMultiple"> %1$s Notes</string>
     <string name="reminder">Reminder set on %1$s at %2$s</string>

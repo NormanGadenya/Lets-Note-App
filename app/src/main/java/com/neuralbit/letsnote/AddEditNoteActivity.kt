@@ -306,6 +306,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 pinButton.visibility = GONE
                 archiveButton.visibility = GONE
                 alertButton.visibility = GONE
+
                 restoreButton.visibility = VISIBLE
             } else {
                 pinButton.visibility = VISIBLE
@@ -315,8 +316,16 @@ class AddEditNoteActivity : AppCompatActivity() ,
             }
         }
         viewModal.deletedNote.observe(lifecycleOwner){
+
             deleted = it
             if (it) {
+                if(noteType=="Edit"){
+                    viewModal.getNote(noteID).observe(this){ note ->
+                        tvTimeStamp.text= getString(R.string.deletedTime,cm.convertLongToTime(note.timeStamp)[0],cm.convertLongToTime(note.timeStamp)[1])
+
+                    }
+
+                }
                 pinButton.visibility = GONE
                 archiveButton.visibility = GONE
                 alertButton.visibility = GONE
@@ -521,6 +530,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                     setPositiveButton("ok"
                     ) { _, _ ->
                         viewModal.deleted.value = true
+                        viewModal.noteChanged.value = true
                         goToMain()
                         }
 
@@ -1081,26 +1091,49 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
             if(textChanged){
                 if (noteTitle.isNotEmpty() || noteDescription.isNotEmpty()){
+
                     val note = Note(noteTitle,noteDescription,currentDate)
                     if(noteType == "Edit"){
                         note.noteID = noteID
                         viewModal.updateNote(note)
 
-                        saveOtherEntities()
                         if (!deletable){
+                            saveOtherEntities()
+
                             Toast.makeText(this,"Note updated .. " , Toast.LENGTH_SHORT).show()
                         }
 
                     }else{
                         lifecycleScope.launch {
                            noteID =  viewModal.addNote(note)
-                            saveOtherEntities()
+                            if (!deletable){
+                                saveOtherEntities()
+
+                            }
+
 
                         }
 
                         if(!deletable){
                             Toast.makeText(this,"Note added .. " , Toast.LENGTH_SHORT).show()
 
+                        }
+
+                    }
+                    if(deletable){
+
+                        lifecycleScope.launch {
+                            withContext(Dispatchers.IO) {
+                                viewModal.insertDeleted(DeletedNote(noteID))
+                            }
+                        }
+                        Toast.makeText(this@AddEditNoteActivity,"Note Deleted",Toast.LENGTH_SHORT).show()
+
+                    }else{
+                        lifecycleScope.launch {
+                            withContext(Dispatchers.IO) {
+                                viewModal.restoreDeleted(DeletedNote(noteID))
+                            }
                         }
 
                     }
@@ -1163,23 +1196,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
             val crossRef = NoteTagCrossRef(noteID,tag.tagTitle)
             viewModal.insertNoteTagCrossRef(crossRef)
         }
-        if(deletable){
 
-            lifecycleScope.launch {
-                withContext(Dispatchers.IO) {
-                    viewModal.insertDeleted(DeletedNote(noteID))
-                }
-            }
-            Toast.makeText(this@AddEditNoteActivity,"Note Deleted",Toast.LENGTH_SHORT).show()
-
-        }else{
-            lifecycleScope.launch {
-                withContext(Dispatchers.IO) {
-                    viewModal.restoreDeleted(DeletedNote(noteID))
-                }
-            }
-
-        }
 
     }
 
