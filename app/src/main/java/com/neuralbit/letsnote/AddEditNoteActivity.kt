@@ -81,8 +81,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private lateinit var undoButton: ImageButton
     private lateinit var redoButton: ImageButton
     private lateinit var noteTitleEdit : EditText
-    private var _binding: ActivityAddEditNoteBinding? = null
-    private val binding get() = _binding!!
     private lateinit var noteDescriptionEdit : MultiAutoCompleteTextView
     private lateinit var addTagBtn : ImageButton
     private lateinit var delLabelBtn : ImageButton
@@ -96,7 +94,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private var noteDescNew : String? = null
     private var noteDescNewList : List<String> ? = null
 
-    var undoMode = false
     private lateinit var noteType : String
     private var deletable : Boolean = false
     private lateinit var tvTimeStamp : TextView
@@ -142,7 +139,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
     override fun onCreate(savedInstanceState: Bundle?)  {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_edit_note)
-        _binding = ActivityAddEditNoteBinding.inflate(layoutInflater)
 
         initControllers()
 
@@ -202,7 +198,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
             addTagDialog.show(supportFragmentManager,"addTagDialog")
 
         }
-
+        //TODO fix archivedNotes Bug
         when (noteType) {
             "Edit" -> {
                 viewModal.getNote(noteID).observe(this){
@@ -215,6 +211,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                         noteTitleEdit.setText(noteTitle)
                         noteDescriptionEdit.setText(noteDesc)
                         if(archived) {
+                            tvTimeStamp.text= getString(R.string.archivedTime,cm.convertLongToTime(noteTimeStamp)[0],cm.convertLongToTime(noteTimeStamp)[1])
 
                             pinButton.visibility = GONE
                             archiveButton.visibility = GONE
@@ -803,7 +800,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
     private fun initControllers(){
         cm= Common()
-        noteTitleEdit = binding.noteEditTitle
         noteTitleEdit = findViewById(R.id.noteEditTitle)
         layoutManager = LinearLayoutManager(applicationContext,LinearLayoutManager.HORIZONTAL,false)
         calendar = Calendar.getInstance()
