@@ -215,8 +215,15 @@ class AddEditNoteActivity : AppCompatActivity() ,
                         noteTitleEdit.setText(noteTitle)
                         noteDescriptionEdit.setText(noteDesc)
                         if(archived) {
+
+                            pinButton.visibility = GONE
                             archiveButton.visibility = GONE
+                            alertButton.visibility = GONE
                             restoreButton.visibility = VISIBLE
+                            noteDescriptionEdit.isEnabled = false
+                            noteTitleEdit.isEnabled = false
+                            infoContainer.visibility = GONE
+
                         }
                         lifecycleScope.launch {
                             for (tag in viewModal.getTagsWithNote(noteID).last().tags){
@@ -308,21 +315,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
             }
         }
 
-        viewModal.archived.observe(lifecycleOwner){
-            archived = it
-            if (it) {
-                pinButton.visibility = GONE
-                archiveButton.visibility = GONE
-                alertButton.visibility = GONE
-
-                restoreButton.visibility = VISIBLE
-            } else {
-                pinButton.visibility = VISIBLE
-                archiveButton.visibility = VISIBLE
-                alertButton.visibility = VISIBLE
-                restoreButton.visibility = GONE
-            }
-        }
         viewModal.deletedNote.observe(lifecycleOwner){
 
             deleted = it
@@ -338,12 +330,44 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 archiveButton.visibility = GONE
                 alertButton.visibility = GONE
                 restoreButton.visibility = VISIBLE
+                noteDescriptionEdit.isEnabled = false
+                noteTitleEdit.isEnabled = false
+                infoContainer.visibility = GONE
             } else {
                 pinButton.visibility = VISIBLE
                 archiveButton.visibility = VISIBLE
                 alertButton.visibility = VISIBLE
                 restoreButton.visibility = GONE
+                infoContainer.visibility = VISIBLE
+                noteDescriptionEdit.isEnabled = true
+                noteTitleEdit.isEnabled = true
+
             }
+        }
+        viewModal.archived.observe(lifecycleOwner){
+            archived = it
+
+//            if (it) {
+//                Log.d(TAG, "onCreate: Archived $it")
+//
+//                pinButton.visibility = GONE
+//                archiveButton.visibility = GONE
+//                alertButton.visibility = GONE
+//                restoreButton.visibility = VISIBLE
+//                noteDescriptionEdit.isEnabled = false
+//                noteTitleEdit.isEnabled = false
+//                infoContainer.visibility = GONE
+//            } else {
+//                pinButton.visibility = VISIBLE
+//                archiveButton.visibility = VISIBLE
+//                alertButton.visibility = VISIBLE
+//                restoreButton.visibility = GONE
+//                infoContainer.visibility = VISIBLE
+//                noteDescriptionEdit.isEnabled = true
+//                noteTitleEdit.isEnabled = true
+//
+//            }
+
         }
 
         alertButton.setOnClickListener {
@@ -479,7 +503,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
         noteDescriptionEdit.addTextChangedListener(object : TextWatcher{
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                if (!backPressed) {
+
+                if (!backPressed ) {
                     noteDescOrigList.clear()
                     noteDescOrig = p0?.toString()
                     noteDescOrig?.split(" ")?.let { noteDescOrigList.addAll(it) }
@@ -1143,7 +1168,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                         note.noteID = noteID
                         viewModal.updateNote(note)
 
-                        if (!deletable){
+                        if (!deletable || !archived){
                             saveOtherEntities()
 
                             Toast.makeText(this,"Note updated .. " , Toast.LENGTH_SHORT).show()
