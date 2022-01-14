@@ -36,6 +36,7 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     var newTagTyped : MutableLiveData<Boolean>
     var backPressed : MutableLiveData<Boolean>
     var tagList : ArrayList<Tag>
+    var undoMode : MutableLiveData<Boolean>
 
     init{
 
@@ -65,6 +66,7 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         reminderSet = MutableLiveData()
         labelSet = MutableLiveData()
         deleted = MutableLiveData()
+        undoMode = MutableLiveData()
 
     }
 

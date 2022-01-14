@@ -11,6 +11,7 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Rect
+import android.inputmethodservice.Keyboard
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -20,6 +21,7 @@ import android.text.TextWatcher
 import android.text.format.DateFormat
 import android.util.Log
 import android.util.SparseArray
+import android.view.KeyEvent
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -76,6 +78,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private lateinit var alertButton: ImageButton
     private lateinit var ocrButton: ImageButton
     private lateinit var sttButton: ImageButton
+    private lateinit var undoButton: ImageButton
+    private lateinit var redoButton: ImageButton
     private lateinit var noteTitleEdit : EditText
     private var _binding: ActivityAddEditNoteBinding? = null
     private val binding get() = _binding!!
@@ -88,6 +92,10 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private lateinit var viewModal : NoteViewModel
     private lateinit var labelViewModel : LabelViewModel
     private var noteDescOrig : String? = null
+    private var noteDescOrigList = ArrayList<String>()
+    private var noteDescNew : String? = null
+    private var noteDescNewList : List<String> ? = null
+
     var undoMode = false
     private lateinit var noteType : String
     private var deletable : Boolean = false
@@ -349,7 +357,9 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 reminder = null
             }
         }
+        
         val tagListStr = ArrayList<String>()
+        
         viewModal.allTags.observe(this){
             tagListStr.clear()
             for (tag in it){
@@ -358,12 +368,14 @@ class AddEditNoteActivity : AppCompatActivity() ,
             val adapter = ArrayAdapter(applicationContext,android.R.layout.simple_dropdown_item_1line,tagListStr)
             noteDescriptionEdit.setAdapter(adapter)
             noteDescriptionEdit.setTokenizer(SpaceTokenizer())
-            noteDescriptionEdit.setOnItemClickListener { adapterView, view, i, l ->
-            }
+            
         }
 
 
-        viewModal.backPressed.observe(this) { backPressed = it }
+        viewModal.backPressed.observe(this) { 
+            backPressed = it 
+            viewModal.undoMode.value = it
+        }   
 
 
         viewModal.newTagTyped.observe(this){
@@ -424,7 +436,28 @@ class AddEditNoteActivity : AppCompatActivity() ,
         labelBtn.setOnClickListener {
             showLabelBottomSheetDialog()
         }
+        undoButton.setOnClickListener {
+            noteDescNew = noteDescriptionEdit.text.toString()
+            noteDescriptionEdit.setText(noteDescOrig)
+            viewModal.undoMode.value = false
+            redoButton.isEnabled = true
 
+        }
+        viewModal.undoMode.value = false
+        viewModal.undoMode.observe(lifecycleOwner){
+            if (it){
+                undoButton.isEnabled = true
+                redoButton.isEnabled = false
+            }else{
+                undoButton.isEnabled = false
+                redoButton.isEnabled = false
+            }
+        }
+        redoButton.setOnClickListener {
+            noteDescriptionEdit.setText(noteDescNew)
+            redoButton.isEnabled = false
+            undoButton.isEnabled = true
+        }
         noteTitleEdit.addTextChangedListener(object : TextWatcher{
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
@@ -446,42 +479,18 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
         noteDescriptionEdit.addTextChangedListener(object : TextWatcher{
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                Log.d(TAG, "beforeTextChanged: $p0")
+                if (!backPressed) {
+                    noteDescOrigList.clear()
+                    noteDescOrig = p0?.toString()
+                    noteDescOrig?.split(" ")?.let { noteDescOrigList.addAll(it) }
+                }
+
             }
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 if(p0?.length!! > 0){
 
-                    val noteContent = noteDescriptionEdit.text
-                    val noteContentSplit = noteContent.split("\n")
-                    var lineIndex = 0
-                    if (noteContentSplit.size>2){
-                        lineIndex = noteContentSplit.lastIndex-1
-                    }
-
-                    if (noteContentSplit.size > 1){
-
-                        if(noteContentSplit.isNotEmpty()){
-                                val prefix = listOf(" ","->","-","+","*",">")
-                                for (p in prefix){
-                                    if (!backPressed){
-                                        addBulletin(noteContentSplit,lineIndex,noteContent, p)
-
-                                    }
-                                }
-                                if (noteContentSplit[lineIndex].endsWith(":")) {
-                                    if (noteContent.endsWith("\n")) {
-                                        if (!backPressed){
-                                            noteDescriptionEdit.append("-> ")
-
-                                        }
-                                    }
-                                }
-
-
-                            }
-
-                    }
+                    noteListBullet()
 
                     getTagFromString(p0,p3)
 
@@ -495,8 +504,11 @@ class AddEditNoteActivity : AppCompatActivity() ,
         })
 
 
-        noteDescriptionEdit.setOnKeyListener { _, _, _ ->
+        noteDescriptionEdit.setOnKeyListener { _, key, _ ->
             viewModal.noteChanged.value = true
+            viewModal.backPressed.value = key == KeyEvent.KEYCODE_DEL
+//            viewModal.undoMode.value = true
+
             false
         }
 
@@ -589,6 +601,39 @@ class AddEditNoteActivity : AppCompatActivity() ,
         restoreButton.setOnClickListener {
             unArchiveNote()
             unDelete()
+        }
+    }
+
+    private fun noteListBullet() {
+        val noteContent = noteDescriptionEdit.text
+        val noteContentSplit = noteContent.split("\n")
+        var lineIndex = 0
+        if (noteContentSplit.size > 2) {
+            lineIndex = noteContentSplit.lastIndex - 1
+        }
+
+        if (noteContentSplit.size > 1) {
+
+            if (noteContentSplit.isNotEmpty()) {
+                val prefix = listOf(" ", "->", "-", "+", "*", ">")
+                for (p in prefix) {
+                    if (!backPressed) {
+                        addBulletin(noteContentSplit, lineIndex, noteContent, p)
+
+                    }
+                }
+                if (noteContentSplit[lineIndex].endsWith(":")) {
+                    if (noteContent.endsWith("\n")) {
+                        if (!backPressed) {
+                            noteDescriptionEdit.append("-> ")
+
+                        }
+                    }
+                }
+
+
+            }
+
         }
     }
 
@@ -754,6 +799,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
         restoreButton = findViewById(R.id.restoreButton)
         ocrButton = findViewById(R.id.ocrButton)
         sttButton = findViewById(R.id.sttButton)
+        undoButton = findViewById(R.id.undoButton)
+        redoButton = findViewById(R.id.redoButton)
         infoContainer = findViewById(R.id.infoContainer)
         alertBottomSheet =  BottomSheetDialog(this)
         labelBottomSheet = BottomSheetDialog(this)
