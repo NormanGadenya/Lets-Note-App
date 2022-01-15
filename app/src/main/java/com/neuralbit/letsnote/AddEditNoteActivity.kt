@@ -51,8 +51,6 @@ import com.neuralbit.letsnote.entities.*
 import com.neuralbit.letsnote.ui.label.LabelViewModel
 import com.neuralbit.letsnote.utilities.*
 
-import com.theartofdev.edmodo.cropper.CropImage
-import com.theartofdev.edmodo.cropper.CropImageView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -590,7 +588,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 requestCameraPermission()
 
             } else {
-                CropImage.activity().setGuidelines(CropImageView.Guidelines.ON).start(this@AddEditNoteActivity)
 
             }
         }
@@ -672,19 +669,19 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE){
-            val result = CropImage.getActivityResult(data)
-            if(resultCode == RESULT_OK){
-                val resultUri : Uri = result.uri
-                try {
-                    bitmap = MediaStore.Images.Media.getBitmap(contentResolver,resultUri)
-                    recognizeText()
-                }catch (e : IOException){
-                    e.printStackTrace()
-                }
-            }
-        }
-        else if (requestCode == REQUEST_CODE_SPEECH_INPUT) {
+//        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE){
+//            val result = CropImage.getActivityResult(data)
+//            if(resultCode == RESULT_OK){
+//                val resultUri : Uri = result.uri
+//                try {
+//                    bitmap = MediaStore.Images.Media.getBitmap(contentResolver,resultUri)
+//                    recognizeText()
+//                }catch (e : IOException){
+//                    e.printStackTrace()
+//                }
+//            }
+//        }
+        if (requestCode == REQUEST_CODE_SPEECH_INPUT) {
             if (resultCode == RESULT_OK && data != null) {
                 val result: ArrayList<String> = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)!!
                 val noteDesc = result[0]
@@ -708,9 +705,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 .setPositiveButton(
                     "ok"
                 ) { _: DialogInterface?, _: Int ->
-                    ActivityCompat.requestPermissions(
-                        this@AddEditNoteActivity, arrayOf(Manifest.permission.CAMERA), REQUEST_CAMERA_CODE)
-                    CropImage.activity().setGuidelines(CropImageView.Guidelines.ON).start(this@AddEditNoteActivity)
+                    ActivityCompat.requestPermissions(this@AddEditNoteActivity, arrayOf(Manifest.permission.CAMERA), REQUEST_CAMERA_CODE)
 
                 }
                 .setNegativeButton(

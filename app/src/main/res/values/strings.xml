@@ -22,7 +22,6 @@
     <string name="menu_archived">Archived Notes</string>
     <string name="menu_tag">Tags</string>
     <string name="menu_label">Labels</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="search">search</string>
     <string name="pinned_notes">Pinned Notes</string>
@@ -33,4 +32,8 @@
     <string name="labels">Labels</string>
     <string name="note_content">Note content</string>
     <string name="trash">Trash</string>
+    <string name="dbFileLoc">/data/data/com.neuralbit.letsnote/databases/letsNoteDB1</string>
+    <string name="databaseLoc">/data/data/com.neuralbit.letsnote/databases</string>
+    <string name="dbShmFileLoc">/data/data/com.neuralbit.letsnote/databases/letsNoteDB1-shm</string>
+    <string name="dbWalFileLoc">/data/data/com.neuralbit.letsnote/databases/letsNoteDB1-wal</string>
 </resources>
