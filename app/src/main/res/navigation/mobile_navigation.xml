@@ -32,4 +32,9 @@
         android:name="com.neuralbit.letsnote.ui.deletedNotes.DeletedNotes"
         android:label="@string/trash"
         tools:layout="@layout/deleted_notes_fragment" />
+    <fragment
+        android:id="@+id/nav_settings"
+        android:name="com.neuralbit.letsnote.ui.SettingsFragment"
+        android:label="settings_fragment"
+        tools:layout="@layout/settings_fragment" />
 </navigation>

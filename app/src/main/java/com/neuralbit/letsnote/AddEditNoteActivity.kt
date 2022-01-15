@@ -588,7 +588,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 requestCameraPermission()
 
             } else {
-
+                //TODO FIX OCR FUNCTION
             }
         }
 

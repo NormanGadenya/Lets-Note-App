@@ -40,7 +40,6 @@ class MainActivity : AppCompatActivity() {
     private val archivedViewModel : ArchivedViewModel by viewModels()
     private val tagViewModel : TagViewModel by viewModels()
     private lateinit var mAuth: FirebaseAuth
-    private lateinit var mStorageReference : StorageReference
     var firebaseUserID : String? = null
 
 
@@ -64,7 +63,7 @@ class MainActivity : AppCompatActivity() {
 
         appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.nav_home, R.id.nav_arch , R.id.nav_tags ,R.id.nav_labels , R.id.nav_deleted
+                R.id.nav_home, R.id.nav_arch , R.id.nav_tags ,R.id.nav_labels , R.id.nav_deleted , R.id.nav_settings
             ), drawerLayout
         )
 
@@ -74,39 +73,23 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(this, DatabaseBackUp::class.java)
-        intent.putExtra("fUserID",firebaseUserID)
-        val c = Calendar.getInstance()
-//        c[Calendar.HOUR_OF_DAY] = 3
-        val pendingIntent = PendingIntent.getBroadcast(this, 100, intent, PendingIntent.FLAG_UPDATE_CURRENT)
-        alarmManager.setRepeating(AlarmManager.RTC,c.timeInMillis,AlarmManager.INTERVAL_FIFTEEN_MINUTES,pendingIntent)
-//        if (firebaseUser != null){
-//            val dbPath = resources.getString(R.string.dbFileLoc)
-//            val dbPathShm = resources.getString(R.string.dbShmFileLoc)
-//            val dbPathWal = resources.getString(R.string.dbWalFileLoc)
-//
-//            val dbFile: Uri = Uri.fromFile(File(dbPath))
-//            val dbShmFile = Uri.fromFile(File(dbPathShm))
-//            val dbWalFile = Uri.fromFile(File(dbPathWal))
-//            val firebaseStorage = FirebaseStorage.getInstance()
-//            mStorageReference = firebaseUser?.let { firebaseStorage.reference.child(it) }!!
-//
-//            val dbFileRef = mStorageReference.child("letsNoteDB1")
-//            val dbShmFileRef = mStorageReference.child("letsNoteDB1-shm")
-//            val dbWalFileRef = mStorageReference.child("letsNoteDB1-wal")
-//            dbFileRef.putFile(dbFile).addOnProgressListener{
-//                Log.d(TAG, "onCreate: ${it.bytesTransferred}")
-//            }
-//            dbShmFileRef.putFile(dbShmFile).addOnProgressListener{
-//                Log.d(TAG, "onCreate: ${it.bytesTransferred}")
-//            }
-//            dbWalFileRef.putFile(dbWalFile).addOnProgressListener{
-//                Log.d(TAG, "onCreate: ${it.bytesTransferred}")
-//            }
-//        }
+        if (firebaseUserID!=null) {
+            val sharedPref = getSharedPreferences("Settings", MODE_PRIVATE)
+            val backupTime = sharedPref.getInt("backupTime",3)
+            val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            val intent = Intent(this, DatabaseBackUp::class.java)
+            intent.putExtra("fUserID", firebaseUserID)
+            val c = Calendar.getInstance()
+            c[Calendar.HOUR_OF_DAY] = backupTime
+            val pendingIntent = PendingIntent.getBroadcast(this, 100, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+            alarmManager.setRepeating(
+                AlarmManager.RTC,
+                c.timeInMillis,
+                AlarmManager.INTERVAL_DAY,
+                pendingIntent
+            )
 
-
+        }
     }
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
 

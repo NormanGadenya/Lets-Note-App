@@ -42,6 +42,10 @@ class SignInActivity : AppCompatActivity() {
 
         createRequest()
         findViewById<View>(R.id.signInWithGoogleBtn).setOnClickListener { signIn() }
+        findViewById<View>(R.id.skipBtn).setOnClickListener {
+            val intent = Intent(this@SignInActivity,MainActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     private fun createRequest() {
