@@ -24,6 +24,7 @@ class SignInActivity : AppCompatActivity() {
     private var firebaseUser : FirebaseUser? = null
     private var TAG = "SIGNUPACTIVITY"
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mAuth = FirebaseAuth.getInstance()
@@ -37,6 +38,7 @@ class SignInActivity : AppCompatActivity() {
             WindowManager.LayoutParams.FLAG_FULLSCREEN,
             WindowManager.LayoutParams.FLAG_FULLSCREEN
         )
+        window.statusBarColor = getColor(R.color.gunmetal)
 
         setContentView(R.layout.activity_sign_in)
 

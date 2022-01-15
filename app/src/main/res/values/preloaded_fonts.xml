@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="preloaded_fonts" translatable="false">
+        <item>@font/abeezee</item>
+        <item>@font/adamina</item>
+        <item>@font/architects_daughter</item>
+        <item>@font/belleza</item>
+        <item>@font/fira_sans_thin</item>
+    </array>
+</resources>
