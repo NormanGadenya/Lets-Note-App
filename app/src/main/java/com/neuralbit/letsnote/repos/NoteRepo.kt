@@ -1,11 +1,8 @@
 package com.neuralbit.letsnote.repos
 
 import androidx.lifecycle.LiveData
-import com.neuralbit.letsnote.entities.ArchivedNote
 import com.neuralbit.letsnote.daos.NotesDao
-import com.neuralbit.letsnote.entities.DeletedNote
-import com.neuralbit.letsnote.entities.Note
-import com.neuralbit.letsnote.entities.PinnedNote
+import com.neuralbit.letsnote.entities.*
 
 class NoteRepo(
     private val notesDao : NotesDao
@@ -26,6 +23,19 @@ class NoteRepo(
 
     suspend fun update(note: Note){
         notesDao.update(note)
+    }
+
+    suspend fun  insertTodo(todoItem: TodoItem) {
+        return notesDao.insertTodo(todoItem)
+    }
+
+
+    suspend fun deleteTodo(todoItem: TodoItem){
+        notesDao.deleteTodo(todoItem)
+    }
+
+    suspend fun updateTodo(todoItem: TodoItem){
+        notesDao.updateTodo(todoItem)
     }
 
     suspend fun insertDeletedNote (noteID: DeletedNote){

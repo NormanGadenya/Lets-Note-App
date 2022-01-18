@@ -9,6 +9,7 @@ interface NotesDao {
     @Insert(onConflict= OnConflictStrategy.REPLACE )
     suspend fun insert(note: Note) : Long
 
+
     @Update
     suspend fun update(note: Note)
 
@@ -17,6 +18,15 @@ interface NotesDao {
 
     @Insert(onConflict= OnConflictStrategy.REPLACE )
     suspend fun insertArchive(noteId : ArchivedNote)
+
+    @Insert(onConflict= OnConflictStrategy.REPLACE )
+    suspend fun insertTodo(todoItems : TodoItem)
+
+    @Update
+    suspend fun updateTodo(todoItems : TodoItem)
+
+    @Delete
+    suspend fun deleteTodo(todoItems : TodoItem)
 
     @Delete
     suspend fun deleteArchive(noteId : ArchivedNote)

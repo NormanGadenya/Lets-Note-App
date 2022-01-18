@@ -1,11 +1,8 @@
 package com.neuralbit.letsnote
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.*
 import com.neuralbit.letsnote.entities.*
-import com.neuralbit.letsnote.relationships.LabelWIthNotes
-import com.neuralbit.letsnote.relationships.NotesWithTag
 import com.neuralbit.letsnote.relationships.TagsWithNote
 import com.neuralbit.letsnote.repos.*
 import kotlinx.coroutines.Dispatchers
@@ -29,7 +26,7 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     var pinned : MutableLiveData<Boolean>
     var reminderSet : MutableLiveData<Boolean>
     var labelSet : MutableLiveData<Boolean>
-    var searchQurery : MutableLiveData<String>
+    var searchQuery : MutableLiveData<String>
     var archivedNote : LiveData<List<Note>>
     var pinnedNotes : LiveData<List<Note>>
     var noteDescString : MutableLiveData<String>
@@ -55,11 +52,11 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         pinnedNotes = noteRepo.pinnedNotes
         deletedNotes = noteRepo.deletedNotes
         allTags = tagRepo.allTags
-        searchQurery = MutableLiveData<String>()
+        searchQuery = MutableLiveData<String>()
         noteDescString = MutableLiveData()
         newTagTyped = MutableLiveData()
         backPressed = MutableLiveData()
-        tagList = ArrayList<Tag>()
+        tagList = ArrayList()
         pinned = MutableLiveData()
         archived = MutableLiveData()
         deletedNote = MutableLiveData()
@@ -97,6 +94,15 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     }
     suspend fun addNote(note: Note) : Long{
         return noteRepo.insert(note)
+    }
+    fun updateTodoItem(todoItem: TodoItem)= viewModelScope.launch(Dispatchers.IO){
+        noteRepo.updateTodo(todoItem)
+    }
+    fun deleteTodoItem(todoItem: TodoItem)= viewModelScope.launch(Dispatchers.IO){
+        noteRepo.deleteTodo(todoItem)
+    }
+    suspend fun addTodoItem(todoItem: TodoItem){
+        noteRepo.insertTodo(todoItem)
     }
     suspend fun insertDeleted(deletedNote: DeletedNote) {
         return noteRepo.insertDeletedNote(deletedNote)
