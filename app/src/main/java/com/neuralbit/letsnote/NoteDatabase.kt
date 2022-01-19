@@ -17,7 +17,8 @@ import com.neuralbit.letsnote.entities.*
         NoteTagCrossRef::class,
         Reminder::class,
         Label::class,
-        DeletedNote::class
+        DeletedNote::class,
+        TodoItem::class
                ],version =5 , exportSchema = true)
 abstract class NoteDatabase : RoomDatabase(){
     abstract fun getNotesDao() : NotesDao
@@ -35,7 +36,7 @@ abstract class NoteDatabase : RoomDatabase(){
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     NoteDatabase::class.java,
-                    "letsNoteDB1"
+                    "letsNoteDB3"
                 ).build()
                 INSTANCE = instance
                 instance

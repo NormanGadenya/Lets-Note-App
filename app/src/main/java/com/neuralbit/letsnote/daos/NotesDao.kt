@@ -3,6 +3,8 @@ package com.neuralbit.letsnote.daos
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.neuralbit.letsnote.entities.*
+import com.neuralbit.letsnote.relationships.LabelWIthNotes
+import com.neuralbit.letsnote.relationships.TodoItems
 
 @Dao
 interface NotesDao {
@@ -59,7 +61,9 @@ interface NotesDao {
     @Query("Select * from Note where not exists (select * from DeletedNote where DeletedNote.noteID = Note.noteID) order by timeStamp DESC ")
     fun getAllNotes(): LiveData<List<Note>>
 
-
+    @Transaction
+    @Query("select * from TodoItem where noteID = :noteID ")
+    fun getTodoList(noteID :Long): LiveData<List<TodoItem>>
 
     @Transaction
     @Query("Select * from ArchivedNote join Note on ArchivedNote.noteID = Note.noteID and  not exists (select * from DeletedNote where DeletedNote.noteID = ArchivedNote.noteID)")

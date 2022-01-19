@@ -3,6 +3,7 @@ package com.neuralbit.letsnote.repos
 import androidx.lifecycle.LiveData
 import com.neuralbit.letsnote.daos.NotesDao
 import com.neuralbit.letsnote.entities.*
+import com.neuralbit.letsnote.relationships.TodoItems
 
 class NoteRepo(
     private val notesDao : NotesDao
@@ -47,6 +48,9 @@ class NoteRepo(
 
     fun getNote(noteID: Long) : LiveData<Note>{
         return notesDao.getNote(noteID)
+    }
+    fun getTodoList(noteID: Long) : LiveData<List<TodoItem>>{
+        return notesDao.getTodoList(noteID)
     }
 
     fun getArchivedNote(noteID: Long) : LiveData<ArchivedNote>{

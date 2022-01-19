@@ -5,9 +5,9 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class TodoItem(
-    val noteID : Long,
-    val itemDesc : String,
-    val itemChecked : Boolean
+    var noteID : Long,
+    var itemDesc : String,
+    var itemChecked : Boolean
 
 ){
     @PrimaryKey(autoGenerate = true)

@@ -64,6 +64,7 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
         pinnedNotesRV = binding.pinnedNotesRV
         pinnedNotesTV = binding.pinnedNotesTV
         otherNotesTV = binding.otherNotesTV
+
         val layoutManagerAll = StaggeredGridLayoutManager( 2,LinearLayoutManager.VERTICAL)
         val layoutManagerPinned = StaggeredGridLayoutManager( 2,LinearLayoutManager.VERTICAL)
         notesRV.layoutManager = layoutManagerAll

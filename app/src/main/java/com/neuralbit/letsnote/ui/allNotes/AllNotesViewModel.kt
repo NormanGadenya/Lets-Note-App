@@ -62,6 +62,17 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
 
     }
 
+    fun getTodoList(noteID: Long) : LiveData<List<TodoItem>>{
+        return noteRepo.getTodoList(noteID)
+    }
+
+    fun updateTodoItem(todoItem: TodoItem)= viewModelScope.launch(Dispatchers.IO){
+        noteRepo.updateTodo(todoItem)
+    }
+    fun deleteTodoItem(todoItem: TodoItem)= viewModelScope.launch(Dispatchers.IO){
+        noteRepo.deleteTodo(todoItem)
+    }
+
     fun filterPinnedList( ) : LiveData<List<Note>>{
         val textLower = searchQuery.value
         Log.d("LOG", "filterList:${searchQuery.value} ")

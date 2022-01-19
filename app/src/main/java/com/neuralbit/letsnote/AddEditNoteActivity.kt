@@ -21,16 +21,14 @@ import android.text.TextWatcher
 import android.text.format.DateFormat
 import android.util.Log
 import android.util.SparseArray
-import android.view.KeyEvent
-import android.view.View
+import android.view.*
 import android.view.View.GONE
 import android.view.View.VISIBLE
-import android.view.ViewTreeObserver
-import android.view.WindowManager
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -44,6 +42,8 @@ import com.google.android.gms.vision.text.TextRecognizer
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import com.neuralbit.letsnote.adapters.AddEditLabelAdapter
+import com.neuralbit.letsnote.adapters.AddEditTodoAdapter
+import com.neuralbit.letsnote.adapters.ItemUpdate
 import com.neuralbit.letsnote.adapters.LabelClickInterface
 import com.neuralbit.letsnote.databinding.ActivityAddEditNoteBinding
 import com.neuralbit.letsnote.databinding.FragmentAllNotesBinding
@@ -65,7 +65,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
     GetTimeFromPicker,
     GetDateFromPicker,
     GetTagFromDialog,
-    LabelClickInterface
+    LabelClickInterface,
+    ItemUpdate
 {
     private var deleted: Boolean = false
     private lateinit var restoreButton: ImageButton
@@ -74,8 +75,10 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private lateinit var backButton: ImageButton
     private lateinit var pinButton: ImageButton
     private lateinit var alertButton: ImageButton
+    private lateinit var dismissTodoButton: ImageButton
     private lateinit var ocrButton: ImageButton
     private lateinit var sttButton: ImageButton
+    private lateinit var addTodoButton: ImageButton
     private lateinit var undoButton: ImageButton
     private lateinit var redoButton: ImageButton
     private lateinit var noteTitleEdit : EditText
@@ -91,7 +94,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private var noteDescOrigList = ArrayList<String>()
     private var noteDescNew : String? = null
     private var noteDescNewList : List<String> ? = null
-
     private lateinit var noteType : String
     private var deletable : Boolean = false
     private lateinit var tvTimeStamp : TextView
@@ -107,8 +109,12 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private var backPressed  = false
     private lateinit var tagListRV : RecyclerView
     private lateinit var labelListRV : RecyclerView
+    private lateinit var todoRV : RecyclerView
+    private lateinit var todoCheckBox: CheckBox
+    private lateinit var todoItemDescTV : EditText
     private var isKeyBoardShowing = false
     private lateinit var tagListAdapter : AddEditTagRVAdapter
+    private lateinit var todoAdapter : AddEditTodoAdapter
     private lateinit var labelListAdapter : AddEditLabelAdapter
     private lateinit var alertBottomSheet : BottomSheetDialog
     private lateinit var labelBottomSheet : BottomSheetDialog
@@ -122,6 +128,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private lateinit var timeTitleTV :TextView
     private lateinit var dateTitleTV :TextView
     private lateinit var layoutManager : LinearLayoutManager
+    private var todoItems = ArrayList<TodoItem>()
     private var tagList = ArrayList<String>()
     private var pinnedNote : PinnedNote ? = null
     private var archivedNote : ArchivedNote ? = null
@@ -233,6 +240,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
             }
             else -> {
+
                 tvTimeStamp.visibility =GONE
             }
         }
@@ -613,6 +621,15 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
 
 
+        viewModal.getTodoList(noteID).observe(lifecycleOwner){
+            if (it.isNotEmpty()){
+                todoRV.visibility = VISIBLE
+            }
+            todoAdapter.getTodoItems(it)
+            todoItems.addAll(it)
+            Log.d(TAG, "onCreate:list $it")
+        }
+
         archiveButton.setOnClickListener { archiveNote() }
 
         pinButton.setOnClickListener { pinOrUnPinNote() }
@@ -620,6 +637,26 @@ class AddEditNoteActivity : AppCompatActivity() ,
         restoreButton.setOnClickListener {
             unArchiveNote()
             unDelete()
+        }
+
+        addTodoButton.setOnClickListener {
+            if (!todoItemDescTV.isVisible){
+                todoRV.visibility = VISIBLE
+                todoItemDescTV.visibility = VISIBLE
+                todoCheckBox.visibility = VISIBLE
+                dismissTodoButton.visibility = VISIBLE
+            }else{
+                val todoDesc = todoItemDescTV.text.toString()
+                val isItemChecked = todoCheckBox.isChecked
+                viewModal.noteChanged.value = true
+                val todoItem = TodoItem(noteID,todoDesc,isItemChecked)
+                todoItems.add(todoItem)
+                todoItemDescTV.text.clear()
+                todoAdapter.getTodoItems(todoItems)
+
+            }
+
+
         }
     }
 
@@ -829,6 +866,15 @@ class AddEditNoteActivity : AppCompatActivity() ,
         delLabelBtn = labelBottomSheet.findViewById(R.id.delLabel)!!
         tagListRV.layoutManager= layoutManager
         tagListRV.adapter = tagListAdapter
+        addTodoButton = findViewById(R.id.addTodo)
+        dismissTodoButton = findViewById(R.id.dismissTodoBtn)
+        todoRV = findViewById(R.id.todoRV)
+        todoAdapter = AddEditTodoAdapter(applicationContext,this)
+        val layoutManagerTodo = LinearLayoutManager(applicationContext,LinearLayoutManager.VERTICAL,false)
+        todoRV.layoutManager = layoutManagerTodo
+        todoRV.adapter = todoAdapter
+        todoCheckBox = findViewById(R.id.todoCheckBox)
+        todoItemDescTV = findViewById(R.id.todoItemDescTV)
         lifecycleOwner = this
         viewModal = ViewModelProvider(
             this,
@@ -1236,6 +1282,17 @@ class AddEditNoteActivity : AppCompatActivity() ,
             }
         }
 
+        for (todoItem in todoItems){
+            todoItem.noteID = noteID
+            lifecycleScope.launch {
+                withContext(Dispatchers.IO){
+                    viewModal.addTodoItem(todoItem)
+
+                }
+            }
+        }
+
+
         if (reminder!=null){
             reminder?.noteID = noteID
 
@@ -1321,6 +1378,36 @@ class AddEditNoteActivity : AppCompatActivity() ,
         coordinatorlayout.setBackgroundColor(labelID)
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
         window.statusBarColor = labelID
+    }
+
+    override fun onItemDelete(position: Int,todoItem: TodoItem) {
+        if(noteType=="Edit"){
+            viewModal.deleteTodoItem(todoItem)
+        }else{
+            todoItems.removeAt(position)
+            todoAdapter.notifyItemRemoved(position)
+        }
+    }
+
+    override fun onItemCheckChanged(position: Int, todoItem: TodoItem) {
+
+
+        if (noteType=="Edit"){
+            viewModal.updateTodoItem(todoItem)
+        }else{
+            todoItems[position] = todoItem
+            todoAdapter.updateTodoItem(todoItems,position)
+        }
+    }
+
+    override fun onItemDescChanged(position: Int, todoItem: TodoItem) {
+        Log.d(TAG, "onItemDescChanged: ${todoItem.itemDesc}")
+        if (noteType=="Edit"){
+            viewModal.updateTodoItem(todoItem)
+        }else{
+            todoItems[position] = todoItem
+            todoAdapter.updateTodoItem(todoItems,position)
+        }
     }
 
 

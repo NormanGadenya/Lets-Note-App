@@ -34,7 +34,7 @@
         <entry key="app/src/main/res/drawable/wild_orchid_tag.xml" value="0.22291666666666668" />
         <entry key="app/src/main/res/drawable/wild_orchid_toolbar.xml" value="0.1225" />
         <entry key="app/src/main/res/font/abeezee.xml" value="0.20555555555555555" />
-        <entry key="app/src/main/res/layout/activity_add_edit_note.xml" value="0.22" />
+        <entry key="app/src/main/res/layout/activity_add_edit_note.xml" value="0.5" />
         <entry key="app/src/main/res/layout/activity_add_edit_todo.xml" value="0.19375" />
         <entry key="app/src/main/res/layout/activity_label_notes.xml" value="0.17" />
         <entry key="app/src/main/res/layout/activity_login.xml" value="0.19375" />
@@ -70,7 +70,7 @@
         <entry key="app/src/main/res/layout/note_action_bar.xml" value="0.5" />
         <entry key="app/src/main/res/layout/note_back_bottom_sheet.xml" value="0.47232472324723246" />
         <entry key="app/src/main/res/layout/note_label_bottom_sheet.xml" value="0.25" />
-        <entry key="app/src/main/res/layout/note_rv_item.xml" value="0.39959839357429716" />
+        <entry key="app/src/main/res/layout/note_rv_item.xml" value="0.33" />
         <entry key="app/src/main/res/layout/save_shared_note_fragment.xml" value="0.15" />
         <entry key="app/src/main/res/layout/spinner_tag_row.xml" value="0.3328125" />
         <entry key="app/src/main/res/layout/tag_adapter_item.xml" value="0.75" />
@@ -78,7 +78,7 @@
         <entry key="app/src/main/res/layout/tag_item.xml" value="0.5" />
         <entry key="app/src/main/res/layout/tag_notes_fragment.xml" value="0.22864583333333333" />
         <entry key="app/src/main/res/layout/tag_spinner_row.xml" value="0.3328125" />
-        <entry key="app/src/main/res/layout/todo_rv_item.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/todo_rv_item.xml" value="0.4834710743801653" />
         <entry key="app/src/main/res/menu/activity_main_drawer.xml" value="0.33" />
         <entry key="app/src/main/res/menu/labelnotes_activity.xml" value="0.19375" />
         <entry key="app/src/main/res/menu/main_activity2.xml" value="0.18" />

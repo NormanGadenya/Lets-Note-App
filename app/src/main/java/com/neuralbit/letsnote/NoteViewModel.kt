@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.*
 import com.neuralbit.letsnote.entities.*
 import com.neuralbit.letsnote.relationships.TagsWithNote
+import com.neuralbit.letsnote.relationships.TodoItems
 import com.neuralbit.letsnote.repos.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -84,6 +85,10 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
 
     fun  getNote(noteID: Long) : LiveData<Note>{
         return noteRepo.getNote(noteID)
+    }
+
+    fun getTodoList(noteID: Long) : LiveData<List<TodoItem>>{
+        return noteRepo.getTodoList(noteID)
     }
 
     fun deleteNote(note: Note)= viewModelScope.launch(Dispatchers.IO){
