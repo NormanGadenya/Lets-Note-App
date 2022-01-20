@@ -4,11 +4,14 @@ import android.content.Context
 import android.graphics.Paint
 import android.text.Editable
 import android.text.SpannableString
+import android.text.TextWatcher
 import android.text.style.StrikethroughSpan
 import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.EditText
@@ -20,30 +23,48 @@ import com.neuralbit.letsnote.entities.TodoItem
 
 class AddEditTodoAdapter(
     val context: Context,
-    val itemUpdate: ItemUpdate
+    private val itemUpdate: ItemUpdate,
+    private val parentClass: String
+    
 
     ):RecyclerView.Adapter<AddEditTodoAdapter.ViewHolder>(){
     inner class ViewHolder( itemView: View) : RecyclerView.ViewHolder(itemView){
         val todoItemDescTV: EditText= itemView.findViewById(R.id.todoItemDescTV)
+        val todoItemDescNoteRV: TextView= itemView.findViewById(R.id.todoItemDescNoteRV)
         val todoItemCheckBox: CheckBox = itemView.findViewById(R.id.todoCheckBox)
         val todoDeleteBtn: ImageButton = itemView.findViewById(R.id.deleteItemBtn)
     }
     private var todoList = ArrayList<TodoItem>()
     val TAG = " ADDEDITTODO"
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        Log.d(TAG, "onCreateViewHolder: $parentClass")
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.todo_rv_item,parent,false)
         return ViewHolder(itemView)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val todoItem = todoList[position]
-        holder.todoItemDescTV.setText(todoItem.itemDesc)
+        Log.d(TAG, "onBindViewHolder: $todoList ")
+
         holder.todoItemCheckBox.isChecked = todoItem.itemChecked
+        if (parentClass=="NoteRVAdapter"){
+            holder.todoItemDescNoteRV.visibility = VISIBLE
+            holder.todoItemDescTV.visibility = GONE
+            holder.todoDeleteBtn.visibility = GONE
+            holder.todoItemCheckBox.width = 10
+            holder.todoItemCheckBox.isEnabled = false
+            holder.todoItemCheckBox.height = 10
+            holder.todoItemDescNoteRV.text = todoItem.itemDesc
+        }
+        holder.todoItemDescTV.setText(todoItem.itemDesc)
+
         holder.todoDeleteBtn.setOnClickListener {
             itemUpdate.onItemDelete(position,todoItem)
 
 //            notifyItemRemoved(position)
         }
+        //todo fix item checkbox bug
+
         holder.todoItemCheckBox.setOnCheckedChangeListener { _, b ->
             todoItem.itemChecked = b
 
@@ -61,7 +82,23 @@ class AddEditTodoAdapter(
             }
 
         }
+//        holder.todoItemDescTV.setOnEditorActionListener() { _, i, keyEvent ->
+//            if (keyEvent.keyCode == KeyEvent.KEYCODE_ENTER){
+//
+//                itemUpdate.onEnterKeyPressed(position,todoItem)
+//            }
+//            holder.todoItemDescTV.isActivated = false
+//
+//            true
+//        }
+        holder.todoItemDescTV.setOnKeyListener { _, key, _ ->
+            if (key == KeyEvent.KEYCODE_ENTER){
+                itemUpdate.onEnterKeyPressed(position,todoItem)
+            }
 
+
+            false
+        }
 
     }
 
@@ -71,7 +108,9 @@ class AddEditTodoAdapter(
 
     fun getTodoItems(newList: List<TodoItem>){
         todoList.clear()
+
         todoList.addAll(newList)
+
         notifyDataSetChanged()
     }
     fun updateTodoItem(newList: List<TodoItem>,position: Int){
@@ -85,4 +124,5 @@ interface ItemUpdate {
     fun onItemDelete(position : Int,todoItem: TodoItem)
     fun onItemCheckChanged(position: Int,todoItem: TodoItem)
     fun onItemDescChanged(position: Int, todoItem: TodoItem)
+    fun onEnterKeyPressed(position: Int,todoItem: TodoItem)
 }

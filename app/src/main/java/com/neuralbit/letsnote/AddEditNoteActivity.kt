@@ -638,7 +638,12 @@ class AddEditNoteActivity : AppCompatActivity() ,
             unArchiveNote()
             unDelete()
         }
-
+        dismissTodoButton.setOnClickListener {
+            todoItemDescTV.text.clear()
+            todoItemDescTV.visibility = GONE
+            todoCheckBox.visibility = GONE
+            dismissTodoButton.visibility = GONE
+        }
         addTodoButton.setOnClickListener {
             if (!todoItemDescTV.isVisible){
                 todoRV.visibility = VISIBLE
@@ -736,7 +741,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 Manifest.permission.CAMERA
             )
         ) {
-            androidx.appcompat.app.AlertDialog.Builder(this)
+            AlertDialog.Builder(this)
                 .setTitle("Permission needed")
                 .setMessage("This permission is needed because we need to access your camera")
                 .setPositiveButton(
@@ -869,7 +874,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         addTodoButton = findViewById(R.id.addTodo)
         dismissTodoButton = findViewById(R.id.dismissTodoBtn)
         todoRV = findViewById(R.id.todoRV)
-        todoAdapter = AddEditTodoAdapter(applicationContext,this)
+        todoAdapter = AddEditTodoAdapter(applicationContext,this,"AddEditNoteActivity")
         val layoutManagerTodo = LinearLayoutManager(applicationContext,LinearLayoutManager.VERTICAL,false)
         todoRV.layoutManager = layoutManagerTodo
         todoRV.adapter = todoAdapter
@@ -1198,7 +1203,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         val currentDate= cm.currentTimeToLong()
 
             if(textChanged){
-                if (noteTitle.isNotEmpty() || noteDescription.isNotEmpty()){
+                if (noteTitle.isNotEmpty() || noteDescription.isNotEmpty() || todoItems.isNotEmpty()){
 
                     val note = Note(noteTitle,noteDescription,currentDate)
                     if(noteType == "Edit"){
@@ -1408,6 +1413,15 @@ class AddEditNoteActivity : AppCompatActivity() ,
             todoItems[position] = todoItem
             todoAdapter.updateTodoItem(todoItems,position)
         }
+    }
+
+    override fun onEnterKeyPressed(position: Int, todoItem: TodoItem) {
+        Log.d(TAG, "onEnterKeyPressed: $todoItem")
+        viewModal.noteChanged.value = true
+        todoItems.add(todoItem)
+        todoItemDescTV.text.clear()
+        todoAdapter.getTodoItems(todoItems)
+        todoItemDescTV.isActivated = true
     }
 
 

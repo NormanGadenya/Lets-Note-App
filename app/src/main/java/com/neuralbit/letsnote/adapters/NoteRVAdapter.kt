@@ -15,12 +15,14 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.LifecycleOwner
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.neuralbit.letsnote.LabelNotesViewModel
 import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.entities.Note
 import com.neuralbit.letsnote.entities.Reminder
 import com.neuralbit.letsnote.entities.Tag
+import com.neuralbit.letsnote.entities.TodoItem
 import com.neuralbit.letsnote.relationships.TagsWithNote
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import com.neuralbit.letsnote.utilities.AlertReceiver
@@ -34,7 +36,7 @@ class NoteRVAdapter (
     val noteClickInterface :NoteClickInterface,
 
 
-    ): RecyclerView.Adapter<NoteRVAdapter.ViewHolder>(){
+    ): RecyclerView.Adapter<NoteRVAdapter.ViewHolder>(),ItemUpdate{
     var viewModel : AllNotesViewModel ? = null
     var labelViewModel : LabelNotesViewModel? = null
     var lifecycleScope : LifecycleCoroutineScope? = null
@@ -44,6 +46,7 @@ class NoteRVAdapter (
     private val tags : String? = null
     private var reminder : Reminder? = null
     var searchString: String? =null
+    val todoAdapter = AddEditTodoAdapter(context,this,"NoteRVAdapter")
 
     val TAG = "NoteRVAdapter"
 
@@ -55,14 +58,22 @@ class NoteRVAdapter (
         val tagsTV : TextView = itemView.findViewById(R.id.noteTagsTV)
         val reminderTV : TextView = itemView.findViewById(R.id.reminderTV)
         val reminderIcon: View = itemView.findViewById(R.id.reminderIcon)
+        val todoRV : RecyclerView = itemView.findViewById(R.id.todoRV)
+
+
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+
         itemView = LayoutInflater.from(parent.context).inflate(R.layout.note_rv_item,parent,false)
         return ViewHolder(itemView)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val layoutManager = LinearLayoutManager(context,LinearLayoutManager.VERTICAL,false)
+        holder.todoRV.layoutManager = layoutManager
+        holder.todoRV.adapter = todoAdapter
+
         var title = allNotes[position].title
         var desc = allNotes[position].description
         val cm = Common()
@@ -83,10 +94,13 @@ class NoteRVAdapter (
             holder.noteTitleTV.visibility = VISIBLE
 
         }
-        
+
 
         lifecycleScope?.launch {
             if (viewModel!=null){
+                viewModel!!.getTodoList(noteID).observe(lifecycleOwner!!){
+                    todoAdapter.getTodoItems(it)
+                }
                 val tagList = viewModel?.getTagsWithNote(noteID)?.last()
 
                 if (tagList?.tags?.isNotEmpty()!!) {
@@ -209,6 +223,24 @@ class NoteRVAdapter (
         val pendingIntent = PendingIntent.getBroadcast(context, noteID, intent, PendingIntent.FLAG_UPDATE_CURRENT)
         alarmManager.cancel(pendingIntent)
     }
+
+    override fun onItemDelete(position: Int, todoItem: TodoItem) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onItemCheckChanged(position: Int, todoItem: TodoItem) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onItemDescChanged(position: Int, todoItem: TodoItem) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onEnterKeyPressed(position: Int, todoItem: TodoItem) {
+        TODO("Not yet implemented")
+    }
+
+
 }
 
 

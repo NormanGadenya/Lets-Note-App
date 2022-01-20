@@ -75,6 +75,7 @@
                     app:layout_constraintTop_toBottomOf="@id/noteEditDesc"
                     />
                     <ImageButton
+                        android:contentDescription="@string/add_todo_item"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:id="@+id/addTodo"
@@ -94,7 +95,7 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="@dimen/margin"
                     android:visibility="gone"
-
+                    android:hint="@string/_hint"
                     android:background="@android:color/transparent"
                     android:minHeight="48dp"
                     app:layout_constraintBottom_toBottomOf="@+id/todoCheckBox"
