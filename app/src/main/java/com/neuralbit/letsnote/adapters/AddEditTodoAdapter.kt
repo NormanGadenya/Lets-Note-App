@@ -1,6 +1,7 @@
 package com.neuralbit.letsnote.adapters
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Paint
 import android.text.Editable
 import android.text.SpannableString
@@ -18,6 +19,7 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.neuralbit.letsnote.AddEditNoteActivity
 import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.entities.TodoItem
 
@@ -33,9 +35,12 @@ class AddEditTodoAdapter(
         val todoItemDescNoteRV: TextView= itemView.findViewById(R.id.todoItemDescNoteRV)
         val todoItemCheckBox: CheckBox = itemView.findViewById(R.id.todoCheckBox)
         val todoDeleteBtn: ImageButton = itemView.findViewById(R.id.deleteItemBtn)
+        val todoContainer: View = itemView.findViewById(R.id.container)
     }
     private var todoList = ArrayList<TodoItem>()
+    var noteID: Long= 0
     val TAG = " ADDEDITTODO"
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         Log.d(TAG, "onCreateViewHolder: $parentClass")
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.todo_rv_item,parent,false)
@@ -44,17 +49,27 @@ class AddEditTodoAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val todoItem = todoList[position]
-        Log.d(TAG, "onBindViewHolder: $todoList ")
 
         holder.todoItemCheckBox.isChecked = todoItem.itemChecked
         if (parentClass=="NoteRVAdapter"){
+
             holder.todoItemDescNoteRV.visibility = VISIBLE
             holder.todoItemDescTV.visibility = GONE
             holder.todoDeleteBtn.visibility = GONE
             holder.todoItemCheckBox.width = 10
             holder.todoItemCheckBox.isEnabled = false
+            holder.todoItemDescNoteRV
             holder.todoItemCheckBox.height = 10
             holder.todoItemDescNoteRV.text = todoItem.itemDesc
+            holder.todoContainer.setOnClickListener {
+                val intent = Intent( context, AddEditNoteActivity::class.java)
+                intent.putExtra("noteType","Edit")
+                intent.putExtra("noteID",noteID)
+
+                context.startActivity(intent)
+            }
+
+
         }
         holder.todoItemDescTV.setText(todoItem.itemDesc)
 

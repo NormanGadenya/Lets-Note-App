@@ -46,7 +46,6 @@ class NoteRVAdapter (
     private val tags : String? = null
     private var reminder : Reminder? = null
     var searchString: String? =null
-    val todoAdapter = AddEditTodoAdapter(context,this,"NoteRVAdapter")
 
     val TAG = "NoteRVAdapter"
 
@@ -70,6 +69,8 @@ class NoteRVAdapter (
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val todoAdapter = AddEditTodoAdapter(context,this,"NoteRVAdapter")
+
         val layoutManager = LinearLayoutManager(context,LinearLayoutManager.VERTICAL,false)
         holder.todoRV.layoutManager = layoutManager
         holder.todoRV.adapter = todoAdapter
@@ -98,6 +99,7 @@ class NoteRVAdapter (
 
         lifecycleScope?.launch {
             if (viewModel!=null){
+                todoAdapter.noteID = noteID
                 viewModel!!.getTodoList(noteID).observe(lifecycleOwner!!){
                     todoAdapter.getTodoItems(it)
                 }

@@ -1386,6 +1386,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
     }
 
     override fun onItemDelete(position: Int,todoItem: TodoItem) {
+        Log.d(TAG, "onItemDelete: ")
         if(noteType=="Edit"){
             viewModal.deleteTodoItem(todoItem)
         }else{
