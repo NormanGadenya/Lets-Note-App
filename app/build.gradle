@@ -41,10 +41,12 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
-
-    packagingOptions{
-        exclude "META-INF/atomicfu.kotlin_module"
+    packagingOptions {
+        resources {
+            excludes += ['META-INF/atomicfu.kotlin_module']
+        }
     }
+
     buildFeatures {
         viewBinding true
     }
@@ -85,6 +87,8 @@ dependencies {
     implementation 'androidx.annotation:annotation:1.2.0'
     implementation 'com.google.firebase:firebase-auth-ktx:21.0.1'
     implementation 'com.google.firebase:firebase-storage-ktx:20.0.0'
+    implementation 'com.google.firebase:firebase-firestore:21.4.0'
+    implementation 'com.google.firebase:firebase-firestore-ktx:24.2.0'
     kapt "androidx.room:room-compiler:$rootProject.roomVersion"
     androidTestImplementation "androidx.room:room-testing:$rootProject.roomVersion"
 

@@ -2,7 +2,6 @@ package com.neuralbit.letsnote
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
@@ -12,11 +11,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
-import com.google.firebase.auth.*
-import com.google.firebase.storage.FirebaseStorage
-import java.io.File
-import java.io.FileOutputStream
-import java.io.OutputStream
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.GoogleAuthProvider
 
 class SignInActivity : AppCompatActivity() {
     private var mGoogleSignInClient: GoogleSignInClient? = null
@@ -86,58 +83,57 @@ class SignInActivity : AppCompatActivity() {
     }
 
     private fun downloadDB() {
-
-        val firebaseStorage = FirebaseStorage.getInstance()
-        val mStorageReference= firebaseUser?.uid?.let { firebaseStorage.reference.child(it) }!!
-        val dbFileRef = mStorageReference.child("letsNoteDB1")
-        val dbShmFileRef = mStorageReference.child("letsNoteDB1-shm")
-        val dbWalFileRef = mStorageReference.child("letsNoteDB1-wal")
-
-        val database = NoteDatabase.getDatabase(application)
-        database.close()
-
-        val dir = File(getString(R.string.databaseLoc))
-        if (dir.isDirectory) {
-            val children = dir.list()
-            if (children!=null){
-                for (i in children.indices) {
-                    File(dir, children[i]).delete()
-                }
-            }
-        }
-        val dbPath = resources.getString(R.string.dbFileLoc)
-        val dbPathShm = resources.getString(R.string.dbShmFileLoc)
-        val dbPathWal = resources.getString(R.string.dbWalFileLoc)
-        val TEN_MEGABYTES: Long = 1024 * 1024 * 10
-        dbFileRef.getBytes(TEN_MEGABYTES).addOnSuccessListener {
-            try {
-                val outputStream: OutputStream = FileOutputStream(dbPath)
-                outputStream.write(it)
-                outputStream.close()
-
-            }catch (e : Exception){
-                e.localizedMessage
-            }
-        }
-        dbShmFileRef.getBytes(TEN_MEGABYTES).addOnSuccessListener {
-            try {
-                val outputStream: OutputStream = FileOutputStream(dbPathShm)
-                outputStream.write(it)
-                outputStream.close()
-
-            }catch (e : Exception){
-                e.localizedMessage
-            }
-        }
-        dbWalFileRef.getBytes(TEN_MEGABYTES).addOnSuccessListener {
-            try {
-                val outputStream: OutputStream = FileOutputStream(dbPathWal)
-                outputStream.write(it)
-                outputStream.close()
-            }catch (e : Exception){
-                e.localizedMessage
-            }
-        }
+//        val firebaseStorage = FirebaseStorage.getInstance()
+//        val mStorageReference= firebaseUser?.uid?.let { firebaseStorage.reference.child(it) }!!
+//        val dbFileRef = mStorageReference.child("letsNoteDB1")
+//        val dbShmFileRef = mStorageReference.child("letsNoteDB1-shm")
+//        val dbWalFileRef = mStorageReference.child("letsNoteDB1-wal")
+//
+//        val database = NoteDatabase.getDatabase(application)
+//        database.close()
+//
+//        val dir = File(getString(R.string.databaseLoc))
+//        if (dir.isDirectory) {
+//            val children = dir.list()
+//            if (children!=null){
+//                for (i in children.indices) {
+//                    File(dir, children[i]).delete()
+//                }
+//            }
+//        }
+//        val dbPath = resources.getString(R.string.dbFileLoc)
+//        val dbPathShm = resources.getString(R.string.dbShmFileLoc)
+//        val dbPathWal = resources.getString(R.string.dbWalFileLoc)
+//        val TEN_MEGABYTES: Long = 1024 * 1024 * 10
+//        dbFileRef.getBytes(TEN_MEGABYTES).addOnSuccessListener {
+//            try {
+//                val outputStream: OutputStream = FileOutputStream(dbPath)
+//                outputStream.write(it)
+//                outputStream.close()
+//
+//            }catch (e : Exception){
+//                e.localizedMessage
+//            }
+//        }
+//        dbShmFileRef.getBytes(TEN_MEGABYTES).addOnSuccessListener {
+//            try {
+//                val outputStream: OutputStream = FileOutputStream(dbPathShm)
+//                outputStream.write(it)
+//                outputStream.close()
+//
+//            }catch (e : Exception){
+//                e.localizedMessage
+//            }
+//        }
+//        dbWalFileRef.getBytes(TEN_MEGABYTES).addOnSuccessListener {
+//            try {
+//                val outputStream: OutputStream = FileOutputStream(dbPathWal)
+//                outputStream.write(it)
+//                outputStream.close()
+//            }catch (e : Exception){
+//                e.localizedMessage
+//            }
+//        }
         val intent = Intent(this@SignInActivity,MainActivity::class.java)
         startActivity(intent)
 
@@ -150,15 +146,11 @@ class SignInActivity : AppCompatActivity() {
             ) { task ->
                 if (task.isSuccessful) {
                     firebaseUser = mAuth.currentUser
-
-                        downloadDB()
-
-
+                    downloadDB()
 
                 } else {
                     Toast.makeText(this@SignInActivity, "Sorry auth failed.", Toast.LENGTH_SHORT).show()
                 }
-
             }
     }
 

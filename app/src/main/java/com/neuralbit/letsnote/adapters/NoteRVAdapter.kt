@@ -4,15 +4,12 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.cardview.widget.CardView
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -21,19 +18,16 @@ import com.neuralbit.letsnote.LabelNotesViewModel
 import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.entities.Note
 import com.neuralbit.letsnote.entities.Reminder
-import com.neuralbit.letsnote.entities.Tag
 import com.neuralbit.letsnote.entities.TodoItem
-import com.neuralbit.letsnote.relationships.TagsWithNote
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import com.neuralbit.letsnote.utilities.AlertReceiver
 import com.neuralbit.letsnote.utilities.Common
 import kotlinx.coroutines.launch
 import java.util.*
-import kotlin.collections.ArrayList
 
 class NoteRVAdapter (
     val context: Context,
-    val noteClickInterface :NoteClickInterface,
+    private val noteClickInterface :NoteClickInterface,
 
 
     ): RecyclerView.Adapter<NoteRVAdapter.ViewHolder>(),ItemUpdate{
@@ -46,7 +40,6 @@ class NoteRVAdapter (
     private val tags : String? = null
     private var reminder : Reminder? = null
     var searchString: String? =null
-
     val TAG = "NoteRVAdapter"
 
 

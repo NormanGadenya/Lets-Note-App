@@ -1,12 +1,7 @@
 package com.neuralbit.letsnote
 
-import android.app.AlarmManager
-import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -19,16 +14,10 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageReference
 import com.neuralbit.letsnote.databinding.ActivityMainBinding
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import com.neuralbit.letsnote.ui.archived.ArchivedViewModel
 import com.neuralbit.letsnote.ui.tag.TagViewModel
-import com.neuralbit.letsnote.utilities.AlertReceiver
-import com.neuralbit.letsnote.utilities.DatabaseBackUp
-import java.io.File
-import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -71,26 +60,7 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
     }
 
-    override fun onStart() {
-        super.onStart()
-        if (firebaseUserID!=null) {
-            val sharedPref = getSharedPreferences("Settings", MODE_PRIVATE)
-            val backupTime = sharedPref.getInt("backupTime",3)
-            val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-            val intent = Intent(this, DatabaseBackUp::class.java)
-            intent.putExtra("fUserID", firebaseUserID)
-            val c = Calendar.getInstance()
-            c[Calendar.HOUR_OF_DAY] = backupTime
-            val pendingIntent = PendingIntent.getBroadcast(this, 100, intent, PendingIntent.FLAG_UPDATE_CURRENT)
-            alarmManager.setRepeating(
-                AlarmManager.RTC,
-                c.timeInMillis,
-                AlarmManager.INTERVAL_DAY,
-                pendingIntent
-            )
 
-        }
-    }
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
 
         menuInflater.inflate(R.menu.main_activity2, menu)
@@ -116,7 +86,6 @@ class MainActivity : AppCompatActivity() {
                 return false
             }
         })
-
         return true
     }
 
