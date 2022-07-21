@@ -4,16 +4,15 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
 import com.neuralbit.letsnote.NoteDatabase
-import com.neuralbit.letsnote.daos.LabelDao
 import com.neuralbit.letsnote.entities.*
 import com.neuralbit.letsnote.relationships.TagsWithNote
 import com.neuralbit.letsnote.repos.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.ArrayList
 
 class AllNotesViewModel (application : Application) : AndroidViewModel(application) {
     var allNotes: LiveData<List<Note>>
+    private val noteFireRepo: NoteFireRepo
     private val noteRepo : NoteRepo
     private val noteTagRepo : NoteTagRepo
     private val reminderRepo : ReminderRepo
@@ -33,6 +32,7 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
         val labelDao = NoteDatabase.getDatabase(application).getLabelDao()
         val tagDao = NoteDatabase.getDatabase(application).getTagDao()
 
+        noteFireRepo = NoteFireRepo()
         noteRepo= NoteRepo(noteDao)
         noteTagRepo = NoteTagRepo(noteTagDao)
         reminderRepo = ReminderRepo(reminderDao)
@@ -60,6 +60,10 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
             allNotes
         }
 
+    }
+
+    fun getAllFireNotes () :LiveData<List<Note>> {
+        return noteFireRepo.getAllNotes()
     }
 
     fun getTodoList(noteID: Long) : LiveData<List<TodoItem>>{

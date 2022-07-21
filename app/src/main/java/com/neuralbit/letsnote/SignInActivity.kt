@@ -19,8 +19,6 @@ class SignInActivity : AppCompatActivity() {
     private var mGoogleSignInClient: GoogleSignInClient? = null
     private lateinit var mAuth: FirebaseAuth
     private var firebaseUser : FirebaseUser? = null
-    private var TAG = "SIGNUPACTIVITY"
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,62 +80,6 @@ class SignInActivity : AppCompatActivity() {
         }
     }
 
-    private fun downloadDB() {
-//        val firebaseStorage = FirebaseStorage.getInstance()
-//        val mStorageReference= firebaseUser?.uid?.let { firebaseStorage.reference.child(it) }!!
-//        val dbFileRef = mStorageReference.child("letsNoteDB1")
-//        val dbShmFileRef = mStorageReference.child("letsNoteDB1-shm")
-//        val dbWalFileRef = mStorageReference.child("letsNoteDB1-wal")
-//
-//        val database = NoteDatabase.getDatabase(application)
-//        database.close()
-//
-//        val dir = File(getString(R.string.databaseLoc))
-//        if (dir.isDirectory) {
-//            val children = dir.list()
-//            if (children!=null){
-//                for (i in children.indices) {
-//                    File(dir, children[i]).delete()
-//                }
-//            }
-//        }
-//        val dbPath = resources.getString(R.string.dbFileLoc)
-//        val dbPathShm = resources.getString(R.string.dbShmFileLoc)
-//        val dbPathWal = resources.getString(R.string.dbWalFileLoc)
-//        val TEN_MEGABYTES: Long = 1024 * 1024 * 10
-//        dbFileRef.getBytes(TEN_MEGABYTES).addOnSuccessListener {
-//            try {
-//                val outputStream: OutputStream = FileOutputStream(dbPath)
-//                outputStream.write(it)
-//                outputStream.close()
-//
-//            }catch (e : Exception){
-//                e.localizedMessage
-//            }
-//        }
-//        dbShmFileRef.getBytes(TEN_MEGABYTES).addOnSuccessListener {
-//            try {
-//                val outputStream: OutputStream = FileOutputStream(dbPathShm)
-//                outputStream.write(it)
-//                outputStream.close()
-//
-//            }catch (e : Exception){
-//                e.localizedMessage
-//            }
-//        }
-//        dbWalFileRef.getBytes(TEN_MEGABYTES).addOnSuccessListener {
-//            try {
-//                val outputStream: OutputStream = FileOutputStream(dbPathWal)
-//                outputStream.write(it)
-//                outputStream.close()
-//            }catch (e : Exception){
-//                e.localizedMessage
-//            }
-//        }
-        val intent = Intent(this@SignInActivity,MainActivity::class.java)
-        startActivity(intent)
-
-    }
     private fun firebaseAuthWithGoogle(acct: GoogleSignInAccount) {
         val credential = GoogleAuthProvider.getCredential(acct.idToken, null)
         mAuth.signInWithCredential(credential)
@@ -145,9 +87,8 @@ class SignInActivity : AppCompatActivity() {
                 this
             ) { task ->
                 if (task.isSuccessful) {
-                    firebaseUser = mAuth.currentUser
-                    downloadDB()
-
+                    val intent = Intent(this@SignInActivity,MainActivity::class.java)
+                    startActivity(intent)
                 } else {
                     Toast.makeText(this@SignInActivity, "Sorry auth failed.", Toast.LENGTH_SHORT).show()
                 }

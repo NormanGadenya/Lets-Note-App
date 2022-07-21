@@ -3,13 +3,14 @@ package com.neuralbit.letsnote.ui.allNotes
 import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.Canvas
-import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
+import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.TextView
@@ -23,7 +24,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.neuralbit.letsnote.*
+import com.neuralbit.letsnote.AddEditNoteActivity
+import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.adapters.NoteClickInterface
 import com.neuralbit.letsnote.adapters.NoteRVAdapter
 import com.neuralbit.letsnote.databinding.FragmentAllNotesBinding
@@ -80,10 +82,15 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
         pinnedNoteRVAdapter?.lifecycleScope = lifecycleScope
         pinnedNoteRVAdapter?.lifecycleOwner = this
 
-        allNotesViewModel.allNotes.observe(viewLifecycleOwner) {
+//        allNotesViewModel.allNotes.observe(viewLifecycleOwner) {
+//            allNotes = it
+//
+//            noteRVAdapter?.updateList(it)
+//        }
+        allNotesViewModel.getAllFireNotes().observe(viewLifecycleOwner){
             allNotes = it
-
             noteRVAdapter?.updateList(it)
+            Log.d(TAG, "onCreateView: $it")
         }
         allNotesViewModel.pinnedNotes.observe(viewLifecycleOwner) {
             pinnedNoteRVAdapter?.updateList(it)

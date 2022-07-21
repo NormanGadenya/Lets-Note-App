@@ -1,14 +1,15 @@
 package com.neuralbit.letsnote
 
 import android.app.Application
-import androidx.lifecycle.*
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.neuralbit.letsnote.entities.*
 import com.neuralbit.letsnote.relationships.TagsWithNote
-import com.neuralbit.letsnote.relationships.TodoItems
 import com.neuralbit.letsnote.repos.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlin.collections.ArrayList
 
 class NoteViewModel(application : Application) : AndroidViewModel(application) {
     var allNotes: LiveData<List<Note>>
@@ -20,6 +21,7 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     private val noteTagRepo : NoteTagRepo
     private val reminderRepo : ReminderRepo
     private val labelRepo : LabelRepo
+    private val noteFireRepo : NoteFireRepo
     var noteChanged = MutableLiveData<Boolean>()
     var deleted = MutableLiveData<Boolean>()
     var archived : MutableLiveData<Boolean>
@@ -29,7 +31,7 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     var labelSet : MutableLiveData<Boolean>
     var searchQuery : MutableLiveData<String>
     var archivedNote : LiveData<List<Note>>
-    var pinnedNotes : LiveData<List<Note>>
+    private var pinnedNotes : LiveData<List<Note>>
     var noteDescString : MutableLiveData<String>
     var newTagTyped : MutableLiveData<Boolean>
     var backPressed : MutableLiveData<Boolean>
@@ -48,6 +50,7 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         noteTagRepo = NoteTagRepo(noteTagDao)
         reminderRepo = ReminderRepo(reminderDao)
         labelRepo = LabelRepo(labelDao)
+        noteFireRepo = NoteFireRepo()
         allNotes = noteRepo.allNotes
         archivedNote = noteRepo.archivedNotes
         pinnedNotes = noteRepo.pinnedNotes
@@ -87,6 +90,9 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         return noteRepo.getNote(noteID)
     }
 
+    suspend fun getAllNotes () :LiveData<List<Note>> {
+        return noteFireRepo.getAllNotes()
+    }
     fun getTodoList(noteID: Long) : LiveData<List<TodoItem>>{
         return noteRepo.getTodoList(noteID)
     }
@@ -98,8 +104,10 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         noteRepo.update(note)
     }
     suspend fun addNote(note: Note) : Long{
+        noteFireRepo.addNote(note)
         return noteRepo.insert(note)
     }
+
     fun updateTodoItem(todoItem: TodoItem)= viewModelScope.launch(Dispatchers.IO){
         noteRepo.updateTodo(todoItem)
     }

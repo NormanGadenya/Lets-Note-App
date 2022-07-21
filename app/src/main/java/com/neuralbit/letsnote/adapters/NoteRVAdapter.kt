@@ -22,7 +22,6 @@ import com.neuralbit.letsnote.entities.TodoItem
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import com.neuralbit.letsnote.utilities.AlertReceiver
 import com.neuralbit.letsnote.utilities.Common
-import kotlinx.coroutines.launch
 import java.util.*
 
 class NoteRVAdapter (
@@ -90,35 +89,35 @@ class NoteRVAdapter (
         }
 
 
-        lifecycleScope?.launch {
-            if (viewModel!=null){
-                todoAdapter.noteID = noteID
-                viewModel!!.getTodoList(noteID).observe(lifecycleOwner!!){
-                    todoAdapter.getTodoItems(it)
-                }
-                val tagList = viewModel?.getTagsWithNote(noteID)?.last()
-
-                if (tagList?.tags?.isNotEmpty()!!) {
-                    holder.tagsTV.visibility = VISIBLE
-
-                }
-                var tagStr : String? = null
-
-                for (t in tagList.tags) {
-                    tagStr = t.tagTitle + " "
-                }
-                if (tagStr!=null){
-                    holder.tagsTV.text = tagStr
-                    holder.tagsTV.visibility = VISIBLE
-
-                }else{
-                    holder.tagsTV.visibility = GONE
-
-                }
-
-            }
-
-        }
+//        lifecycleScope?.launch {
+//            if (viewModel!=null){
+//                todoAdapter.noteID = noteID
+//                viewModel!!.getTodoList(noteID).observe(lifecycleOwner!!){
+//                    todoAdapter.getTodoItems(it)
+//                }
+////                val tagList = viewModel?.getTagsWithNote(noteID)?.last()
+//                var tagList = viewModel?.getTagsWithNote(noteID).let { it?.last() }
+//                if (tagList?.tags?.isNotEmpty()!!) {
+//                    holder.tagsTV.visibility = VISIBLE
+//
+//                }
+//                var tagStr : String? = null
+//
+//                for (t in tagList.tags) {
+//                    tagStr = t.tagTitle + " "
+//                }
+//                if (tagStr!=null){
+//                    holder.tagsTV.text = tagStr
+//                    holder.tagsTV.visibility = VISIBLE
+//
+//                }else{
+//                    holder.tagsTV.visibility = GONE
+//
+//                }
+//
+//            }
+//
+//        }
 
         lifecycleOwner?.let {
             viewModel?.getReminder(noteID)?.observe(it) { r ->

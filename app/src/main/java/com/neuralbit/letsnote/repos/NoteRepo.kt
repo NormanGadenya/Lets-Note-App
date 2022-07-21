@@ -3,7 +3,6 @@ package com.neuralbit.letsnote.repos
 import androidx.lifecycle.LiveData
 import com.neuralbit.letsnote.daos.NotesDao
 import com.neuralbit.letsnote.entities.*
-import com.neuralbit.letsnote.relationships.TodoItems
 
 class NoteRepo(
     private val notesDao : NotesDao

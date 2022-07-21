@@ -9,5 +9,4 @@ data class Label(
     @PrimaryKey(autoGenerate = false)
     @ColumnInfo var noteID : Long,
     @ColumnInfo val labelID : Int,
-
 )
