@@ -62,7 +62,7 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
 
     }
 
-    fun getAllFireNotes () :LiveData<List<Note>> {
+    fun getAllFireNotes () :LiveData<List<NoteFire>> {
         return noteFireRepo.getAllNotes()
     }
 

@@ -2,7 +2,6 @@ package com.neuralbit.letsnote.ui.archived
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,14 +10,16 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.neuralbit.letsnote.*
+import com.neuralbit.letsnote.AddEditNoteActivity
 import com.neuralbit.letsnote.adapters.NoteClickInterface
+import com.neuralbit.letsnote.adapters.NoteFireClick
 import com.neuralbit.letsnote.adapters.NoteRVAdapter
 import com.neuralbit.letsnote.databinding.FragmentArchivedNotesBinding
 import com.neuralbit.letsnote.entities.Note
+import com.neuralbit.letsnote.repos.NoteFire
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 
-class ArchivedFragment : Fragment() , NoteClickInterface {
+class ArchivedFragment : Fragment() , NoteClickInterface, NoteFireClick {
 
     private val archivedViewModel: ArchivedViewModel by activityViewModels()
     private val allNotesViewModel: AllNotesViewModel by activityViewModels()
@@ -38,7 +39,7 @@ class ArchivedFragment : Fragment() , NoteClickInterface {
         val root: View = binding.root
         notesRV = binding.archivedRV
         notesRV.layoutManager = LinearLayoutManager(context)
-        val noteRVAdapter = context?.let { NoteRVAdapter(it,this) }
+        val noteRVAdapter = context?.let { NoteRVAdapter(it,this,this) }
         notesRV.adapter= noteRVAdapter
         noteRVAdapter?.viewModel = allNotesViewModel
         noteRVAdapter?.lifecycleScope = lifecycleScope
@@ -73,6 +74,10 @@ class ArchivedFragment : Fragment() , NoteClickInterface {
 
 
 
+    }
+
+    override fun onNoteFireClick(note: NoteFire) {
+        TODO("Not yet implemented")
     }
 
 }

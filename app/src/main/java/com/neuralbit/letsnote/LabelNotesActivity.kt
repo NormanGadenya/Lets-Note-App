@@ -1,23 +1,23 @@
 package com.neuralbit.letsnote
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.neuralbit.letsnote.adapters.NoteClickInterface
+import com.neuralbit.letsnote.adapters.NoteFireClick
 import com.neuralbit.letsnote.adapters.NoteRVAdapter
 import com.neuralbit.letsnote.entities.Note
+import com.neuralbit.letsnote.repos.NoteFire
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 
-class LabelNotesActivity : AppCompatActivity() , NoteClickInterface {
+class LabelNotesActivity : AppCompatActivity() , NoteClickInterface, NoteFireClick {
     private lateinit var viewModel : LabelNotesViewModel
     private lateinit var allNotesViewModel: AllNotesViewModel
     private lateinit var notesList : ArrayList<Note>
@@ -39,7 +39,7 @@ class LabelNotesActivity : AppCompatActivity() , NoteClickInterface {
         val labelID = intent.getIntExtra("labelID",1)
         val layoutManager = StaggeredGridLayoutManager( 2, LinearLayoutManager.VERTICAL)
         recyclerView.layoutManager = layoutManager
-        val noteRVAdapter = NoteRVAdapter(applicationContext,this)
+        val noteRVAdapter = NoteRVAdapter(applicationContext,this,this)
         noteRVAdapter.viewModel = allNotesViewModel
         noteRVAdapter.lifecycleScope = lifecycleScope
         noteRVAdapter.lifecycleOwner = this
@@ -115,6 +115,10 @@ class LabelNotesActivity : AppCompatActivity() , NoteClickInterface {
         })
 
         return true
+    }
+
+    override fun onNoteFireClick(note: NoteFire) {
+        TODO("Not yet implemented")
     }
 
 }

@@ -11,19 +11,19 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Rect
-import android.inputmethodservice.Keyboard
-import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
 import android.speech.RecognizerIntent
 import android.text.Editable
 import android.text.TextWatcher
 import android.text.format.DateFormat
 import android.util.Log
 import android.util.SparseArray
-import android.view.*
+import android.view.KeyEvent
+import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
+import android.view.ViewTreeObserver
+import android.view.WindowManager
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -45,19 +45,14 @@ import com.neuralbit.letsnote.adapters.AddEditLabelAdapter
 import com.neuralbit.letsnote.adapters.AddEditTodoAdapter
 import com.neuralbit.letsnote.adapters.ItemUpdate
 import com.neuralbit.letsnote.adapters.LabelClickInterface
-import com.neuralbit.letsnote.databinding.ActivityAddEditNoteBinding
-import com.neuralbit.letsnote.databinding.FragmentAllNotesBinding
 import com.neuralbit.letsnote.entities.*
+import com.neuralbit.letsnote.repos.NoteFireIns
 import com.neuralbit.letsnote.ui.label.LabelViewModel
 import com.neuralbit.letsnote.utilities.*
-
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.IOException
 import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.collections.HashSet
 
 
 class AddEditNoteActivity : AppCompatActivity() ,
@@ -88,6 +83,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private lateinit var reminderIcon : ImageView
     private lateinit var reminderTV : TextView
     private var noteID : Long= -1
+    private var noteUid : String? = null
     private lateinit var viewModal : NoteViewModel
     private lateinit var labelViewModel : LabelViewModel
     private var noteDescOrig : String? = null
@@ -101,7 +97,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private var archived = false
     private lateinit var cm : Common
     private var noteDesc : String? = null
-    private lateinit var noteTitle : String
+    private var noteTitle : String? = null
     private var noteTimeStamp : Long = 0
     private lateinit var coordinatorlayout : View
     private var tagString : String ? = null
@@ -206,15 +202,18 @@ class AddEditNoteActivity : AppCompatActivity() ,
         //TODO fix archivedNotes Bug
         when (noteType) {
             "Edit" -> {
+                noteTitleEdit.setText(noteTitle)
+                noteDescriptionEdit.setText(noteDesc)
+                tvTimeStamp.text= getString(R.string.timeStamp,cm.convertLongToTime(noteTimeStamp)[0],cm.convertLongToTime(noteTimeStamp)[1])
+                tvTimeStamp.visibility =VISIBLE
+//                noteTitleEdit.setText(noteTitle)
+//                noteDescriptionEdit.setText(noteDesc)
                 viewModal.getNote(noteID).observe(this){
                     if(it!=null){
                         noteTitle = it.title!!
                         noteDesc = it.description!!
                         noteTimeStamp = it.timeStamp
-                        tvTimeStamp.text= getString(R.string.timeStamp,cm.convertLongToTime(noteTimeStamp)[0],cm.convertLongToTime(noteTimeStamp)[1])
-                        tvTimeStamp.visibility =VISIBLE
-                        noteTitleEdit.setText(noteTitle)
-                        noteDescriptionEdit.setText(noteDesc)
+
                         if(archived) {
                             tvTimeStamp.text= getString(R.string.archivedTime,cm.convertLongToTime(noteTimeStamp)[0],cm.convertLongToTime(noteTimeStamp)[1])
 
@@ -851,6 +850,11 @@ class AddEditNoteActivity : AppCompatActivity() ,
         reminderIcon = findViewById(R.id.reminderIcon)
         noteID = intent.getLongExtra("noteID",-1)
         noteType = intent.getStringExtra("noteType").toString()
+        intent.putExtra("noteType","Edit")
+        noteTitle = intent.getStringExtra("noteTitle")
+        noteUid = intent.getStringExtra("noteUid")
+        noteDesc = intent.getStringExtra("noteDescription")
+        noteTimeStamp = intent.getLongExtra("timeStamp",-1)
         deleteButton = findViewById(R.id.deleteButton)
         backButton = findViewById(R.id.backButton)
         archiveButton = findViewById(R.id.archiveButton)
@@ -1206,9 +1210,15 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 if (noteTitle.isNotEmpty() || noteDescription.isNotEmpty() || todoItems.isNotEmpty()){
 
                     val note = Note(noteTitle,noteDescription,currentDate)
+
                     if(noteType == "Edit"){
                         note.noteID = noteID
-                        viewModal.updateNote(note)
+
+                        val noteUpdate = HashMap<String,Any>()
+                        noteUpdate["title"] = noteTitle
+                        noteUpdate["description"] = noteDescription
+                        noteUpdate["timeStamp"] = currentDate
+                        noteUid?.let { viewModal.updateFireNote(noteUpdate, it) }
 
                         if (!deletable || !archived){
                             saveOtherEntities()
@@ -1218,7 +1228,10 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
                     }else{
                         lifecycleScope.launch {
-                           noteID =  viewModal.addNote(note)
+                            val noteFire = NoteFireIns(noteTitle, noteDescription, currentDate)
+                            noteFire.tags = tagList
+                            noteFire.pinned = notePinned
+                            noteUid =  viewModal.addFireNote(noteFire)
                             if (!deletable){
                                 saveOtherEntities()
                             }

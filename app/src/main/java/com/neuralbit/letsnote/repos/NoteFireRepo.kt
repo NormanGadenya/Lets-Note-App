@@ -9,8 +9,6 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import com.neuralbit.letsnote.entities.Note
-import com.neuralbit.letsnote.entities.NoteFire
 
 class NoteFireRepo {
 
@@ -19,32 +17,62 @@ class NoteFireRepo {
 
     private val fUser = FirebaseAuth.getInstance().currentUser
 
-    fun addNote( note : Note){
-        val notesRef = fUser?.let { database.getReference(it.uid) }
-        notesRef?.child("notes")?.push()?.setValue(note)
+    fun addNote( note : NoteFireIns) : String ?{
+        val notesRef = fUser?.let { database.getReference(it.uid).child("notes")}
+        val key = notesRef?.push()?.key
+        if (key != null) {
+            notesRef.child(key).setValue(note)
+        }
+        return key
     }
 
-    fun getAllNotes () : LiveData<List<Note>> {
-        val live = MutableLiveData<List<Note>>()
-        val notesRef = fUser?.let { database.getReference(it.uid).child("notes") }
+    fun getNote( noteUid : String) : LiveData<NoteFire?> {
+        val live = MutableLiveData<NoteFire?>()
+        val notesRef = fUser?.let { database.getReference(it.uid).child("notes").child(noteUid) }
         notesRef?.addValueEventListener(object : ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
-                val notes = ArrayList<Note>()
-                for ( s : DataSnapshot in snapshot.children ){
-                    val note = s.getValue(NoteFire::class.java)
-                    if (note != null) {
-                        val n = Note(note.title,note.description,note.timeStamp)
-                        notes.add(n)
-                    }
-                }
-                live.value = notes
+                val note = snapshot.getValue(NoteFire::class.java)
+                live.value = note
             }
 
             override fun onCancelled(error: DatabaseError) {
                 Log.e(TAG, "onCancelled: ${error.message}" )
             }
         })
+        fUser?.let { database.getReference(it.uid).keepSynced(true) }
         return live
+    }
+
+    fun getAllNotes () : LiveData<List<NoteFire>> {
+        val live = MutableLiveData<List<NoteFire>>()
+        val notesRef = fUser?.let { database.getReference(it.uid).child("notes") }
+        notesRef?.addValueEventListener(object : ValueEventListener{
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val notes = ArrayList<NoteFire>()
+                for ( s : DataSnapshot in snapshot.children ){
+                    val note = s.getValue(NoteFire::class.java)
+                    if (note != null) {
+                        note.noteUid = s.key
+                        notes.add(note)
+                    }
+                }
+                live.value = notes
+                Log.d(TAG, "onDataChange: $notes")
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e(TAG, "onCancelled: ${error.message}" )
+            }
+        })
+        fUser?.let { database.getReference(it.uid).keepSynced(true) }
+        return live
+    }
+
+    fun updateNote(noteUpdate : Map<String,Any>, noteUid : String) {
+        fUser?.let {
+            val noteRef = database.reference.child(it.uid).child("notes").child(noteUid)
+            noteRef.updateChildren(noteUpdate)
+        }
     }
 
 }

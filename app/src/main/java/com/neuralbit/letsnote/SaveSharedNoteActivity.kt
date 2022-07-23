@@ -4,12 +4,12 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import com.neuralbit.letsnote.entities.Note
+import com.neuralbit.letsnote.repos.NoteFireIns
 import com.neuralbit.letsnote.utilities.Common
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -79,7 +79,7 @@ class SaveSharedNoteActivity : AppCompatActivity() {
 
     private suspend fun saveNote() {
         val cm = Common()
-        viewModal.addNote(Note(noteTitle,noteDesc,cm.currentTimeToLong()))
+        viewModal.addFireNote(NoteFireIns(noteTitle,noteDesc, timeStamp = cm.currentTimeToLong()))
         dismissApp()
 
     }

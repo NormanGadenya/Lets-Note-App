@@ -1,28 +1,27 @@
 package com.neuralbit.letsnote.ui.deletedNotes
 
 import android.content.Intent
-import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.neuralbit.letsnote.AddEditNoteActivity
 import com.neuralbit.letsnote.NoteViewModel
-import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.adapters.NoteClickInterface
+import com.neuralbit.letsnote.adapters.NoteFireClick
 import com.neuralbit.letsnote.adapters.NoteRVAdapter
 import com.neuralbit.letsnote.databinding.DeletedNotesFragmentBinding
-import com.neuralbit.letsnote.databinding.FragmentAllNotesBinding
 import com.neuralbit.letsnote.entities.Note
+import com.neuralbit.letsnote.repos.NoteFire
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 
-class DeletedNotes : Fragment() , NoteClickInterface {
+class DeletedNotes : Fragment() , NoteClickInterface, NoteFireClick {
     private val noteViewModel: NoteViewModel by activityViewModels()
     private val allNotesViewModel: AllNotesViewModel by activityViewModels()
     private val deletedNotesViewModel: DeletedNotesViewModel by activityViewModels()
@@ -44,7 +43,7 @@ class DeletedNotes : Fragment() , NoteClickInterface {
         deletedRV = binding.deletedRV
         val root: View = binding.root
 
-        val noteRVAdapter = context?.let { NoteRVAdapter(it,this) }
+        val noteRVAdapter = context?.let { NoteRVAdapter(it,this, this) }
         deletedRV.layoutManager = LinearLayoutManager(context)
 
         noteRVAdapter?.viewModel = allNotesViewModel
@@ -73,6 +72,10 @@ class DeletedNotes : Fragment() , NoteClickInterface {
         intent.putExtra("noteType","Edit")
         intent.putExtra("noteID",note.noteID)
         startActivity(intent)
+    }
+
+    override fun onNoteFireClick(note: NoteFire) {
+        TODO("Not yet implemented")
     }
 
 }

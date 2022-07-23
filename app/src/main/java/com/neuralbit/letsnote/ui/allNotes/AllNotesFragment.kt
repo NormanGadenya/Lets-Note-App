@@ -27,13 +27,15 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.neuralbit.letsnote.AddEditNoteActivity
 import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.adapters.NoteClickInterface
+import com.neuralbit.letsnote.adapters.NoteFireClick
 import com.neuralbit.letsnote.adapters.NoteRVAdapter
 import com.neuralbit.letsnote.databinding.FragmentAllNotesBinding
 import com.neuralbit.letsnote.entities.*
+import com.neuralbit.letsnote.repos.NoteFire
 import com.neuralbit.letsnote.utilities.Common
 import kotlinx.coroutines.launch
 
-class AllNotesFragment : Fragment() , NoteClickInterface {
+class AllNotesFragment : Fragment() , NoteClickInterface, NoteFireClick {
 
     private val allNotesViewModel: AllNotesViewModel by activityViewModels()
     private var _binding: FragmentAllNotesBinding? = null
@@ -71,8 +73,8 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
         val layoutManagerPinned = StaggeredGridLayoutManager( 2,LinearLayoutManager.VERTICAL)
         notesRV.layoutManager = layoutManagerAll
         pinnedNotesRV.layoutManager =layoutManagerPinned
-        val noteRVAdapter = context?.let { NoteRVAdapter(it,this) }
-        val pinnedNoteRVAdapter = context?.let { NoteRVAdapter(it,this) }
+        val noteRVAdapter = context?.let { NoteRVAdapter(it,this, this) }
+        val pinnedNoteRVAdapter = context?.let { NoteRVAdapter(it,this,this) }
         notesRV.adapter= noteRVAdapter
         pinnedNotesRV.adapter = pinnedNoteRVAdapter
         noteRVAdapter?.viewModel = allNotesViewModel
@@ -88,10 +90,12 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
 //            noteRVAdapter?.updateList(it)
 //        }
         allNotesViewModel.getAllFireNotes().observe(viewLifecycleOwner){
-            allNotes = it
-            noteRVAdapter?.updateList(it)
+
+//            allNotes = it
+            noteRVAdapter?.updateListFire(it)
             Log.d(TAG, "onCreateView: $it")
         }
+
         allNotesViewModel.pinnedNotes.observe(viewLifecycleOwner) {
             pinnedNoteRVAdapter?.updateList(it)
             pinnedNotes = it
@@ -459,12 +463,18 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
 
 
     override fun onNoteClick(note: Note) {
+
+
+    }
+
+    override fun onNoteFireClick(note: NoteFire) {
         val intent = Intent( context, AddEditNoteActivity::class.java)
         intent.putExtra("noteType","Edit")
-        intent.putExtra("noteID",note.noteID)
-
+        intent.putExtra("noteTitle",note.title)
+        intent.putExtra("noteDescription",note.description)
+        intent.putExtra("noteUid",note.noteUid)
+        intent.putExtra("timeStamp",note.timeStamp)
         startActivity(intent)
-
 
     }
 

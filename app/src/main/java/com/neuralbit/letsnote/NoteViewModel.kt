@@ -90,7 +90,7 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         return noteRepo.getNote(noteID)
     }
 
-    suspend fun getAllNotes () :LiveData<List<Note>> {
+    fun getAllFireNotes () :LiveData<List<NoteFire>> {
         return noteFireRepo.getAllNotes()
     }
     fun getTodoList(noteID: Long) : LiveData<List<TodoItem>>{
@@ -103,9 +103,17 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     fun updateNote(note: Note)= viewModelScope.launch(Dispatchers.IO){
         noteRepo.update(note)
     }
+
+    fun updateFireNote(noteUpdate : Map<String, Any>, noteUid : String) {
+        noteFireRepo.updateNote(noteUpdate,noteUid)
+    }
+
     suspend fun addNote(note: Note) : Long{
-        noteFireRepo.addNote(note)
         return noteRepo.insert(note)
+    }
+
+    fun addFireNote(note: NoteFireIns) : String ?{
+        return noteFireRepo.addNote(note)
     }
 
     fun updateTodoItem(todoItem: TodoItem)= viewModelScope.launch(Dispatchers.IO){
