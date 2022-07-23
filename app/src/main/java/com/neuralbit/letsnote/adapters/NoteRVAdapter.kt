@@ -74,11 +74,10 @@ class NoteRVAdapter (
         var title = note.title
         var desc = note.description
         val cm = Common()
-//        val noteID = allNotes[position].noteID
-        if (title?.length!! > 20) {
+        if (title.length > 20) {
             title = title.substring(0, 15) + "..."
         }
-        if (desc?.length!! > 250) {
+        if (desc.length > 250) {
             desc = desc.substring(0, 250) + "..."
         }
         val c = Calendar.getInstance()
@@ -99,7 +98,10 @@ class NoteRVAdapter (
         }
         var tagStr = ""
         for (tag in note.tags) {
-            tagStr = "$tagStr $tag"
+            tagStr = "$tagStr $tag "
+            if (tagStr.length > 20){
+                break
+            }
         }
         if (tagStr.isNotEmpty()){
             holder.tagsTV.text = tagStr
@@ -107,7 +109,9 @@ class NoteRVAdapter (
         }else{
             holder.tagsTV.visibility = GONE
         }
-
+        if (note.label > 0){
+            holder.noteCard.setBackgroundColor(note.label)
+        }
 
 //        lifecycleScope?.launch {
 //            if (viewModel!=null){
@@ -192,11 +196,11 @@ class NoteRVAdapter (
 //            }
 //
 //
-//            searchString?.let {
-//                cm.setHighLightedText(holder.noteTextTV, it)
-//                cm.setHighLightedText(holder.noteTitleTV, it)
-//
-//            }
+            searchString?.let {
+                cm.setHighLightedText(holder.noteTextTV, it)
+                cm.setHighLightedText(holder.noteTitleTV, it)
+
+            }
 //
 //
 //

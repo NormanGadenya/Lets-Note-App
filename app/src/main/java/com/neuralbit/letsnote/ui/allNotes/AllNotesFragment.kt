@@ -5,7 +5,6 @@ import android.content.Intent
 import android.graphics.Canvas
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
@@ -91,29 +90,50 @@ class AllNotesFragment : Fragment() , NoteClickInterface, NoteFireClick {
 //        }
         allNotesViewModel.getAllFireNotes().observe(viewLifecycleOwner){
 
-//            allNotes = it
-            noteRVAdapter?.updateListFire(it)
-            Log.d(TAG, "onCreateView: $it")
-        }
-
-        allNotesViewModel.pinnedNotes.observe(viewLifecycleOwner) {
-            pinnedNoteRVAdapter?.updateList(it)
-            pinnedNotes = it
-            if (it.isNotEmpty()) {
-                allNotesViewModel.allNotes.observe(viewLifecycleOwner) { allNotes ->
-                    if (allNotes.isNotEmpty()) {
-                        otherNotesTV.visibility = VISIBLE
-                    } else {
-                        otherNotesTV.visibility = GONE
-                    }
+            val pinnedNotes = ArrayList<NoteFire>()
+            val otherNotes = ArrayList<NoteFire>()
+            for (note in it) {
+                if (note.pinned){
+                    pinnedNotes.add(note)
+                }else{
+                    otherNotes.add(note)
                 }
-
+            }
+            allNotesViewModel.otherFireNotesList.value = otherNotes
+            allNotesViewModel.pinnedFireNotesList.value = pinnedNotes
+            if (pinnedNotes.isNotEmpty()){
+                otherNotesTV.visibility = VISIBLE
                 pinnedNotesTV.visibility = VISIBLE
-            } else {
+                pinnedNotesRV.visibility = VISIBLE
+                pinnedNoteRVAdapter?.updateListFire(pinnedNotes)
+
+            }else{
                 otherNotesTV.visibility = GONE
                 pinnedNotesTV.visibility = GONE
+                pinnedNotesRV.visibility = GONE
             }
+            noteRVAdapter?.updateListFire(otherNotes)
+
         }
+
+//        allNotesViewModel.pinnedNotes.observe(viewLifecycleOwner) {
+//            pinnedNoteRVAdapter?.updateList(it)
+//            pinnedNotes = it
+//            if (it.isNotEmpty()) {
+//                allNotesViewModel.allNotes.observe(viewLifecycleOwner) { allNotes ->
+//                    if (allNotes.isNotEmpty()) {
+//                        otherNotesTV.visibility = VISIBLE
+//                    } else {
+//                        otherNotesTV.visibility = GONE
+//                    }
+//                }
+//
+//                pinnedNotesTV.visibility = VISIBLE
+//            } else {
+//                otherNotesTV.visibility = GONE
+//                pinnedNotesTV.visibility = GONE
+//            }
+//        }
 
         val touchHelperPinned = ItemTouchHelper(object  : ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.RIGHT){
             override fun onMove(
@@ -375,15 +395,14 @@ class AllNotesFragment : Fragment() , NoteClickInterface, NoteFireClick {
 
 
         allNotesViewModel.searchQuery.observe(viewLifecycleOwner) { str->
-            allNotesViewModel.filterPinnedList().observe(viewLifecycleOwner) {
+            allNotesViewModel.filterPinnedFireList().observe(viewLifecycleOwner) {
                 pinnedNoteRVAdapter?.searchString = str
-                pinnedNoteRVAdapter?.updateList(it)
+                pinnedNoteRVAdapter?.updateListFire(it)
 
             }
-            allNotesViewModel.filterList().observe(viewLifecycleOwner) {
-                noteRVAdapter?.updateList(it)
+            allNotesViewModel.filterOtherFireList().observe(viewLifecycleOwner) {
+                noteRVAdapter?.updateListFire(it)
                 noteRVAdapter?.searchString = str
-
             }
 
         }
@@ -474,6 +493,8 @@ class AllNotesFragment : Fragment() , NoteClickInterface, NoteFireClick {
         intent.putExtra("noteDescription",note.description)
         intent.putExtra("noteUid",note.noteUid)
         intent.putExtra("timeStamp",note.timeStamp)
+        intent.putExtra("labelColor",note.label)
+        intent.putStringArrayListExtra("tagList", ArrayList(note.tags))
         startActivity(intent)
 
     }

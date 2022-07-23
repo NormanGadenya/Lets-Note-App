@@ -35,7 +35,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
-        android:visibility="visible"
+        android:visibility="gone"
         android:text="@string/other_notes"
         android:textSize="32sp"
         app:layout_constraintStart_toStartOf="parent"
