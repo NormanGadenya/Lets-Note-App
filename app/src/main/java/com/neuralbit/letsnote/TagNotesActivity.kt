@@ -14,7 +14,7 @@ import com.neuralbit.letsnote.adapters.NoteClickInterface
 import com.neuralbit.letsnote.adapters.NoteFireClick
 import com.neuralbit.letsnote.adapters.NoteRVAdapter
 import com.neuralbit.letsnote.entities.Note
-import com.neuralbit.letsnote.repos.NoteFire
+import com.neuralbit.letsnote.entities.NoteFire
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import kotlinx.coroutines.launch
 

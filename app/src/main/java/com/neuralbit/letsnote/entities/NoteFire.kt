@@ -1,4 +1,4 @@
-package com.neuralbit.letsnote.repos
+package com.neuralbit.letsnote.entities
 
 data class NoteFire (
     val title: String ="",

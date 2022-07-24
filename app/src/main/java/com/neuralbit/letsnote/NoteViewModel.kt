@@ -22,6 +22,7 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     private val reminderRepo : ReminderRepo
     private val labelRepo : LabelRepo
     private val noteFireRepo : NoteFireRepo
+    private val tagFireRepo : TagFireRepo
     var noteChanged = MutableLiveData<Boolean>()
     var deleted = MutableLiveData<Boolean>()
     var archived : MutableLiveData<Boolean>
@@ -51,6 +52,7 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         reminderRepo = ReminderRepo(reminderDao)
         labelRepo = LabelRepo(labelDao)
         noteFireRepo = NoteFireRepo()
+        tagFireRepo = TagFireRepo()
         allNotes = noteRepo.allNotes
         archivedNote = noteRepo.archivedNotes
         pinnedNotes = noteRepo.pinnedNotes
@@ -90,30 +92,21 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         return noteRepo.getNote(noteID)
     }
 
-    fun getAllFireNotes () :LiveData<List<NoteFire>> {
-        return noteFireRepo.getAllNotes()
-    }
     fun getTodoList(noteID: Long) : LiveData<List<TodoItem>>{
         return noteRepo.getTodoList(noteID)
     }
 
-    fun deleteNote(note: Note)= viewModelScope.launch(Dispatchers.IO){
-        noteRepo.delete(note)
-    }
-    fun updateNote(note: Note)= viewModelScope.launch(Dispatchers.IO){
-        noteRepo.update(note)
-    }
 
     fun updateFireNote(noteUpdate : Map<String, Any>, noteUid : String) {
         noteFireRepo.updateNote(noteUpdate,noteUid)
     }
 
-    suspend fun addNote(note: Note) : Long{
-        return noteRepo.insert(note)
-    }
-
     fun addFireNote(note: NoteFireIns) : String ?{
         return noteFireRepo.addNote(note)
+    }
+
+    fun addTagFire(tags: List<String>, noteUid: String){
+        tagFireRepo.addTag(tags,noteUid)
     }
 
     fun updateTodoItem(todoItem: TodoItem)= viewModelScope.launch(Dispatchers.IO){
@@ -148,9 +141,6 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         noteRepo.deletePinned(pinnedNote)
     }
 
-    fun addTag(tag : Tag) = viewModelScope.launch(Dispatchers.IO){
-        tagRepo.insert(tag)
-    }
 
     fun deleteTag(tag : Tag) = viewModelScope.launch(Dispatchers.IO){
         tagRepo.delete(tag)

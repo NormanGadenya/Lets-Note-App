@@ -30,7 +30,6 @@ import com.neuralbit.letsnote.adapters.NoteFireClick
 import com.neuralbit.letsnote.adapters.NoteRVAdapter
 import com.neuralbit.letsnote.databinding.FragmentAllNotesBinding
 import com.neuralbit.letsnote.entities.*
-import com.neuralbit.letsnote.repos.NoteFire
 import com.neuralbit.letsnote.utilities.Common
 import kotlinx.coroutines.launch
 
@@ -494,6 +493,7 @@ class AllNotesFragment : Fragment() , NoteClickInterface, NoteFireClick {
         intent.putExtra("noteUid",note.noteUid)
         intent.putExtra("timeStamp",note.timeStamp)
         intent.putExtra("labelColor",note.label)
+        intent.putExtra("pinned",note.pinned)
         intent.putStringArrayListExtra("tagList", ArrayList(note.tags))
         startActivity(intent)
 

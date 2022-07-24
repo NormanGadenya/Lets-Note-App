@@ -17,9 +17,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.neuralbit.letsnote.LabelNotesViewModel
 import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.entities.Note
+import com.neuralbit.letsnote.entities.NoteFire
 import com.neuralbit.letsnote.entities.Reminder
 import com.neuralbit.letsnote.entities.TodoItem
-import com.neuralbit.letsnote.repos.NoteFire
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import com.neuralbit.letsnote.utilities.AlertReceiver
 import com.neuralbit.letsnote.utilities.Common

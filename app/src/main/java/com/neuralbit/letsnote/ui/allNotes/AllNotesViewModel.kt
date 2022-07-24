@@ -21,7 +21,7 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
     private val reminderRepo : ReminderRepo
     private val labelRepo : LabelRepo
     private val tagRepo : TagRepo
-    var allTags: LiveData<List<Tag>>
+    private var allTags: LiveData<List<Tag>>
 
 
     var pinnedNotes: LiveData<List<Note>>
@@ -52,18 +52,7 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
         noteRepo.delete(note)
     }
 
-    fun filterList( ) : LiveData<List<Note>>{
-        val textLower = searchQuery.value
-        Log.d("LOG", "filterList:${searchQuery.value} ")
-        return if (searchQuery.value!=null){
-            Transformations.map(allNotes,){
-                filterLiveList(it,textLower)
-            }
-        }else{
-            allNotes
-        }
 
-    }
 
     fun filterOtherFireList () : LiveData<List<NoteFire>>{
         val textLower = searchQuery.value
@@ -105,19 +94,6 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
         noteRepo.deleteTodo(todoItem)
     }
 
-    fun filterPinnedList( ) : LiveData<List<Note>>{
-        val textLower = searchQuery.value
-        Log.d("LOG", "filterList:${searchQuery.value} ")
-        return if (searchQuery.value!=null){
-            Transformations.map(pinnedNotes,){
-                filterLiveList(it,textLower)
-            }
-        }else{
-            pinnedNotes
-        }
-
-    }
-
 
     private fun filterLiveList(list: List<Note>, text : String? ): List<Note>{
         var newList = ArrayList<Note>()
@@ -141,7 +117,7 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
 
     }
 
-    private fun filterList(list : List<NoteFire> , text: String?) : List<NoteFire>{
+    private fun filterList(list : List<NoteFire>, text: String?) : List<NoteFire>{
         val newList = ArrayList<NoteFire>()
 
         return if (text != null) {

@@ -9,7 +9,7 @@ import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import com.neuralbit.letsnote.repos.NoteFireIns
+import com.neuralbit.letsnote.entities.NoteFireIns
 import com.neuralbit.letsnote.utilities.Common
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope

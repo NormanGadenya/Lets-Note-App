@@ -46,7 +46,6 @@ import com.neuralbit.letsnote.adapters.AddEditTodoAdapter
 import com.neuralbit.letsnote.adapters.ItemUpdate
 import com.neuralbit.letsnote.adapters.LabelClickInterface
 import com.neuralbit.letsnote.entities.*
-import com.neuralbit.letsnote.repos.NoteFireIns
 import com.neuralbit.letsnote.ui.label.LabelViewModel
 import com.neuralbit.letsnote.utilities.*
 import kotlinx.coroutines.Dispatchers
@@ -126,7 +125,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private lateinit var dateTitleTV :TextView
     private lateinit var layoutManager : LinearLayoutManager
     private var todoItems = ArrayList<TodoItem>()
-    private var tagList : ArrayList<String>? = ArrayList<String>()
+    private var tagList : ArrayList<String> = ArrayList<String>()
     private var pinnedNote : PinnedNote ? = null
     private var archivedNote : ArchivedNote ? = null
     private var notePinned = false
@@ -182,28 +181,20 @@ class AddEditNoteActivity : AppCompatActivity() ,
             viewModal.deletedNote.value = it!=null
         }
 
-        viewModal.allTags.observe(lifecycleOwner){
-            
-            for (tag in it){
-                if (!tagList?.contains(tag.tagTitle)!!){
-                    tagList!!.add(tag.tagTitle)
 
-                }
-            }
-
-        }
 
 
         addTagBtn.setOnClickListener {
             val addTagDialog = AddTagDialog(this,applicationContext)
             addTagDialog.tagList = tagList!!
-            addTagDialog.show(supportFragmentManager,"addTagDialog")
+            addTagDialog.show(supportFragmentManager,"addTagDialogs")
 
         }
         //TODO fix archivedNotes Bug
         when (noteType) {
             "Edit" -> {
                 noteTitleEdit.setText(noteTitle)
+                viewModal.pinned.value = notePinned
 
                 noteDescriptionEdit.setText(noteDesc)
                 tvTimeStamp.text= getString(R.string.timeStamp,cm.convertLongToTime(noteTimeStamp)[0],cm.convertLongToTime(noteTimeStamp)[1])
@@ -318,11 +309,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
             }
         }
 
-        viewModal.getPinnedNote(noteID).observe(this){ pN->
-            viewModal.pinned.value = pN!=null
-            pinnedNote = pN
-
-        }
         viewModal.pinned.observe(lifecycleOwner){
             notePinned = it
 
@@ -423,16 +409,15 @@ class AddEditNoteActivity : AppCompatActivity() ,
         viewModal.newTagTyped.observe(this){
 
             for (tagStr in tagListSet){
+                tagList!!.add(tagStr)
                 if (noteDesc != null){
 
                     if (!noteDesc?.contains(tagStr)!!){
-                        viewModal.addTag(Tag(tagStr))
                         viewModal.addTagToList(Tag(tagStr))
                         tagListAdapter.updateList(viewModal.tagList)
 
                     }
                 }else{
-                    viewModal.addTag(Tag(tagStr))
                     viewModal.addTagToList(Tag(tagStr))
                     tagListAdapter.updateList(viewModal.tagList)
 
@@ -458,7 +443,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
                             }
 
-                            viewModal.addTag(tag)
 
                             viewModal.addTagToList(tag)
                             tagListAdapter.updateList(viewModal.tagList)
@@ -870,7 +854,12 @@ class AddEditNoteActivity : AppCompatActivity() ,
         noteTitle = intent.getStringExtra("noteTitle")
         noteUid = intent.getStringExtra("noteUid")
         noteDesc = intent.getStringExtra("noteDescription")
-        tagList = intent.getStringArrayListExtra("tagList")
+
+        notePinned = intent.getBooleanExtra("pinned",false)
+        val tlist = intent.getStringArrayListExtra("tagList")
+        if (tlist != null){
+            tagList = tlist
+        }
         labelColor = intent.getIntExtra("labelColor",0)
         noteTimeStamp = intent.getLongExtra("timeStamp",-1)
         deleteButton = findViewById(R.id.deleteButton)
@@ -916,7 +905,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
     }
 
     private fun pinOrUnPinNote(){
-        pinnedNote = PinnedNote(noteID)
         viewModal.noteChanged.value = true
             if(notePinned){
                 viewModal.pinned.value = false
@@ -931,7 +919,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 }
                 snackbar.show()
             }else{
-                pinnedNote = PinnedNote(noteID)
                 viewModal.pinned.value = true
 
                 var snackbar = Snackbar.make(coordinatorlayout,"Note pinned",Snackbar.LENGTH_LONG)
@@ -1250,7 +1237,9 @@ class AddEditNoteActivity : AppCompatActivity() ,
                     }else{
                         lifecycleScope.launch {
                             val noteFire = NoteFireIns(noteTitle, noteDescription, currentDate)
-                            noteFire.tags = tagList!!
+
+                            noteFire.tags = ArrayList(tagListSet)
+
                             noteFire.pinned = notePinned
                             noteFire.label = labelColor
                             noteUid =  viewModal.addFireNote(noteFire)
@@ -1296,14 +1285,12 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
     private fun saveOtherEntities(){
 
-        if (pinnedNote!=null){
-            pinnedNote?.noteID = noteID
-            if (notePinned){
-                viewModal.pinNote(pinnedNote!!)
-            }else{
-                viewModal.removePin(pinnedNote!!)
-            }
+        noteUid?.let {
+            viewModal.addTagFire(tagList!!, it)
         }
+
+
+
 //        if (label!=null){
 //            label?.noteID = noteID
 //            if (labelNoteSet){
@@ -1347,13 +1334,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 cancelAlarm()
             }
         }
-
-        for(tag in viewModal.tagList){
-
-            val crossRef = NoteTagCrossRef(noteID,tag.tagTitle)
-            viewModal.insertNoteTagCrossRef(crossRef)
-        }
-
 
     }
 
@@ -1404,7 +1384,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
     }
 
     override fun getTag(tag: Tag) {
-        viewModal.addTag(tag)
         viewModal.addTagToList(tag)
         tagListAdapter.updateList(viewModal.tagList)
         viewModal.noteChanged.value = true
