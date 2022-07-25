@@ -87,6 +87,7 @@ class SignInActivity : AppCompatActivity() {
                 this
             ) { task ->
                 if (task.isSuccessful) {
+
                     val intent = Intent(this@SignInActivity,MainActivity::class.java)
                     startActivity(intent)
                 } else {

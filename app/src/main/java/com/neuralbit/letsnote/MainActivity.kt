@@ -3,6 +3,8 @@ package com.neuralbit.letsnote
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
@@ -12,8 +14,10 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.bumptech.glide.Glide
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.neuralbit.letsnote.databinding.ActivityMainBinding
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import com.neuralbit.letsnote.ui.archived.ArchivedViewModel
@@ -29,15 +33,15 @@ class MainActivity : AppCompatActivity() {
     private val archivedViewModel : ArchivedViewModel by viewModels()
     private val tagViewModel : TagViewModel by viewModels()
     private lateinit var mAuth: FirebaseAuth
-    var firebaseUserID : String? = null
+    var fUser : FirebaseUser? = null
 
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mAuth = FirebaseAuth.getInstance()
-        firebaseUserID= mAuth.currentUser?.uid
-        if (firebaseUserID == null) {
+        fUser= mAuth.currentUser
+        if (fUser == null) {
 
             val intent = Intent(applicationContext, SignInActivity::class.java)
             startActivity(intent)
@@ -58,6 +62,26 @@ class MainActivity : AppCompatActivity() {
 
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+        val profileUrl = fUser?.photoUrl
+        val headerLayout = navView.getHeaderView(0)
+        val profileIV = headerLayout.findViewById<ImageView>(R.id.profilePic)
+        val nameTV = headerLayout.findViewById<TextView>(R.id.accountName)
+        val emailTV = headerLayout.findViewById<TextView>(R.id.emailAddress)
+//        val navController.navigate(R.id.profilePic)
+        if(profileUrl != null){
+            Glide.with(applicationContext).load(profileUrl).into(profileIV)
+        }
+
+        val name = fUser?.displayName
+        if (name != null){
+            nameTV.text = name
+        }
+
+        val emailAdd = fUser?.email
+        if (emailAdd != null){
+            emailTV.text = emailAdd
+        }
+
     }
 
 
