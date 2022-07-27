@@ -41,10 +41,7 @@ import com.google.android.gms.vision.text.TextBlock
 import com.google.android.gms.vision.text.TextRecognizer
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
-import com.neuralbit.letsnote.adapters.AddEditLabelAdapter
-import com.neuralbit.letsnote.adapters.AddEditTodoAdapter
-import com.neuralbit.letsnote.adapters.ItemUpdate
-import com.neuralbit.letsnote.adapters.LabelClickInterface
+import com.neuralbit.letsnote.adapters.*
 import com.neuralbit.letsnote.entities.*
 import com.neuralbit.letsnote.ui.label.LabelViewModel
 import com.neuralbit.letsnote.utilities.*
@@ -88,7 +85,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private var noteDescOrig : String? = null
     private var noteDescOrigList = ArrayList<String>()
     private var noteDescNew : String? = null
-    private var noteDescNewList : List<String> ? = null
     private lateinit var noteType : String
     private var deletable : Boolean = false
     private lateinit var tvTimeStamp : TextView
@@ -125,7 +121,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private lateinit var dateTitleTV :TextView
     private lateinit var layoutManager : LinearLayoutManager
     private var todoItems = ArrayList<TodoItem>()
-    private var tagList : ArrayList<String> = ArrayList<String>()
+//    private var tagList : ArrayList<String> = ArrayList<String>()
     private var pinnedNote : PinnedNote ? = null
     private var archivedNote : ArchivedNote ? = null
     private var notePinned = false
@@ -135,7 +131,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private var bitmap : Bitmap? = null
     private val REQUEST_CODE_SPEECH_INPUT = 1
     private lateinit var colorPickerView: ColorPickerView
-    private val tagListSet : HashSet<String> = HashSet()
 
     override fun onCreate(savedInstanceState: Bundle?)  {
         super.onCreate(savedInstanceState)
@@ -186,7 +181,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
         addTagBtn.setOnClickListener {
             val addTagDialog = AddTagDialog(this,applicationContext)
-            addTagDialog.tagList = tagList!!
+            addTagDialog.tagList = viewModal.oldTagList
             addTagDialog.show(supportFragmentManager,"addTagDialogs")
 
         }
@@ -209,40 +204,35 @@ class AddEditNoteActivity : AppCompatActivity() ,
                     window.statusBarColor = getColor(R.color.gunmetal)
                     delLabelBtn.visibility = GONE
                 }
-                for (tagStr in tagList!!){viewModal.addTagToList(Tag(tagStr))
-                        tagListAdapter.updateList(viewModal.tagList)
-
-                    viewModal.addTagToList(Tag(tagStr))
-                    tagListAdapter.updateList(viewModal.tagList)
-                }
-                viewModal.getNote(noteID).observe(this){
-                    if(it!=null){
-                        noteTitle = it.title!!
-                        noteDesc = it.description!!
-                        noteTimeStamp = it.timeStamp
-
-                        if(archived) {
-                            tvTimeStamp.text= getString(R.string.archivedTime,cm.convertLongToTime(noteTimeStamp)[0],cm.convertLongToTime(noteTimeStamp)[1])
-
-                            pinButton.visibility = GONE
-                            archiveButton.visibility = GONE
-                            alertButton.visibility = GONE
-                            restoreButton.visibility = VISIBLE
-                            noteDescriptionEdit.isEnabled = false
-                            noteTitleEdit.isEnabled = false
-                            infoContainer.visibility = GONE
-
-                        }
-                        lifecycleScope.launch {
-                            for (tag in viewModal.getTagsWithNote(noteID).last().tags){
-                                viewModal.addTagToList(tag)
-                            }
-                            tagListAdapter.updateList(viewModal.tagList)
-
-                        }
-                    }
-
-                }
+                tagListAdapter.updateList(viewModal.oldTagList)
+//                viewModal.getNote(noteID).observe(this){
+//                    if(it!=null){
+//                        noteTitle = it.title!!
+//                        noteDesc = it.description!!
+//                        noteTimeStamp = it.timeStamp
+//
+//                        if(archived) {
+//                            tvTimeStamp.text= getString(R.string.archivedTime,cm.convertLongToTime(noteTimeStamp)[0],cm.convertLongToTime(noteTimeStamp)[1])
+//
+//                            pinButton.visibility = GONE
+//                            archiveButton.visibility = GONE
+//                            alertButton.visibility = GONE
+//                            restoreButton.visibility = VISIBLE
+//                            noteDescriptionEdit.isEnabled = false
+//                            noteTitleEdit.isEnabled = false
+//                            infoContainer.visibility = GONE
+//
+//                        }
+//                        lifecycleScope.launch {
+//                            for (tag in viewModal.getTagsWithNote(noteID).last().tags){
+//                                viewModal.addTagToList(tag)
+//                            }
+//                            tagListAdapter.updateList(viewModal.tagList)
+//
+//                        }
+//                    }
+//
+//                }
 
             }
             else -> {
@@ -351,26 +341,25 @@ class AddEditNoteActivity : AppCompatActivity() ,
         viewModal.archived.observe(lifecycleOwner){
             archived = it
 
-//            if (it) {
-//                Log.d(TAG, "onCreate: Archived $it")
-//
-//                pinButton.visibility = GONE
-//                archiveButton.visibility = GONE
-//                alertButton.visibility = GONE
-//                restoreButton.visibility = VISIBLE
-//                noteDescriptionEdit.isEnabled = false
-//                noteTitleEdit.isEnabled = false
-//                infoContainer.visibility = GONE
-//            } else {
-//                pinButton.visibility = VISIBLE
-//                archiveButton.visibility = VISIBLE
-//                alertButton.visibility = VISIBLE
-//                restoreButton.visibility = GONE
-//                infoContainer.visibility = VISIBLE
-//                noteDescriptionEdit.isEnabled = true
-//                noteTitleEdit.isEnabled = true
-//
-//            }
+            if (it) {
+
+                pinButton.visibility = GONE
+                archiveButton.visibility = GONE
+                alertButton.visibility = GONE
+                restoreButton.visibility = VISIBLE
+                noteDescriptionEdit.isEnabled = false
+                noteTitleEdit.isEnabled = false
+                infoContainer.visibility = GONE
+            } else {
+                pinButton.visibility = VISIBLE
+                archiveButton.visibility = VISIBLE
+                alertButton.visibility = VISIBLE
+                restoreButton.visibility = GONE
+                infoContainer.visibility = VISIBLE
+                noteDescriptionEdit.isEnabled = true
+                noteTitleEdit.isEnabled = true
+
+            }
 
         }
 
@@ -387,12 +376,13 @@ class AddEditNoteActivity : AppCompatActivity() ,
         }
         
         val tagListStr = ArrayList<String>()
-        
-        viewModal.allTags.observe(this){
+        //TODO fix this
+        viewModal.allFireTags().observe(this){
             tagListStr.clear()
             for (tag in it){
-                tagListStr.add(tag.tagTitle)
+                tagListStr.add(tag.tagName)
             }
+            Log.d(TAG, "onCreate: taglist $tagListStr")
             val adapter = ArrayAdapter(applicationContext,android.R.layout.simple_dropdown_item_1line,tagListStr)
             noteDescriptionEdit.setAdapter(adapter)
             noteDescriptionEdit.setTokenizer(SpaceTokenizer())
@@ -407,56 +397,43 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
 
         viewModal.newTagTyped.observe(this){
+            val tags = HashSet<String>()
+            tags.addAll(viewModal.oldTagList)
+            tags.addAll(viewModal.newTags)
+            tagListAdapter.updateList(ArrayList(tags))
 
-            for (tagStr in tagListSet){
-                tagList!!.add(tagStr)
-                if (noteDesc != null){
-
-                    if (!noteDesc?.contains(tagStr)!!){
-                        viewModal.addTagToList(Tag(tagStr))
-                        tagListAdapter.updateList(viewModal.tagList)
-
-                    }
-                }else{
-                    viewModal.addTagToList(Tag(tagStr))
-                    tagListAdapter.updateList(viewModal.tagList)
-
-                }
-
-
-            }
 
         }
-        viewModal.noteDescString.observe(this) { noteDescStr ->
-            Log.d(TAG, "onCreate: $noteDescStr")
-
-            if (newTagTyped) {
-                if (noteDescStr.isNotEmpty()) {
-                    if (noteDescStr.length >= 2) {
-
-                        if (noteDescStr[noteDescStr.length - 1] == ' ') {
-                            val tagString = noteDescStr.substring(0,noteDescStr.length -1)
-                            val tag : Tag  = if(tagString.contains('#')){
-                                Tag(noteDescStr.substring(0, noteDescStr.length - 1))
-                            }else{
-                                Tag("#" +noteDescStr.substring(0, noteDescStr.length - 1))
-
-                            }
-
-
-                            viewModal.addTagToList(tag)
-                            tagListAdapter.updateList(viewModal.tagList)
-                        }
-
-                    }
-                }
-
-
-
-                if (noteDescStr != null) { tagString = noteDescStr }
-            }
-
-        }
+//        viewModal.noteDescString.observe(this) { noteDescStr ->
+//            Log.d(TAG, "onCreate: $noteDescStr")
+//
+//            if (newTagTyped) {
+//                if (noteDescStr.isNotEmpty()) {
+//                    if (noteDescStr.length >= 2) {
+//
+//                        if (noteDescStr[noteDescStr.length - 1] == ' ') {
+//                            val tagString = noteDescStr.substring(0,noteDescStr.length -1)
+//                            val tag : String  = if(tagString.contains('#')){
+//
+//                                noteDescStr.substring(0, noteDescStr.length - 1)
+//                            }else{
+//                                "#" +noteDescStr.substring(0, noteDescStr.length - 1)
+//                            }
+//                            tag.replace("\n","")
+//                            viewModal.newTags.add(tag)
+//                            val tags = ArrayList<String>()
+////                            tags.addAll(viewModal.oldTagList)
+//                            tags.addAll(viewModal.newTags)
+//                            tagListAdapter.updateList(tags)
+//                        }
+//
+//                    }
+//                }
+//
+//                if (noteDescStr != null) { tagString = noteDescStr }
+//            }
+//
+//        }
 
 
         labelBtn.setOnClickListener {
@@ -519,7 +496,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
                     noteListBullet()
 
-                    getTagFromString(p0,p3)
+                    getTagFromString(p0)
 
                 }
 
@@ -734,6 +711,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
         }
     }
+
     private fun requestCameraPermission() {
         if (ActivityCompat.shouldShowRequestPermissionRationale(
                 this,
@@ -854,12 +832,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
         noteTitle = intent.getStringExtra("noteTitle")
         noteUid = intent.getStringExtra("noteUid")
         noteDesc = intent.getStringExtra("noteDescription")
-
         notePinned = intent.getBooleanExtra("pinned",false)
-        val tlist = intent.getStringArrayListExtra("tagList")
-        if (tlist != null){
-            tagList = tlist
-        }
+        val tagIntentList = intent.getStringArrayListExtra("tagList")
         labelColor = intent.getIntExtra("labelColor",0)
         noteTimeStamp = intent.getLongExtra("timeStamp",-1)
         deleteButton = findViewById(R.id.deleteButton)
@@ -901,49 +875,54 @@ class AddEditNoteActivity : AppCompatActivity() ,
             this,
             ViewModelProvider.AndroidViewModelFactory.getInstance(application)
         ).get(LabelViewModel::class.java)
+        if (tagIntentList != null){
+            viewModal.oldTagList = tagIntentList
+        }
 
     }
 
     private fun pinOrUnPinNote(){
         viewModal.noteChanged.value = true
-            if(notePinned){
-                viewModal.pinned.value = false
-                var snackbar = Snackbar.make(coordinatorlayout,"Note unpinned",Snackbar.LENGTH_LONG)
-                snackbar.setAction("UNDO"
-                ) {
-                    pinnedNote = PinnedNote(noteID)
-                    viewModal.pinned.value = true
-
-                    snackbar = Snackbar.make(coordinatorlayout,"Note pinned",Snackbar.LENGTH_SHORT)
-                    snackbar.show()
-                }
-                snackbar.show()
-            }else{
+        if(notePinned){
+            viewModal.pinned.value = false
+            var snackbar = Snackbar.make(coordinatorlayout,"Note unpinned",Snackbar.LENGTH_LONG)
+            snackbar.setAction("UNDO"
+            ) {
+                pinnedNote = PinnedNote(noteID)
                 viewModal.pinned.value = true
 
-                var snackbar = Snackbar.make(coordinatorlayout,"Note pinned",Snackbar.LENGTH_LONG)
-                snackbar.setAction("UNDO"
-                ) {
-                    viewModal.pinned.value = false
-
-                    snackbar = Snackbar.make(coordinatorlayout,"Note unpinned",Snackbar.LENGTH_SHORT)
-                    snackbar.show()
-                }
+                snackbar = Snackbar.make(coordinatorlayout,"Note pinned",Snackbar.LENGTH_SHORT)
                 snackbar.show()
             }
+            snackbar.show()
+        }else{
+            viewModal.pinned.value = true
+
+            var snackbar = Snackbar.make(coordinatorlayout,"Note pinned",Snackbar.LENGTH_LONG)
+            snackbar.setAction("UNDO"
+            ) {
+                viewModal.pinned.value = false
+
+                snackbar = Snackbar.make(coordinatorlayout,"Note unpinned",Snackbar.LENGTH_SHORT)
+                snackbar.show()
+            }
+            snackbar.show()
+        }
 
 
 
     }
 
-    private fun getTagFromString(p0: CharSequence?, p3: Int) {
+    private fun getTagFromString(p0: CharSequence?) {
         val strL = p0?.toString()?.split(" ")
         if (!backPressed) {
             if (strL != null && strL.size > 1) {
                 val word = strL[strL.lastIndex - 1]
                 if (word.contains("#")) {
-                    tagListSet.add(word)
-                    viewModal.newTagTyped.value = true
+                    if (!viewModal.oldTagList.contains(word)){
+                        viewModal.newTags.add(word)
+                        viewModal.newTagTyped.value = true
+                    }
                 }
             }
         }
@@ -1138,7 +1117,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
 
     private fun openDateTimeDialog(){
-        val alertDialog: AlertDialog? = this?.let {
+        val alertDialog: AlertDialog? = this.let {
             val builder = AlertDialog.Builder(it)
             builder.apply {
                 setPositiveButton("ok"
@@ -1212,72 +1191,81 @@ class AddEditNoteActivity : AppCompatActivity() ,
         val noteDescription = noteDescriptionEdit.text.toString()
         val currentDate= cm.currentTimeToLong()
 
-            if(textChanged){
-                if (noteTitle.isNotEmpty() || noteDescription.isNotEmpty() || todoItems.isNotEmpty()){
+        if(textChanged){
+            if (noteTitle.isNotEmpty() || noteDescription.isNotEmpty() || todoItems.isNotEmpty()){
 
-                    val note = Note(noteTitle,noteDescription,currentDate)
+                val note = Note(noteTitle,noteDescription,currentDate)
 
-                    if(noteType == "Edit"){
-                        note.noteID = noteID
+                if(noteType == "Edit"){
+                    note.noteID = noteID
+                    val noteUpdate = HashMap<String,Any>()
+                    noteUpdate["title"] = noteTitle
+                    noteUpdate["description"] = noteDescription
+                    noteUpdate["timeStamp"] = currentDate
+                    noteUpdate["label"] = labelColor
+                    noteUpdate["pinned"] = notePinned
+                    noteUpdate["archived"] = archived
+                    noteUpdate["deleted"] = deletable
+                    val tags = ArrayList<String>()
+                    tags.addAll(viewModal.oldTagList)
+                    tags.addAll(viewModal.newTags)
+                    tags.removeAll(viewModal.deletedTags.toSet())
+                    noteUpdate["tags"] = tags
+                    noteUid?.let { viewModal.updateFireNote(noteUpdate, it) }
 
-                        val noteUpdate = HashMap<String,Any>()
-                        noteUpdate["title"] = noteTitle
-                        noteUpdate["description"] = noteDescription
-                        noteUpdate["timeStamp"] = currentDate
-                        noteUpdate["label"] = labelColor
-                        noteUpdate["pinned"] = notePinned
-                        noteUid?.let { viewModal.updateFireNote(noteUpdate, it) }
+                    if (!deletable || !archived){
+                        saveOtherEntities()
 
-                        if (!deletable || !archived){
+                        Toast.makeText(this,"Note updated .. " , Toast.LENGTH_SHORT).show()
+                    }
+
+                }else{
+                    lifecycleScope.launch {
+                        val noteFire = NoteFireIns(noteTitle, noteDescription, currentDate)
+                        val tags = ArrayList<String>()
+                        tags.addAll(viewModal.oldTagList)
+                        tags.addAll(viewModal.newTags)
+                        tags.removeAll(viewModal.deletedTags.toSet())
+                        noteFire.tags = ArrayList(tags)
+
+                        noteFire.pinned = notePinned
+                        noteFire.label = labelColor
+                        noteUid =  viewModal.addFireNote(noteFire)
+                        if (!deletable){
                             saveOtherEntities()
-
-                            Toast.makeText(this,"Note updated .. " , Toast.LENGTH_SHORT).show()
-                        }
-
-                    }else{
-                        lifecycleScope.launch {
-                            val noteFire = NoteFireIns(noteTitle, noteDescription, currentDate)
-
-                            noteFire.tags = ArrayList(tagListSet)
-
-                            noteFire.pinned = notePinned
-                            noteFire.label = labelColor
-                            noteUid =  viewModal.addFireNote(noteFire)
-                            if (!deletable){
-                                saveOtherEntities()
-                            }
-
-                        }
-
-                        if(!deletable){
-                            Toast.makeText(this,"Note added .. " , Toast.LENGTH_SHORT).show()
-
-                        }
-
-                    }
-                    if(deletable){
-
-                        lifecycleScope.launch {
-                            withContext(Dispatchers.IO) {
-                                viewModal.insertDeleted(DeletedNote(noteID))
-                            }
-                        }
-                        Toast.makeText(this@AddEditNoteActivity,"Note Deleted",Toast.LENGTH_SHORT).show()
-
-                    }else{
-                        lifecycleScope.launch {
-                            withContext(Dispatchers.IO) {
-                                viewModal.restoreDeleted(DeletedNote(noteID))
-                            }
                         }
 
                     }
 
+                    if(!deletable){
+                        Toast.makeText(this,"Note added .. " , Toast.LENGTH_SHORT).show()
+
+                    }
+
+                }
+                if(deletable){
+
+                    lifecycleScope.launch {
+                        withContext(Dispatchers.IO) {
+                            viewModal.insertDeleted(DeletedNote(noteID))
+                        }
+                    }
+                    Toast.makeText(this@AddEditNoteActivity,"Note Deleted",Toast.LENGTH_SHORT).show()
+
+                }else{
+                    lifecycleScope.launch {
+                        withContext(Dispatchers.IO) {
+                            viewModal.restoreDeleted(DeletedNote(noteID))
+                        }
+                    }
 
                 }
 
 
             }
+
+
+        }
     }
 
 
@@ -1286,7 +1274,11 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private fun saveOtherEntities(){
 
         noteUid?.let {
-            viewModal.addTagFire(tagList!!, it)
+
+            val newTagsAdded = viewModal.newTags
+            val deletedTags = viewModal.deletedTags
+            Log.e(TAG, "saveOtherEntities: $newTagsAdded" )
+            viewModal.addOrDeleteTags(newTagsAdded,deletedTags,it)
         }
 
 
@@ -1343,9 +1335,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         saveNote()
         val intent = Intent(this@AddEditNoteActivity, MainActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP;
-
         startActivity(intent)
-
         finish()
     }
 
@@ -1358,12 +1348,17 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
     }
 
-    override fun deleteTag(tag: Tag) {
-        viewModal.tagList.remove(tag)
+    override fun deleteTag(tag: String) {
         if (noteType == "Edit"){
-            viewModal.deleteNoteTagCrossRef(NoteTagCrossRef(noteID,tag.tagTitle))
+            viewModal.noteChanged.value = true
         }
-        tagListAdapter.updateList(viewModal.tagList)
+        viewModal.newTags.remove(tag)
+        viewModal.deletedTags.add(tag)
+        val tags = ArrayList<String>()
+        tags.addAll(viewModal.newTags)
+        tags.addAll(viewModal.oldTagList)
+        tags.remove(tag)
+        tagListAdapter.updateList(tags)
     }
 
     override fun getTimeInfo(calendar : Calendar) {
@@ -1383,9 +1378,9 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
     }
 
-    override fun getTag(tag: Tag) {
-        viewModal.addTagToList(tag)
-        tagListAdapter.updateList(viewModal.tagList)
+    override fun getTag(tag: String) {
+        viewModal.newTags.add(tag)
+        tagListAdapter.updateList(viewModal.oldTagList)
         viewModal.noteChanged.value = true
 
     }

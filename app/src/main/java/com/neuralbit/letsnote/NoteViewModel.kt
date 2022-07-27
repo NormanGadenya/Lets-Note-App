@@ -14,7 +14,6 @@ import kotlinx.coroutines.launch
 class NoteViewModel(application : Application) : AndroidViewModel(application) {
     var allNotes: LiveData<List<Note>>
     var deletedNotes: LiveData<List<Note>>
-    var allTags: LiveData<List<Tag>>
     val TAG = "NoteViewModel"
     private val noteRepo : NoteRepo
     private val tagRepo : TagRepo
@@ -23,6 +22,9 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     private val labelRepo : LabelRepo
     private val noteFireRepo : NoteFireRepo
     private val tagFireRepo : TagFireRepo
+    var oldTagList = ArrayList<String>()
+    var newTags = HashSet<String>()
+    var deletedTags = HashSet<String>()
     var noteChanged = MutableLiveData<Boolean>()
     var deleted = MutableLiveData<Boolean>()
     var archived : MutableLiveData<Boolean>
@@ -31,12 +33,11 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     var reminderSet : MutableLiveData<Boolean>
     var labelSet : MutableLiveData<Boolean>
     var searchQuery : MutableLiveData<String>
-    var archivedNote : LiveData<List<Note>>
+    private var archivedNote : LiveData<List<Note>>
     private var pinnedNotes : LiveData<List<Note>>
     var noteDescString : MutableLiveData<String>
     var newTagTyped : MutableLiveData<Boolean>
     var backPressed : MutableLiveData<Boolean>
-    var tagList : ArrayList<Tag>
     var undoMode : MutableLiveData<Boolean>
 
     init{
@@ -57,12 +58,10 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         archivedNote = noteRepo.archivedNotes
         pinnedNotes = noteRepo.pinnedNotes
         deletedNotes = noteRepo.deletedNotes
-        allTags = tagRepo.allTags
         searchQuery = MutableLiveData<String>()
         noteDescString = MutableLiveData()
         newTagTyped = MutableLiveData()
         backPressed = MutableLiveData()
-        tagList = ArrayList()
         pinned = MutableLiveData()
         archived = MutableLiveData()
         deletedNote = MutableLiveData()
@@ -72,20 +71,6 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         undoMode = MutableLiveData()
 
     }
-
-
-
-
-
-    fun addTagToList(tag : Tag) {
-
-        if (!tagList.contains(tag)){
-            tagList.add(tag)
-
-        }
-    }
-
-
 
 
     fun  getNote(noteID: Long) : LiveData<Note>{
@@ -105,8 +90,9 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         return noteFireRepo.addNote(note)
     }
 
-    fun addTagFire(tags: List<String>, noteUid: String){
-        tagFireRepo.addTag(tags,noteUid)
+
+    fun allFireTags() : LiveData<List<TagFire>>{
+        return tagFireRepo.getAllTags()
     }
 
     fun updateTodoItem(todoItem: TodoItem)= viewModelScope.launch(Dispatchers.IO){
@@ -192,6 +178,10 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
 
     fun getNoteLabel( noteID : Long) : LiveData <Label> {
         return labelRepo.getNoteLabel(noteID)
+    }
+
+    fun addOrDeleteTags(newTagsAdded: HashSet<String>, deletedTags: HashSet<String>, noteUid: String) {
+        tagFireRepo.addOrDeleteTags(newTagsAdded,deletedTags,noteUid)
     }
 
 
