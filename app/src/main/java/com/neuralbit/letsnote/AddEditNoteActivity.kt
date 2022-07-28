@@ -108,7 +108,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private lateinit var alertBottomSheet : BottomSheetDialog
     private lateinit var labelBottomSheet : BottomSheetDialog
     private lateinit var labelBtn : ImageButton
-    private  var reminder: Reminder? = null
     var TAG = "AddEditNoteActivity"
     private val REQUEST_CAMERA_CODE = 100
     private lateinit var lifecycleOwner : LifecycleOwner
@@ -152,15 +151,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
             }
             labelListAdapter.updateLabelIDList(labelColors)
         }
-        viewModal.getArchivedNote(noteID).observe(this){
-            viewModal.archived.value = it!=null
-            archivedNote = it
-
-        }
-
-        viewModal.getDeletedNote(noteID).observe(this){
-            viewModal.deletedNote.value = it!=null
-        }
 
 
 
@@ -199,32 +189,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
             }
         }
 
-
-//        viewModal.getReminder(noteID).observe(this) {
-//            reminder = it
-//            viewModal.reminderSet.value = it !=null
-//        }
-//
-//        viewModal.labelSet.observe(lifecycleOwner){
-//            labelNoteSet = it
-//            if(labelNoteSet){
-//                if (label != null){
-//
-//                    coordinatorlayout.setBackgroundColor(label!!.labelID)
-//                    window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
-//                    window.statusBarColor = label!!.labelID
-//
-//                }
-//                delLabelBtn.visibility = VISIBLE
-//            }else{
-//                coordinatorlayout.setBackgroundColor(Color.TRANSPARENT)
-//                window.statusBarColor = getColor(R.color.gunmetal)
-//                delLabelBtn.visibility = GONE
-//
-//            }
-//
-//        }
-
         delLabelBtn.setOnClickListener {
             viewModal.noteChanged.value = true
             viewModal.labelChanged = true
@@ -236,17 +200,17 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
 
         viewModal.reminderSet.observe(lifecycleOwner){
+            val reminderTime = viewModal.reminderTime
             reminderNoteSet = it
             if(it){
                 alertButton.setImageResource(R.drawable.ic_baseline_add_alert_24)
                 reminderTV.visibility =  VISIBLE
                 reminderIcon.visibility = VISIBLE
 
-                reminderTV.text = resources.getString(R.string.reminder,cm.convertLongToTime(reminder?.dateTime!!)[0],cm.convertLongToTime(reminder?.dateTime!!)[1])
+                reminderTV.text = resources.getString(R.string.reminder,cm.convertLongToTime(reminderTime)[0],cm.convertLongToTime(reminderTime)[1])
                 val c = Calendar.getInstance()
-                if (c.timeInMillis > reminder?.dateTime!!){
-                    cancelAlarm()
-                    viewModal.deleteReminder(noteID)
+                if (c.timeInMillis > reminderTime){
+                    cancelAlarm(viewModal.reminderTime.toInt())
                 }
             }else{
                 alertButton.setBackgroundResource(R.drawable.ic_outline_add_alert_24)
@@ -320,19 +284,17 @@ class AddEditNoteActivity : AppCompatActivity() ,
         }
 
         alertButton.setOnClickListener {
-            if (reminder==null){
+            val reminderTime = viewModal.reminderTime
+            if (reminderTime == (0).toLong()){
                 showAlertSheetDialog()
 
             }else{
-                cancelAlarm()
-
-                viewModal.deleteReminder(noteID)
-                reminder = null
+                cancelAlarm(reminderTime.toInt())
+                viewModal.reminderTime = 0
             }
         }
         
         val tagListStr = ArrayList<String>()
-        //TODO fix this
         viewModal.allFireTags().observe(this){
             tagListStr.clear()
             for (tag in it){
@@ -759,8 +721,10 @@ class AddEditNoteActivity : AppCompatActivity() ,
         noteUid = intent.getStringExtra("noteUid")
         noteDesc = intent.getStringExtra("noteDescription")
         notePinned = intent.getBooleanExtra("pinned",false)
+        archived = intent.getBooleanExtra("archieved",false)
         val tagIntentList = intent.getStringArrayListExtra("tagList")
         val labelColor = intent.getIntExtra("labelColor",0)
+        val reminderTime = intent.getLongExtra("reminder",0)
         noteTimeStamp = intent.getLongExtra("timeStamp",-1)
         deleteButton = findViewById(R.id.deleteButton)
         backButton = findViewById(R.id.backButton)
@@ -804,7 +768,12 @@ class AddEditNoteActivity : AppCompatActivity() ,
         if (tagIntentList != null){
             viewModal.oldTagList = tagIntentList
         }
+        viewModal.reminderTime = reminderTime
+        if (reminderTime > (0).toLong()){
+            viewModal.reminderSet.value = true
+        }
         viewModal.labelColor = labelColor
+        viewModal.archived.value = archived
     }
 
     private fun pinOrUnPinNote(){
@@ -834,8 +803,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
             }
             snackbar.show()
         }
-
-
 
     }
 
@@ -970,7 +937,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
         opt1?.setOnClickListener {
             if(noteDescriptionEdit.length() > 0 || noteTitleEdit.length() >0 ){
                 viewModal.noteChanged.value = true
-
             }
             alertBottomSheet.dismiss()
             when(currentHr){
@@ -999,7 +965,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
                 }
             }
-            reminder = Reminder(noteID, calendar.timeInMillis)
+            viewModal.reminderTime = calendar.timeInMillis
             viewModal.reminderSet.value = true
 
         }
@@ -1016,7 +982,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
             }
             Toast.makeText(this, "Reminder set for tomorrow at 8:00am", Toast.LENGTH_SHORT).show()
 
-            reminder = Reminder(noteID, calendar.timeInMillis)
+            viewModal.reminderTime = calendar.timeInMillis
             viewModal.reminderSet.value = true
 
 
@@ -1030,7 +996,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 viewModal.noteChanged.value = true
 
             }
-            reminder = Reminder(noteID, calendar.timeInMillis)
+            viewModal.reminderTime = calendar.timeInMillis
             viewModal.reminderSet.value = true
 
             Toast.makeText(this, "Reminder set for tomorrow at 6:00pm", Toast.LENGTH_SHORT).show()
@@ -1052,7 +1018,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
                     }
                     Toast.makeText(context, "Reminder set", Toast.LENGTH_SHORT).show()
-                    reminder = Reminder(noteID, calendar.timeInMillis)
+                    viewModal.reminderTime = calendar.timeInMillis
                     viewModal.reminderSet.value = true
                     alertBottomSheet.dismiss()
 
@@ -1085,7 +1051,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
     }
 
-    private fun startAlarm() {
+    private fun startAlarm(requestCode: Int) {
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(this, AlertReceiver::class.java)
         viewModal.noteChanged.value = true
@@ -1097,17 +1063,26 @@ class AddEditNoteActivity : AppCompatActivity() ,
         if (noteDescription.isNotEmpty()){
             intent.putExtra("noteDesc",noteDescription)
         }
-        intent.putExtra("noteID",noteID)
+        intent.putExtra("noteUid",noteUid)
+        intent.putExtra("timeStamp",System.currentTimeMillis())
+        intent.putExtra("labelColor",viewModal.labelColor)
+        intent.putExtra("pinned",viewModal.pinned.value)
+        intent.putExtra("archieved",viewModal.archived.value)
+        val tags = ArrayList<String>()
+        tags.addAll(viewModal.oldTagList)
+        tags.addAll(viewModal.newTags)
+        tags.removeAll(viewModal.deletedTags.toSet())
+        intent.putStringArrayListExtra("tagList", tags)
         intent.putExtra("noteType","Edit")
 
-        val pendingIntent = PendingIntent.getBroadcast(this, noteID.toInt(), intent, PendingIntent.FLAG_UPDATE_CURRENT)
+        val pendingIntent = PendingIntent.getBroadcast(this, requestCode, intent, PendingIntent.FLAG_IMMUTABLE)
         alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
     }
 
-    private fun cancelAlarm(){
+    private fun cancelAlarm(requestCode: Int){
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(this, AlertReceiver::class.java)
-        val pendingIntent = PendingIntent.getBroadcast(this, noteID.toInt(), intent, PendingIntent.FLAG_UPDATE_CURRENT)
+        val pendingIntent = PendingIntent.getBroadcast(this,requestCode , intent, PendingIntent.FLAG_IMMUTABLE)
         alarmManager.cancel(pendingIntent)
     }
 
@@ -1133,6 +1108,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                     noteUpdate["pinned"] = notePinned
                     noteUpdate["archived"] = archived
                     noteUpdate["deleted"] = deletable
+                    noteUpdate["reminderDate"] = viewModal.reminderTime
                     val tags = ArrayList<String>()
                     tags.addAll(viewModal.oldTagList)
                     tags.addAll(viewModal.newTags)
@@ -1154,7 +1130,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                         tags.addAll(viewModal.newTags)
                         tags.removeAll(viewModal.deletedTags.toSet())
                         noteFire.tags = ArrayList(tags)
-
+                        noteFire.reminderDate = viewModal.reminderTime
                         noteFire.pinned = notePinned
                         noteFire.label = viewModal.labelColor
                         noteUid =  viewModal.addFireNote(noteFire)
@@ -1218,15 +1194,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
             }
         }
 
-        if (archivedNote!=null){
-            archivedNote?.noteID = noteID
-
-            if (archived){
-                viewModal.archiveNote(archivedNote!!)
-            }else{
-                viewModal.removeArchive(archivedNote!!)
-            }
-        }
 
         for (todoItem in todoItems){
             todoItem.noteID = noteID
@@ -1239,18 +1206,14 @@ class AddEditNoteActivity : AppCompatActivity() ,
         }
 
 
-        if (reminder!=null){
-            reminder?.noteID = noteID
-
+        if (viewModal.reminderTime > 0){
             if (reminderNoteSet){
                 if (!deletable){
-                    startAlarm()
-                    viewModal.insertReminder(reminder!!)
+                    startAlarm(viewModal.reminderTime.toInt())
                 }
 
             }else{
-                viewModal.deleteReminder(noteID)
-                cancelAlarm()
+                cancelAlarm(viewModal.reminderTime.toInt())
             }
         }
 

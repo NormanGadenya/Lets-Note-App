@@ -34,6 +34,7 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     var pinned : MutableLiveData<Boolean>
     var reminderSet : MutableLiveData<Boolean>
     var labelSet : MutableLiveData<Boolean>
+    var reminderTime : Long = 0
     var searchQuery : MutableLiveData<String>
     private var archivedNote : LiveData<List<Note>>
     private var pinnedNotes : LiveData<List<Note>>
@@ -122,29 +123,6 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         return noteRepo.restoreDeletedNote(deletedNote)
     }
 
-    fun archiveNote(archivedNote: ArchivedNote) = viewModelScope.launch(Dispatchers.IO){
-        noteRepo.insertArchive(archivedNote)
-    }
-
-    fun removeArchive(archivedNote: ArchivedNote) = viewModelScope.launch(Dispatchers.IO){
-        noteRepo.deleteArchive(archivedNote)
-    }
-
-    fun getArchivedNote(noteID: Long):LiveData<ArchivedNote> {
-        return noteRepo.getArchivedNote(noteID)
-    }
-    fun getDeletedNote(noteID: Long):LiveData<DeletedNote> {
-        return noteRepo.getDeletedNote(noteID)
-    }
-
-
-    fun insertReminder(reminder: Reminder) = viewModelScope.launch(Dispatchers.IO){
-        reminderRepo.insert(reminder)
-    }
-
-    fun deleteReminder(noteID: Long) = viewModelScope.launch(Dispatchers.IO){
-        reminderRepo.delete(noteID)
-    }
 
     fun addOrDeleteTags(newTagsAdded: HashSet<String>, deletedTags: HashSet<String>, noteUid: String) {
         tagFireRepo.addOrDeleteTags(newTagsAdded,deletedTags,noteUid)

@@ -146,6 +146,7 @@
                     android:id="@+id/reminderIcon"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
+                    android:visibility="gone"
                     android:layout_marginTop="@dimen/margin"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:src="@drawable/ic_baseline_access_alarm_24"

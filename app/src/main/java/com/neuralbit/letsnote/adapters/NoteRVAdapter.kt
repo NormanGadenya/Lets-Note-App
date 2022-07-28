@@ -113,103 +113,40 @@ class NoteRVAdapter (
             holder.noteCard.setBackgroundColor(note.label)
         }
 
-//        lifecycleScope?.launch {
-//            if (viewModel!=null){
-//                todoAdapter.noteID = noteID
-//                viewModel!!.getTodoList(noteID).observe(lifecycleOwner!!){
-//                    todoAdapter.getTodoItems(it)
-//                }
-//                val tagList = viewModel?.getTagsWithNote(noteID)?.last()
-//                var tagList = viewModel?.getTagsWithNote(noteID).let { it?.last() }
-//                if (tagList?.tags?.isNotEmpty()!!) {
-//                    holder.tagsTV.visibility = VISIBLE
-//
-//                }
-//                var tagStr : String? = null
-//
-//                for (t in tagList.tags) {
-//                    tagStr = t.tagTitle + " "
-//                }
-//                if (tagStr!=null){
-//                    holder.tagsTV.text = tagStr
-//                    holder.tagsTV.visibility = VISIBLE
-//
-//                }else{
-//                    holder.tagsTV.visibility = GONE
-//
-//                }
-//
-//            }
-//
-//        }
+        val reminderDate = note.reminderDate
 
-//        lifecycleOwner?.let {
-//            viewModel?.getReminder(noteID)?.observe(it) { r ->
-//                if (r != null) {
-//
-//                    if(c.timeInMillis > r.dateTime){
-//                        cancelAlarm(noteID.toInt())
-//                        viewModel?.deleteReminder(noteID)
-//                    }else{
-//                        holder.reminderIcon.visibility = VISIBLE
-//                        holder.reminderTV.visibility = VISIBLE
-//                        holder.reminderTV.text = context.resources.getString(
-//                            R.string.reminder,
-//                            cm.convertLongToTime(r.dateTime)[0],
-//                            cm.convertLongToTime(r.dateTime)[1]
-//                        )
-//
-//                    }
-//
-//
-//                } else {
-//                    holder.reminderIcon.visibility = GONE
-//                    holder.reminderTV.visibility = GONE
-//                }
-//            }
-//        }
+        if (reminderDate > 0) {
 
-//        lifecycleOwner?.let { owner ->
-//            if (viewModel != null) {
-//                viewModel?.getNoteLabel(noteID)?.observe(owner) {
-//                    if(it!=null){
-//
-//                        val noteCardColor = it.labelID
-//                        holder.noteCard.setBackgroundColor(noteCardColor)
-//
-//                    }
-//
-//                }
-//            } else if(labelViewModel!=null) {
-//                labelViewModel?.getNoteLabel(noteID)?.observe(owner) {
-//                    val noteCardColor = context.getColor(it.labelID)
-//                    holder.noteCard.setBackgroundColor(noteCardColor)
-//                }
-//
-//            }
-//
-//            if (desc.isEmpty()) {
-//                holder.noteTextTV.visibility = GONE
-//            } else {
-//                holder.noteTextTV.text = desc
-//                holder.noteTextTV.visibility = VISIBLE
-//            }
-//
-//
-            searchString?.let {
-                cm.setHighLightedText(holder.noteTextTV, it)
-                cm.setHighLightedText(holder.noteTitleTV, it)
+            if(c.timeInMillis > reminderDate){
+                holder.reminderIcon.visibility = GONE
+                holder.reminderTV.visibility = GONE
+                cancelAlarm(reminderDate.toInt())
+            }else{
+                holder.reminderIcon.visibility = VISIBLE
+                holder.reminderTV.visibility = VISIBLE
+                holder.reminderTV.text = context.resources.getString(
+                    R.string.reminder,
+                    cm.convertLongToTime(reminderDate)[0],
+                    cm.convertLongToTime(reminderDate)[1]
+                )
 
             }
-//
-//
-//
-//
-//
-            holder.itemView.setOnClickListener {
-                noteFireClick.onNoteFireClick(note)
-            }
-//        }
+
+
+        } else {
+            holder.reminderIcon.visibility = GONE
+            holder.reminderTV.visibility = GONE
+        }
+
+        searchString?.let {
+            cm.setHighLightedText(holder.noteTextTV, it)
+            cm.setHighLightedText(holder.noteTitleTV, it)
+
+        }
+
+        holder.itemView.setOnClickListener {
+            noteFireClick.onNoteFireClick(note)
+        }
     }
     override fun getItemCount(): Int {
         return allNotesFire.size
@@ -244,7 +181,7 @@ class NoteRVAdapter (
     private fun cancelAlarm(noteID : Int){
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(context, AlertReceiver::class.java)
-        val pendingIntent = PendingIntent.getBroadcast(context, noteID, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+        val pendingIntent = PendingIntent.getBroadcast(context, noteID, intent, PendingIntent.FLAG_IMMUTABLE)
         alarmManager.cancel(pendingIntent)
     }
 

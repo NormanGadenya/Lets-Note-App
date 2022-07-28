@@ -64,26 +64,27 @@
             tools:text ="#tag #james #patric"/>
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
             android:id="@+id/reminderIcon"
             android:layout_marginTop="4dp"
 
             app:layout_constraintTop_toBottomOf="@id/noteTagsTV"
             app:layout_constraintStart_toStartOf="parent"
             android:background="@drawable/ic_baseline_access_alarm_24"
-            android:visibility="gone"
+            android:visibility="visible"
             />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/reminderTV"
             android:layout_marginTop="4dp"
+            android:layout_marginEnd="8dp"
             android:textColor="@color/gunmetal"
             app:layout_constraintTop_toBottomOf="@id/noteTagsTV"
             app:layout_constraintStart_toEndOf="@id/reminderIcon"
-            android:layout_marginStart="8dp"
-            android:visibility="gone"
+            android:layout_marginStart="4dp"
+            android:visibility="visible"
             android:textSize="12sp"
             tools:text ="#tag #james #patric"/>
 

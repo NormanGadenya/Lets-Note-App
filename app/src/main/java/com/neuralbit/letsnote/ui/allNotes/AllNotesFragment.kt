@@ -494,6 +494,8 @@ class AllNotesFragment : Fragment() , NoteClickInterface, NoteFireClick {
         intent.putExtra("timeStamp",note.timeStamp)
         intent.putExtra("labelColor",note.label)
         intent.putExtra("pinned",note.pinned)
+        intent.putExtra("archieved",note.archived)
+        intent.putExtra("reminder",note.reminderDate)
         intent.putStringArrayListExtra("tagList", ArrayList(note.tags))
         startActivity(intent)
 
