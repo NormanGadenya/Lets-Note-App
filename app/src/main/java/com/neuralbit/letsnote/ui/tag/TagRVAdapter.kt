@@ -8,16 +8,13 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
-import com.neuralbit.letsnote.LabelNotesActivity
 import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.TagNotesActivity
-import com.neuralbit.letsnote.entities.Tag
 import com.neuralbit.letsnote.utilities.Common
 
 class TagRVAdapter (
     val context: Context
         ): RecyclerView.Adapter<TagRVAdapter.ViewHolder>(){
-    var tagCount : Map<String,Int> = HashMap()
     var searchString : String? = null
 
     inner class ViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView) {
@@ -34,10 +31,10 @@ class TagRVAdapter (
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val tagTitle = tagList[position].tagTitle
+        val tagTitle = tagList[position].title
         holder.tagNameTV.text = tagTitle
-        val noteCount = tagCount[tagTitle]
-        var cm = Common()
+        val noteCount = tagList[position].noteCount
+        val cm = Common()
         if(noteCount==1){
             holder.tagNoteCount.text = context.getString(R.string.noteTagCountSingle,noteCount.toString())
         }else {
@@ -56,7 +53,7 @@ class TagRVAdapter (
     }
 
     override fun getItemCount(): Int {
-        return tagList?.size!!
+        return tagList.size
     }
 
     fun updateTagList(tList : ArrayList<Tag>){

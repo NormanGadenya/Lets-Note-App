@@ -82,20 +82,17 @@ class AllNotesFragment : Fragment() , NoteClickInterface, NoteFireClick {
         pinnedNoteRVAdapter?.lifecycleScope = lifecycleScope
         pinnedNoteRVAdapter?.lifecycleOwner = this
 
-//        allNotesViewModel.allNotes.observe(viewLifecycleOwner) {
-//            allNotes = it
-//
-//            noteRVAdapter?.updateList(it)
-//        }
         allNotesViewModel.getAllFireNotes().observe(viewLifecycleOwner){
 
             val pinnedNotes = ArrayList<NoteFire>()
             val otherNotes = ArrayList<NoteFire>()
             for (note in it) {
-                if (note.pinned){
-                    pinnedNotes.add(note)
-                }else{
-                    otherNotes.add(note)
+                if (!note.archived){
+                    if (note.pinned){
+                        pinnedNotes.add(note)
+                    }else{
+                        otherNotes.add(note)
+                    }
                 }
             }
             allNotesViewModel.otherFireNotesList.value = otherNotes
@@ -114,25 +111,6 @@ class AllNotesFragment : Fragment() , NoteClickInterface, NoteFireClick {
             noteRVAdapter?.updateListFire(otherNotes)
 
         }
-
-//        allNotesViewModel.pinnedNotes.observe(viewLifecycleOwner) {
-//            pinnedNoteRVAdapter?.updateList(it)
-//            pinnedNotes = it
-//            if (it.isNotEmpty()) {
-//                allNotesViewModel.allNotes.observe(viewLifecycleOwner) { allNotes ->
-//                    if (allNotes.isNotEmpty()) {
-//                        otherNotesTV.visibility = VISIBLE
-//                    } else {
-//                        otherNotesTV.visibility = GONE
-//                    }
-//                }
-//
-//                pinnedNotesTV.visibility = VISIBLE
-//            } else {
-//                otherNotesTV.visibility = GONE
-//                pinnedNotesTV.visibility = GONE
-//            }
-//        }
 
         val touchHelperPinned = ItemTouchHelper(object  : ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.RIGHT){
             override fun onMove(

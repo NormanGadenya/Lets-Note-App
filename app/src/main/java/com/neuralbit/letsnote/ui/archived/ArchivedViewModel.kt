@@ -3,16 +3,19 @@ package com.neuralbit.letsnote.ui.archived
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
-import com.neuralbit.letsnote.entities.Note
 import com.neuralbit.letsnote.NoteDatabase
+import com.neuralbit.letsnote.entities.Note
+import com.neuralbit.letsnote.entities.NoteFire
 import com.neuralbit.letsnote.repos.NoteRepo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.ArrayList
+import java.util.*
 
 class ArchivedViewModel (application : Application): AndroidViewModel(application) {
 
     var archivedNotes: LiveData<List<Note>>
+    var archivedFireNotes = MutableLiveData<List<NoteFire>>()
+
     val repo : NoteRepo
     var searchQuery : MutableLiveData<String> = MutableLiveData()
 
@@ -38,6 +41,37 @@ class ArchivedViewModel (application : Application): AndroidViewModel(applicatio
             }
         }else{
             archivedNotes
+        }
+
+    }
+
+    fun filterArchivedFireList () : LiveData<List<NoteFire>>{
+        val textLower = searchQuery.value
+        Log.d("LOG", "filterList:${searchQuery.value} ")
+        return if (searchQuery.value!=null){
+            Transformations.map(archivedFireNotes,){
+                filterList(it,textLower)
+            }
+        }else{
+            archivedFireNotes
+        }
+    }
+
+    private fun filterList(list : List<NoteFire>, text: String?) : List<NoteFire>{
+        val newList = ArrayList<NoteFire>()
+
+        return if (text != null) {
+            val textLower= text.toLowerCase(Locale.ROOT)
+            for ( note in list){
+
+                if(note.title.toLowerCase(Locale.ROOT).contains(textLower) || note.description.toLowerCase(
+                        Locale.ROOT).contains(textLower)){
+                    newList.add(note)
+                }
+            }
+            newList
+        }else{
+            list
         }
 
     }

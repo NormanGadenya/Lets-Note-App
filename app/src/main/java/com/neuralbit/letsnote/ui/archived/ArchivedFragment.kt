@@ -44,18 +44,24 @@ class ArchivedFragment : Fragment() , NoteClickInterface, NoteFireClick {
         noteRVAdapter?.viewModel = allNotesViewModel
         noteRVAdapter?.lifecycleScope = lifecycleScope
         noteRVAdapter?.lifecycleOwner = this
-        archivedViewModel.archivedNotes.observe(viewLifecycleOwner) {
-            noteRVAdapter?.updateList(it)
-        }
-        allNotesViewModel.pinnedNotes.observe(viewLifecycleOwner) {
-            pinnedNotes = it
+
+        allNotesViewModel.getAllFireNotes().observe(viewLifecycleOwner) {
+            val archivedNotes = ArrayList<NoteFire>()
+            for ( note in it){
+                if (note.archived){
+                    archivedNotes.add(note)
+                }
+            }
+            archivedViewModel.archivedFireNotes.value = archivedNotes
+            noteRVAdapter?.updateListFire(archivedNotes)
         }
 
         archivedViewModel.searchQuery.observe(viewLifecycleOwner) {
-            archivedViewModel.filterList().observe(viewLifecycleOwner) {
-                noteRVAdapter?.updateList(it)
+            archivedViewModel.filterArchivedFireList().observe(viewLifecycleOwner) {
+                noteRVAdapter?.updateListFire(it)
             }
         }
+
 
         return root
     }

@@ -1,21 +1,17 @@
 package com.neuralbit.letsnote.ui.tag
 
 import android.app.Application
-import androidx.lifecycle.*
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.MutableLiveData
 import com.neuralbit.letsnote.NoteDatabase
-import com.neuralbit.letsnote.entities.*
-import com.neuralbit.letsnote.relationships.NotesWithTag
-import com.neuralbit.letsnote.relationships.TagsWithNote
 import com.neuralbit.letsnote.repos.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class TagViewModel (application: Application): AndroidViewModel(application) {
-    var allTags: LiveData<List<Tag>>
     private val noteTagRepo : NoteTagRepo
     private val tagRepo : TagRepo
     private val noteRepo : NoteRepo
     private val reminderRepo : ReminderRepo
+    var allTags  = ArrayList<Tag>()
     private val labelRepo : LabelRepo
     var searchQuery : MutableLiveData <String>
     init {
@@ -29,48 +25,7 @@ class TagViewModel (application: Application): AndroidViewModel(application) {
         noteRepo = NoteRepo(noteDao)
         reminderRepo = ReminderRepo(reminderDao)
         labelRepo = LabelRepo(labelDao)
-        allTags = tagRepo.allTags
         searchQuery = MutableLiveData()
     }
-    suspend fun getNotesWithTag(tagTitle : String) : List<NotesWithTag> {
-        return noteTagRepo.getNotesWithTag(tagTitle)
-    }
 
-    suspend fun getTagsWithNote(noteID: Long):List<TagsWithNote> {
-        return noteTagRepo.getTagsWithNote(noteID)
-    }
-
-    fun deleteNoteTagCrossRef(crossRef: NoteTagCrossRef) = viewModelScope.launch(Dispatchers.IO){
-        noteTagRepo.deleteNoteTagCrossRef(crossRef)
-    }
-
-    fun deleteNoteLabel(noteID: Long) = viewModelScope.launch(Dispatchers.IO){
-        labelRepo.deleteNoteLabel(noteID)
-    }
-    fun deleteLabel(labelID: Int) = viewModelScope.launch(Dispatchers.IO){
-        labelRepo.deleteLabel(labelID)
-    }
-
-    fun deleteTag(tag: Tag) = viewModelScope.launch(Dispatchers.IO){
-        tagRepo.delete(tag)
-    }
-
-    fun deleteNote(note : Note) = viewModelScope.launch(Dispatchers.IO){
-            noteRepo.delete(note)
-        }
-
-    fun deleteReminder(noteID: Long) = viewModelScope.launch(Dispatchers.IO){
-        reminderRepo.delete(noteID)
-    }
-
-    fun removePin(pinnedNote: PinnedNote) = viewModelScope.launch(Dispatchers.IO){
-        noteRepo.deletePinned(pinnedNote)
-    }
-
-    fun removeArchive(archivedNote: ArchivedNote) = viewModelScope.launch(Dispatchers.IO){
-        noteRepo.deleteArchive(archivedNote)
-    }
-    fun getDeletedNote(noteID: Long):LiveData<DeletedNote> {
-        return noteRepo.getDeletedNote(noteID)
-    }
 }
