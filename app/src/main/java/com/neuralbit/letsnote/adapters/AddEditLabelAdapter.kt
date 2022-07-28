@@ -1,24 +1,21 @@
 package com.neuralbit.letsnote.adapters
 
 import android.content.Context
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.neuralbit.letsnote.R
-import com.neuralbit.letsnote.entities.Label
-import com.neuralbit.letsnote.entities.Note
 
 
 class AddEditLabelAdapter(
 
     val context : Context,
-    val labelClickInterface: LabelClickInterface
+    private val labelClickInterface: LabelClickInterface
 
 ): RecyclerView.Adapter<AddEditLabelAdapter.ViewHolder>() {
-    private var labelIDs = ArrayList<Int>()
+    private var labelColors = ArrayList<Int>()
 
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
@@ -32,24 +29,24 @@ class AddEditLabelAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val labelID = labelIDs[position]
-        holder.labelView.setColorFilter(labelID)
+        val labelColor = labelColors[position]
+        holder.labelView.setColorFilter(labelColor)
         holder.labelView.setOnClickListener{
-            labelClickInterface.onLabelItemClick(labelID)
+            labelClickInterface.onLabelItemClick(labelColor)
         }
     }
 
     override fun getItemCount(): Int {
-        return labelIDs.size
+        return labelColors.size
     }
 
-    fun updateLabelIDList(labelIDs : HashSet<Int>){
-        val list = ArrayList<Int>(labelIDs)
-        this.labelIDs = list
+    fun updateLabelIDList(labelColors : HashSet<Int>){
+        val list = ArrayList<Int>(labelColors)
+        this.labelColors = list
         notifyDataSetChanged()
     }
 }
 
 interface  LabelClickInterface{
-    fun onLabelItemClick(labelID: Int)
+    fun onLabelItemClick(labelColor: Int)
 }

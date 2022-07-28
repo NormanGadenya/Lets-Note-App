@@ -95,12 +95,9 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private var noteTitle : String? = null
     private var noteTimeStamp : Long = 0
     private lateinit var coordinatorlayout : View
-    private var tagString : String ? = null
-    private var newTagTyped = false
     private var backPressed  = false
     private lateinit var tagListRV : RecyclerView
     private lateinit var labelListRV : RecyclerView
-    private var labelColor : Int = 0
     private lateinit var todoRV : RecyclerView
     private lateinit var todoCheckBox: CheckBox
     private lateinit var todoItemDescTV : EditText
@@ -112,7 +109,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private lateinit var labelBottomSheet : BottomSheetDialog
     private lateinit var labelBtn : ImageButton
     private  var reminder: Reminder? = null
-    private  var label: Label? = null
     var TAG = "AddEditNoteActivity"
     private val REQUEST_CAMERA_CODE = 100
     private lateinit var lifecycleOwner : LifecycleOwner
@@ -121,12 +117,10 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private lateinit var dateTitleTV :TextView
     private lateinit var layoutManager : LinearLayoutManager
     private var todoItems = ArrayList<TodoItem>()
-//    private var tagList : ArrayList<String> = ArrayList<String>()
     private var pinnedNote : PinnedNote ? = null
     private var archivedNote : ArchivedNote ? = null
     private var notePinned = false
     private var reminderNoteSet = false
-    private var labelNoteSet = false
     private lateinit var infoContainer : View
     private var bitmap : Bitmap? = null
     private val REQUEST_CODE_SPEECH_INPUT = 1
@@ -149,22 +143,14 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 }
             }
         }
-        viewModal.getNoteLabel(noteID).observe(this){
-            label = it
-
-            viewModal.labelSet.value = it !=null
-        }
 
         manipulateNoteDescLines()
-        val labelIDs = HashSet<Int>()
-
-        labelViewModel.getAllNotes().observe(lifecycleOwner){ list ->
-            for (lwn in list){
-                val label = lwn.label.labelID
-                labelIDs.add(label)
+        viewModal.allFireLabels().observe(lifecycleOwner){
+            val labelColors = HashSet<Int>()
+            for (l in it){
+                labelColors.add(l.labelColor)
             }
-            labelListAdapter.updateLabelIDList(labelIDs)
-
+            labelListAdapter.updateLabelIDList(labelColors)
         }
         viewModal.getArchivedNote(noteID).observe(this){
             viewModal.archived.value = it!=null
@@ -194,6 +180,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 noteDescriptionEdit.setText(noteDesc)
                 tvTimeStamp.text= getString(R.string.timeStamp,cm.convertLongToTime(noteTimeStamp)[0],cm.convertLongToTime(noteTimeStamp)[1])
                 tvTimeStamp.visibility =VISIBLE
+                val labelColor = viewModal.labelColor
                 if(labelColor > 0){
                     coordinatorlayout.setBackgroundColor(labelColor)
                     window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
@@ -205,35 +192,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
                     delLabelBtn.visibility = GONE
                 }
                 tagListAdapter.updateList(viewModal.oldTagList)
-//                viewModal.getNote(noteID).observe(this){
-//                    if(it!=null){
-//                        noteTitle = it.title!!
-//                        noteDesc = it.description!!
-//                        noteTimeStamp = it.timeStamp
-//
-//                        if(archived) {
-//                            tvTimeStamp.text= getString(R.string.archivedTime,cm.convertLongToTime(noteTimeStamp)[0],cm.convertLongToTime(noteTimeStamp)[1])
-//
-//                            pinButton.visibility = GONE
-//                            archiveButton.visibility = GONE
-//                            alertButton.visibility = GONE
-//                            restoreButton.visibility = VISIBLE
-//                            noteDescriptionEdit.isEnabled = false
-//                            noteTitleEdit.isEnabled = false
-//                            infoContainer.visibility = GONE
-//
-//                        }
-//                        lifecycleScope.launch {
-//                            for (tag in viewModal.getTagsWithNote(noteID).last().tags){
-//                                viewModal.addTagToList(tag)
-//                            }
-//                            tagListAdapter.updateList(viewModal.tagList)
-//
-//                        }
-//                    }
-//
-//                }
-
             }
             else -> {
 
@@ -268,13 +226,11 @@ class AddEditNoteActivity : AppCompatActivity() ,
 //        }
 
         delLabelBtn.setOnClickListener {
-            viewModal.labelSet.value = false
             viewModal.noteChanged.value = true
+            viewModal.labelChanged = true
+            viewModal.labelColor = 0
 
-            if (label!=null && noteID>=0){
 
-                viewModal.deleteNoteLabel(noteID)
-            }
         }
 
 
@@ -404,36 +360,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
 
         }
-//        viewModal.noteDescString.observe(this) { noteDescStr ->
-//            Log.d(TAG, "onCreate: $noteDescStr")
-//
-//            if (newTagTyped) {
-//                if (noteDescStr.isNotEmpty()) {
-//                    if (noteDescStr.length >= 2) {
-//
-//                        if (noteDescStr[noteDescStr.length - 1] == ' ') {
-//                            val tagString = noteDescStr.substring(0,noteDescStr.length -1)
-//                            val tag : String  = if(tagString.contains('#')){
-//
-//                                noteDescStr.substring(0, noteDescStr.length - 1)
-//                            }else{
-//                                "#" +noteDescStr.substring(0, noteDescStr.length - 1)
-//                            }
-//                            tag.replace("\n","")
-//                            viewModal.newTags.add(tag)
-//                            val tags = ArrayList<String>()
-////                            tags.addAll(viewModal.oldTagList)
-//                            tags.addAll(viewModal.newTags)
-//                            tagListAdapter.updateList(tags)
-//                        }
-//
-//                    }
-//                }
-//
-//                if (noteDescStr != null) { tagString = noteDescStr }
-//            }
-//
-//        }
+
 
 
         labelBtn.setOnClickListener {
@@ -511,7 +438,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
         noteDescriptionEdit.setOnKeyListener { _, key, _ ->
             viewModal.noteChanged.value = true
             viewModal.backPressed.value = key == KeyEvent.KEYCODE_DEL
-//            viewModal.undoMode.value = true
 
             false
         }
@@ -834,7 +760,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         noteDesc = intent.getStringExtra("noteDescription")
         notePinned = intent.getBooleanExtra("pinned",false)
         val tagIntentList = intent.getStringArrayListExtra("tagList")
-        labelColor = intent.getIntExtra("labelColor",0)
+        val labelColor = intent.getIntExtra("labelColor",0)
         noteTimeStamp = intent.getLongExtra("timeStamp",-1)
         deleteButton = findViewById(R.id.deleteButton)
         backButton = findViewById(R.id.backButton)
@@ -878,7 +804,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         if (tagIntentList != null){
             viewModal.oldTagList = tagIntentList
         }
-
+        viewModal.labelColor = labelColor
     }
 
     private fun pinOrUnPinNote(){
@@ -959,12 +885,11 @@ class AddEditNoteActivity : AppCompatActivity() ,
             }
 
             labelDialog.show()
-            colorPickerView = labelDialog.findViewById<ColorPickerView>(R.id.colorPicker)
+            colorPickerView = labelDialog.findViewById(R.id.colorPicker)
             colorPickerView.addOnColorSelectedListener{
                 val hex = ColorTransparentUtils.transparentColor(it,30)
-                labelColor = Color.parseColor(hex)
-                label = Label(noteID,Color.parseColor(hex))
-                viewModal.labelSet.value = true
+                viewModal.labelColor = Color.parseColor(hex)
+                viewModal.labelChanged = true
                 viewModal.noteChanged.value = true
                 coordinatorlayout.setBackgroundColor(Color.parseColor(hex))
                 window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
@@ -1202,7 +1127,9 @@ class AddEditNoteActivity : AppCompatActivity() ,
                     noteUpdate["title"] = noteTitle
                     noteUpdate["description"] = noteDescription
                     noteUpdate["timeStamp"] = currentDate
-                    noteUpdate["label"] = labelColor
+                    if (viewModal.labelChanged){
+                        noteUpdate["label"] = viewModal.labelColor
+                    }
                     noteUpdate["pinned"] = notePinned
                     noteUpdate["archived"] = archived
                     noteUpdate["deleted"] = deletable
@@ -1229,7 +1156,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                         noteFire.tags = ArrayList(tags)
 
                         noteFire.pinned = notePinned
-                        noteFire.label = labelColor
+                        noteFire.label = viewModal.labelColor
                         noteUid =  viewModal.addFireNote(noteFire)
                         if (!deletable){
                             saveOtherEntities()
@@ -1281,16 +1208,16 @@ class AddEditNoteActivity : AppCompatActivity() ,
             viewModal.addOrDeleteTags(newTagsAdded,deletedTags,it)
         }
 
+        val labelColor = viewModal.labelColor
+        if (viewModal.labelChanged){
+            if (labelColor > 0){
+                noteUid?.let { viewModal.addOrDeleteLabel(labelColor, it,true) }
+            }else{
+                noteUid?.let { viewModal.addOrDeleteLabel(labelColor, it,false) }
 
+            }
+        }
 
-//        if (label!=null){
-//            label?.noteID = noteID
-//            if (labelNoteSet){
-//                viewModal.insertLabel(label!!)
-//            }else{
-//                viewModal.deleteNoteLabel(noteID)
-//            }
-//        }
         if (archivedNote!=null){
             archivedNote?.noteID = noteID
 
@@ -1385,13 +1312,13 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
     }
 
-    override fun onLabelItemClick(labelID: Int) {
-        label = Label(noteID,labelID)
+    override fun onLabelItemClick(labelColor: Int) {
+        viewModal.labelColor = labelColor
         viewModal.labelSet.value = true
         viewModal.noteChanged.value = true
-        coordinatorlayout.setBackgroundColor(labelID)
+        coordinatorlayout.setBackgroundColor(labelColor)
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
-        window.statusBarColor = labelID
+        window.statusBarColor = labelColor
     }
 
     override fun onItemDelete(position: Int,todoItem: TodoItem) {

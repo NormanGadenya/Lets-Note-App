@@ -2,27 +2,21 @@ package com.neuralbit.letsnote.adapters
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.appcompat.content.res.AppCompatResources
-import androidx.cardview.widget.CardView
-import androidx.core.graphics.drawable.DrawableCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.neuralbit.letsnote.LabelNotesActivity
 import com.neuralbit.letsnote.R
-import com.neuralbit.letsnote.entities.Label
-import com.neuralbit.letsnote.utilities.Common
 import kotlinx.coroutines.*
 
 class LabelRVAdapter(
     val context: Context
     ): RecyclerView.Adapter<LabelRVAdapter.ViewHolder>() {
     val TAG = "LabelRV"
-    private var labelIDs = ArrayList<Int>()
+    private var labelColors = ArrayList<Int>()
     private var labelCount : Map<Int,Int> = HashMap()
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
@@ -52,10 +46,10 @@ class LabelRVAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
-        val labelID = labelIDs[position]
-        val labelCountVal = labelCount[labelID]
+        val labelColor = labelColors[position]
+        val labelCountVal = labelCount[labelColor]
 
-        holder.labelCard.setBackgroundColor(labelID)
+        holder.labelCard.setBackgroundColor(labelColor)
 
 
         GlobalScope.launch {
@@ -71,19 +65,19 @@ class LabelRVAdapter(
         }
         holder.labelCard.setOnClickListener {
             val intent = Intent(context,LabelNotesActivity::class.java)
-            intent.putExtra("labelID",labelID)
+            intent.putExtra("labelID",labelColor)
             context.startActivity(intent)
         }
     }
 
     override fun getItemCount(): Int {
-        return labelIDs.size
+        return labelColors.size
     }
 
     fun updateLabelCount(labelCountMap : Map<Int,Int>, labelIDs : HashSet<Int>){
         labelCount = labelCountMap
         val list = ArrayList<Int>(labelIDs)
-        this.labelIDs = list
+        this.labelColors = list
         notifyDataSetChanged()
     }
 }
