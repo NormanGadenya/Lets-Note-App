@@ -41,13 +41,14 @@ import com.google.android.gms.vision.text.TextBlock
 import com.google.android.gms.vision.text.TextRecognizer
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
-import com.neuralbit.letsnote.adapters.*
-import com.neuralbit.letsnote.entities.*
+import com.neuralbit.letsnote.adapters.AddEditLabelAdapter
+import com.neuralbit.letsnote.adapters.AddEditTagRVAdapter
+import com.neuralbit.letsnote.adapters.LabelClickInterface
+import com.neuralbit.letsnote.adapters.TagRVInterface
+import com.neuralbit.letsnote.entities.NoteFireIns
 import com.neuralbit.letsnote.ui.label.LabelViewModel
 import com.neuralbit.letsnote.utilities.*
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.*
 
 
@@ -56,8 +57,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
     GetTimeFromPicker,
     GetDateFromPicker,
     GetTagFromDialog,
-    LabelClickInterface,
-    ItemUpdate
+    LabelClickInterface
 {
     private var deleted: Boolean = false
     private lateinit var restoreButton: ImageButton
@@ -103,7 +103,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private lateinit var todoItemDescTV : EditText
     private var isKeyBoardShowing = false
     private lateinit var tagListAdapter : AddEditTagRVAdapter
-    private lateinit var todoAdapter : AddEditTodoAdapter
     private lateinit var labelListAdapter : AddEditLabelAdapter
     private lateinit var alertBottomSheet : BottomSheetDialog
     private lateinit var labelBottomSheet : BottomSheetDialog
@@ -115,9 +114,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private lateinit var timeTitleTV :TextView
     private lateinit var dateTitleTV :TextView
     private lateinit var layoutManager : LinearLayoutManager
-    private var todoItems = ArrayList<TodoItem>()
-    private var pinnedNote : PinnedNote ? = null
-    private var archivedNote : ArchivedNote ? = null
     private var notePinned = false
     private var reminderNoteSet = false
     private lateinit var infoContainer : View
@@ -233,13 +229,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
             deleted = it
             if (it) {
-                if(noteType=="Edit"){
-                    viewModal.getNote(noteID).observe(this){ note ->
-                        tvTimeStamp.text= getString(R.string.deletedTime,cm.convertLongToTime(note.timeStamp)[0],cm.convertLongToTime(note.timeStamp)[1])
 
-                    }
-
-                }
                 pinButton.visibility = GONE
                 archiveButton.visibility = GONE
                 alertButton.visibility = GONE
@@ -483,17 +473,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
             }
         }
 
-
-
-        viewModal.getTodoList(noteID).observe(lifecycleOwner){
-            if (it.isNotEmpty()){
-                todoRV.visibility = VISIBLE
-            }
-            todoAdapter.getTodoItems(it)
-            todoItems.addAll(it)
-            Log.d(TAG, "onCreate:list $it")
-        }
-
         archiveButton.setOnClickListener { archiveNote() }
 
         pinButton.setOnClickListener { pinOrUnPinNote() }
@@ -515,13 +494,11 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 todoCheckBox.visibility = VISIBLE
                 dismissTodoButton.visibility = VISIBLE
             }else{
-                val todoDesc = todoItemDescTV.text.toString()
-                val isItemChecked = todoCheckBox.isChecked
-                viewModal.noteChanged.value = true
-                val todoItem = TodoItem(noteID,todoDesc,isItemChecked)
-                todoItems.add(todoItem)
-                todoItemDescTV.text.clear()
-                todoAdapter.getTodoItems(todoItems)
+//                val todoDesc = todoItemDescTV.text.toString()
+//                val isItemChecked = todoCheckBox.isChecked
+//                viewModal.noteChanged.value = true
+//                todoItemDescTV.text.clear()
+//                todoAdapter.getTodoItems(todoItems)
 
             }
 
@@ -648,7 +625,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
     }
 
     private fun archiveNote(){
-        archivedNote = ArchivedNote(noteID)
         viewModal.noteChanged.value = true
 
         viewModal.archived.value = true
@@ -749,10 +725,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
         addTodoButton = findViewById(R.id.addTodo)
         dismissTodoButton = findViewById(R.id.dismissTodoBtn)
         todoRV = findViewById(R.id.todoRV)
-        todoAdapter = AddEditTodoAdapter(applicationContext,this,"AddEditNoteActivity")
         val layoutManagerTodo = LinearLayoutManager(applicationContext,LinearLayoutManager.VERTICAL,false)
         todoRV.layoutManager = layoutManagerTodo
-        todoRV.adapter = todoAdapter
         todoCheckBox = findViewById(R.id.todoCheckBox)
         todoItemDescTV = findViewById(R.id.todoItemDescTV)
         lifecycleOwner = this
@@ -783,7 +757,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
             var snackbar = Snackbar.make(coordinatorlayout,"Note unpinned",Snackbar.LENGTH_LONG)
             snackbar.setAction("UNDO"
             ) {
-                pinnedNote = PinnedNote(noteID)
                 viewModal.pinned.value = true
 
                 snackbar = Snackbar.make(coordinatorlayout,"Note pinned",Snackbar.LENGTH_SHORT)
@@ -1092,12 +1065,9 @@ class AddEditNoteActivity : AppCompatActivity() ,
         val currentDate= cm.currentTimeToLong()
 
         if(textChanged){
-            if (noteTitle.isNotEmpty() || noteDescription.isNotEmpty() || todoItems.isNotEmpty()){
-
-                val note = Note(noteTitle,noteDescription,currentDate)
+            if (noteTitle.isNotEmpty() || noteDescription.isNotEmpty()){
 
                 if(noteType == "Edit"){
-                    note.noteID = noteID
                     val noteUpdate = HashMap<String,Any>()
                     noteUpdate["title"] = noteTitle
                     noteUpdate["description"] = noteDescription
@@ -1148,19 +1118,19 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 }
                 if(deletable){
 
-                    lifecycleScope.launch {
-                        withContext(Dispatchers.IO) {
-                            viewModal.insertDeleted(DeletedNote(noteID))
-                        }
-                    }
+//                    lifecycleScope.launch {
+//                        withContext(Dispatchers.IO) {
+//                            viewModal.insertDeleted(DeletedNote(noteID))
+//                        }
+//                    }
                     Toast.makeText(this@AddEditNoteActivity,"Note Deleted",Toast.LENGTH_SHORT).show()
 
                 }else{
-                    lifecycleScope.launch {
-                        withContext(Dispatchers.IO) {
-                            viewModal.restoreDeleted(DeletedNote(noteID))
-                        }
-                    }
+//                    lifecycleScope.launch {
+//                        withContext(Dispatchers.IO) {
+//                            viewModal.restoreDeleted(DeletedNote(noteID))
+//                        }
+//                    }
 
                 }
 
@@ -1194,16 +1164,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
             }
         }
 
-
-        for (todoItem in todoItems){
-            todoItem.noteID = noteID
-            lifecycleScope.launch {
-                withContext(Dispatchers.IO){
-                    viewModal.addTodoItem(todoItem)
-
-                }
-            }
-        }
 
 
         if (viewModal.reminderTime > 0){
@@ -1284,45 +1244,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         window.statusBarColor = labelColor
     }
 
-    override fun onItemDelete(position: Int,todoItem: TodoItem) {
-        Log.d(TAG, "onItemDelete: ")
-        if(noteType=="Edit"){
-            viewModal.deleteTodoItem(todoItem)
-        }else{
-            todoItems.removeAt(position)
-            todoAdapter.notifyItemRemoved(position)
-        }
-    }
 
-    override fun onItemCheckChanged(position: Int, todoItem: TodoItem) {
-
-
-        if (noteType=="Edit"){
-            viewModal.updateTodoItem(todoItem)
-        }else{
-            todoItems[position] = todoItem
-            todoAdapter.updateTodoItem(todoItems,position)
-        }
-    }
-
-    override fun onItemDescChanged(position: Int, todoItem: TodoItem) {
-        Log.d(TAG, "onItemDescChanged: ${todoItem.itemDesc}")
-        if (noteType=="Edit"){
-            viewModal.updateTodoItem(todoItem)
-        }else{
-            todoItems[position] = todoItem
-            todoAdapter.updateTodoItem(todoItems,position)
-        }
-    }
-
-    override fun onEnterKeyPressed(position: Int, todoItem: TodoItem) {
-        Log.d(TAG, "onEnterKeyPressed: $todoItem")
-        viewModal.noteChanged.value = true
-        todoItems.add(todoItem)
-        todoItemDescTV.text.clear()
-        todoAdapter.getTodoItems(todoItems)
-        todoItemDescTV.isActivated = true
-    }
 
 
 }

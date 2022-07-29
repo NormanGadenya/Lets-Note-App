@@ -10,15 +10,13 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.neuralbit.letsnote.adapters.NoteClickInterface
 import com.neuralbit.letsnote.adapters.NoteFireClick
 import com.neuralbit.letsnote.adapters.NoteRVAdapter
-import com.neuralbit.letsnote.entities.Note
 import com.neuralbit.letsnote.entities.NoteFire
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import java.util.*
 
-class LabelNotesActivity : AppCompatActivity() , NoteClickInterface, NoteFireClick {
+class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
     private lateinit var viewModel : LabelNotesViewModel
     private lateinit var allNotesViewModel: AllNotesViewModel
     private lateinit var labelViewModel: LabelNotesViewModel
@@ -44,7 +42,7 @@ class LabelNotesActivity : AppCompatActivity() , NoteClickInterface, NoteFireCli
         val noteUids = intent.getStringArrayListExtra("noteUids")
         val layoutManager = StaggeredGridLayoutManager( 2, LinearLayoutManager.VERTICAL)
         recyclerView.layoutManager = layoutManager
-        val noteRVAdapter = NoteRVAdapter(applicationContext,this,this)
+        val noteRVAdapter = NoteRVAdapter(applicationContext,this)
         noteRVAdapter.viewModel = allNotesViewModel
         noteRVAdapter.lifecycleScope = lifecycleScope
         noteRVAdapter.lifecycleOwner = this
@@ -95,14 +93,6 @@ class LabelNotesActivity : AppCompatActivity() , NoteClickInterface, NoteFireCli
 
             newList
         }
-    }
-
-    override fun onNoteClick(note: Note) {
-        val intent = Intent( applicationContext, AddEditNoteActivity::class.java)
-        intent.putExtra("noteType","Edit")
-        intent.putExtra("noteID",note.noteID)
-
-        startActivity(intent)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

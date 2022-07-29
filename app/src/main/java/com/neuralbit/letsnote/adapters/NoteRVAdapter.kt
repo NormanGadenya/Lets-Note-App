@@ -14,12 +14,8 @@ import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.neuralbit.letsnote.LabelNotesViewModel
 import com.neuralbit.letsnote.R
-import com.neuralbit.letsnote.entities.Note
 import com.neuralbit.letsnote.entities.NoteFire
-import com.neuralbit.letsnote.entities.Reminder
-import com.neuralbit.letsnote.entities.TodoItem
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import com.neuralbit.letsnote.utilities.AlertReceiver
 import com.neuralbit.letsnote.utilities.Common
@@ -27,20 +23,15 @@ import java.util.*
 
 class NoteRVAdapter (
     val context: Context,
-    private val noteClickInterface :NoteClickInterface,
     private val noteFireClick :NoteFireClick,
 
 
-    ): RecyclerView.Adapter<NoteRVAdapter.ViewHolder>(),ItemUpdate{
+    ): RecyclerView.Adapter<NoteRVAdapter.ViewHolder>(){
     var viewModel : AllNotesViewModel ? = null
-    var labelViewModel : LabelNotesViewModel? = null
     var lifecycleScope : LifecycleCoroutineScope? = null
     var lifecycleOwner: LifecycleOwner ? = null
     lateinit var itemView: View
-    private val allNotes = ArrayList<Note>()
     private val allNotesFire = ArrayList<NoteFire>()
-    private val tags : String? = null
-    private var reminder : Reminder? = null
     var searchString: String? =null
     val TAG = "NoteRVAdapter"
 
@@ -65,11 +56,9 @@ class NoteRVAdapter (
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val note = allNotesFire[position]
-        val todoAdapter = AddEditTodoAdapter(context,this,"NoteRVAdapter")
 
         val layoutManager = LinearLayoutManager(context,LinearLayoutManager.VERTICAL,false)
         holder.todoRV.layoutManager = layoutManager
-        holder.todoRV.adapter = todoAdapter
 
         var title = note.title
         var desc = note.description
@@ -152,30 +141,11 @@ class NoteRVAdapter (
         return allNotesFire.size
     }
 
-    fun updateList( newList: List<Note>){
-        allNotes.clear()
-        allNotes.addAll(newList)
-
-        notifyDataSetChanged()
-    }
 
     fun updateListFire( newList: List<NoteFire>){
         allNotesFire.clear()
         allNotesFire.addAll(newList)
-        notifyDataSetChanged()
-    }
-    fun undoDelete( swipedNote: Note,oldPosition : Int){
-//        allNotes.clear()
-        allNotes.add(oldPosition,swipedNote)
-        notifyItemInserted(oldPosition)
-    }
-
-    fun restoreItemColor (){
-        val c = ViewHolder(itemView)
-        c.noteCard.setBackgroundColor(0)
-    }
-    fun updateReminder(r: Reminder){
-        reminder = r
+        notifyItemRangeChanged(0,allNotesFire.size)
     }
 
     private fun cancelAlarm(noteID : Int){
@@ -185,31 +155,8 @@ class NoteRVAdapter (
         alarmManager.cancel(pendingIntent)
     }
 
-    override fun onItemDelete(position: Int, todoItem: TodoItem) {
-        TODO("Not yet implemented")
-    }
-
-    override fun onItemCheckChanged(position: Int, todoItem: TodoItem) {
-        TODO("Not yet implemented")
-    }
-
-    override fun onItemDescChanged(position: Int, todoItem: TodoItem) {
-        TODO("Not yet implemented")
-    }
-
-    override fun onEnterKeyPressed(position: Int, todoItem: TodoItem) {
-        TODO("Not yet implemented")
-    }
-
-
 }
 
-
-
-
-interface  NoteClickInterface{
-    fun onNoteClick(note: Note)
-}
 
 interface NoteFireClick{
     fun onNoteFireClick(note : NoteFire)

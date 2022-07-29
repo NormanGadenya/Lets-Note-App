@@ -68,8 +68,6 @@
             android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
 
         <receiver android:name=".utilities.AlertReceiver" />
-        <receiver android:name=".utilities.DatabaseBackUp" />
-
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />

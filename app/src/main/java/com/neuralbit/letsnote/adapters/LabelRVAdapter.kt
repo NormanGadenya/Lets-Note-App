@@ -13,7 +13,7 @@ import kotlinx.coroutines.*
 
 class LabelRVAdapter(
     val context: Context,
-    val labelClick: LabelClick
+    private val labelClick: LabelClick
     ): RecyclerView.Adapter<LabelRVAdapter.ViewHolder>() {
     val TAG = "LabelRV"
     private var labels = ArrayList<Label>()
@@ -54,7 +54,6 @@ class LabelRVAdapter(
         GlobalScope.launch {
 
             updateNoteCountTV(labelCount,holder.noteCountTV)
-
         }
 
         if (labelCount==1){
@@ -72,7 +71,7 @@ class LabelRVAdapter(
     fun updateLabelList(labels : ArrayList<Label>){
         this.labels.clear()
         this.labels = labels
-        notifyDataSetChanged()
+        notifyItemRangeChanged(0,labels.size)
     }
 
     interface LabelClick{

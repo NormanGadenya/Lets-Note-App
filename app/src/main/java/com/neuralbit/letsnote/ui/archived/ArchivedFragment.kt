@@ -11,23 +11,20 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.neuralbit.letsnote.AddEditNoteActivity
-import com.neuralbit.letsnote.adapters.NoteClickInterface
 import com.neuralbit.letsnote.adapters.NoteFireClick
 import com.neuralbit.letsnote.adapters.NoteRVAdapter
 import com.neuralbit.letsnote.databinding.FragmentArchivedNotesBinding
-import com.neuralbit.letsnote.entities.Note
 import com.neuralbit.letsnote.entities.NoteFire
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 
-class ArchivedFragment : Fragment() , NoteClickInterface, NoteFireClick {
+class ArchivedFragment : Fragment() , NoteFireClick {
 
     private val archivedViewModel: ArchivedViewModel by activityViewModels()
     private val allNotesViewModel: AllNotesViewModel by activityViewModels()
     private var _binding: FragmentArchivedNotesBinding? = null
-    lateinit var  notesRV: RecyclerView
+    private lateinit var  notesRV: RecyclerView
     private val binding get() = _binding!!
-    private lateinit var pinnedNotes: List<Note>
-    val TAG = "HSBD"
+    val TAG = "ArchivedFragment"
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -39,7 +36,7 @@ class ArchivedFragment : Fragment() , NoteClickInterface, NoteFireClick {
         val root: View = binding.root
         notesRV = binding.archivedRV
         notesRV.layoutManager = LinearLayoutManager(context)
-        val noteRVAdapter = context?.let { NoteRVAdapter(it,this,this) }
+        val noteRVAdapter = context?.let { NoteRVAdapter(it,this) }
         notesRV.adapter= noteRVAdapter
         noteRVAdapter?.viewModel = allNotesViewModel
         noteRVAdapter?.lifecycleScope = lifecycleScope
@@ -71,19 +68,20 @@ class ArchivedFragment : Fragment() , NoteClickInterface, NoteFireClick {
         _binding = null
     }
 
-    override fun onNoteClick(note: Note) {
-        val intent = Intent( context, AddEditNoteActivity::class.java)
-        intent.putExtra("noteType","Edit")
-        intent.putExtra("noteID",note.noteID)
-        startActivity(intent)
-
-
-
-
-    }
 
     override fun onNoteFireClick(note: NoteFire) {
-        TODO("Not yet implemented")
+        val intent = Intent( context, AddEditNoteActivity::class.java)
+        intent.putExtra("noteType","Edit")
+        intent.putExtra("noteTitle",note.title)
+        intent.putExtra("noteDescription",note.description)
+        intent.putExtra("noteUid",note.noteUid)
+        intent.putExtra("timeStamp",note.timeStamp)
+        intent.putExtra("labelColor",note.label)
+        intent.putExtra("pinned",note.pinned)
+        intent.putExtra("archieved",note.archived)
+        intent.putExtra("reminder",note.reminderDate)
+        intent.putStringArrayListExtra("tagList", ArrayList(note.tags))
+        startActivity(intent)
     }
 
 }

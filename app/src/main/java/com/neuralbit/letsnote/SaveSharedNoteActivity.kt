@@ -46,7 +46,7 @@ class SaveSharedNoteActivity : AppCompatActivity() {
             }
             builder.create()
         }
-        saveNoteDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+        saveNoteDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         saveNoteDialog.setOnDismissListener {
             dismissApp()
         }
@@ -60,9 +60,9 @@ class SaveSharedNoteActivity : AppCompatActivity() {
         saveNoteBtn.setOnClickListener {
             noteDesc = noteDescEdit?.text.toString()
             noteTitle = noteTitleEdit?.text.toString()
-            if(noteDesc!=null || noteTitle!=null){
-                saveNote()
-            }
+
+            saveNote()
+
         }
 
         noteDescEdit?.setText(noteDesc)
