@@ -1,20 +1,19 @@
 package com.neuralbit.letsnote.adapters
 
 import android.content.Context
-import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.neuralbit.letsnote.LabelNotesActivity
 import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.ui.label.Label
 import kotlinx.coroutines.*
 
 class LabelRVAdapter(
-    val context: Context
+    val context: Context,
+    val labelClick: LabelClick
     ): RecyclerView.Adapter<LabelRVAdapter.ViewHolder>() {
     val TAG = "LabelRV"
     private var labels = ArrayList<Label>()
@@ -58,15 +57,11 @@ class LabelRVAdapter(
 
         }
 
-
-
         if (labelCount==1){
             holder.noteTV.text = "Note"
         }
         holder.labelCard.setOnClickListener {
-            val intent = Intent(context,LabelNotesActivity::class.java)
-            intent.putExtra("labelID",labelColor)
-            context.startActivity(intent)
+            labelClick.onLabelClick(labelColor)
         }
     }
 
@@ -78,5 +73,9 @@ class LabelRVAdapter(
         this.labels.clear()
         this.labels = labels
         notifyDataSetChanged()
+    }
+
+    interface LabelClick{
+        fun onLabelClick(labelColor : Int)
     }
 }

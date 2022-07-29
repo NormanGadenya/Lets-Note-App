@@ -18,6 +18,7 @@ class LabelViewModel (application: Application): AndroidViewModel(application)  
     private val labelRepo : LabelRepo
     private val noteRepo : NoteRepo
     private val labelFireRepo : LabelFireRepo
+    var labelFire : List<LabelFire> = ArrayList()
     init {
         val labelDao = NoteDatabase.getDatabase(application).getLabelDao()
         labelRepo = LabelRepo(labelDao)

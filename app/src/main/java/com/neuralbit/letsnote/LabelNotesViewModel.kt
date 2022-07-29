@@ -1,17 +1,19 @@
 package com.neuralbit.letsnote
 
 import android.app.Application
-import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.neuralbit.letsnote.entities.Label
+import com.neuralbit.letsnote.entities.NoteFire
 import com.neuralbit.letsnote.relationships.LabelWIthNotes
 import com.neuralbit.letsnote.repos.LabelRepo
 
 class LabelNotesViewModel(
     application: Application) :AndroidViewModel(application){
     val searchQuery: MutableLiveData<String>
+    var labelNotes = ArrayList<NoteFire>()
+    var noteUids = ArrayList<String>()
     private val labelRepo  : LabelRepo
 
     init {
