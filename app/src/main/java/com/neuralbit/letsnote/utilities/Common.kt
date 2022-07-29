@@ -5,9 +5,7 @@ import android.text.SpannableString
 import android.text.style.BackgroundColorSpan
 import android.widget.TextView
 import androidx.core.graphics.ColorUtils
-import androidx.room.TypeConverter
 import com.neuralbit.letsnote.R
-import java.sql.Time
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -90,29 +88,6 @@ class Common (){
         }
     }
 
-
-
-}
-class DateTimeConverter {
-    @TypeConverter
-    fun toDate(dateLong: Long?): Date? {
-        return dateLong?.let { Date(it) }
-    }
-
-    @TypeConverter
-    fun fromDate(date: Date?): Long? {
-        return date?.time
-    }
-
-    @TypeConverter
-    fun toTime(timeLong: Long?): Time? {
-        return timeLong?.let { Time(it) }
-    }
-
-    @TypeConverter
-    fun fromTime(time: Time?): Long? {
-        return time?.time
-    }
 
 
 }
