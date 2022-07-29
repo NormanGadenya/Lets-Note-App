@@ -16,7 +16,7 @@ import com.neuralbit.letsnote.adapters.NoteRVAdapter
 import com.neuralbit.letsnote.entities.Note
 import com.neuralbit.letsnote.entities.NoteFire
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
-import kotlinx.coroutines.launch
+import java.util.*
 
 class TagNotesActivity : AppCompatActivity() , NoteClickInterface, NoteFireClick {
     private lateinit var viewModel : TagNotesViewModel
@@ -38,6 +38,8 @@ class TagNotesActivity : AppCompatActivity() , NoteClickInterface, NoteFireClick
         setContentView(R.layout.activity_label_notes)
         recyclerView = findViewById(R.id.notesRV)
         val tagTitle = intent.getStringExtra("tagTitle")
+        val noteUids = intent.getStringArrayListExtra("noteUids")
+
         val layoutManager = StaggeredGridLayoutManager( 2, LinearLayoutManager.VERTICAL)
         recyclerView.layoutManager = layoutManager
         val noteRVAdapter = NoteRVAdapter(applicationContext,this,this)
@@ -45,41 +47,49 @@ class TagNotesActivity : AppCompatActivity() , NoteClickInterface, NoteFireClick
         noteRVAdapter.lifecycleScope = lifecycleScope
         noteRVAdapter.lifecycleOwner = this
         supportActionBar?.title = tagTitle
-        lifecycleScope.launch {
-            val it = viewModel.getNotesWithTag(tagTitle!!)
-            notesList = ArrayList()
-            noteRVAdapter.updateList(it.first().notes)
-            notesList.addAll(it.last().notes)
+        if (noteUids != null){
+            viewModel.noteUids = noteUids
+        }
+        allNotesViewModel.getAllFireNotes().observe(this){
+            val notes = ArrayList<NoteFire>()
+            for(note in it){
+                for (uid in viewModel.noteUids){
+                    if (note.noteUid == uid ){
+                        notes.add(note)
+                    }
+                }
+            }
+            viewModel.allTagNotes = notes
+            noteRVAdapter.updateListFire(notes)
         }
 
         viewModel.searchQuery.observe(this){
 
             if (it!=null){
-                noteRVAdapter.updateList(filterNotes(it))
+                noteRVAdapter.updateListFire(filterNotes(it))
                 noteRVAdapter.searchString = it
 
             }
         }
+
         recyclerView.adapter= noteRVAdapter
     }
 
-    fun filterNotes(text : String) : ArrayList<Note>{
-        val newList = ArrayList<Note>()
+    private fun filterNotes(text : String) : ArrayList<NoteFire>{
+        val newList = ArrayList<NoteFire>()
 
-        return if(text!=null){
-            val textLower= text.toLowerCase()
-            for ( note in notesList){
+        return run {
+            val textLower= text.toLowerCase(Locale.ROOT)
+            for ( note in viewModel.allTagNotes){
 
-                if(note.title?.toLowerCase()?.contains(textLower) == true || note.description?.toLowerCase()
-                        ?.contains(textLower) == true
+                if(note.title.lowercase(Locale.ROOT).contains(textLower) || note.description.toLowerCase(Locale.ROOT)
+                        .contains(textLower)
                 ){
                     newList.add(note)
                 }
             }
 
             newList
-        }else{
-            notesList
         }
     }
 
@@ -117,7 +127,18 @@ class TagNotesActivity : AppCompatActivity() , NoteClickInterface, NoteFireClick
     }
 
     override fun onNoteFireClick(note: NoteFire) {
-        TODO("Not yet implemented")
+        val intent = Intent( applicationContext, AddEditNoteActivity::class.java)
+        intent.putExtra("noteType","Edit")
+        intent.putExtra("noteTitle",note.title)
+        intent.putExtra("noteDescription",note.description)
+        intent.putExtra("noteUid",note.noteUid)
+        intent.putExtra("timeStamp",note.timeStamp)
+        intent.putExtra("labelColor",note.label)
+        intent.putExtra("pinned",note.pinned)
+        intent.putExtra("archieved",note.archived)
+        intent.putExtra("reminder",note.reminderDate)
+        intent.putStringArrayListExtra("tagList", ArrayList(note.tags))
+        startActivity(intent)
     }
 
 }

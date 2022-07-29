@@ -1,5 +1,6 @@
 package com.neuralbit.letsnote.ui.tag
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,10 +11,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.neuralbit.letsnote.NoteViewModel
+import com.neuralbit.letsnote.TagNotesActivity
 import com.neuralbit.letsnote.databinding.FragmentTagBinding
 import java.util.*
 
-class TagFragment : Fragment() {
+class TagFragment : Fragment(), TagRVAdapter.TagItemClick {
 
     private val tagViewModel: TagViewModel by activityViewModels()
     private val noteViewModel: NoteViewModel by activityViewModels()
@@ -35,7 +37,7 @@ class TagFragment : Fragment() {
         tagRV = binding.noteTagRV
         val layoutManager = StaggeredGridLayoutManager( 2, LinearLayoutManager.VERTICAL)
         tagRV.layoutManager =layoutManager
-        val tagRVAdapter = context?.let { TagRVAdapter(it) }
+        val tagRVAdapter = context?.let { TagRVAdapter(it,this) }
         tagRV.adapter= tagRVAdapter
 
 //        tagViewModel.allTags.observe(viewLifecycleOwner){
@@ -54,6 +56,7 @@ class TagFragment : Fragment() {
 //
 //        }
         noteViewModel.allFireTags().observe(viewLifecycleOwner){
+            tagViewModel.allTagFire = it
             val tagList = ArrayList<Tag>()
             for (t in it){
                 val tag = Tag(t.tagName,t.noteUids.size)
@@ -175,5 +178,17 @@ class TagFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onTagItemClick(tagTitle: String) {
+        val tagList = tagViewModel.allTagFire
+        for( t in tagList){
+            if (t.tagName == tagTitle){
+                val intent = Intent(context, TagNotesActivity::class.java)
+                intent.putExtra("tagTitle",tagTitle)
+                intent.putStringArrayListExtra("noteUids", t.noteUids)
+                startActivity(intent)
+            }
+        }
     }
 }

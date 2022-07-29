@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.neuralbit.letsnote.NoteDatabase
+import com.neuralbit.letsnote.entities.TagFire
 import com.neuralbit.letsnote.repos.*
 
 class TagViewModel (application: Application): AndroidViewModel(application) {
@@ -12,6 +13,8 @@ class TagViewModel (application: Application): AndroidViewModel(application) {
     private val noteRepo : NoteRepo
     private val reminderRepo : ReminderRepo
     var allTags  = ArrayList<Tag>()
+    var allTagFire : List<TagFire>  = ArrayList()
+    var noteUids = ArrayList<String>()
     private val labelRepo : LabelRepo
     var searchQuery : MutableLiveData <String>
     init {

@@ -1,7 +1,6 @@
 package com.neuralbit.letsnote.ui.tag
 
 import android.content.Context
-import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,11 +8,11 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.neuralbit.letsnote.R
-import com.neuralbit.letsnote.TagNotesActivity
 import com.neuralbit.letsnote.utilities.Common
 
 class TagRVAdapter (
-    val context: Context
+    val context: Context,
+    val tagItemClick: TagItemClick
         ): RecyclerView.Adapter<TagRVAdapter.ViewHolder>(){
     var searchString : String? = null
 
@@ -42,13 +41,10 @@ class TagRVAdapter (
                 context.getString(R.string.noteTagCountMultiple, noteCount.toString())
         }
         holder.tagCard.setOnClickListener {
-            val intent = Intent(context, TagNotesActivity::class.java)
-            intent.putExtra("tagTitle",tagTitle)
-            context.startActivity(intent)
+            tagItemClick.onTagItemClick(tagTitle)
         }
         searchString?.let {
             cm.setHighLightedText(holder.tagNameTV, it)
-
         }
     }
 
@@ -59,5 +55,9 @@ class TagRVAdapter (
     fun updateTagList(tList : ArrayList<Tag>){
         tagList = tList
         notifyDataSetChanged()
+    }
+
+    interface  TagItemClick{
+        fun onTagItemClick(tagTitle: String)
     }
 }

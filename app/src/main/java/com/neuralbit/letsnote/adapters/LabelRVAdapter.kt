@@ -10,14 +10,14 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.neuralbit.letsnote.LabelNotesActivity
 import com.neuralbit.letsnote.R
+import com.neuralbit.letsnote.ui.label.Label
 import kotlinx.coroutines.*
 
 class LabelRVAdapter(
     val context: Context
     ): RecyclerView.Adapter<LabelRVAdapter.ViewHolder>() {
     val TAG = "LabelRV"
-    private var labelColors = ArrayList<Int>()
-    private var labelCount : Map<Int,Int> = HashMap()
+    private var labels = ArrayList<Label>()
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         val noteCountTV: TextView = itemView.findViewById(R.id.noteCount)
@@ -46,21 +46,21 @@ class LabelRVAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
-        val labelColor = labelColors[position]
-        val labelCountVal = labelCount[labelColor]
+        val labelColor = labels[position].labelColor
+        val labelCount = labels[position].labelCount
 
         holder.labelCard.setBackgroundColor(labelColor)
 
 
         GlobalScope.launch {
-            if (labelCountVal != null) {
-                updateNoteCountTV(labelCountVal,holder.noteCountTV)
-            }
+
+            updateNoteCountTV(labelCount,holder.noteCountTV)
+
         }
 
 
 
-        if (labelCountVal==1){
+        if (labelCount==1){
             holder.noteTV.text = "Note"
         }
         holder.labelCard.setOnClickListener {
@@ -71,13 +71,12 @@ class LabelRVAdapter(
     }
 
     override fun getItemCount(): Int {
-        return labelColors.size
+        return labels.size
     }
 
-    fun updateLabelCount(labelCountMap : Map<Int,Int>, labelIDs : HashSet<Int>){
-        labelCount = labelCountMap
-        val list = ArrayList<Int>(labelIDs)
-        this.labelColors = list
+    fun updateLabelList(labels : ArrayList<Label>){
+        this.labels.clear()
+        this.labels = labels
         notifyDataSetChanged()
     }
 }
