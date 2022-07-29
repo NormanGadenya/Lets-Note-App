@@ -83,4 +83,33 @@ class LabelFireRepo {
         })
     }
 
+    fun deleteNotesFromLabel(label: Int , notes: List<String>){
+        val labelRef = fUser?.let { database.getReference(it.uid).child("labels")}
+        labelRef?.child(label.toString())?.addListenerForSingleValueEvent( object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                for (noteUid in notes) {
+                    val labelFire = snapshot.getValue(LabelFire::class.java)
+                    if (labelFire != null) {
+                        val noteUids = labelFire.noteUids
+                        noteUids.remove(noteUid)
+                        val updateMap = HashMap<String, Any>()
+                        updateMap["noteUids"] = noteUids
+                        if (noteUids.isNotEmpty()){
+                            labelRef.child(label.toString()).updateChildren(updateMap)
+                        }else{
+                            labelRef.child(label.toString()).removeValue()
+                        }
+
+                    }
+                }
+
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e(TAG, "onCancelled: $error",)
+            }
+        })
+    }
+
 }

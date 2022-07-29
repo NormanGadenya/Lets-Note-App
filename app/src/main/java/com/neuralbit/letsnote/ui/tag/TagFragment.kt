@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -13,6 +14,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.neuralbit.letsnote.NoteViewModel
 import com.neuralbit.letsnote.TagNotesActivity
 import com.neuralbit.letsnote.databinding.FragmentTagBinding
+import com.neuralbit.letsnote.entities.TagFire
 import java.util.*
 
 class TagFragment : Fragment(), TagRVAdapter.TagItemClick {
@@ -40,30 +42,32 @@ class TagFragment : Fragment(), TagRVAdapter.TagItemClick {
         val tagRVAdapter = context?.let { TagRVAdapter(it,this) }
         tagRV.adapter= tagRVAdapter
 
-//        tagViewModel.allTags.observe(viewLifecycleOwner){
-//            for (tag in it){
-//                lifecycleScope.launch {
-//
-//                    tagCount[tag.tagTitle] = tagViewModel.getNotesWithTag(tag.tagTitle).first().notes.size
-//                    tagRVAdapter?.tagCount = tagCount
-//                    tagRVAdapter?.notifyDataSetChanged()
-//
-//                }
-//            }
-//            tagList = ArrayList<Tag>()
-//            tagList.addAll(it)
-//            tagRVAdapter?.updateTagList(tagList)
-//
-//        }
-        noteViewModel.allFireTags().observe(viewLifecycleOwner){
-            tagViewModel.allTagFire = it
-            val tagList = ArrayList<Tag>()
+        noteViewModel.allFireTags().observe(viewLifecycleOwner){ it ->
+            val tagFireList = HashSet<TagFire>()
+            val pref = context?.getSharedPreferences("DeletedNotes", AppCompatActivity.MODE_PRIVATE)
+            val deletedNotes = pref?.getStringSet("noteUids", HashSet())
+            val tagList = HashSet<Tag>()
             for (t in it){
                 val tag = Tag(t.tagName,t.noteUids.size)
-                tagList.add(tag)
+                if (deletedNotes != null){
+                    for (n in t.noteUids){
+                        if (!deletedNotes.contains(n)){
+                            tagList.add(tag)
+                            tagFireList.add(t)
+                        }
+                    }
+
+                }else{
+                    tagList.add(tag)
+                    tagFireList.add(t)
+                }
+
             }
-            tagViewModel.allTags = tagList
-            tagRVAdapter?.updateTagList(tagList)
+            val sortedTagList = tagList.sortedBy { i -> i.noteCount }.reversed()
+            val sortedTagFireList = tagFireList.sortedBy { i -> i.noteUids.size }.reversed()
+            tagViewModel.allTagFire = ArrayList(sortedTagFireList)
+            tagViewModel.allTags = ArrayList(sortedTagList)
+            tagRVAdapter?.updateTagList(ArrayList(sortedTagList))
         }
 
         tagViewModel.searchQuery.observe(viewLifecycleOwner){

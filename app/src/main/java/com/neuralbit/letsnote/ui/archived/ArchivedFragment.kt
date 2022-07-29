@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -43,10 +44,20 @@ class ArchivedFragment : Fragment() , NoteFireClick {
         noteRVAdapter?.lifecycleOwner = this
 
         allNotesViewModel.getAllFireNotes().observe(viewLifecycleOwner) {
+            val pref = context?.getSharedPreferences("DeletedNotes", AppCompatActivity.MODE_PRIVATE)
+            val deletedNotes = pref?.getStringSet("noteUids", HashSet())
             val archivedNotes = ArrayList<NoteFire>()
             for ( note in it){
-                if (note.archived){
-                    archivedNotes.add(note)
+                if (deletedNotes != null){
+                    if (!deletedNotes.contains(note.noteUid)){
+                        if (note.archived){
+                            archivedNotes.add(note)
+                        }
+                    }
+                }else{
+                    if (note.archived){
+                        archivedNotes.add(note)
+                    }
                 }
             }
             archivedViewModel.archivedFireNotes.value = archivedNotes

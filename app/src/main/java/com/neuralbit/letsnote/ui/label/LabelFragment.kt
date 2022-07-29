@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,6 +17,7 @@ import com.neuralbit.letsnote.NoteViewModel
 import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.adapters.LabelRVAdapter
 import com.neuralbit.letsnote.databinding.LabelFragmentBinding
+import com.neuralbit.letsnote.entities.LabelFire
 
 class LabelFragment : Fragment(), LabelRVAdapter.LabelClick {
     private val noteViewModel: NoteViewModel by activityViewModels()
@@ -42,94 +44,30 @@ class LabelFragment : Fragment(), LabelRVAdapter.LabelClick {
 
 
         noteViewModel.allFireLabels().observe(viewLifecycleOwner){
-
-            val labelList = ArrayList<Label>()
+            val pref = context?.getSharedPreferences("DeletedNotes", AppCompatActivity.MODE_PRIVATE)
+            val deletedNotes = pref?.getStringSet("noteUids", HashSet())
+            val labelList = HashSet<Label>()
+            val labelFireList = HashSet<LabelFire>()
             for ( l in it){
                 val label = Label(l.labelColor,l.noteUids.size)
-                labelList.add(label)
+                if (deletedNotes != null){
+                    for (n in l.noteUids){
+                        if (!deletedNotes.contains(n)){
+                            labelList.add(label)
+                            labelFireList.add(l)
+                        }
+                    }
+
+                }else{
+                    labelList.add(label)
+                    labelFireList.add(l)
+                }
             }
-            labelViewModel.labelFire = it
-            labelRVAdapter?.updateLabelList(labelList)
+            val sortedLabelList = labelList.sortedBy { i -> i.labelCount }.reversed()
+            val sortedLabelFireList = labelFireList.sortedBy { i -> i.noteUids.size }.reversed()
+            labelViewModel.labelFire = sortedLabelFireList
+            labelRVAdapter?.updateLabelList(ArrayList(sortedLabelList))
         }
-//        val touchHelperLabel = ItemTouchHelper(object  : ItemTouchHelper.SimpleCallback(0,
-//            ItemTouchHelper.RIGHT){
-//            override fun onMove(
-//                recyclerView: RecyclerView,
-//                viewHolder: RecyclerView.ViewHolder,
-//                target: RecyclerView.ViewHolder
-//            ): Boolean {
-//
-//                return true
-//            }
-//
-//            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-//                val list = ArrayList(labelIDs)
-//                val labelID = list[viewHolder.adapterPosition]
-//
-//
-//
-//                    val deleteDialog: AlertDialog? = this.let {
-//                        val builder = AlertDialog.Builder(context)
-//                        builder.apply {
-//                            setPositiveButton("ok"
-//                            ) { _, _ ->
-//
-//                                labelViewModel.deleteLabel(labelID)
-//
-//                            }
-//                            setNegativeButton("cancel"
-//                            ) { _, _ ->
-//                                labelRVAdapter?.updateLabelCount(labelCount,labelIDs)
-//
-//
-//                            }
-//
-//                            setTitle("Delete label?")
-//
-//                        }
-//                        builder.create()
-//                    }
-//                    deleteDialog?.show()
-//
-//
-//
-//
-//
-//
-//            }
-//
-//            override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
-//                super.onSelectedChanged(viewHolder, actionState)
-//                if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE){
-//                    val iView = viewHolder?.itemView as CardView
-//                    iView.setCardBackgroundColor(resources.getColor(R.color.Red))
-//
-//                }
-//            }
-//
-//            override fun clearView(
-//                recyclerView: RecyclerView,
-//                viewHolder: RecyclerView.ViewHolder
-//            ) {
-//                super.clearView(recyclerView, viewHolder)
-//                val iView = viewHolder.itemView as CardView
-//                val list = ArrayList(labelIDs)
-//                try {
-//                    val labelID = list[viewHolder.adapterPosition]
-//                    iView.setCardBackgroundColor(labelID)
-//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-//                        iView.outlineSpotShadowColor = labelID
-//                    }
-//                }catch (e : Exception){
-//                    e.printStackTrace()
-//                }
-//
-//
-//
-//            }
-//        })
-//
-//        touchHelperLabel.attachToRecyclerView(labelRV)
 
         return root
     }

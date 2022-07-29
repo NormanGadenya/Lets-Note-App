@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -74,14 +75,29 @@ class AllNotesFragment : Fragment() , NoteFireClick {
             val pinnedNotes = ArrayList<NoteFire>()
             val otherNotes = ArrayList<NoteFire>()
             for (note in it) {
-                if (!note.archived){
-                    if (note.pinned){
-                        pinnedNotes.add(note)
-                    }else{
-                        otherNotes.add(note)
+                val pref = context?.getSharedPreferences("DeletedNotes", AppCompatActivity.MODE_PRIVATE)
+                val deletedNotes = pref?.getStringSet("noteUids", HashSet())
+                if (deletedNotes != null){
+                    if (!deletedNotes.contains(note.noteUid)){
+                        if (!note.archived){
+                            if (note.pinned){
+                                pinnedNotes.add(note)
+                            }else{
+                                otherNotes.add(note)
+                            }
+                        }
+                    }
+                }else{
+                    if (!note.archived){
+                        if (note.pinned){
+                            pinnedNotes.add(note)
+                        }else{
+                            otherNotes.add(note)
+                        }
                     }
                 }
             }
+
             allNotesViewModel.otherFireNotesList.value = otherNotes
             allNotesViewModel.pinnedFireNotesList.value = pinnedNotes
             if (pinnedNotes.isNotEmpty()){
@@ -144,7 +160,6 @@ class AllNotesFragment : Fragment() , NoteFireClick {
         intent.putExtra("reminder",note.reminderDate)
         intent.putStringArrayListExtra("tagList", ArrayList(note.tags))
         startActivity(intent)
-
     }
 
 }

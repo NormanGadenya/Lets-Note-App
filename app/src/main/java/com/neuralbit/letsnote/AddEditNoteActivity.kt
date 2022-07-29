@@ -7,6 +7,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -157,7 +158,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
             addTagDialog.show(supportFragmentManager,"addTagDialogs")
 
         }
-        //TODO fix archivedNotes Bug
         when (noteType) {
             "Edit" -> {
                 noteTitleEdit.setText(noteTitle)
@@ -200,13 +200,17 @@ class AddEditNoteActivity : AppCompatActivity() ,
             reminderNoteSet = it
             if(it){
                 alertButton.setImageResource(R.drawable.ic_baseline_add_alert_24)
-                reminderTV.visibility =  VISIBLE
-                reminderIcon.visibility = VISIBLE
+
 
                 reminderTV.text = resources.getString(R.string.reminder,cm.convertLongToTime(reminderTime)[0],cm.convertLongToTime(reminderTime)[1])
                 val c = Calendar.getInstance()
                 if (c.timeInMillis > reminderTime){
                     cancelAlarm(viewModal.reminderTime.toInt())
+                    reminderTV.visibility =  GONE
+                    reminderIcon.visibility = GONE
+                }else{
+                    reminderTV.visibility =  VISIBLE
+                    reminderIcon.visibility = VISIBLE
                 }
             }else{
                 alertButton.setBackgroundResource(R.drawable.ic_outline_add_alert_24)
@@ -226,7 +230,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
         }
 
         viewModal.deletedNote.observe(lifecycleOwner){
-
             deleted = it
             if (it) {
 
@@ -237,6 +240,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 noteDescriptionEdit.isEnabled = false
                 noteTitleEdit.isEnabled = false
                 infoContainer.visibility = GONE
+                reminderTV.visibility =  GONE
+                reminderIcon.visibility = GONE
             } else {
                 pinButton.visibility = VISIBLE
                 archiveButton.visibility = VISIBLE
@@ -245,32 +250,37 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 infoContainer.visibility = VISIBLE
                 noteDescriptionEdit.isEnabled = true
                 noteTitleEdit.isEnabled = true
+                if (viewModal.reminderSet.value == true){
+                    reminderTV.visibility =  VISIBLE
+                    reminderIcon.visibility = VISIBLE
+                }
 
             }
         }
         viewModal.archived.observe(lifecycleOwner){
             archived = it
 
-            if (it) {
+            if (!deleted){
+                if (it) {
 
-                pinButton.visibility = GONE
-                archiveButton.visibility = GONE
-                alertButton.visibility = GONE
-                restoreButton.visibility = VISIBLE
-                noteDescriptionEdit.isEnabled = false
-                noteTitleEdit.isEnabled = false
-                infoContainer.visibility = GONE
-            } else {
-                pinButton.visibility = VISIBLE
-                archiveButton.visibility = VISIBLE
-                alertButton.visibility = VISIBLE
-                restoreButton.visibility = GONE
-                infoContainer.visibility = VISIBLE
-                noteDescriptionEdit.isEnabled = true
-                noteTitleEdit.isEnabled = true
+                    pinButton.visibility = GONE
+                    archiveButton.visibility = GONE
+                    alertButton.visibility = GONE
+                    restoreButton.visibility = VISIBLE
+                    noteDescriptionEdit.isEnabled = false
+                    noteTitleEdit.isEnabled = false
+                    infoContainer.visibility = GONE
+                } else {
+                    pinButton.visibility = VISIBLE
+                    archiveButton.visibility = VISIBLE
+                    alertButton.visibility = VISIBLE
+                    restoreButton.visibility = GONE
+                    infoContainer.visibility = VISIBLE
+                    noteDescriptionEdit.isEnabled = true
+                    noteTitleEdit.isEnabled = true
 
+                }
             }
-
         }
 
         alertButton.setOnClickListener {
@@ -290,7 +300,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
             for (tag in it){
                 tagListStr.add(tag.tagName)
             }
-            Log.d(TAG, "onCreate: taglist $tagListStr")
             val adapter = ArrayAdapter(applicationContext,android.R.layout.simple_dropdown_item_1line,tagListStr)
             noteDescriptionEdit.setAdapter(adapter)
             noteDescriptionEdit.setTokenizer(SpaceTokenizer())
@@ -409,9 +418,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
             }
         }
-        viewModal.deleted.observe(this) {
-            deletable = it
-        }
+
 
 
         backButton.setOnClickListener { goToMain() }
@@ -516,25 +523,24 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
         if (noteContentSplit.size > 1) {
 
-            if (noteContentSplit.isNotEmpty()) {
-                val prefix = listOf(" ", "->", "-", "+", "*", ">")
-                for (p in prefix) {
-                    if (!backPressed) {
-                        addBulletin(noteContentSplit, lineIndex, noteContent, p)
+            val prefix = listOf(" ", "->", "-", "+", "*", ">")
+            for (p in prefix) {
+                if (!backPressed) {
+                    addBulletin(noteContentSplit, lineIndex, noteContent, p)
 
-                    }
                 }
-                if (noteContentSplit[lineIndex].endsWith(":")) {
-                    if (noteContent.endsWith("\n")) {
-                        if (!backPressed) {
-                            noteDescriptionEdit.append("-> ")
-
-                        }
-                    }
-                }
-
-
             }
+            if (noteContentSplit[lineIndex].endsWith(":")) {
+                if (noteContent.endsWith("\n")) {
+                    if (!backPressed) {
+                        noteDescriptionEdit.append("-> ")
+
+                    }
+                }
+            }
+
+
+
 
         }
     }
@@ -698,6 +704,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         noteDesc = intent.getStringExtra("noteDescription")
         notePinned = intent.getBooleanExtra("pinned",false)
         archived = intent.getBooleanExtra("archieved",false)
+        deleted = intent.getBooleanExtra("deleted",false)
         val tagIntentList = intent.getStringArrayListExtra("tagList")
         val labelColor = intent.getIntExtra("labelColor",0)
         val reminderTime = intent.getLongExtra("reminder",0)
@@ -748,6 +755,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         }
         viewModal.labelColor = labelColor
         viewModal.archived.value = archived
+        viewModal.deletedNote.value = deleted
     }
 
     private fun pinOrUnPinNote(){
@@ -1116,21 +1124,34 @@ class AddEditNoteActivity : AppCompatActivity() ,
                     }
 
                 }
+                val pref = applicationContext.getSharedPreferences("DeletedNotes", MODE_PRIVATE)
                 if(deletable){
+                    val editor: SharedPreferences.Editor = pref.edit()
+                    val noteUids = pref.getStringSet("noteUids",HashSet())
+                    val deletedNoteUids = HashSet<String>()
+                    if (noteUids != null){
+                        deletedNoteUids.addAll(noteUids)
+                        noteUid?.let { deletedNoteUids.add(it) }
+                    }else{
+                        noteUid?.let { deletedNoteUids.add(it) }
+                    }
+                    editor.putStringSet("noteUids",deletedNoteUids)
+                    editor.apply()
 
-//                    lifecycleScope.launch {
-//                        withContext(Dispatchers.IO) {
-//                            viewModal.insertDeleted(DeletedNote(noteID))
-//                        }
-//                    }
                     Toast.makeText(this@AddEditNoteActivity,"Note Deleted",Toast.LENGTH_SHORT).show()
 
                 }else{
-//                    lifecycleScope.launch {
-//                        withContext(Dispatchers.IO) {
-//                            viewModal.restoreDeleted(DeletedNote(noteID))
-//                        }
-//                    }
+                    val editor: SharedPreferences.Editor = pref.edit()
+                    val noteUids = pref.getStringSet("noteUids",HashSet())
+                    val deletedNoteUids = HashSet<String>()
+                    if (noteUids != null){
+                        deletedNoteUids.addAll(noteUids)
+                        noteUid?.let { deletedNoteUids.remove(it) }
+                    }else{
+                        noteUid?.let { deletedNoteUids.remove(it) }
+                    }
+                    editor.putStringSet("noteUids",deletedNoteUids)
+                    editor.apply()
 
                 }
 
@@ -1188,6 +1209,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         startActivity(intent)
         finish()
     }
+
 
 
 
