@@ -60,7 +60,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
     GetTagFromDialog,
     LabelClickInterface
 {
-    private var deleted: Boolean = false
     private lateinit var restoreButton: ImageButton
     private lateinit var archiveButton: ImageButton
     private lateinit var deleteButton: ImageButton
@@ -87,7 +86,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private var noteDescOrigList = ArrayList<String>()
     private var noteDescNew : String? = null
     private lateinit var noteType : String
-    private var deletable : Boolean = false
     private lateinit var tvTimeStamp : TextView
     private var textChanged : Boolean = false
     private var archived = false
@@ -230,7 +228,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
         }
 
         viewModal.deletedNote.observe(lifecycleOwner){
-            deleted = it
             if (it) {
 
                 pinButton.visibility = GONE
@@ -260,7 +257,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         viewModal.archived.observe(lifecycleOwner){
             archived = it
 
-            if (!deleted){
+            if (viewModal.deletedNote.value != true){
                 if (it) {
 
                     pinButton.visibility = GONE
@@ -430,7 +427,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 builder.apply {
                     setPositiveButton("ok"
                     ) { _, _ ->
-                        viewModal.deleted.value = true
+                        viewModal.deletedNote.value = true
                         viewModal.noteChanged.value = true
                         goToMain()
                         }
@@ -704,7 +701,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         noteDesc = intent.getStringExtra("noteDescription")
         notePinned = intent.getBooleanExtra("pinned",false)
         archived = intent.getBooleanExtra("archieved",false)
-        deleted = intent.getBooleanExtra("deleted",false)
+        val deleted = intent.getBooleanExtra("deleted",false)
         val tagIntentList = intent.getStringArrayListExtra("tagList")
         val labelColor = intent.getIntExtra("labelColor",0)
         val reminderTime = intent.getLongExtra("reminder",0)
@@ -1071,61 +1068,68 @@ class AddEditNoteActivity : AppCompatActivity() ,
         val noteTitle = noteTitleEdit.text.toString()
         val noteDescription = noteDescriptionEdit.text.toString()
         val currentDate= cm.currentTimeToLong()
+        val pref = applicationContext.getSharedPreferences("DeletedNotes", MODE_PRIVATE)
+
 
         if(textChanged){
             if (noteTitle.isNotEmpty() || noteDescription.isNotEmpty()){
-
-                if(noteType == "Edit"){
-                    val noteUpdate = HashMap<String,Any>()
-                    noteUpdate["title"] = noteTitle
-                    noteUpdate["description"] = noteDescription
-                    noteUpdate["timeStamp"] = currentDate
-                    if (viewModal.labelChanged){
-                        noteUpdate["label"] = viewModal.labelColor
-                    }
-                    noteUpdate["pinned"] = notePinned
-                    noteUpdate["archived"] = archived
-                    noteUpdate["deleted"] = deletable
-                    noteUpdate["reminderDate"] = viewModal.reminderTime
-                    val tags = ArrayList<String>()
-                    tags.addAll(viewModal.oldTagList)
-                    tags.addAll(viewModal.newTags)
-                    tags.removeAll(viewModal.deletedTags.toSet())
-                    noteUpdate["tags"] = tags
-                    noteUid?.let { viewModal.updateFireNote(noteUpdate, it) }
-
-                    if (!deletable || !archived){
-                        saveOtherEntities()
-
-                        Toast.makeText(this,"Note updated .. " , Toast.LENGTH_SHORT).show()
-                    }
-
-                }else{
-                    lifecycleScope.launch {
-                        val noteFire = NoteFireIns(noteTitle, noteDescription, currentDate)
+                Log.d(TAG, "saveNote: ${viewModal.deletedNote.value}")
+                if (viewModal.deletedNote.value != true){
+                    if(noteType == "Edit"){
+                        val noteUpdate = HashMap<String,Any>()
+                        noteUpdate["title"] = noteTitle
+                        noteUpdate["description"] = noteDescription
+                        noteUpdate["timeStamp"] = currentDate
+                        if (viewModal.labelChanged){
+                            noteUpdate["label"] = viewModal.labelColor
+                        }
+                        noteUpdate["pinned"] = notePinned
+                        noteUpdate["archived"] = archived
+                        noteUpdate["reminderDate"] = viewModal.reminderTime
                         val tags = ArrayList<String>()
                         tags.addAll(viewModal.oldTagList)
                         tags.addAll(viewModal.newTags)
                         tags.removeAll(viewModal.deletedTags.toSet())
-                        noteFire.tags = ArrayList(tags)
-                        noteFire.reminderDate = viewModal.reminderTime
-                        noteFire.pinned = notePinned
-                        noteFire.label = viewModal.labelColor
-                        noteUid =  viewModal.addFireNote(noteFire)
-                        if (!deletable){
+                        noteUpdate["tags"] = tags
+                        noteUid?.let { viewModal.updateFireNote(noteUpdate, it) }
+
+                        if (!archived){
                             saveOtherEntities()
+
+                            Toast.makeText(this,"Note updated .. " , Toast.LENGTH_SHORT).show()
                         }
+                        val editor: SharedPreferences.Editor = pref.edit()
+                        val noteUids = pref.getStringSet("noteUids",HashSet())
+                        val deletedNoteUids = HashSet<String>()
+                        if (noteUids != null){
+                            deletedNoteUids.addAll(noteUids)
+                            noteUid?.let { deletedNoteUids.remove(it) }
+                        }else{
+                            noteUid?.let { deletedNoteUids.remove(it) }
+                        }
+                        editor.putStringSet("noteUids",deletedNoteUids)
+                        editor.apply()
 
-                    }
+                    }else{
+                        lifecycleScope.launch {
+                            val noteFire = NoteFireIns(noteTitle, noteDescription, currentDate)
+                            val tags = ArrayList<String>()
+                            tags.addAll(viewModal.oldTagList)
+                            tags.addAll(viewModal.newTags)
+                            tags.removeAll(viewModal.deletedTags.toSet())
+                            noteFire.tags = ArrayList(tags)
+                            noteFire.reminderDate = viewModal.reminderTime
+                            noteFire.pinned = notePinned
+                            noteFire.label = viewModal.labelColor
+                            noteUid =  viewModal.addFireNote(noteFire)
+                            saveOtherEntities()
 
-                    if(!deletable){
+
+                        }
                         Toast.makeText(this,"Note added .. " , Toast.LENGTH_SHORT).show()
 
                     }
-
-                }
-                val pref = applicationContext.getSharedPreferences("DeletedNotes", MODE_PRIVATE)
-                if(deletable){
+                }else{
                     val editor: SharedPreferences.Editor = pref.edit()
                     val noteUids = pref.getStringSet("noteUids",HashSet())
                     val deletedNoteUids = HashSet<String>()
@@ -1139,19 +1143,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
                     editor.apply()
 
                     Toast.makeText(this@AddEditNoteActivity,"Note Deleted",Toast.LENGTH_SHORT).show()
-
-                }else{
-                    val editor: SharedPreferences.Editor = pref.edit()
-                    val noteUids = pref.getStringSet("noteUids",HashSet())
-                    val deletedNoteUids = HashSet<String>()
-                    if (noteUids != null){
-                        deletedNoteUids.addAll(noteUids)
-                        noteUid?.let { deletedNoteUids.remove(it) }
-                    }else{
-                        noteUid?.let { deletedNoteUids.remove(it) }
-                    }
-                    editor.putStringSet("noteUids",deletedNoteUids)
-                    editor.apply()
 
                 }
 
@@ -1189,7 +1180,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
         if (viewModal.reminderTime > 0){
             if (reminderNoteSet){
-                if (!deletable){
+                if (viewModal.deletedNote.value != true){
                     startAlarm(viewModal.reminderTime.toInt())
                 }
 
