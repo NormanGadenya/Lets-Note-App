@@ -21,6 +21,7 @@ import com.neuralbit.letsnote.utilities.AlertReceiver
 import com.neuralbit.letsnote.utilities.Common
 import java.util.*
 
+
 class NoteRVAdapter (
     val context: Context,
     private val noteFireClick :NoteFireClick,
@@ -59,7 +60,6 @@ class NoteRVAdapter (
 
         val layoutManager = LinearLayoutManager(context,LinearLayoutManager.VERTICAL,false)
         holder.todoRV.layoutManager = layoutManager
-
         var title = note.title
         var desc = note.description
         val cm = Common()
@@ -68,6 +68,15 @@ class NoteRVAdapter (
         }
         if (desc.length > 250) {
             desc = desc.substring(0, 250) + "..."
+        }
+        val todoItems = note.todoItems
+        for (todoItem in todoItems) {
+            desc += if (todoItem.checked){
+                "\n + ${todoItem.item} "
+            }else{
+
+                "\n - ${todoItem.item} "
+            }
         }
         val c = Calendar.getInstance()
 
@@ -127,6 +136,7 @@ class NoteRVAdapter (
             holder.reminderTV.visibility = GONE
         }
 
+
         searchString?.let {
             cm.setHighLightedText(holder.noteTextTV, it)
             cm.setHighLightedText(holder.noteTitleTV, it)
@@ -148,10 +158,10 @@ class NoteRVAdapter (
         notifyItemRangeChanged(0,allNotesFire.size)
     }
 
-    private fun cancelAlarm(noteID : Int){
+    private fun cancelAlarm(reminder : Int){
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(context, AlertReceiver::class.java)
-        val pendingIntent = PendingIntent.getBroadcast(context, noteID, intent, PendingIntent.FLAG_IMMUTABLE)
+        val pendingIntent = PendingIntent.getBroadcast(context, reminder, intent, PendingIntent.FLAG_IMMUTABLE)
         alarmManager.cancel(pendingIntent)
     }
 

@@ -9,7 +9,8 @@
 
 
     <EditText
-        android:id="@+id/todoItemDescTV"
+        android:id="@+id/todoItemDescET"
+
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
@@ -21,20 +22,9 @@
         app:layout_constraintEnd_toStartOf="@+id/deleteItemBtn"
         app:layout_constraintStart_toEndOf="@+id/todoCheckBox"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="See family" />
+        tools:text="See family"
+    />
 
-    <TextView
-        android:id="@+id/todoItemDescNoteRV"
-        android:layout_width="0dp"
-        android:visibility="gone"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
-        android:layout_marginEnd="4dp"
-        app:layout_constraintBottom_toBottomOf="@+id/todoCheckBox"
-        app:layout_constraintEnd_toStartOf="@+id/deleteItemBtn"
-        app:layout_constraintStart_toEndOf="@+id/todoCheckBox"
-        app:layout_constraintTop_toTopOf="@+id/todoCheckBox"
-        tools:text="See family" />
 
     <CheckBox
         android:id="@+id/todoCheckBox"
@@ -50,9 +40,9 @@
         android:layout_height="wrap_content"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:src="@drawable/ic_baseline_close_24"
-        app:layout_constraintBottom_toBottomOf="@+id/todoItemDescTV"
+        app:layout_constraintBottom_toBottomOf="@+id/todoItemDescET"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/todoItemDescTV" />
+        app:layout_constraintTop_toTopOf="@+id/todoItemDescET" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

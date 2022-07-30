@@ -7,51 +7,36 @@ import androidx.lifecycle.MutableLiveData
 import com.neuralbit.letsnote.entities.LabelFire
 import com.neuralbit.letsnote.entities.NoteFireIns
 import com.neuralbit.letsnote.entities.TagFire
+import com.neuralbit.letsnote.entities.TodoItem
 import com.neuralbit.letsnote.repos.LabelFireRepo
 import com.neuralbit.letsnote.repos.NoteFireRepo
 import com.neuralbit.letsnote.repos.TagFireRepo
 
 class NoteViewModel(application : Application) : AndroidViewModel(application) {
     val TAG = "NoteViewModel"
-    private val noteFireRepo : NoteFireRepo
-    private val labelFireRepo : LabelFireRepo
-    private val tagFireRepo : TagFireRepo
+    private val noteFireRepo : NoteFireRepo = NoteFireRepo()
+    private val labelFireRepo : LabelFireRepo = LabelFireRepo()
+    private val tagFireRepo : TagFireRepo = TagFireRepo()
     var oldTagList = ArrayList<String>()
     var newTags = HashSet<String>()
     var deletedTags = HashSet<String>()
     var noteChanged = MutableLiveData<Boolean>()
-    var deleted = MutableLiveData<Boolean>()
-    var archived : MutableLiveData<Boolean>
-    var deletedNote : MutableLiveData<Boolean>
+    var archived : MutableLiveData<Boolean> = MutableLiveData()
+    var deletedNote : MutableLiveData<Boolean> = MutableLiveData()
     var labelChanged : Boolean = false
     var labelColor : Int = 0
-    var pinned : MutableLiveData<Boolean>
-    var reminderSet : MutableLiveData<Boolean>
-    var labelSet : MutableLiveData<Boolean>
+    var pinned : MutableLiveData<Boolean> = MutableLiveData()
+    var reminderSet : MutableLiveData<Boolean> = MutableLiveData()
+    var labelSet : MutableLiveData<Boolean> = MutableLiveData()
     var reminderTime : Long = 0
-    var searchQuery : MutableLiveData<String>
-    var noteDescString : MutableLiveData<String>
-    var newTagTyped : MutableLiveData<Boolean>
-    var backPressed : MutableLiveData<Boolean>
-    var undoMode : MutableLiveData<Boolean>
-
-    init{
-        noteFireRepo = NoteFireRepo()
-        tagFireRepo = TagFireRepo()
-        labelFireRepo = LabelFireRepo()
-        searchQuery = MutableLiveData<String>()
-        noteDescString = MutableLiveData()
-        newTagTyped = MutableLiveData()
-        backPressed = MutableLiveData()
-        pinned = MutableLiveData()
-        archived = MutableLiveData()
-        deletedNote = MutableLiveData()
-        reminderSet = MutableLiveData()
-        labelSet = MutableLiveData()
-        deleted = MutableLiveData()
-        undoMode = MutableLiveData()
-
-    }
+    var searchQuery : MutableLiveData<String> = MutableLiveData<String>()
+    var newTagTyped : MutableLiveData<Boolean> = MutableLiveData()
+    var backPressed : MutableLiveData<Boolean> = MutableLiveData()
+    var todoItems = ArrayList<TodoItem>()
+    var allTodoItems = MutableLiveData<ArrayList<TodoItem>>()
+    val deletedTodos = ArrayList<TodoItem>()
+    val updatedTodos = ArrayList<TodoItem>()
+    var undoMode : MutableLiveData<Boolean> = MutableLiveData()
 
     fun updateFireNote(noteUpdate : Map<String, Any>, noteUid : String) {
         noteFireRepo.updateNote(noteUpdate,noteUid)
@@ -61,6 +46,14 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         return noteFireRepo.addNote(note)
     }
 
+    fun allTodoItems(noteUid: String) : LiveData<List<TodoItem>>{
+        val note = noteFireRepo.getNote(noteUid).value
+        val todoItems = MutableLiveData<List<TodoItem>>()
+        if (note != null){
+            todoItems.value = note.todoItems
+        }
+        return todoItems
+    }
 
     fun allFireTags() : LiveData<List<TagFire>>{
         return tagFireRepo.getAllTags()

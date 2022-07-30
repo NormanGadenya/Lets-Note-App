@@ -63,6 +63,7 @@ dependencies {
     implementation 'com.github.QuadFlask:colorpicker:0.0.15'
 
     implementation 'com.github.yalantis:ucrop:2.2.6'
+    implementation 'com.google.code.gson:gson:2.8.9'
 
     // Import the BoM for the Firebase platform
     implementation platform('com.google.firebase:firebase-bom:29.0.3')

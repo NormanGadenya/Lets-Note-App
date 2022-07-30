@@ -49,18 +49,24 @@ public class NotificationHelper extends ContextWrapper {
                 return new NotificationCompat.Builder(getApplicationContext(), channelID)
                         .setContentTitle(getResources().getString(R.string.app_name))
                         .setContentText(noteTitle)
-                        .setSmallIcon(R.mipmap.ic_launcher1_round);
+                        .setPriority(NotificationCompat.PRIORITY_MAX)
+                        .setSmallIcon(R.mipmap.ic_launcher1_round)
+                        .setAutoCancel(true);
             }else{
                 return new NotificationCompat.Builder(getApplicationContext(), channelID)
                         .setContentTitle("Reminder")
                         .setContentText(noteDesc)
-                        .setSmallIcon(R.mipmap.ic_launcher1_round);
+                        .setPriority(NotificationCompat.PRIORITY_MAX)
+                        .setSmallIcon(R.mipmap.ic_launcher1_round)
+                        .setAutoCancel(true);
             }
         }else{
             return new NotificationCompat.Builder(getApplicationContext(), channelID)
                     .setContentTitle(getResources().getString(R.string.app_name))
                     .setContentText(noteDesc)
-                    .setSmallIcon(R.mipmap.ic_launcher1_round);
+                    .setPriority(NotificationCompat.PRIORITY_MAX)
+                    .setSmallIcon(R.mipmap.ic_launcher1_round)
+                    .setAutoCancel(true);
         }
 
     }

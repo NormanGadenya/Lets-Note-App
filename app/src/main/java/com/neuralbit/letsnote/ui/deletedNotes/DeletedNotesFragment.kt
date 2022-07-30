@@ -11,6 +11,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.gson.Gson
 import com.neuralbit.letsnote.AddEditNoteActivity
 import com.neuralbit.letsnote.NoteViewModel
 import com.neuralbit.letsnote.adapters.NoteFireClick
@@ -81,6 +82,8 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
         intent.putExtra("archieved",note.archived)
         intent.putExtra("reminder",note.reminderDate)
         intent.putExtra("deleted", true)
+        val toDoItemString: String = Gson().toJson(note.todoItems)
+        intent.putExtra("todoItems", toDoItemString)
         intent.putStringArrayListExtra("tagList", ArrayList(note.tags))
         startActivity(intent)
     }
