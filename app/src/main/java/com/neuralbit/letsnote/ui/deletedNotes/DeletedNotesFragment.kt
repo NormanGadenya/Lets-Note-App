@@ -1,10 +1,15 @@
 package com.neuralbit.letsnote.ui.deletedNotes
 
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -15,6 +20,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.gson.Gson
 import com.neuralbit.letsnote.AddEditNoteActivity
 import com.neuralbit.letsnote.NoteViewModel
+import com.neuralbit.letsnote.Services.DeleteReceiver
 import com.neuralbit.letsnote.adapters.NoteFireClick
 import com.neuralbit.letsnote.adapters.NoteRVAdapter
 import com.neuralbit.letsnote.databinding.DeletedNotesFragmentBinding
@@ -51,7 +57,7 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
         deletedRV.adapter= noteRVAdapter
         allNotesViewModel.deleteFrag.value = true
         noteRVAdapter?.deleteFrag = true
-
+        val pref = context?.getSharedPreferences("DeletedNotes", AppCompatActivity.MODE_PRIVATE)
         val staggeredLayoutManagerAll = StaggeredGridLayoutManager( 2,LinearLayoutManager.VERTICAL)
         allNotesViewModel.staggeredView.observe(viewLifecycleOwner){
             if (it){
@@ -62,7 +68,6 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
             }
         }
         allNotesViewModel.getAllFireNotes().observe(viewLifecycleOwner){
-            val pref = context?.getSharedPreferences("DeletedNotes", AppCompatActivity.MODE_PRIVATE)
             val deletedNotes = pref?.getStringSet("noteUids", HashSet())
 
             val filteredNotes = HashSet<NoteFire>()
@@ -75,14 +80,34 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
                     }
                 }
             }
+            deletedNotesViewModel.deletedNotes = filteredNotes
             noteRVAdapter?.updateListFire(ArrayList(filteredNotes))
-        }
 
+        }
+        deletedNotesViewModel.clearTrash.observe(viewLifecycleOwner){
+            if (it){
+                for (deletedNote in deletedNotesViewModel.deletedNotes) {
+                    deletedNote.noteUid?.let { uid -> deletedNotesViewModel.deleteNote(uid,deletedNote.label,deletedNote.tags)
+                        cancelDelete(deletedNote.timeStamp.toInt())
+
+                    }
+                }
+                val editor: SharedPreferences.Editor ?= pref?.edit()
+                editor?.clear()
+                editor?.apply()
+                Toast.makeText(context,"Trash cleared successfully",Toast.LENGTH_SHORT).show()
+            }
+        }
 
         return root
 
     }
-
+    private fun cancelDelete(timestamp : Int){
+        val alarmManager = context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(context, DeleteReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(context, timestamp, intent, PendingIntent.FLAG_IMMUTABLE)
+        alarmManager.cancel(pendingIntent)
+    }
 
     override fun onNoteFireClick(note: NoteFire, activated : Boolean) {
         val intent = Intent( context, AddEditNoteActivity::class.java)
@@ -103,7 +128,7 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
     }
 
     override fun onNoteFireLongClick(note: NoteFire) {
-        TODO("Not yet implemented")
+
     }
 
 }

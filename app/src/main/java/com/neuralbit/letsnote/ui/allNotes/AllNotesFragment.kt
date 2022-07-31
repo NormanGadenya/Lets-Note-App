@@ -57,14 +57,17 @@ class AllNotesFragment : Fragment() , NoteFireClick {
         pinnedNotesRV = binding.pinnedNotesRV
         pinnedNotesTV = binding.pinnedNotesTV
         otherNotesTV = binding.otherNotesTV
+        val settingsSharedPref = context?.getSharedPreferences("Settings", AppCompatActivity.MODE_PRIVATE)
         val staggeredLayoutManagerAll = StaggeredGridLayoutManager( 2,LinearLayoutManager.VERTICAL)
         val staggeredLayoutManagerPinned = StaggeredGridLayoutManager( 2,LinearLayoutManager.VERTICAL)
         notesRV.layoutManager = staggeredLayoutManagerAll
         pinnedNotesRV.layoutManager =staggeredLayoutManagerPinned
-        allNotesViewModel.staggeredView.value = true
         allNotesViewModel.deleteFrag.value = false
-
+        allNotesViewModel.staggeredView.value = settingsSharedPref?.getBoolean("staggered",true)
         allNotesViewModel.staggeredView.observe(viewLifecycleOwner){
+            val editor: SharedPreferences.Editor ?= settingsSharedPref?.edit()
+            editor?.putBoolean("staggered",it)
+            editor?.apply()
             if (it){
                 notesRV.layoutManager = staggeredLayoutManagerAll
                 pinnedNotesRV.layoutManager =staggeredLayoutManagerPinned

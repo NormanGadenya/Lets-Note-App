@@ -10,7 +10,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
@@ -26,10 +25,10 @@ import com.firebase.ui.auth.AuthUI
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.neuralbit.letsnote.Services.DeleteReceiver
 import com.neuralbit.letsnote.databinding.ActivityMainBinding
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import com.neuralbit.letsnote.ui.archived.ArchivedViewModel
+import com.neuralbit.letsnote.ui.deletedNotes.DeletedNotesViewModel
 import com.neuralbit.letsnote.ui.tag.TagViewModel
 import com.neuralbit.letsnote.utilities.AlertReceiver
 
@@ -41,6 +40,7 @@ class MainActivity : AppCompatActivity() {
     private val TAG = "MainActivity"
     private val allNotesViewModal : AllNotesViewModel by viewModels()
     private val archivedViewModel : ArchivedViewModel by viewModels()
+    private val deleteVieModel : DeletedNotesViewModel by viewModels()
     private val tagViewModel : TagViewModel by viewModels()
     private lateinit var mAuth: FirebaseAuth
     private var actionMode : ActionMode? = null
@@ -84,7 +84,6 @@ class MainActivity : AppCompatActivity() {
 
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
-        allNotesViewModal
         val profileUrl = fUser?.photoUrl
         val headerLayout = navView.getHeaderView(0)
         val profileIV = headerLayout.findViewById<ImageView>(R.id.profilePic)
@@ -109,7 +108,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main_activity2, menu)
-//        allNotesViewModal.deleteFrag.value = false
         val searchViewMenuItem = menu.findItem(R.id.search)
         val layoutViewBtn = menu.findItem(R.id.layoutStyle)
         val signOutButton = menu.findItem(R.id.signOut)
@@ -144,7 +142,15 @@ class MainActivity : AppCompatActivity() {
 
 
         deleteButton.setOnMenuItemClickListener {
-            Toast.makeText(this,"Deleted successfully", Toast.LENGTH_SHORT).show()
+            val alertDialog: AlertDialog.Builder = AlertDialog.Builder(this@MainActivity)
+            alertDialog.setTitle("Are you sure about this ?")
+            alertDialog.setPositiveButton("Yes"
+            ) { _, _ ->
+                deleteVieModel.clearTrash.value = true
+            }
+            alertDialog.setNegativeButton("Cancel"
+            ) { dialog, _ -> dialog.cancel() }
+            alertDialog.show()
             return@setOnMenuItemClickListener true
         }
 
@@ -161,7 +167,6 @@ class MainActivity : AppCompatActivity() {
                 allNotesViewModal.getAllFireNotes().observe(this){
                     for ( note in it){
                         cancelAlarm(note.reminderDate.toInt())
-                        cancelDelete(note.timeStamp.toInt())
                     }
                 }
 
@@ -228,13 +233,6 @@ class MainActivity : AppCompatActivity() {
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(this, AlertReceiver::class.java)
         val pendingIntent = PendingIntent.getBroadcast(this, reminder, intent, PendingIntent.FLAG_IMMUTABLE)
-        alarmManager.cancel(pendingIntent)
-    }
-
-    private fun cancelDelete(timestamp : Int){
-        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(this, DeleteReceiver::class.java)
-        val pendingIntent = PendingIntent.getBroadcast(this, timestamp, intent, PendingIntent.FLAG_IMMUTABLE)
         alarmManager.cancel(pendingIntent)
     }
 

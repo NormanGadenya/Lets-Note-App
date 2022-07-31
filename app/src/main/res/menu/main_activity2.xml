@@ -16,8 +16,8 @@
         />
     <item
         android:id="@+id/trash"
-        android:title="Delete All"
-        android:icon="@drawable/ic_baseline_delete_24"
+        android:title="Clear trash"
+        android:icon="@drawable/baseline_delete_forever_24"
         app:showAsAction="always"/>
     <item
         android:id="@+id/signOut"

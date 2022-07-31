@@ -105,27 +105,27 @@ class TagFireRepo {
 
     }
 
-    fun deleteNoteFromTags(tags : List<String>, notes: List<String>){
+    fun deleteNoteFromTags(tags : List<String>, noteUid: String){
         val tagRef = fUser?.let { database.getReference(it.uid).child("tags") }
         for ( tag in tags){
 
             val tagStr = tag.split("#")[1]
             tagRef?.child(tagStr)?.addListenerForSingleValueEvent( object :ValueEventListener{
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    for (noteUid in notes){
-                        val tagFire = snapshot.getValue(TagFire::class.java)
-                        if (tagFire != null) {
-                            val noteUids = tagFire.noteUids
-                            noteUids.remove(noteUid)
-                            val updateMap = HashMap<String, Any>()
-                            updateMap["noteUids"] = noteUids
-                            if (noteUids.isNotEmpty()){
-                                tagRef.child(tagStr).updateChildren(updateMap)
-                            }else{
-                                tagRef.child(tagStr).removeValue()
-                            }
+
+                    val tagFire = snapshot.getValue(TagFire::class.java)
+                    if (tagFire != null) {
+                        val noteUids = tagFire.noteUids
+                        noteUids.remove(noteUid)
+                        val updateMap = HashMap<String, Any>()
+                        updateMap["noteUids"] = noteUids
+                        if (noteUids.isNotEmpty()){
+                            tagRef.child(tagStr).updateChildren(updateMap)
+                        }else{
+                            tagRef.child(tagStr).removeValue()
                         }
                     }
+
                 }
 
                 override fun onCancelled(error: DatabaseError) {

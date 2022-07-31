@@ -35,7 +35,6 @@ class NoteRVAdapter (
     var lifecycleOwner: LifecycleOwner ? = null
     lateinit var itemView: View
     private var allNotesFire : List<NoteFire> = ArrayList<NoteFire>()
-    private val selectedNotes = ArrayList<NoteFire>()
     var deleteFrag = false
     var searchString: String? =null
     var multipleActivated = false
@@ -87,7 +86,7 @@ class NoteRVAdapter (
                 if (!i){
                     holder.selectIcon.visibility = GONE
                     note.selected = false
-                    selectedNotes.clear()
+                    viewModel?.selectedNotes?.clear()
                 }
             }
         }
@@ -169,6 +168,10 @@ class NoteRVAdapter (
             cm.setHighLightedText(holder.noteTitleTV, it)
 
         }
+        lifecycleOwner?.let { owner ->
+            viewModel?.itemSelectEnabled?.observe(owner){
+            multipleActivated = it
+        }}
 
         holder.itemView.setOnClickListener {
             if (multipleActivated){
@@ -176,16 +179,18 @@ class NoteRVAdapter (
                     holder.selectIcon.visibility = VISIBLE
                     note.selected = true
                     note.itemPosition = holder.adapterPosition
-                    selectedNotes.add(note)
+                    viewModel?.selectedNotes?.add(note)
+
                 }else{
                     holder.selectIcon.visibility = GONE
                     note.selected = false
-                    selectedNotes.remove(note)
+                    viewModel?.selectedNotes?.remove(note)
+
                 }
             }
 
             noteFireClick.onNoteFireClick(note,multipleActivated)
-            if (multipleActivated && selectedNotes.isEmpty()){
+            if (multipleActivated && viewModel?.selectedNotes?.isEmpty() == true){
                 multipleActivated = false
                 viewModel?.itemSelectEnabled?.value = false
             }
@@ -198,7 +203,7 @@ class NoteRVAdapter (
                 note.selected = true
                 note.itemPosition = holder.adapterPosition
                 holder.selectIcon.visibility = VISIBLE
-                selectedNotes.add(note)
+                viewModel?.selectedNotes?.add(note)
                 noteFireClick.onNoteFireLongClick(note)
                 return@setOnLongClickListener true
             }

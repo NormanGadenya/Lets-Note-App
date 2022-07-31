@@ -30,14 +30,12 @@ class DeleteReceiver : BroadcastReceiver() {
         editor?.apply()
 
         if (timeStamp != null && noteUid != null){
-            val noteList = ArrayList<String>()
-            noteList.add(noteUid)
-            noteRepo.deleteNote(noteList)
+            noteRepo.deleteNote(noteUid)
             if (tagList != null){
-                tagRepo.deleteNoteFromTags(tagList,noteList)
+                tagRepo.deleteNoteFromTags(tagList,noteUid)
             }
             if (labelColor != null){
-                labelRepo.deleteNotesFromLabel(labelColor,noteList)
+                labelRepo.deleteNoteFromLabel(labelColor,noteUid)
             }
         }
     }

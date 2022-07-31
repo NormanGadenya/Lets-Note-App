@@ -44,7 +44,6 @@ class ArchivedFragment : Fragment() , NoteFireClick {
         noteRVAdapter?.viewModel = allNotesViewModel
         noteRVAdapter?.lifecycleScope = lifecycleScope
         noteRVAdapter?.lifecycleOwner = this
-        allNotesViewModel.staggeredView.value = true
         allNotesViewModel.deleteFrag.value = false
 
         val staggeredLayoutManagerAll = StaggeredGridLayoutManager( 2,LinearLayoutManager.VERTICAL)

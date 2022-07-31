@@ -34,7 +34,6 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     var backPressed : MutableLiveData<Boolean> = MutableLiveData()
     var todoItems = ArrayList<TodoItem>()
     var allTodoItems = MutableLiveData<ArrayList<TodoItem>>()
-    val deletedTodos = ArrayList<TodoItem>()
     val updatedTodos = ArrayList<TodoItem>()
     var undoMode : MutableLiveData<Boolean> = MutableLiveData()
 

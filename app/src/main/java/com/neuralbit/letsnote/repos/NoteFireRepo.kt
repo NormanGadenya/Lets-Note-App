@@ -77,11 +77,10 @@ class NoteFireRepo {
         }
     }
 
-    fun deleteNote ( notes : List<String>){
+    fun deleteNote ( noteUid : String){
         val notesRef = fUser?.let { database.getReference(it.uid).child("notes") }
-        for (noteUid in notes){
-            notesRef?.child(noteUid)?.removeValue()
-        }
+        notesRef?.child(noteUid)?.removeValue()
+
     }
 
 }

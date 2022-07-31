@@ -1133,10 +1133,10 @@ class AddEditNoteActivity : AppCompatActivity() ,
         alarmManager.set(AlarmManager.RTC_WAKEUP, timeToDelete.toLong(), pendingIntent)
     }
 
-    private fun cancelDelete(reminder : Int){
+    private fun cancelDelete(timestamp : Int){
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(this, DeleteReceiver::class.java)
-        val pendingIntent = PendingIntent.getBroadcast(this, reminder, intent, PendingIntent.FLAG_IMMUTABLE)
+        val pendingIntent = PendingIntent.getBroadcast(this, timestamp, intent, PendingIntent.FLAG_IMMUTABLE)
         alarmManager.cancel(pendingIntent)
     }
 
