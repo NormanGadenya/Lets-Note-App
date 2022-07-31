@@ -20,6 +20,7 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
     var itemArchiveClicked : MutableLiveData<Boolean> = MutableLiveData()
     var staggeredView : MutableLiveData<Boolean> = MutableLiveData()
     var selectedNotes = HashSet<NoteFire>()
+    var deleteFrag : MutableLiveData<Boolean> = MutableLiveData()
 
 
     fun filterOtherFireList () : LiveData<LinkedList<NoteFire>>{

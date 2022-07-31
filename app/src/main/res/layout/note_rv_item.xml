@@ -66,14 +66,13 @@
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvNoteDesc" />
+            app:layout_constraintTop_toBottomOf="@+id/noteTagsTV" />
 
         <ImageView
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:id="@+id/reminderIcon"
             android:layout_marginTop="4dp"
-
             app:layout_constraintTop_toBottomOf="@id/noteTagsTV"
             app:layout_constraintStart_toStartOf="parent"
             android:background="@drawable/ic_baseline_access_alarm_24"
@@ -92,6 +91,21 @@
             android:visibility="visible"
             android:textSize="12sp"
             tools:text ="#tag #james #patric"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            app:layout_constraintTop_toBottomOf="@id/reminderTV"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginTop="4dp"
+            android:visibility="gone"
+            android:id="@+id/timeLeftDeleteTV"
+            android:textColor="@color/Red"
+            tools:text = "23 days"
+            />
+
+
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

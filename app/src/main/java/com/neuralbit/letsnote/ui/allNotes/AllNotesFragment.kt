@@ -7,12 +7,11 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
-import android.view.animation.Animation
-import android.view.animation.AnimationUtils
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -45,11 +44,6 @@ class AllNotesFragment : Fragment() , NoteFireClick {
     private val binding get() = _binding!!
     private lateinit var pinnedNotesTV: TextView
     private lateinit var otherNotesTV: TextView
-    private val rotateOpen: Animation by lazy { AnimationUtils.loadAnimation(context,R.anim.rotate_open_anim)}
-    private val rotateClose: Animation by lazy { AnimationUtils.loadAnimation(context,R.anim.rotate_close_anim)}
-    private val fromBottom: Animation by lazy { AnimationUtils.loadAnimation(context,R.anim.from_bottom_anim)}
-    private val toBottom: Animation by lazy { AnimationUtils.loadAnimation(context,R.anim.to_bottom)}
-    private var clicked = false
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -68,6 +62,8 @@ class AllNotesFragment : Fragment() , NoteFireClick {
         notesRV.layoutManager = staggeredLayoutManagerAll
         pinnedNotesRV.layoutManager =staggeredLayoutManagerPinned
         allNotesViewModel.staggeredView.value = true
+        allNotesViewModel.deleteFrag.value = false
+
         allNotesViewModel.staggeredView.observe(viewLifecycleOwner){
             if (it){
                 notesRV.layoutManager = staggeredLayoutManagerAll
@@ -156,7 +152,6 @@ class AllNotesFragment : Fragment() , NoteFireClick {
             if (it && allNotesViewModel.selectedNotes.isNotEmpty()){
 
                 for ( note in allNotesViewModel.selectedNotes){
-
                     if (note.pinned){
                         allNotesViewModel.pinnedFireNotesList.value?.remove(note)
                         cancelAlarm(note.reminderDate.toInt())
@@ -245,6 +240,11 @@ class AllNotesFragment : Fragment() , NoteFireClick {
         return root
     }
 
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        super.onPrepareOptionsMenu(menu)
+        val trashButton = menu.findItem(R.id.trash)
+        trashButton.isVisible = false
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()
@@ -271,14 +271,6 @@ class AllNotesFragment : Fragment() , NoteFireClick {
         val timeToDelete = timeStamp + 6.048e+8 // 7 days from the time it is softly deleted
         alarmManager.set(AlarmManager.RTC_WAKEUP, timeToDelete.toLong(), pendingIntent)
     }
-
-    private fun cancelDelete(reminder : Int){
-        val alarmManager = context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(context, DeleteReceiver::class.java)
-        val pendingIntent = PendingIntent.getBroadcast(context, reminder, intent, PendingIntent.FLAG_IMMUTABLE)
-        alarmManager.cancel(pendingIntent)
-    }
-
 
     override fun onNoteFireClick(note: NoteFire, activated : Boolean) {
         if (!note.selected && !activated){

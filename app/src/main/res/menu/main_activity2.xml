@@ -15,9 +15,15 @@
         app:showAsAction="ifRoom"
         />
     <item
+        android:id="@+id/trash"
+        android:title="Delete All"
+        android:icon="@drawable/ic_baseline_delete_24"
+        app:showAsAction="always"/>
+    <item
         android:id="@+id/signOut"
         android:title="Sign out"
         android:icon="@drawable/baseline_logout_24"
         app:showAsAction="never"/>
+
 
 </menu>

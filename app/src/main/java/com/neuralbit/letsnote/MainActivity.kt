@@ -10,6 +10,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
@@ -107,11 +108,18 @@ class MainActivity : AppCompatActivity() {
 
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-
         menuInflater.inflate(R.menu.main_activity2, menu)
+//        allNotesViewModal.deleteFrag.value = false
         val searchViewMenuItem = menu.findItem(R.id.search)
         val layoutViewBtn = menu.findItem(R.id.layoutStyle)
         val signOutButton = menu.findItem(R.id.signOut)
+        val deleteButton = menu.findItem(R.id.trash)
+//
+        allNotesViewModal.deleteFrag.observe(this){
+            deleteButton.isVisible = it
+        }
+
+
         val searchView = searchViewMenuItem.actionView as SearchView
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(p0: String?): Boolean {
@@ -133,6 +141,13 @@ class MainActivity : AppCompatActivity() {
                 return false
             }
         })
+
+
+        deleteButton.setOnMenuItemClickListener {
+            Toast.makeText(this,"Deleted successfully", Toast.LENGTH_SHORT).show()
+            return@setOnMenuItemClickListener true
+        }
+
         layoutViewBtn.setOnMenuItemClickListener {
             allNotesViewModal.staggeredView.value = !allNotesViewModal.staggeredView.value!!
             return@setOnMenuItemClickListener true
@@ -165,11 +180,13 @@ class MainActivity : AppCompatActivity() {
             return@setOnMenuItemClickListener true
         }
         allNotesViewModal.staggeredView.observe(this){
-            if (it){
-                layoutViewBtn.setIcon(R.drawable.baseline_format_list_bulleted_24)
-            }else{
-                layoutViewBtn.setIcon(R.drawable.baseline_grid_view_24)
+            if (layoutViewBtn != null){
+                if (it){
+                    layoutViewBtn.setIcon(R.drawable.baseline_format_list_bulleted_24)
+                }else{
+                    layoutViewBtn.setIcon(R.drawable.baseline_grid_view_24)
 
+                }
             }
         }
         return true

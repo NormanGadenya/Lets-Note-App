@@ -21,6 +21,7 @@ import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import com.neuralbit.letsnote.utilities.AlertReceiver
 import com.neuralbit.letsnote.utilities.Common
 import java.util.*
+import kotlin.math.floor
 
 
 class NoteRVAdapter (
@@ -35,6 +36,7 @@ class NoteRVAdapter (
     lateinit var itemView: View
     private var allNotesFire : List<NoteFire> = ArrayList<NoteFire>()
     private val selectedNotes = ArrayList<NoteFire>()
+    var deleteFrag = false
     var searchString: String? =null
     var multipleActivated = false
     val TAG = "NoteRVAdapter"
@@ -48,8 +50,7 @@ class NoteRVAdapter (
         val tagsTV : TextView = itemView.findViewById(R.id.noteTagsTV)
         val reminderTV : TextView = itemView.findViewById(R.id.reminderTV)
         val reminderIcon: View = itemView.findViewById(R.id.reminderIcon)
-
-
+        val daysLeft : TextView = itemView.findViewById(R.id.timeLeftDeleteTV)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -89,6 +90,20 @@ class NoteRVAdapter (
                     selectedNotes.clear()
                 }
             }
+        }
+
+        if (deleteFrag){
+            holder.daysLeft.visibility = VISIBLE
+            val timeLeftMS = note.timeStamp +  6.048e+8 - System.currentTimeMillis()
+            val daysLeft = floor(timeLeftMS * 1.1574E-8)
+            if (daysLeft >1 || daysLeft== (0).toDouble()){
+                holder.daysLeft.text = "${daysLeft.toInt()} days left "
+            }else if (daysLeft == (1).toDouble()){
+                holder.daysLeft.text = "${daysLeft.toInt()} day left"
+            }
+
+        }else{
+            holder.daysLeft.visibility = GONE
         }
 
         if (title.isEmpty()) {

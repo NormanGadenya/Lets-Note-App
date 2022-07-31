@@ -11,6 +11,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.gson.Gson
 import com.neuralbit.letsnote.AddEditNoteActivity
 import com.neuralbit.letsnote.adapters.NoteFireClick
@@ -43,7 +44,18 @@ class ArchivedFragment : Fragment() , NoteFireClick {
         noteRVAdapter?.viewModel = allNotesViewModel
         noteRVAdapter?.lifecycleScope = lifecycleScope
         noteRVAdapter?.lifecycleOwner = this
+        allNotesViewModel.staggeredView.value = true
+        allNotesViewModel.deleteFrag.value = false
 
+        val staggeredLayoutManagerAll = StaggeredGridLayoutManager( 2,LinearLayoutManager.VERTICAL)
+        allNotesViewModel.staggeredView.observe(viewLifecycleOwner){
+            if (it){
+                notesRV.layoutManager = staggeredLayoutManagerAll
+            }else{
+
+                notesRV.layoutManager = LinearLayoutManager(context)
+            }
+        }
         allNotesViewModel.getAllFireNotes().observe(viewLifecycleOwner) {
             val pref = context?.getSharedPreferences("DeletedNotes", AppCompatActivity.MODE_PRIVATE)
             val deletedNotes = pref?.getStringSet("noteUids", HashSet())

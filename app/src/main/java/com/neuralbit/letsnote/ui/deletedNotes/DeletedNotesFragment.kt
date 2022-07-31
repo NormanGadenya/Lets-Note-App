@@ -11,6 +11,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.gson.Gson
 import com.neuralbit.letsnote.AddEditNoteActivity
 import com.neuralbit.letsnote.NoteViewModel
@@ -48,9 +49,22 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
         noteRVAdapter?.lifecycleOwner = this
 
         deletedRV.adapter= noteRVAdapter
+        allNotesViewModel.deleteFrag.value = true
+        noteRVAdapter?.deleteFrag = true
+
+        val staggeredLayoutManagerAll = StaggeredGridLayoutManager( 2,LinearLayoutManager.VERTICAL)
+        allNotesViewModel.staggeredView.observe(viewLifecycleOwner){
+            if (it){
+                deletedRV.layoutManager = staggeredLayoutManagerAll
+            }else{
+
+                deletedRV.layoutManager = LinearLayoutManager(context)
+            }
+        }
         allNotesViewModel.getAllFireNotes().observe(viewLifecycleOwner){
             val pref = context?.getSharedPreferences("DeletedNotes", AppCompatActivity.MODE_PRIVATE)
             val deletedNotes = pref?.getStringSet("noteUids", HashSet())
+
             val filteredNotes = HashSet<NoteFire>()
             for (n in it){
                 if (deletedNotes != null){
@@ -70,7 +84,7 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
     }
 
 
-    override fun onNoteFireClick(note: NoteFire , activated : Boolean) {
+    override fun onNoteFireClick(note: NoteFire, activated : Boolean) {
         val intent = Intent( context, AddEditNoteActivity::class.java)
         intent.putExtra("noteType","Edit")
         intent.putExtra("noteTitle",note.title)
