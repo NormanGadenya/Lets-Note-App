@@ -142,15 +142,17 @@ class MainActivity : AppCompatActivity() {
 
 
         deleteButton.setOnMenuItemClickListener {
-            val alertDialog: AlertDialog.Builder = AlertDialog.Builder(this@MainActivity)
-            alertDialog.setTitle("Are you sure about this ?")
-            alertDialog.setPositiveButton("Yes"
-            ) { _, _ ->
-                deleteVieModel.clearTrash.value = true
+            if (deleteVieModel.deletedNotes.isNotEmpty()){
+                val alertDialog: AlertDialog.Builder = AlertDialog.Builder(this@MainActivity)
+                alertDialog.setTitle("Are you sure about this ?")
+                alertDialog.setPositiveButton("Yes"
+                ) { _, _ ->
+                    deleteVieModel.clearTrash.value = true
+                }
+                alertDialog.setNegativeButton("Cancel"
+                ) { dialog, _ -> dialog.cancel() }
+                alertDialog.show()
             }
-            alertDialog.setNegativeButton("Cancel"
-            ) { dialog, _ -> dialog.cancel() }
-            alertDialog.show()
             return@setOnMenuItemClickListener true
         }
 

@@ -9,6 +9,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -35,6 +37,8 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
     private var _binding : DeletedNotesFragmentBinding? = null
     private val binding get() = _binding!!
     val TAG = "DELETEDNOTESFRAG"
+    private lateinit var trashIcon : ImageView
+    private lateinit var trashText : TextView
 
 
 
@@ -46,7 +50,8 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
 
         deletedRV = binding.deletedRV
         val root: View = binding.root
-
+        trashIcon = binding.trashIcon
+        trashText = binding.trashText
         val noteRVAdapter = context?.let { NoteRVAdapter(it,this) }
         deletedRV.layoutManager = LinearLayoutManager(context)
 
@@ -80,12 +85,21 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
                     }
                 }
             }
+
+            if (filteredNotes.isEmpty()){
+                trashText.visibility = View.VISIBLE
+                trashIcon.visibility = View.VISIBLE
+            }else{
+                trashText.visibility = View.GONE
+                trashIcon.visibility = View.GONE
+            }
             deletedNotesViewModel.deletedNotes = filteredNotes
             noteRVAdapter?.updateListFire(ArrayList(filteredNotes))
 
         }
         deletedNotesViewModel.clearTrash.observe(viewLifecycleOwner){
-            if (it){
+
+            if (it ){
                 for (deletedNote in deletedNotesViewModel.deletedNotes) {
                     deletedNote.noteUid?.let { uid -> deletedNotesViewModel.deleteNote(uid,deletedNote.label,deletedNote.tags)
                         cancelDelete(deletedNote.timeStamp.toInt())
@@ -95,6 +109,7 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
                 val editor: SharedPreferences.Editor ?= pref?.edit()
                 editor?.clear()
                 editor?.apply()
+
                 Toast.makeText(context,"Trash cleared successfully",Toast.LENGTH_SHORT).show()
             }
         }

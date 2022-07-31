@@ -12,6 +12,7 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -41,6 +42,8 @@ class AllNotesFragment : Fragment() , NoteFireClick {
     private lateinit var  notesRV: RecyclerView
     private lateinit var  pinnedNotesRV: RecyclerView
     private lateinit var addNoteFAB : FloatingActionButton
+    private lateinit var welcomeIcon : ImageView
+    private lateinit var welcomeText : TextView
     private val binding get() = _binding!!
     private lateinit var pinnedNotesTV: TextView
     private lateinit var otherNotesTV: TextView
@@ -57,6 +60,8 @@ class AllNotesFragment : Fragment() , NoteFireClick {
         pinnedNotesRV = binding.pinnedNotesRV
         pinnedNotesTV = binding.pinnedNotesTV
         otherNotesTV = binding.otherNotesTV
+        welcomeIcon = binding.welcomeIcon
+        welcomeText = binding.allNotesText
         val settingsSharedPref = context?.getSharedPreferences("Settings", AppCompatActivity.MODE_PRIVATE)
         val staggeredLayoutManagerAll = StaggeredGridLayoutManager( 2,LinearLayoutManager.VERTICAL)
         val staggeredLayoutManagerPinned = StaggeredGridLayoutManager( 2,LinearLayoutManager.VERTICAL)
@@ -117,6 +122,13 @@ class AllNotesFragment : Fragment() , NoteFireClick {
                         }
                     }
                 }
+            }
+            if (otherNotes.isEmpty() && pinnedNotes.isEmpty()){
+                welcomeIcon.visibility = VISIBLE
+                welcomeText.visibility = VISIBLE
+            }else{
+                welcomeIcon.visibility = GONE
+                welcomeText.visibility = GONE
             }
             otherNotes.sortedWith(compareBy { it.timeStamp }).asReversed()
             pinnedNotes.sortedWith(compareBy { it.timeStamp })

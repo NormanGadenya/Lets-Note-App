@@ -24,6 +24,7 @@
         <entry key="app/src/main/res/drawable/ic_apricot_24.xml" value="0.353125" />
         <entry key="app/src/main/res/drawable/ic_baseline_bookmark_24.xml" value="0.353125" />
         <entry key="app/src/main/res/drawable/ic_baseline_bookmark_remove_24.xml" value="0.1125" />
+        <entry key="app/src/main/res/drawable/ic_baseline_delete_24.xml" value="0.158" />
         <entry key="app/src/main/res/drawable/ic_baseline_more_vert_24.xml" value="0.141" />
         <entry key="app/src/main/res/drawable/ic_ev_24.xml" value="0.353125" />
         <entry key="app/src/main/res/drawable/ic_launcher1_foreground.xml" value="0.1" />
@@ -36,6 +37,7 @@
         <entry key="app/src/main/res/drawable/sign_in_bgnd.xml" value="0.111" />
         <entry key="app/src/main/res/drawable/tag_background.xml" value="0.1975" />
         <entry key="app/src/main/res/drawable/tag_background_sel.xml" value="0.3205" />
+        <entry key="app/src/main/res/drawable/welcome_icon.xml" value="0.158" />
         <entry key="app/src/main/res/drawable/white.xml" value="0.1225" />
         <entry key="app/src/main/res/drawable/white_tag.xml" value="0.353125" />
         <entry key="app/src/main/res/drawable/wild_orchid_tag.xml" value="0.22291666666666668" />
@@ -58,7 +60,7 @@
         <entry key="app/src/main/res/layout/custom_datetime_dialog.xml" value="0.18" />
         <entry key="app/src/main/res/layout/deleted_notes_fragment.xml" value="0.19375" />
         <entry key="app/src/main/res/layout/fragment_add_edit.xml" value="0.2625" />
-        <entry key="app/src/main/res/layout/fragment_all_notes.xml" value="0.12" />
+        <entry key="app/src/main/res/layout/fragment_all_notes.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_archived_notes.xml" value="0.3328125" />
         <entry key="app/src/main/res/layout/fragment_gallery.xml" value="0.33" />
         <entry key="app/src/main/res/layout/fragment_home.xml" value="0.25" />

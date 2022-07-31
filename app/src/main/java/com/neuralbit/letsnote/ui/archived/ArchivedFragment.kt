@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -26,6 +28,8 @@ class ArchivedFragment : Fragment() , NoteFireClick {
     private val allNotesViewModel: AllNotesViewModel by activityViewModels()
     private var _binding: FragmentArchivedNotesBinding? = null
     private lateinit var  notesRV: RecyclerView
+    private lateinit var archiveIcon : ImageView
+    private lateinit var archiveText : TextView
     private val binding get() = _binding!!
     val TAG = "ArchivedFragment"
 
@@ -44,6 +48,8 @@ class ArchivedFragment : Fragment() , NoteFireClick {
         noteRVAdapter?.viewModel = allNotesViewModel
         noteRVAdapter?.lifecycleScope = lifecycleScope
         noteRVAdapter?.lifecycleOwner = this
+        archiveIcon = binding.archivedIcon
+        archiveText = binding.archivedText
         allNotesViewModel.deleteFrag.value = false
 
         val staggeredLayoutManagerAll = StaggeredGridLayoutManager( 2,LinearLayoutManager.VERTICAL)
@@ -59,6 +65,7 @@ class ArchivedFragment : Fragment() , NoteFireClick {
             val pref = context?.getSharedPreferences("DeletedNotes", AppCompatActivity.MODE_PRIVATE)
             val deletedNotes = pref?.getStringSet("noteUids", HashSet())
             val archivedNotes = ArrayList<NoteFire>()
+
             for ( note in it){
                 if (deletedNotes != null){
                     if (!deletedNotes.contains(note.noteUid)){
@@ -71,6 +78,13 @@ class ArchivedFragment : Fragment() , NoteFireClick {
                         archivedNotes.add(note)
                     }
                 }
+            }
+            if (archivedNotes.isEmpty()){
+                archiveIcon.visibility = View.VISIBLE
+                archiveText.visibility = View.VISIBLE
+            }else{
+                archiveIcon.visibility = View.GONE
+                archiveText.visibility = View.GONE
             }
             archivedViewModel.archivedFireNotes.value = archivedNotes
             noteRVAdapter?.updateListFire(archivedNotes)
