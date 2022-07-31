@@ -10,6 +10,8 @@ data class NoteFire (
     var protected: Boolean = false,
     var tags : List<String> = ArrayList(),
     var todoItems : List<TodoItem> = ArrayList(),
+    var selected :Boolean = false,
     var label : Int = 0,
-    var noteUid: String ?= ""
+    var noteUid: String ?= "",
+    var itemPosition : Int = 0
 )

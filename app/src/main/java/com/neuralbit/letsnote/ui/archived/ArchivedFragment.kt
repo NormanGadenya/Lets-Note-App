@@ -81,7 +81,7 @@ class ArchivedFragment : Fragment() , NoteFireClick {
     }
 
 
-    override fun onNoteFireClick(note: NoteFire) {
+    override fun onNoteFireClick(note: NoteFire, activated : Boolean) {
         val intent = Intent( context, AddEditNoteActivity::class.java)
         intent.putExtra("noteType","Edit")
         intent.putExtra("noteTitle",note.title)
@@ -96,6 +96,10 @@ class ArchivedFragment : Fragment() , NoteFireClick {
         intent.putExtra("todoItems", toDoItemString)
         intent.putStringArrayListExtra("tagList", ArrayList(note.tags))
         startActivity(intent)
+    }
+
+    override fun onNoteFireLongClick(note: NoteFire) {
+        TODO("Not yet implemented")
     }
 
 }

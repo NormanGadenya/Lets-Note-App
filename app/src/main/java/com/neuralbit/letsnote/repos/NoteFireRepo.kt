@@ -45,10 +45,10 @@ class NoteFireRepo {
         return live
     }
 
-    fun getAllNotes () : LiveData<List<NoteFire>> {
-        val live = MutableLiveData<List<NoteFire>>()
+    fun getAllNotes () : LiveData<ArrayList<NoteFire>> {
+        val live = MutableLiveData<ArrayList<NoteFire>>()
         val notesRef = fUser?.let { database.getReference(it.uid).child("notes") }
-        notesRef?.addValueEventListener(object : ValueEventListener{
+        notesRef?.addListenerForSingleValueEvent(object : ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
                 val notes = ArrayList<NoteFire>()
                 for ( s : DataSnapshot in snapshot.children ){
@@ -66,7 +66,7 @@ class NoteFireRepo {
                 Log.e(TAG, "onCancelled: ${error.message}" )
             }
         })
-        fUser?.let { database.getReference(it.uid).keepSynced(true) }
+//        fUser?.let { database.getReference(it.uid).keepSynced(true) }
         return live
     }
 

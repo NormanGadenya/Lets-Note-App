@@ -3,10 +3,12 @@ package com.neuralbit.letsnote
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
+import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.view.ActionMode
 import androidx.appcompat.widget.SearchView
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.findNavController
@@ -33,7 +35,10 @@ class MainActivity : AppCompatActivity() {
     private val archivedViewModel : ArchivedViewModel by viewModels()
     private val tagViewModel : TagViewModel by viewModels()
     private lateinit var mAuth: FirebaseAuth
+    private var actionMode : ActionMode? = null
     var fUser : FirebaseUser? = null
+
+
 
 
 
@@ -59,15 +64,24 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_home, R.id.nav_arch , R.id.nav_tags ,R.id.nav_labels , R.id.nav_deleted , R.id.nav_settings
             ), drawerLayout
         )
+        allNotesViewModal.itemSelectEnabled.observe(this){
+            if (it){
+                actionMode = startSupportActionMode(MActionModeCallBack())
+                supportActionBar?.hide()
+            }else{
+                actionMode?.finish()
+
+            }
+        }
 
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+        allNotesViewModal
         val profileUrl = fUser?.photoUrl
         val headerLayout = navView.getHeaderView(0)
         val profileIV = headerLayout.findViewById<ImageView>(R.id.profilePic)
         val nameTV = headerLayout.findViewById<TextView>(R.id.accountName)
         val emailTV = headerLayout.findViewById<TextView>(R.id.emailAddress)
-//        val navController.navigate(R.id.profilePic)
         if(profileUrl != null){
             Glide.with(applicationContext).load(profileUrl).into(profileIV)
         }
@@ -89,6 +103,7 @@ class MainActivity : AppCompatActivity() {
 
         menuInflater.inflate(R.menu.main_activity2, menu)
         val searchViewMenuItem = menu.findItem(R.id.search)
+        val layoutViewBtn = menu.findItem(R.id.layoutStyle)
         val searchView = searchViewMenuItem.actionView as SearchView
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(p0: String?): Boolean {
@@ -110,7 +125,52 @@ class MainActivity : AppCompatActivity() {
                 return false
             }
         })
+        layoutViewBtn.setOnMenuItemClickListener {
+            allNotesViewModal.staggeredView.value = !allNotesViewModal.staggeredView.value!!
+            return@setOnMenuItemClickListener true
+        }
+
+        allNotesViewModal.staggeredView.observe(this){
+            if (it){
+                layoutViewBtn.setIcon(R.drawable.baseline_format_list_bulleted_24)
+            }else{
+                layoutViewBtn.setIcon(R.drawable.baseline_line_style_24)
+
+            }
+        }
         return true
+    }
+
+    private inner class MActionModeCallBack : ActionMode.Callback {
+        override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+            mode?.menuInflater?.inflate(R.menu.action_menu,menu)
+            mode?.title = "Delete or Archive notes"
+            return true
+        }
+
+        override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+            return false
+        }
+
+        override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
+            if (item?.itemId == R.id.archive ){
+                allNotesViewModal.itemArchiveClicked.value = true
+                mode?.finish()
+                return true
+            }else if (item?.itemId == R.id.delete){
+                allNotesViewModal.itemDeleteClicked.value = true
+                mode?.finish()
+                return true
+            }
+            return false
+        }
+
+        override fun onDestroyActionMode(mode: ActionMode?) {
+            allNotesViewModal.itemSelectEnabled.value = false
+            supportActionBar?.show()
+            actionMode = null
+        }
+
     }
 
 

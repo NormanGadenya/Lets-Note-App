@@ -11,13 +11,18 @@ import com.neuralbit.letsnote.repos.NoteFireRepo
 import java.util.*
 
 class AllNotesViewModel (application : Application) : AndroidViewModel(application) {
-    var otherFireNotesList = MutableLiveData<List<NoteFire>>()
-    var pinnedFireNotesList = MutableLiveData<List<NoteFire>>()
+    var otherFireNotesList = MutableLiveData<LinkedList<NoteFire>>()
+    var pinnedFireNotesList = MutableLiveData<LinkedList<NoteFire>>()
     private val noteFireRepo: NoteFireRepo = NoteFireRepo()
     var searchQuery : MutableLiveData<String> = MutableLiveData()
+    var itemSelectEnabled : MutableLiveData<Boolean> = MutableLiveData()
+    var itemDeleteClicked : MutableLiveData<Boolean> = MutableLiveData()
+    var itemArchiveClicked : MutableLiveData<Boolean> = MutableLiveData()
+    var staggeredView : MutableLiveData<Boolean> = MutableLiveData()
+    var selectedNotes = HashSet<NoteFire>()
 
 
-    fun filterOtherFireList () : LiveData<List<NoteFire>>{
+    fun filterOtherFireList () : LiveData<LinkedList<NoteFire>>{
         val textLower = searchQuery.value
         Log.d("LOG", "filterList:${searchQuery.value} ")
         return if (searchQuery.value!=null){
@@ -29,7 +34,7 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
         }
     }
 
-    fun filterPinnedFireList () : LiveData<List<NoteFire>>{
+    fun filterPinnedFireList () : LiveData<LinkedList<NoteFire>>{
         val textLower = searchQuery.value
         Log.d("LOG", "filterList:${searchQuery.value} ")
         return if (searchQuery.value!=null){
@@ -42,13 +47,16 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
     }
 
 
-    fun getAllFireNotes () :LiveData<List<NoteFire>> {
+    fun getAllFireNotes () :LiveData<ArrayList<NoteFire>> {
         return noteFireRepo.getAllNotes()
     }
 
+    fun updateFireNote(noteUpdate : Map<String, Any>, noteUid : String) {
+        noteFireRepo.updateNote(noteUpdate,noteUid)
+    }
 
-    private fun filterList(list : List<NoteFire>, text: String?) : List<NoteFire>{
-        val newList = ArrayList<NoteFire>()
+    private fun filterList(list : LinkedList<NoteFire>, text: String?) : LinkedList<NoteFire>{
+        val newList = LinkedList<NoteFire>()
 
         return if (text != null) {
             val textLower= text.toLowerCase(Locale.ROOT)

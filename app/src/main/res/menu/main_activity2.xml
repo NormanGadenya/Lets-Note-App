@@ -8,4 +8,11 @@
         app:showAsAction="always"
         app:actionViewClass="androidx.appcompat.widget.SearchView" />
 
+    <item
+        android:id="@+id/layoutStyle"
+        android:icon="@drawable/baseline_line_style_24"
+        android:title="Layout style"
+        app:showAsAction="ifRoom"
+        />
+
 </menu>

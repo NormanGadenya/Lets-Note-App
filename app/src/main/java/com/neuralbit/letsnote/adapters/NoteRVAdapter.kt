@@ -4,15 +4,17 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.LifecycleOwner
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.entities.NoteFire
@@ -32,19 +34,21 @@ class NoteRVAdapter (
     var lifecycleScope : LifecycleCoroutineScope? = null
     var lifecycleOwner: LifecycleOwner ? = null
     lateinit var itemView: View
-    private val allNotesFire = ArrayList<NoteFire>()
+    private var allNotesFire : List<NoteFire> = ArrayList<NoteFire>()
+    private val selectedNotes = ArrayList<NoteFire>()
     var searchString: String? =null
+    var multipleActivated = false
     val TAG = "NoteRVAdapter"
 
 
     inner class ViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView){
         val noteTitleTV: TextView = itemView.findViewById(R.id.tvNoteTitle)
+        val selectIcon: ImageView = itemView.findViewById(R.id.selectIcon)
         val noteTextTV: TextView = itemView.findViewById(R.id.tvNoteDesc)
         val noteCard : View = itemView.findViewById(R.id.noteCard)
         val tagsTV : TextView = itemView.findViewById(R.id.noteTagsTV)
         val reminderTV : TextView = itemView.findViewById(R.id.reminderTV)
         val reminderIcon: View = itemView.findViewById(R.id.reminderIcon)
-        val todoRV : RecyclerView = itemView.findViewById(R.id.todoRV)
 
 
     }
@@ -57,9 +61,8 @@ class NoteRVAdapter (
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val note = allNotesFire[position]
+        Log.d(TAG, "updateListFire: $note")
 
-        val layoutManager = LinearLayoutManager(context,LinearLayoutManager.VERTICAL,false)
-        holder.todoRV.layoutManager = layoutManager
         var title = note.title
         var desc = note.description
         val cm = Common()
@@ -109,6 +112,8 @@ class NoteRVAdapter (
         }
         if (note.label > 0){
             holder.noteCard.setBackgroundColor(note.label)
+        }else{
+            holder.noteCard.setBackgroundColor(Color.parseColor("#80EBF0F4"))
         }
 
         val reminderDate = note.reminderDate
@@ -144,7 +149,38 @@ class NoteRVAdapter (
         }
 
         holder.itemView.setOnClickListener {
-            noteFireClick.onNoteFireClick(note)
+            if (multipleActivated){
+                if (!note.selected){
+                    holder.selectIcon.visibility = VISIBLE
+                    note.selected = true
+                    note.itemPosition = holder.adapterPosition
+                    selectedNotes.add(note)
+                }else{
+                    holder.selectIcon.visibility = GONE
+                    note.selected = false
+                    selectedNotes.remove(note)
+                }
+            }
+
+            noteFireClick.onNoteFireClick(note,multipleActivated)
+            if (multipleActivated && selectedNotes.isEmpty()){
+                multipleActivated = false
+                viewModel?.itemSelectEnabled?.value = false
+            }
+        }
+
+        holder.itemView.setOnLongClickListener {
+
+            if (!note.selected && !multipleActivated){
+                multipleActivated = true
+                note.selected = true
+                note.itemPosition = holder.adapterPosition
+                holder.selectIcon.visibility = VISIBLE
+                selectedNotes.add(note)
+                noteFireClick.onNoteFireLongClick(note)
+                return@setOnLongClickListener true
+            }
+            return@setOnLongClickListener false
         }
     }
     override fun getItemCount(): Int {
@@ -153,9 +189,9 @@ class NoteRVAdapter (
 
 
     fun updateListFire( newList: List<NoteFire>){
-        allNotesFire.clear()
-        allNotesFire.addAll(newList)
-        notifyItemRangeChanged(0,allNotesFire.size)
+        allNotesFire = newList
+
+        notifyDataSetChanged()
     }
 
     private fun cancelAlarm(reminder : Int){
@@ -169,5 +205,6 @@ class NoteRVAdapter (
 
 
 interface NoteFireClick{
-    fun onNoteFireClick(note : NoteFire)
+    fun onNoteFireClick(note : NoteFire , activated : Boolean)
+    fun onNoteFireLongClick(note: NoteFire)
 }

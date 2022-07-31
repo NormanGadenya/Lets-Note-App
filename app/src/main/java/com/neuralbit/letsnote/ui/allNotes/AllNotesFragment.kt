@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -56,11 +57,24 @@ class AllNotesFragment : Fragment() , NoteFireClick {
         pinnedNotesRV = binding.pinnedNotesRV
         pinnedNotesTV = binding.pinnedNotesTV
         otherNotesTV = binding.otherNotesTV
+        val staggeredLayoutManagerAll = StaggeredGridLayoutManager( 2,LinearLayoutManager.VERTICAL)
+        val staggeredLayoutManagerPinned = StaggeredGridLayoutManager( 2,LinearLayoutManager.VERTICAL)
+        notesRV.layoutManager = staggeredLayoutManagerAll
+        pinnedNotesRV.layoutManager =staggeredLayoutManagerPinned
+        allNotesViewModel.staggeredView.value = true
+        allNotesViewModel.staggeredView.observe(viewLifecycleOwner){
+            if (it){
+                notesRV.layoutManager = staggeredLayoutManagerAll
+                pinnedNotesRV.layoutManager =staggeredLayoutManagerPinned
+            }else{
 
-        val layoutManagerAll = StaggeredGridLayoutManager( 2,LinearLayoutManager.VERTICAL)
-        val layoutManagerPinned = StaggeredGridLayoutManager( 2,LinearLayoutManager.VERTICAL)
-        notesRV.layoutManager = layoutManagerAll
-        pinnedNotesRV.layoutManager =layoutManagerPinned
+                notesRV.layoutManager = LinearLayoutManager(context)
+                pinnedNotesRV.layoutManager = LinearLayoutManager(context)
+            }
+        }
+
+
+
         val noteRVAdapter = context?.let { NoteRVAdapter(it,this) }
         val pinnedNoteRVAdapter = context?.let { NoteRVAdapter(it,this) }
         notesRV.adapter= noteRVAdapter
@@ -71,11 +85,11 @@ class AllNotesFragment : Fragment() , NoteFireClick {
         pinnedNoteRVAdapter?.viewModel = allNotesViewModel
         pinnedNoteRVAdapter?.lifecycleScope = lifecycleScope
         pinnedNoteRVAdapter?.lifecycleOwner = this
-
+        allNotesViewModel.selectedNotes.clear()
         allNotesViewModel.getAllFireNotes().observe(viewLifecycleOwner){
 
-            val pinnedNotes = ArrayList<NoteFire>()
-            val otherNotes = ArrayList<NoteFire>()
+            val pinnedNotes = LinkedList<NoteFire>()
+            val otherNotes = LinkedList<NoteFire>()
             for (note in it) {
                 val pref = context?.getSharedPreferences("DeletedNotes", AppCompatActivity.MODE_PRIVATE)
                 val deletedNotes = pref?.getStringSet("noteUids", HashSet())
@@ -114,7 +128,6 @@ class AllNotesFragment : Fragment() , NoteFireClick {
                 pinnedNotesRV.visibility = GONE
             }
             noteRVAdapter?.updateListFire(otherNotes)
-
         }
 
 
@@ -129,6 +142,44 @@ class AllNotesFragment : Fragment() , NoteFireClick {
                 noteRVAdapter?.searchString = str
             }
 
+        }
+
+        allNotesViewModel.itemArchiveClicked.observe(viewLifecycleOwner){
+            if (it && allNotesViewModel.selectedNotes.isNotEmpty()){
+
+                for ( note in allNotesViewModel.selectedNotes){
+
+                    Toast.makeText(context,note.description,Toast.LENGTH_SHORT).show()
+                    if (note.pinned){
+                        allNotesViewModel.pinnedFireNotesList.value?.remove(note)
+                        pinnedNoteRVAdapter?.notifyDataSetChanged()
+
+                    }else{
+                        allNotesViewModel.otherFireNotesList.value?.remove(note)
+                        noteRVAdapter?.notifyDataSetChanged()
+                    }
+
+//                    val noteUpdate = HashMap<String,Any>()
+//                    noteUpdate["archived"] = true
+//                    note.noteUid?.let { it1 ->
+//                        allNotesViewModel.updateFireNote(noteUpdate, it1) }
+                }
+
+                allNotesViewModel.otherFireNotesList.value?.let { list ->
+                    noteRVAdapter?.updateListFire(list)
+                }
+                allNotesViewModel.pinnedFireNotesList.value?.let { list ->
+                    pinnedNoteRVAdapter?.updateListFire(list)
+                }
+
+//                noteRVAdapter?.notifyDataSetChanged()
+                allNotesViewModel.selectedNotes.clear()
+
+
+                allNotesViewModel.itemSelectEnabled.value = false
+
+                Toast.makeText(context,"Notes archived successfully",Toast.LENGTH_SHORT).show()
+            }
         }
 
 
@@ -149,24 +200,41 @@ class AllNotesFragment : Fragment() , NoteFireClick {
     }
 
 
-    override fun onNoteFireClick(note: NoteFire) {
-        val intent = Intent( context, AddEditNoteActivity::class.java)
-        intent.putExtra("noteType","Edit")
-        intent.putExtra("noteTitle",note.title)
-        intent.putExtra("noteDescription",note.description)
-        intent.putExtra("noteUid",note.noteUid)
-        intent.putExtra("timeStamp",note.timeStamp)
-        intent.putExtra("labelColor",note.label)
-        intent.putExtra("pinned",note.pinned)
-        intent.putExtra("archieved",note.archived)
-        val c = Calendar.getInstance()
-        if (c.timeInMillis < note.reminderDate){
-            intent.putExtra("reminder",note.reminderDate)
+    override fun onNoteFireClick(note: NoteFire, activated : Boolean) {
+        if (!note.selected && !activated){
+            val intent = Intent( context, AddEditNoteActivity::class.java)
+            intent.putExtra("noteType","Edit")
+            intent.putExtra("noteTitle",note.title)
+            intent.putExtra("noteDescription",note.description)
+            intent.putExtra("noteUid",note.noteUid)
+            intent.putExtra("timeStamp",note.timeStamp)
+            intent.putExtra("labelColor",note.label)
+            intent.putExtra("pinned",note.pinned)
+            intent.putExtra("archieved",note.archived)
+            val c = Calendar.getInstance()
+            if (c.timeInMillis < note.reminderDate){
+                intent.putExtra("reminder",note.reminderDate)
+            }
+            val toDoItemString: String = Gson().toJson(note.todoItems)
+            intent.putExtra("todoItems", toDoItemString)
+            intent.putStringArrayListExtra("tagList", ArrayList(note.tags))
+            startActivity(intent)
+        }else{
+            if (note.selected){
+                allNotesViewModel.selectedNotes.add(note)
+            }else{
+                allNotesViewModel.selectedNotes.remove(note)
+            }
         }
-        val toDoItemString: String = Gson().toJson(note.todoItems)
-        intent.putExtra("todoItems", toDoItemString)
-        intent.putStringArrayListExtra("tagList", ArrayList(note.tags))
-        startActivity(intent)
+    }
+
+    override fun onNoteFireLongClick(note: NoteFire) {
+        if (note.selected){
+            allNotesViewModel.selectedNotes.add(note)
+        }else{
+            allNotesViewModel.selectedNotes.remove(note)
+        }
+        allNotesViewModel.itemSelectEnabled.value = true
     }
 
 }

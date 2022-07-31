@@ -98,7 +98,7 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
 
-        menuInflater.inflate(R.menu.labelnotes_activity, menu)
+        menuInflater.inflate(R.menu.label_tag_activity_menu, menu)
         val searchViewMenuItem = menu.findItem(R.id.search)
         val searchView = searchViewMenuItem.actionView as SearchView
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
@@ -121,7 +121,7 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
         return true
     }
 
-    override fun onNoteFireClick(note: NoteFire) {
+    override fun onNoteFireClick(note: NoteFire, activated : Boolean) {
         val intent = Intent( applicationContext, AddEditNoteActivity::class.java)
         intent.putExtra("noteType","Edit")
         intent.putExtra("noteTitle",note.title)
@@ -139,6 +139,10 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
         intent.putExtra("todoItems", toDoItemString)
         intent.putStringArrayListExtra("tagList", ArrayList(note.tags))
         startActivity(intent)
+    }
+
+    override fun onNoteFireLongClick(note: NoteFire) {
+        TODO("Not yet implemented")
     }
 
 }
