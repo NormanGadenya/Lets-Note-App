@@ -48,7 +48,7 @@ class NoteFireRepo {
     fun getAllNotes () : LiveData<ArrayList<NoteFire>> {
         val live = MutableLiveData<ArrayList<NoteFire>>()
         val notesRef = fUser?.let { database.getReference(it.uid).child("notes") }
-        notesRef?.addListenerForSingleValueEvent(object : ValueEventListener{
+        notesRef?.addValueEventListener(object : ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
                 val notes = ArrayList<NoteFire>()
                 for ( s : DataSnapshot in snapshot.children ){

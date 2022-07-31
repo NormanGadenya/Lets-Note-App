@@ -10,9 +10,14 @@
 
     <item
         android:id="@+id/layoutStyle"
-        android:icon="@drawable/baseline_line_style_24"
+        android:icon="@drawable/baseline_grid_view_24"
         android:title="Layout style"
         app:showAsAction="ifRoom"
         />
+    <item
+        android:id="@+id/signOut"
+        android:title="Sign out"
+        android:icon="@drawable/baseline_logout_24"
+        app:showAsAction="never"/>
 
 </menu>

@@ -30,4 +30,5 @@
             android:title="@string/settings"/>
 
     </group>
+
 </menu>

@@ -9,6 +9,7 @@ import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.utilities.Common
+import kotlinx.coroutines.*
 
 class TagRVAdapter (
     val context: Context,
@@ -34,11 +35,10 @@ class TagRVAdapter (
         holder.tagNameTV.text = tagTitle
         val noteCount = tagList[position].noteCount
         val cm = Common()
-        if(noteCount==1){
-            holder.tagNoteCount.text = context.getString(R.string.noteTagCountSingle,noteCount.toString())
-        }else {
-            holder.tagNoteCount.text =
-                context.getString(R.string.noteTagCountMultiple, noteCount.toString())
+
+
+        GlobalScope.launch {
+            updateNoteCountTV(noteCount,holder.tagNoteCount)
         }
         holder.tagCard.setOnClickListener {
             tagItemClick.onTagItemClick(tagTitle)
@@ -48,6 +48,18 @@ class TagRVAdapter (
         }
     }
 
+    private suspend fun updateNoteCountTV(value : Int, textView: TextView){
+        withContext(Dispatchers.Main){
+            for (i in 0..value){
+                delay(100L)
+                if(value==1){
+                    textView.text = context.getString(R.string.noteTagCountSingle,value.toString())
+                }else {
+                    textView.text = context.getString(R.string.noteTagCountMultiple, value.toString())
+                }
+            }
+        }
+    }
     override fun getItemCount(): Int {
         return tagList.size
     }

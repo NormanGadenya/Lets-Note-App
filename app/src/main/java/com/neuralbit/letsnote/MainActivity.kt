@@ -1,5 +1,9 @@
 package com.neuralbit.letsnote
 
+import android.app.AlarmManager
+import android.app.AlertDialog
+import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
@@ -17,13 +21,16 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.bumptech.glide.Glide
+import com.firebase.ui.auth.AuthUI
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.neuralbit.letsnote.Services.DeleteReceiver
 import com.neuralbit.letsnote.databinding.ActivityMainBinding
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import com.neuralbit.letsnote.ui.archived.ArchivedViewModel
 import com.neuralbit.letsnote.ui.tag.TagViewModel
+import com.neuralbit.letsnote.utilities.AlertReceiver
 
 
 class MainActivity : AppCompatActivity() {
@@ -104,6 +111,7 @@ class MainActivity : AppCompatActivity() {
         menuInflater.inflate(R.menu.main_activity2, menu)
         val searchViewMenuItem = menu.findItem(R.id.search)
         val layoutViewBtn = menu.findItem(R.id.layoutStyle)
+        val signOutButton = menu.findItem(R.id.signOut)
         val searchView = searchViewMenuItem.actionView as SearchView
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(p0: String?): Boolean {
@@ -130,11 +138,37 @@ class MainActivity : AppCompatActivity() {
             return@setOnMenuItemClickListener true
         }
 
+        signOutButton.setOnMenuItemClickListener {
+            val alertDialog: AlertDialog.Builder = AlertDialog.Builder(this@MainActivity)
+            alertDialog.setTitle("Are you sure about this ?")
+            alertDialog.setPositiveButton("Yes"
+            ) { _, _ ->
+                allNotesViewModal.getAllFireNotes().observe(this){
+                    for ( note in it){
+                        cancelAlarm(note.reminderDate.toInt())
+                        cancelDelete(note.timeStamp.toInt())
+                    }
+                }
+
+
+                AuthUI.getInstance()
+                    .signOut(this)
+                    .addOnCompleteListener{
+                        val intent = Intent(this@MainActivity,SignInActivity::class.java)
+                        startActivity(intent)
+                    }
+            }
+
+            alertDialog.setNegativeButton("Cancel"
+            ) { dialog, _ -> dialog.cancel() }
+            alertDialog.show()
+            return@setOnMenuItemClickListener true
+        }
         allNotesViewModal.staggeredView.observe(this){
             if (it){
                 layoutViewBtn.setIcon(R.drawable.baseline_format_list_bulleted_24)
             }else{
-                layoutViewBtn.setIcon(R.drawable.baseline_line_style_24)
+                layoutViewBtn.setIcon(R.drawable.baseline_grid_view_24)
 
             }
         }
@@ -171,6 +205,20 @@ class MainActivity : AppCompatActivity() {
             actionMode = null
         }
 
+    }
+
+    private fun cancelAlarm(reminder : Int){
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(this, AlertReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(this, reminder, intent, PendingIntent.FLAG_IMMUTABLE)
+        alarmManager.cancel(pendingIntent)
+    }
+
+    private fun cancelDelete(timestamp : Int){
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(this, DeleteReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(this, timestamp, intent, PendingIntent.FLAG_IMMUTABLE)
+        alarmManager.cancel(pendingIntent)
     }
 
 

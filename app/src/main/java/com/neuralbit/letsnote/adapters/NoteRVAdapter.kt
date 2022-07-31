@@ -5,7 +5,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
@@ -61,8 +60,6 @@ class NoteRVAdapter (
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val note = allNotesFire[position]
-        Log.d(TAG, "updateListFire: $note")
-
         var title = note.title
         var desc = note.description
         val cm = Common()
@@ -83,6 +80,16 @@ class NoteRVAdapter (
         }
         val c = Calendar.getInstance()
 
+        lifecycleOwner?.let {
+            viewModel?.itemSelectEnabled?.observe(it){ i ->
+
+                if (!i){
+                    holder.selectIcon.visibility = GONE
+                    note.selected = false
+                    selectedNotes.clear()
+                }
+            }
+        }
 
         if (title.isEmpty()) {
             holder.noteTitleTV.visibility = GONE

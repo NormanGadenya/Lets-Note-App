@@ -46,6 +46,7 @@ class LabelFireRepo {
         val labelRef = fUser?.let { database.getReference(it.uid).child("labels")}
         labelRef?.child(label.toString())?.addListenerForSingleValueEvent( object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
+
                 if (snapshot.exists()) {
                     val labelFire = snapshot.getValue(LabelFire::class.java)
                     if (labelFire != null) {
@@ -54,6 +55,7 @@ class LabelFireRepo {
                             noteUids.add(noteUid)
                             val updateMap = HashMap<String, Any>()
                             updateMap["noteUids"] = noteUids
+                            Log.d(TAG, "onDataChange: $noteUids")
                             labelRef.child(label.toString()).updateChildren(updateMap)
                         }else {
                             noteUids.remove(noteUid)

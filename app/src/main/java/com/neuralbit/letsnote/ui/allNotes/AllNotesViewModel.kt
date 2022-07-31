@@ -61,9 +61,18 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
         return if (text != null) {
             val textLower= text.toLowerCase(Locale.ROOT)
             for ( note in list){
-
-                if(note.title.toLowerCase(Locale.ROOT).contains(textLower) || note.description.toLowerCase(Locale.ROOT).contains(textLower)){
-                    newList.add(note)
+                if (note.todoItems.isNotEmpty()){
+                    for (todo in note.todoItems){
+                        if(note.title.toLowerCase(Locale.ROOT).contains(textLower) || note.description.toLowerCase(Locale.ROOT).contains(textLower) || todo.item.toLowerCase(Locale.ROOT).contains(textLower) ){
+                            if (!newList.contains(note)){
+                                newList.add(note)
+                            }
+                        }
+                    }
+                }else{
+                    if(note.title.toLowerCase(Locale.ROOT).contains(textLower) || note.description.toLowerCase(Locale.ROOT).contains(textLower)){
+                        newList.add(note)
+                    }
                 }
             }
             newList

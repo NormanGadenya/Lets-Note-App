@@ -1,6 +1,10 @@
 package com.neuralbit.letsnote.ui.allNotes
 
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -22,10 +26,12 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.gson.Gson
 import com.neuralbit.letsnote.AddEditNoteActivity
 import com.neuralbit.letsnote.R
+import com.neuralbit.letsnote.Services.DeleteReceiver
 import com.neuralbit.letsnote.adapters.NoteFireClick
 import com.neuralbit.letsnote.adapters.NoteRVAdapter
 import com.neuralbit.letsnote.databinding.FragmentAllNotesBinding
 import com.neuralbit.letsnote.entities.NoteFire
+import com.neuralbit.letsnote.utilities.AlertReceiver
 import java.util.*
 
 class AllNotesFragment : Fragment() , NoteFireClick {
@@ -86,11 +92,11 @@ class AllNotesFragment : Fragment() , NoteFireClick {
         pinnedNoteRVAdapter?.lifecycleScope = lifecycleScope
         pinnedNoteRVAdapter?.lifecycleOwner = this
         allNotesViewModel.selectedNotes.clear()
-        allNotesViewModel.getAllFireNotes().observe(viewLifecycleOwner){
+        allNotesViewModel.getAllFireNotes().observe(viewLifecycleOwner){ notes ->
 
             val pinnedNotes = LinkedList<NoteFire>()
             val otherNotes = LinkedList<NoteFire>()
-            for (note in it) {
+            for (note in notes) {
                 val pref = context?.getSharedPreferences("DeletedNotes", AppCompatActivity.MODE_PRIVATE)
                 val deletedNotes = pref?.getStringSet("noteUids", HashSet())
                 if (deletedNotes != null){
@@ -113,6 +119,8 @@ class AllNotesFragment : Fragment() , NoteFireClick {
                     }
                 }
             }
+            otherNotes.sortedWith(compareBy { it.timeStamp }).asReversed()
+            pinnedNotes.sortedWith(compareBy { it.timeStamp })
 
             allNotesViewModel.otherFireNotesList.value = otherNotes
             allNotesViewModel.pinnedFireNotesList.value = pinnedNotes
@@ -149,20 +157,20 @@ class AllNotesFragment : Fragment() , NoteFireClick {
 
                 for ( note in allNotesViewModel.selectedNotes){
 
-                    Toast.makeText(context,note.description,Toast.LENGTH_SHORT).show()
                     if (note.pinned){
                         allNotesViewModel.pinnedFireNotesList.value?.remove(note)
+                        cancelAlarm(note.reminderDate.toInt())
                         pinnedNoteRVAdapter?.notifyDataSetChanged()
 
                     }else{
                         allNotesViewModel.otherFireNotesList.value?.remove(note)
+                        cancelAlarm(note.reminderDate.toInt())
                         noteRVAdapter?.notifyDataSetChanged()
                     }
 
-//                    val noteUpdate = HashMap<String,Any>()
-//                    noteUpdate["archived"] = true
-//                    note.noteUid?.let { it1 ->
-//                        allNotesViewModel.updateFireNote(noteUpdate, it1) }
+                    val noteUpdate = HashMap<String,Any>()
+                    noteUpdate["archived"] = true
+                    note.noteUid?.let { it1 -> allNotesViewModel.updateFireNote(noteUpdate, it1) }
                 }
 
                 allNotesViewModel.otherFireNotesList.value?.let { list ->
@@ -172,13 +180,57 @@ class AllNotesFragment : Fragment() , NoteFireClick {
                     pinnedNoteRVAdapter?.updateListFire(list)
                 }
 
-//                noteRVAdapter?.notifyDataSetChanged()
                 allNotesViewModel.selectedNotes.clear()
 
 
                 allNotesViewModel.itemSelectEnabled.value = false
 
                 Toast.makeText(context,"Notes archived successfully",Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        allNotesViewModel.itemDeleteClicked.observe(viewLifecycleOwner){
+            if (it && allNotesViewModel.selectedNotes.isNotEmpty()){
+                val pref = context?.getSharedPreferences("DeletedNotes", AppCompatActivity.MODE_PRIVATE)
+
+                for ( note in allNotesViewModel.selectedNotes){
+                    val editor: SharedPreferences.Editor ?= pref?.edit()
+                    val noteUids = pref?.getStringSet("noteUids",HashSet())
+                    val deletedNoteUids = HashSet<String>()
+                    if (noteUids != null){ deletedNoteUids.addAll(noteUids)}
+                    note.noteUid?.let { it1 -> deletedNoteUids.add(it1) }
+
+                    note.noteUid?.let { it1 -> scheduleDelete(it1,note.tags,note.label,note.timeStamp) }
+
+                    editor?.putStringSet("noteUids",deletedNoteUids)
+                    editor?.apply()
+
+                    if (note.pinned){
+                        allNotesViewModel.pinnedFireNotesList.value?.remove(note)
+                        cancelAlarm(note.reminderDate.toInt())
+                        pinnedNoteRVAdapter?.notifyDataSetChanged()
+
+                    }else{
+                        allNotesViewModel.otherFireNotesList.value?.remove(note)
+                        cancelAlarm(note.reminderDate.toInt())
+                        noteRVAdapter?.notifyDataSetChanged()
+                    }
+
+                }
+
+                allNotesViewModel.otherFireNotesList.value?.let { list ->
+                    noteRVAdapter?.updateListFire(list)
+                }
+                allNotesViewModel.pinnedFireNotesList.value?.let { list ->
+                    pinnedNoteRVAdapter?.updateListFire(list)
+                }
+
+                allNotesViewModel.selectedNotes.clear()
+
+
+                allNotesViewModel.itemSelectEnabled.value = false
+
+                Toast.makeText(context,"Notes deleted successfully",Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -197,6 +249,34 @@ class AllNotesFragment : Fragment() , NoteFireClick {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun cancelAlarm(reminder : Int){
+        val alarmManager = context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(context, AlertReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(context, reminder, intent, PendingIntent.FLAG_IMMUTABLE)
+        alarmManager.cancel(pendingIntent)
+    }
+
+
+    private fun scheduleDelete( noteUid : String, tags : List<String>, label: Int , timeStamp : Long) {
+        val alarmManager = context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(context, DeleteReceiver::class.java)
+
+        intent.putExtra("noteUid",noteUid)
+        intent.putExtra("timeStamp",System.currentTimeMillis())
+        intent.putExtra("labelColor", label)
+        intent.putStringArrayListExtra("tagList", ArrayList(tags))
+        val pendingIntent = PendingIntent.getBroadcast(context, timeStamp.toInt(), intent, PendingIntent.FLAG_IMMUTABLE)
+        val timeToDelete = timeStamp + 6.048e+8 // 7 days from the time it is softly deleted
+        alarmManager.set(AlarmManager.RTC_WAKEUP, timeToDelete.toLong(), pendingIntent)
+    }
+
+    private fun cancelDelete(reminder : Int){
+        val alarmManager = context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(context, DeleteReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(context, reminder, intent, PendingIntent.FLAG_IMMUTABLE)
+        alarmManager.cancel(pendingIntent)
     }
 
 
