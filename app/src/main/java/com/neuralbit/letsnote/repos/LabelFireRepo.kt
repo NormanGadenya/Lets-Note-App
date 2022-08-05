@@ -83,6 +83,7 @@ class LabelFireRepo {
                 Log.e(TAG, "onCancelled: $error",)
             }
         })
+
     }
 
     fun deleteNoteFromLabel(label: Int , noteUid :String){

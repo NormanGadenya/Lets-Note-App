@@ -62,8 +62,8 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         return labelFireRepo.getAllLabels()
     }
 
-    fun addOrDeleteLabel( labelColor : Int, noteUid: String, add : Boolean){
-        labelFireRepo.addOrDeleteLabels(labelColor,noteUid,add)
+    fun addOrDeleteLabel(labelColor: Int, oldLabel: Int, noteUid: String, add: Boolean){
+        labelFireRepo.addOrDeleteLabels(labelColor,oldLabel,noteUid,add)
     }
 
     fun addOrDeleteTags(newTagsAdded: HashSet<String>, deletedTags: HashSet<String>, noteUid: String) {
