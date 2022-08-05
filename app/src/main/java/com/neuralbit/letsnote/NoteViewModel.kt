@@ -45,15 +45,6 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         return noteFireRepo.addNote(note)
     }
 
-    fun allTodoItems(noteUid: String) : LiveData<List<TodoItem>>{
-        val note = noteFireRepo.getNote(noteUid).value
-        val todoItems = MutableLiveData<List<TodoItem>>()
-        if (note != null){
-            todoItems.value = note.todoItems
-        }
-        return todoItems
-    }
-
     fun allFireTags() : LiveData<List<TagFire>>{
         return tagFireRepo.getAllTags()
     }
@@ -62,13 +53,12 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         return labelFireRepo.getAllLabels()
     }
 
-    fun addOrDeleteLabel(labelColor: Int, oldLabel: Int, noteUid: String, add: Boolean){
+    fun addOrDeleteLabel(labelColor: Int,oldLabel : Int, noteUid: String, add: Boolean){
         labelFireRepo.addOrDeleteLabels(labelColor,oldLabel,noteUid,add)
     }
 
     fun addOrDeleteTags(newTagsAdded: HashSet<String>, deletedTags: HashSet<String>, noteUid: String) {
         tagFireRepo.addOrDeleteTags(newTagsAdded,deletedTags,noteUid)
     }
-
 
 }

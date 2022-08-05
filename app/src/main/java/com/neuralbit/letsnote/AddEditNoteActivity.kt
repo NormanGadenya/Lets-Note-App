@@ -84,6 +84,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private var noteUid : String? = null
     private lateinit var viewModal : NoteViewModel
     private lateinit var labelViewModel : LabelViewModel
+    private var oldLabel : Int = -1
     private var noteDescOrig : String? = null
     private var noteDescOrigList = ArrayList<String>()
     private var noteDescNew : String? = null
@@ -417,6 +418,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
         noteDescriptionEdit.addTextChangedListener(object : TextWatcher{
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                Log.d(TAG, "beforeTextChanged: $p0 p1  $p1 $p2 $p3")
 
                 if (!backPressed ) {
                     noteDescOrigList.clear()
@@ -427,6 +429,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
             }
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                Log.d(TAG, "onTextChanged: $p0 p1  $p1 $p2 $p3")
                 if(p0?.length!! > 0){
 
                     noteListBullet()
@@ -757,13 +760,14 @@ class AddEditNoteActivity : AppCompatActivity() ,
         archived = intent.getBooleanExtra("archieved",false)
         val deleted = intent.getBooleanExtra("deleted",false)
         val tagIntentList = intent.getStringArrayListExtra("tagList")
-        val labelColor = intent.getIntExtra("labelColor",0)
+        oldLabel = intent.getIntExtra("labelColor",0)
         val reminderTime = intent.getLongExtra("reminder",0)
         val todoItemStr = intent.getStringExtra("todoItems")
         var todoDoItemList: ArrayList<TodoItem> = ArrayList()
         if (todoItemStr != null){
             todoDoItemList = Gson().fromJson(todoItemStr, object : TypeToken<List<TodoItem?>?>() {}.type)
         }
+
         noteTimeStamp = intent.getLongExtra("timeStamp",-1)
         deleteButton = findViewById(R.id.deleteButton)
         backButton = findViewById(R.id.backButton)
@@ -813,7 +817,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         }
         viewModal.allTodoItems.value = todoDoItemList
 
-        viewModal.labelColor = labelColor
+        viewModal.labelColor = oldLabel
         viewModal.archived.value = archived
         viewModal.deletedNote.value = deleted
     }
@@ -1225,12 +1229,14 @@ class AddEditNoteActivity : AppCompatActivity() ,
         val labelColor = viewModal.labelColor
         if (viewModal.labelChanged){
             if (labelColor > 0){
-                noteUid?.let { viewModal.addOrDeleteLabel(labelColor, it,true) }
+                noteUid?.let { viewModal.addOrDeleteLabel(labelColor,oldLabel, it,true) }
             }else{
-                noteUid?.let { viewModal.addOrDeleteLabel(labelColor, it,false) }
+                noteUid?.let { viewModal.addOrDeleteLabel(labelColor, oldLabel, it, false) }
 
             }
         }
+
+
 
 
         if (viewModal.reminderTime > 0){
