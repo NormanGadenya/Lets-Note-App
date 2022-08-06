@@ -48,16 +48,17 @@ class LabelFireRepo {
             override fun onDataChange(s: DataSnapshot) {
                 var exists = false
                 for (snapshot in s.children){
-                    if (s.key == newLabel.toString()){
-                        val labelFire = snapshot.getValue(LabelFire::class.java)
+                    val labelFire = snapshot.getValue(LabelFire::class.java)
+                    if (snapshot.key == newLabel.toString()){
                         if (labelFire != null) {
                             val noteUids = labelFire.noteUids
                             if (add) {
-                                noteUids.add(noteUid)
-                                val updateMap = HashMap<String, Any>()
-                                updateMap["noteUids"] = noteUids
-                                Log.d(TAG, "onDataChange: $noteUids")
-                                labelRef.child(newLabel.toString()).updateChildren(updateMap)
+                                if (!noteUids.contains(noteUid)){
+                                    noteUids.add(noteUid)
+                                    val updateMap = HashMap<String, Any>()
+                                    updateMap["noteUids"] = noteUids
+                                    labelRef.child(newLabel.toString()).updateChildren(updateMap)
+                                }
                             }else {
                                 noteUids.remove(noteUid)
                                 val updateMap = HashMap<String, Any>()
@@ -72,16 +73,18 @@ class LabelFireRepo {
                         exists = true
                     }
                     if (oldLabel > 0 && oldLabel != newLabel){
-                        val labelFire = snapshot.getValue(LabelFire::class.java)
-                        if (labelFire != null){
-                            val noteUids = labelFire.noteUids
-                            noteUids.remove(noteUid)
-                            val updateMap = HashMap<String, Any>()
-                            updateMap["noteUids"] = noteUids
-                            if (noteUids.isNotEmpty()){
-                                labelRef.child(newLabel.toString()).updateChildren(updateMap)
-                            }else{
-                                labelRef.child(newLabel.toString()).removeValue()
+                        if (snapshot.key == oldLabel.toString()){
+
+                            if (labelFire != null) {
+                                val noteUids = labelFire.noteUids
+                                noteUids.remove(noteUid)
+                                val updateMap = HashMap<String, Any>()
+                                updateMap["noteUids"] = noteUids
+                                if (noteUids.isNotEmpty()) {
+                                    labelRef.child(oldLabel.toString()).updateChildren(updateMap)
+                                } else {
+                                    labelRef.child(oldLabel.toString()).removeValue()
+                                }
                             }
                         }
                     }
