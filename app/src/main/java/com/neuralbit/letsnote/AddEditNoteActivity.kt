@@ -59,6 +59,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
     LabelClickInterface,
     TodoItemInterface
 {
+    private var deleted: Boolean = false
     private var reminderItem : MenuItem? = null
     private var restoreItem : MenuItem? = null
     private var pinItem: MenuItem? = null
@@ -66,7 +67,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private var deleteItem: MenuItem? = null
     private lateinit var dismissTodoButton: ImageButton
     private lateinit var ocrButton: ImageButton
-    private lateinit var sttButton: ImageButton
     private lateinit var addTodoButton: ImageButton
     private lateinit var undoButton: ImageButton
     private lateinit var redoButton: ImageButton
@@ -122,6 +122,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private lateinit var colorPickerView: ColorPickerView
     private val deletedTodos = ArrayList<TodoItem>()
     private lateinit var pref : SharedPreferences
+    private val charListDesc = ArrayList<CharStatus>()
 
 
     override fun onCreate(savedInstanceState: Bundle?)  {
@@ -304,7 +305,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         viewModal.archived.observe(lifecycleOwner){
             archived = it
 
-            if (viewModal.deletedNote.value != true){
+            if (viewModal.deletedNote.value!= true){
                 if (it) {
                     pinItem?.isVisible = false
                     archiveItem?.isVisible = false
@@ -404,7 +405,9 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
         noteDescriptionEdit.addTextChangedListener(object : TextWatcher{
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                Log.d(TAG, "beforeTextChanged: $p0 p1  $p1 $p2 $p3")
+
+//                var charStatus = CharStatus(p0);
+//                Log.d(TAG, "beforeTextChanged: $p0 p1  $p1 $p2 $p3")
 
                 if (!backPressed ) {
                     noteDescOrigList.clear()
@@ -414,8 +417,9 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
             }
 
-            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                Log.d(TAG, "onTextChanged: $p0 p1  $p1 $p2 $p3")
+            override fun onTextChanged(p0: CharSequence?, start: Int, before: Int, count: Int) {
+                Log.d(TAG, "beforeTextChanged: $p0 start $start before $before $count")
+
                 if(p0?.length!! > 0){
 
                     noteListBullet()
@@ -469,24 +473,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
             }
         }
 
-        sttButton.setOnClickListener {
-            val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
-
-            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
-            intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak to text")
-
-            try {
-                startActivityForResult(intent, REQUEST_CODE_SPEECH_INPUT)
-            } catch (e: Exception) {
-                Toast
-                    .makeText(
-                        this@AddEditNoteActivity, e.message,
-                        Toast.LENGTH_SHORT
-                    )
-                    .show()
-            }
-        }
 
         dismissTodoButton.setOnClickListener {
             todoItemDescTV.text.clear()
@@ -730,7 +716,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         noteDesc = intent.getStringExtra("noteDescription")
         notePinned = intent.getBooleanExtra("pinned",false)
         archived = intent.getBooleanExtra("archieved",false)
-        val deleted = intent.getBooleanExtra("deleted",false)
+        deleted = intent.getBooleanExtra("deleted",false)
         val tagIntentList = intent.getStringArrayListExtra("tagList")
         oldLabel = intent.getIntExtra("labelColor",0)
         val reminderTime = intent.getLongExtra("reminder",0)
@@ -743,7 +729,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
         noteTimeStamp = intent.getLongExtra("timeStamp",-1)
         ocrButton = findViewById(R.id.ocrButton)
-        sttButton = findViewById(R.id.sttButton)
         undoButton = findViewById(R.id.undoButton)
         redoButton = findViewById(R.id.redoButton)
         infoContainer = findViewById(R.id.infoContainer)
@@ -796,12 +781,25 @@ class AddEditNoteActivity : AppCompatActivity() ,
         pinItem = menu?.findItem(R.id.pinButton)
         archiveItem = menu?.findItem(R.id.archiveButton)
         deleteItem = menu?.findItem(R.id.deleteButton)
+        reminderItem = menu?.findItem(R.id.reminderButton)
         val shareItem = menu?.findItem(R.id.shareButton)
+        restoreItem?.isVisible = false
+        if (archived || deleted){
+            restoreItem?.isVisible = true
+            reminderItem?.isVisible = false
+            archiveItem?.isVisible = false
+            pinItem?.isVisible = false
+            shareItem?.isVisible = false
+        }
+
+        if (deleted){
+            archiveItem?.isVisible = false
+        }
+
         shareItem?.setOnMenuItemClickListener {
             shareNote()
             return@setOnMenuItemClickListener true
         }
-        reminderItem = menu?.findItem(R.id.reminderButton)
 
 
         archiveItem?.setOnMenuItemClickListener {
@@ -1197,7 +1195,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         val currentDate= cm.currentTimeToLong()
         Log.d(TAG, "saveNote: item saved ${viewModal.todoItems}")
 
-        if(textChanged){
+        if(viewModal.noteChanged.value == true){
             if (noteTitle.isNotEmpty() || noteDescription.isNotEmpty() || viewModal.todoItems.isNotEmpty()){
                 Log.d(TAG, "saveNote: item saved ${viewModal.todoItems} $textChanged")
 
