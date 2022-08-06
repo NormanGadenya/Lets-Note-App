@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/reminderButton"
+        android:icon="@drawable/ic_baseline_access_alarm_24"
+        android:title="Reminder"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/pinButton"
+        android:icon="@drawable/ic_outline_push_pin_24"
+        android:title="Pin Note"
+        app:showAsAction="always"/>
+
+
+    <item
+        android:id="@+id/restoreButton"
+        android:icon="@drawable/ic_baseline_restore_24"
+        android:title="Restore"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/shareButton"
+        android:icon="@drawable/baseline_share_24"
+        android:title="Share"
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/archiveButton"
+        android:icon="@drawable/ic_outline_archive_24"
+        android:title="Archive"
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/deleteButton"
+        android:icon="@drawable/ic_outline_delete_24"
+        android:title="Delete"
+        app:showAsAction="never"/>
+
+
+</menu>

@@ -11,6 +11,7 @@
         <entry key="app/src/main/res/drawable/baseline_grid_view_24.xml" value="0.158" />
         <entry key="app/src/main/res/drawable/baseline_line_style_24.xml" value="0.26" />
         <entry key="app/src/main/res/drawable/baseline_logout_24.xml" value="0.158" />
+        <entry key="app/src/main/res/drawable/baseline_share_24.xml" value="0.158" />
         <entry key="app/src/main/res/drawable/cancel_background.xml" value="0.2095" />
         <entry key="app/src/main/res/drawable/celadon_tag.xml" value="0.22291666666666668" />
         <entry key="app/src/main/res/drawable/celadon_toolbar.xml" value="0.1225" />
@@ -90,6 +91,7 @@
         <entry key="app/src/main/res/layout/todo_rv_item.xml" value="0.1" />
         <entry key="app/src/main/res/menu/action_menu.xml" value="0.35885416666666664" />
         <entry key="app/src/main/res/menu/activity_main_drawer.xml" value="0.33" />
+        <entry key="app/src/main/res/menu/add_edit_menu.xml" value="0.35885416666666664" />
         <entry key="app/src/main/res/menu/archive_menu.xml" value="0.26927083333333335" />
         <entry key="app/src/main/res/menu/delete_menu.xml" value="0.26927083333333335" />
         <entry key="app/src/main/res/menu/label_tag_activity_menu.xml" value="0.35333333333333333" />

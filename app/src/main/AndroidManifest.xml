@@ -69,7 +69,8 @@
         <activity
             android:name=".AddEditNoteActivity"
             android:exported="true"
-            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
+            android:parentActivityName=".MainActivity"
+            />
 
         <receiver android:name=".utilities.AlertReceiver" />
         <receiver

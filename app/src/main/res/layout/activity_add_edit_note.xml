@@ -12,7 +12,6 @@
         android:layout_width="match_parent"
 
         android:layout_height="match_parent">
-        <include layout="@layout/note_action_bar" android:id="@+id/actionBar"/>
         <EditText
             android:id="@+id/noteEditTitle"
             android:layout_width="match_parent"

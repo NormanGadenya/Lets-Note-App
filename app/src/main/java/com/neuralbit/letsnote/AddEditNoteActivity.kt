@@ -19,12 +19,9 @@ import android.text.TextWatcher
 import android.text.format.DateFormat
 import android.util.Log
 import android.util.SparseArray
-import android.view.KeyEvent
-import android.view.View
+import android.view.*
 import android.view.View.GONE
 import android.view.View.VISIBLE
-import android.view.ViewTreeObserver
-import android.view.WindowManager
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -62,12 +59,11 @@ class AddEditNoteActivity : AppCompatActivity() ,
     LabelClickInterface,
     TodoItemInterface
 {
-    private lateinit var restoreButton: ImageButton
-    private lateinit var archiveButton: ImageButton
-    private lateinit var deleteButton: ImageButton
-    private lateinit var backButton: ImageButton
-    private lateinit var pinButton: ImageButton
-    private lateinit var alertButton: ImageButton
+    private var reminderItem : MenuItem? = null
+    private var restoreItem : MenuItem? = null
+    private var pinItem: MenuItem? = null
+    private var archiveItem: MenuItem? = null
+    private var deleteItem: MenuItem? = null
     private lateinit var dismissTodoButton: ImageButton
     private lateinit var ocrButton: ImageButton
     private lateinit var sttButton: ImageButton
@@ -201,12 +197,10 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 val labelColor = viewModal.labelColor
                 if(labelColor > 0){
                     coordinatorlayout.setBackgroundColor(labelColor)
-                    window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
-                    window.statusBarColor = labelColor
                     delLabelBtn.visibility = VISIBLE
                 }else{
                     coordinatorlayout.setBackgroundColor(Color.TRANSPARENT)
-                    window.statusBarColor = getColor(R.color.gunmetal)
+
                     delLabelBtn.visibility = GONE
                 }
                 tagListAdapter.updateList(viewModal.oldTagList)
@@ -231,7 +225,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
             val reminderTime = viewModal.reminderTime
             reminderNoteSet = it
             if(it){
-                alertButton.setImageResource(R.drawable.ic_baseline_add_alert_24)
+                reminderItem?.setIcon(R.drawable.ic_baseline_add_alert_24)
 
 
                 reminderTV.text = resources.getString(R.string.reminder,cm.convertLongToTime(reminderTime)[0],cm.convertLongToTime(reminderTime)[1])
@@ -245,7 +239,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                     reminderIcon.visibility = VISIBLE
                 }
             }else{
-                alertButton.setBackgroundResource(R.drawable.ic_outline_add_alert_24)
+                reminderItem?.setIcon(R.drawable.ic_outline_add_alert_24)
                 reminderTV.visibility =  GONE
                 reminderIcon.visibility = GONE
             }
@@ -255,9 +249,9 @@ class AddEditNoteActivity : AppCompatActivity() ,
             notePinned = it
 
             if (!it){
-                pinButton.setImageResource(R.drawable.ic_outline_push_pin_24)
+                pinItem?.setIcon(R.drawable.ic_outline_push_pin_24)
             }else{
-                pinButton.setImageResource(R.drawable.ic_baseline_push_pin_24)
+                pinItem?.setIcon(R.drawable.ic_baseline_push_pin_24)
             }
         }
 
@@ -266,10 +260,11 @@ class AddEditNoteActivity : AppCompatActivity() ,
             val noteUids = pref.getStringSet("noteUids",HashSet())
             val deletedNoteUids = HashSet<String>()
             if (it) {
-                pinButton.visibility = GONE
-                archiveButton.visibility = GONE
-                alertButton.visibility = GONE
-                restoreButton.visibility = VISIBLE
+
+                pinItem?.isVisible = false
+                archiveItem?.isVisible = false
+                restoreItem?.isVisible = true
+                reminderItem?.isVisible = false
                 noteDescriptionEdit.isEnabled = false
                 noteTitleEdit.isEnabled = false
                 infoContainer.visibility = GONE
@@ -286,10 +281,10 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
 
             } else {
-                pinButton.visibility = VISIBLE
-                archiveButton.visibility = VISIBLE
-                alertButton.visibility = VISIBLE
-                restoreButton.visibility = GONE
+                pinItem?.isVisible = true
+                archiveItem?.isVisible = true
+                restoreItem?.isVisible = false
+                reminderItem?.isVisible = true
                 infoContainer.visibility = VISIBLE
                 noteDescriptionEdit.isEnabled = true
                 noteTitleEdit.isEnabled = true
@@ -311,19 +306,19 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
             if (viewModal.deletedNote.value != true){
                 if (it) {
-
-                    pinButton.visibility = GONE
-                    archiveButton.visibility = GONE
-                    alertButton.visibility = GONE
-                    restoreButton.visibility = VISIBLE
+                    pinItem?.isVisible = false
+                    archiveItem?.isVisible = false
+                    restoreItem?.isVisible = true
+                    reminderItem?.isVisible = false
                     noteDescriptionEdit.isEnabled = false
                     noteTitleEdit.isEnabled = false
                     infoContainer.visibility = GONE
                 } else {
-                    pinButton.visibility = VISIBLE
-                    archiveButton.visibility = VISIBLE
-                    alertButton.visibility = VISIBLE
-                    restoreButton.visibility = GONE
+                    pinItem?.isVisible = true
+                    archiveItem?.isVisible = true
+                    restoreItem?.isVisible = false
+                    reminderItem?.isVisible = true
+
                     infoContainer.visibility = VISIBLE
                     noteDescriptionEdit.isEnabled = true
                     noteTitleEdit.isEnabled = true
@@ -332,16 +327,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
             }
         }
 
-        alertButton.setOnClickListener {
-            val reminderTime = viewModal.reminderTime
-            if (reminderTime == (0).toLong()){
-                showAlertSheetDialog()
 
-            }else{
-                cancelAlarm(reminderTime.toInt())
-                viewModal.reminderTime = 0
-            }
-        }
         
         val tagListStr = ArrayList<String>()
         viewModal.allFireTags().observe(this){
@@ -470,34 +456,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
         }
 
 
-
-        backButton.setOnClickListener { goToMain() }
-
-        deleteButton.setOnClickListener {
-
-            val alertDialog: AlertDialog? = this.let {
-                val builder = AlertDialog.Builder(this)
-                builder.apply {
-                    setPositiveButton("ok"
-                    ) { _, _ ->
-                        viewModal.deletedNote.value = true
-                        viewModal.noteChanged.value = true
-                        goToMain()
-                        }
-
-                    setNegativeButton("cancel"
-                    ) { _, _ ->
-                    }
-                    setTitle("Delete Note")
-
-                }
-                builder.create()
-            }
-
-            alertDialog?.show()
-
-        }
-
         ocrButton.setOnClickListener {
             if (ContextCompat.checkSelfPermission(
                     this@AddEditNoteActivity,
@@ -530,14 +488,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
             }
         }
 
-        archiveButton.setOnClickListener { archiveNote() }
-
-        pinButton.setOnClickListener { pinOrUnPinNote() }
-
-        restoreButton.setOnClickListener {
-            unArchiveNote()
-            unDelete()
-        }
         dismissTodoButton.setOnClickListener {
             todoItemDescTV.text.clear()
             todoItemDescTV.visibility = GONE
@@ -564,6 +514,29 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
 
         }
+    }
+
+    private fun deleteNote(){
+        val alertDialog: AlertDialog? = this.let {
+            val builder = AlertDialog.Builder(this)
+            builder.apply {
+                setPositiveButton("ok"
+                ) { _, _ ->
+                    viewModal.deletedNote.value = true
+                    viewModal.noteChanged.value = true
+                    goToMain()
+                }
+
+                setNegativeButton("cancel"
+                ) { _, _ ->
+                }
+                setTitle("Delete Note")
+
+            }
+            builder.create()
+        }
+
+        alertDialog?.show()
     }
 
     private fun noteListBullet() {
@@ -746,7 +719,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
         tagListRV = findViewById(R.id.tagListRV)
         labelBtn = findViewById(R.id.labelBtn)
         coordinatorlayout = findViewById(R.id.coordinatorlayout)
-        alertButton = findViewById(R.id.alertButton)
         addTagBtn = findViewById(R.id.addTagBtn)
         reminderTV = findViewById(R.id.reminderTV)
         reminderIcon = findViewById(R.id.reminderIcon)
@@ -767,12 +739,9 @@ class AddEditNoteActivity : AppCompatActivity() ,
         if (todoItemStr != null){
             todoDoItemList = Gson().fromJson(todoItemStr, object : TypeToken<List<TodoItem?>?>() {}.type)
         }
+        supportActionBar?.title = ""
 
         noteTimeStamp = intent.getLongExtra("timeStamp",-1)
-        deleteButton = findViewById(R.id.deleteButton)
-        backButton = findViewById(R.id.backButton)
-        archiveButton = findViewById(R.id.archiveButton)
-        restoreButton = findViewById(R.id.restoreButton)
         ocrButton = findViewById(R.id.ocrButton)
         sttButton = findViewById(R.id.sttButton)
         undoButton = findViewById(R.id.undoButton)
@@ -781,7 +750,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
         alertBottomSheet =  BottomSheetDialog(this)
         labelBottomSheet = BottomSheetDialog(this)
         coordinatorlayout = findViewById(R.id.coordinatorlayout)
-        pinButton = findViewById(R.id.pinButton)
         layoutManager.orientation = HORIZONTAL
         tagListAdapter= AddEditTagRVAdapter(applicationContext,this)
         labelListAdapter= AddEditLabelAdapter(applicationContext,this)
@@ -821,6 +789,79 @@ class AddEditNoteActivity : AppCompatActivity() ,
         viewModal.archived.value = archived
         viewModal.deletedNote.value = deleted
     }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.add_edit_menu, menu)
+        restoreItem  = menu?.findItem(R.id.restoreButton)
+        pinItem = menu?.findItem(R.id.pinButton)
+        archiveItem = menu?.findItem(R.id.archiveButton)
+        deleteItem = menu?.findItem(R.id.deleteButton)
+        val shareItem = menu?.findItem(R.id.shareButton)
+        shareItem?.setOnMenuItemClickListener {
+            shareNote()
+            return@setOnMenuItemClickListener true
+        }
+        reminderItem = menu?.findItem(R.id.reminderButton)
+
+
+        archiveItem?.setOnMenuItemClickListener {
+            archiveNote()
+            return@setOnMenuItemClickListener true
+        }
+
+        pinItem?.setOnMenuItemClickListener {
+            pinOrUnPinNote()
+            return@setOnMenuItemClickListener true
+        }
+
+        restoreItem?.setOnMenuItemClickListener {
+            unArchiveNote()
+            unDelete()
+            return@setOnMenuItemClickListener true
+        }
+
+        deleteItem?.setOnMenuItemClickListener {
+            deleteNote()
+            return@setOnMenuItemClickListener true
+        }
+        reminderItem?.setOnMenuItemClickListener {
+            val reminderTime = viewModal.reminderTime
+            if (reminderTime == (0).toLong()){
+                showAlertSheetDialog()
+
+            }else{
+                cancelAlarm(reminderTime.toInt())
+                viewModal.reminderTime = 0
+            }
+            return@setOnMenuItemClickListener true
+        }
+
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    private fun shareNote() {
+        noteTitle = noteTitleEdit.text.toString()
+        noteDesc = noteDescriptionEdit.text.toString()
+        if (noteTitle?.isNotBlank() == true || noteDesc?.isNotBlank() == true){
+
+            val sendIntent: Intent = Intent().apply {
+                action = Intent.ACTION_SEND
+
+                val textToShare : String ? = if (noteTitle!!.isNotBlank()){
+                    noteTitle + "\n" + noteDesc
+                }else{
+                    noteDesc
+                }
+
+                putExtra(Intent.EXTRA_TEXT, textToShare)
+                type = "text/plain"
+            }
+            val shareIntent = Intent.createChooser(sendIntent, null)
+            startActivity(shareIntent)
+        }
+
+    }
+
 
     private fun pinOrUnPinNote(){
         viewModal.noteChanged.value = true
@@ -904,8 +945,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 viewModal.labelChanged = true
                 viewModal.noteChanged.value = true
                 coordinatorlayout.setBackgroundColor(Color.parseColor(hex))
-                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
-                window.statusBarColor = Color.parseColor(hex)
+
             }
 
 
@@ -1316,8 +1356,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         viewModal.noteChanged.value = true
         textChanged = true
         coordinatorlayout.setBackgroundColor(labelColor)
-        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
-        window.statusBarColor = labelColor
+
     }
 
 
