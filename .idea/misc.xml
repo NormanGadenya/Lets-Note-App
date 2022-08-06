@@ -7,6 +7,7 @@
         <entry key="app/src/main/res/drawable/apricot_tag.xml" value="0.22291666666666668" />
         <entry key="app/src/main/res/drawable/apricot_toolbar.xml" value="0.1225" />
         <entry key="app/src/main/res/drawable/baseline_delete_forever_24.xml" value="0.158" />
+        <entry key="app/src/main/res/drawable/baseline_drag_indicator_24.xml" value="0.261" />
         <entry key="app/src/main/res/drawable/baseline_format_list_bulleted_24.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/baseline_grid_view_24.xml" value="0.158" />
         <entry key="app/src/main/res/drawable/baseline_line_style_24.xml" value="0.26" />
@@ -25,6 +26,7 @@
         <entry key="app/src/main/res/drawable/ic_apricot_24.xml" value="0.353125" />
         <entry key="app/src/main/res/drawable/ic_baseline_bookmark_24.xml" value="0.353125" />
         <entry key="app/src/main/res/drawable/ic_baseline_bookmark_remove_24.xml" value="0.1125" />
+        <entry key="app/src/main/res/drawable/ic_baseline_close_24.xml" value="0.261" />
         <entry key="app/src/main/res/drawable/ic_baseline_delete_24.xml" value="0.158" />
         <entry key="app/src/main/res/drawable/ic_baseline_more_vert_24.xml" value="0.141" />
         <entry key="app/src/main/res/drawable/ic_ev_24.xml" value="0.353125" />
@@ -88,7 +90,7 @@
         <entry key="app/src/main/res/layout/tag_item.xml" value="0.5" />
         <entry key="app/src/main/res/layout/tag_notes_fragment.xml" value="0.22864583333333333" />
         <entry key="app/src/main/res/layout/tag_spinner_row.xml" value="0.3328125" />
-        <entry key="app/src/main/res/layout/todo_rv_item.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/todo_rv_item.xml" value="0.5" />
         <entry key="app/src/main/res/menu/action_menu.xml" value="0.35885416666666664" />
         <entry key="app/src/main/res/menu/activity_main_drawer.xml" value="0.33" />
         <entry key="app/src/main/res/menu/add_edit_menu.xml" value="0.35885416666666664" />

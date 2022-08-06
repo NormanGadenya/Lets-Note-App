@@ -30,6 +30,7 @@ class TodoRVAdapter (
         val todoItemDescET: EditText = itemView.findViewById(R.id.todoItemDescET)
         val checkBox : CheckBox = itemView.findViewById(R.id.todoCheckBox)
         val deleteButton : ImageButton = itemView.findViewById(R.id.deleteItemBtn)
+        val dragIndicator : ImageButton = itemView.findViewById(R.id.dragTodo)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -59,6 +60,7 @@ class TodoRVAdapter (
 
             }
         })
+
 
         holder.todoItemDescET.setOnKeyListener { _, key, v ->
 
@@ -95,5 +97,6 @@ interface TodoItemInterface{
     fun onItemCheckChanged(position: Int,todoItem: TodoItem)
     fun onItemDescChanged(position: Int, todoItem: TodoItem)
     fun onEnterKeyPressed(position: Int,todoItem: TodoItem)
+    fun onItemPositionChanged(oldPosition: Int, newPosition : Int)
 }
 

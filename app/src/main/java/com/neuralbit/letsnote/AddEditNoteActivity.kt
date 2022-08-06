@@ -1362,5 +1362,9 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
     }
 
+    override fun onItemPositionChanged(oldPosition: Int, newPosition: Int) {
+        TODO("Not yet implemented")
+    }
+
 
 }
