@@ -34,7 +34,7 @@
             android:id="@+id/undoButton"
             android:layout_width="25dp"
             android:layout_height="25dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="16dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:foreground="@drawable/ic_baseline_undo_24"
             android:visibility="visible"

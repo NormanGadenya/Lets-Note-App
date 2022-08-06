@@ -11,7 +11,6 @@ import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Color
-import android.graphics.Rect
 import android.os.Bundle
 import android.speech.RecognizerIntent
 import android.text.Editable
@@ -19,7 +18,10 @@ import android.text.TextWatcher
 import android.text.format.DateFormat
 import android.util.Log
 import android.util.SparseArray
-import android.view.*
+import android.view.KeyEvent
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.*
@@ -101,7 +103,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private lateinit var todoItemDescTV : EditText
     private var todoItemChecked: Boolean = false
     private lateinit var todoRVAdapter : TodoRVAdapter
-    private var isKeyBoardShowing = false
     private lateinit var tagListAdapter : AddEditTagRVAdapter
     private lateinit var labelListAdapter : AddEditLabelAdapter
     private lateinit var alertBottomSheet : BottomSheetDialog
@@ -122,7 +123,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private lateinit var colorPickerView: ColorPickerView
     private val deletedTodos = ArrayList<TodoItem>()
     private lateinit var pref : SharedPreferences
-    private val charListDesc = ArrayList<CharStatus>()
 
 
     override fun onCreate(savedInstanceState: Bundle?)  {
@@ -144,7 +144,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
         }
 
 
-        manipulateNoteDescLines()
         viewModal.allFireLabels().observe(lifecycleOwner){
             val labelColors = HashSet<Int>()
             for (l in it){
@@ -362,27 +361,16 @@ class AddEditNoteActivity : AppCompatActivity() ,
         labelBtn.setOnClickListener {
             showLabelBottomSheetDialog()
         }
+        val helper = TextViewUndoRedo(noteDescriptionEdit)
         undoButton.setOnClickListener {
-            noteDescNew = noteDescriptionEdit.text.toString()
-            noteDescriptionEdit.setText(noteDescOrig)
-            viewModal.undoMode.value = false
-            redoButton.isEnabled = true
-
+            helper.undo()
+//            redoButton.isEnabled = true
         }
         viewModal.undoMode.value = false
-        viewModal.undoMode.observe(lifecycleOwner){
-            if (it){
-                undoButton.isEnabled = true
-                redoButton.isEnabled = false
-            }else{
-                undoButton.isEnabled = false
-                redoButton.isEnabled = false
-            }
-        }
+
         redoButton.setOnClickListener {
-            noteDescriptionEdit.setText(noteDescNew)
-            redoButton.isEnabled = false
-            undoButton.isEnabled = true
+            helper.redo()
+//            undoButton.isEnabled = true
         }
         noteTitleEdit.addTextChangedListener(object : TextWatcher{
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
@@ -407,7 +395,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
 
 //                var charStatus = CharStatus(p0);
-//                Log.d(TAG, "beforeTextChanged: $p0 p1  $p1 $p2 $p3")
+                Log.d(TAG, "beforeTextChanged: $p0 p1  $p1 $p2 $p3")
 
                 if (!backPressed ) {
                     noteDescOrigList.clear()
@@ -951,27 +939,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
     }
 
-    private fun manipulateNoteDescLines() {
-        coordinatorlayout.viewTreeObserver.addOnGlobalLayoutListener { ViewTreeObserver.OnGlobalLayoutListener {
-            val r = Rect()
-            coordinatorlayout.getWindowVisibleDisplayFrame(r)
-            val screenHeight =  coordinatorlayout.rootView.height
-            val keypadHeight = screenHeight - r.bottom
-            if (keypadHeight > screenHeight * 0.15) {
-                if (!isKeyBoardShowing) {
-                    isKeyBoardShowing = true
-                }
-            }
-            else {
-                if (isKeyBoardShowing) {
-
-                    isKeyBoardShowing = false
-
-                }
-            }
-
-        } }
-    }
 
     private fun showAlertSheetDialog() {
         alertBottomSheet.setContentView(R.layout.alert_bottom_sheet)
