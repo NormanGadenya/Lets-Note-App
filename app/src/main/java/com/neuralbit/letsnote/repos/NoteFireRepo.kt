@@ -58,15 +58,13 @@ class NoteFireRepo {
                         notes.add(note)
                     }
                 }
-                live.value = notes
-                Log.d(TAG, "onDataChange: $notes")
+                live.value = ArrayList(notes.reversed())
             }
 
             override fun onCancelled(error: DatabaseError) {
                 Log.e(TAG, "onCancelled: ${error.message}" )
             }
         })
-//        fUser?.let { database.getReference(it.uid).keepSynced(true) }
         return live
     }
 
