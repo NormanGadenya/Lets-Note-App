@@ -11,6 +11,7 @@ import com.neuralbit.letsnote.entities.TodoItem
 import com.neuralbit.letsnote.repos.LabelFireRepo
 import com.neuralbit.letsnote.repos.NoteFireRepo
 import com.neuralbit.letsnote.repos.TagFireRepo
+import java.util.*
 
 class NoteViewModel(application : Application) : AndroidViewModel(application) {
     val TAG = "NoteViewModel"
@@ -22,17 +23,18 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     var deletedTags = HashSet<String>()
     var noteChanged = MutableLiveData<Boolean>()
     var archived : MutableLiveData<Boolean> = MutableLiveData()
+    var noteLocked = MutableLiveData<Boolean>()
     var deletedNote : MutableLiveData<Boolean> = MutableLiveData()
     var labelChanged : Boolean = false
+    var lockChanged : Boolean = false
     var labelColor : Int = 0
     var pinned : MutableLiveData<Boolean> = MutableLiveData()
     var reminderSet : MutableLiveData<Boolean> = MutableLiveData()
-    var labelSet : MutableLiveData<Boolean> = MutableLiveData()
     var reminderTime : Long = 0
     var searchQuery : MutableLiveData<String> = MutableLiveData<String>()
     var newTagTyped : MutableLiveData<Boolean> = MutableLiveData()
     var backPressed : MutableLiveData<Boolean> = MutableLiveData()
-    var todoItems = HashSet<TodoItem>()
+    var todoItems = LinkedList<TodoItem>()
     var allTodoItems = MutableLiveData<ArrayList<TodoItem>>()
     val updatedTodos = ArrayList<TodoItem>()
     var undoMode : MutableLiveData<Boolean> = MutableLiveData()

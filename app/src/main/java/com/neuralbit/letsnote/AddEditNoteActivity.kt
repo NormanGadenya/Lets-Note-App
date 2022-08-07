@@ -67,6 +67,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private var mItemTouchHelper: ItemTouchHelper? = null
     private var deleted: Boolean = false
     private var reminderItem : MenuItem? = null
+    private var lockNoteItem : MenuItem? = null
     private var restoreItem : MenuItem? = null
     private var pinItem: MenuItem? = null
     private var archiveItem: MenuItem? = null
@@ -160,21 +161,25 @@ class AddEditNoteActivity : AppCompatActivity() ,
             if (it.isNotEmpty()){
                 todoRV.visibility = VISIBLE
             }
-            viewModal.todoItems = it.toHashSet()
+            viewModal.todoItems = LinkedList(it)
             todoRVAdapter.updateTodoItems(it)
+            todoRVAdapter.notifyItemRangeChanged(0,it.size)
         }
         todoItemDescTV.setOnKeyListener { _, key, _ ->
             if (key == KeyEvent.KEYCODE_ENTER){
-                Log.d(TAG, "onEnterKeyPressed: ${viewModal.todoItems}")
 
                 val todoItemText = todoItemDescTV.text.toString()
                 if(todoItemText.isNotEmpty()){
                     val todoItem = TodoItem(todoItemText,todoItemChecked)
                     viewModal.todoItems.add(todoItem)
-                    todoItemDescTV.text.clear()
                     todoCheckBox.isChecked = false
                     viewModal.noteChanged.value = true
-                    todoRVAdapter.updateTodoItems(ArrayList(viewModal.todoItems))
+                    todoRVAdapter.updateTodoItems(viewModal.todoItems)
+                    todoRVAdapter.notifyDataSetChanged()
+
+                    todoRV.scrollToPosition(viewModal.todoItems.size - 1)
+
+                    todoItemDescTV.text.clear()
                 }
                 return@setOnKeyListener true
             }
@@ -350,6 +355,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         val callback: ItemTouchHelper.Callback = SimpleItemTouchHelperCallback(todoRVAdapter)
         mItemTouchHelper = ItemTouchHelper(callback)
         mItemTouchHelper?.attachToRecyclerView(todoRV)
+        todoRV.isNestedScrollingEnabled = false
 //
 //        val touchHelper = ItemTouchHelper(object  : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN,0){
 //            override fun onMove(
@@ -445,8 +451,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
         noteDescriptionEdit.addTextChangedListener(object : TextWatcher{
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
 
-//                var charStatus = CharStatus(p0);
-                Log.d(TAG, "beforeTextChanged: $p0 p1  $p1 $p2 $p3")
 
                 if (!backPressed ) {
                     noteDescOrigList.clear()
@@ -457,7 +461,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
             }
 
             override fun onTextChanged(p0: CharSequence?, start: Int, before: Int, count: Int) {
-                Log.d(TAG, "beforeTextChanged: $p0 start $start before $before $count")
 
                 if(p0?.length!! > 0){
 
@@ -756,6 +759,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         notePinned = intent.getBooleanExtra("pinned",false)
         archived = intent.getBooleanExtra("archieved",false)
         deleted = intent.getBooleanExtra("deleted",false)
+        val protected = intent.getBooleanExtra("protected", false)
         val tagIntentList = intent.getStringArrayListExtra("tagList")
         oldLabel = intent.getIntExtra("labelColor",0)
         val reminderTime = intent.getLongExtra("reminder",0)
@@ -812,6 +816,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         viewModal.labelColor = oldLabel
         viewModal.archived.value = archived
         viewModal.deletedNote.value = deleted
+        viewModal.noteLocked.value = protected
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -822,6 +827,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         deleteItem = menu?.findItem(R.id.deleteButton)
         reminderItem = menu?.findItem(R.id.reminderButton)
         val shareItem = menu?.findItem(R.id.shareButton)
+        lockNoteItem = menu?.findItem(R.id.lockButton)
         restoreItem?.isVisible = false
         if (archived || deleted){
             restoreItem?.isVisible = true
@@ -870,6 +876,11 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 cancelAlarm(reminderTime.toInt())
                 viewModal.reminderTime = 0
             }
+            return@setOnMenuItemClickListener true
+        }
+
+        lockNoteItem?.setOnMenuItemClickListener {
+            viewModal.lockChanged = !viewModal.lockChanged
             return@setOnMenuItemClickListener true
         }
 
@@ -1211,11 +1222,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
         val noteTitle = noteTitleEdit.text.toString()
         val noteDescription = noteDescriptionEdit.text.toString()
         val currentDate= cm.currentTimeToLong()
-        Log.d(TAG, "saveNote: item saved ${viewModal.todoItems}")
-
         if(viewModal.noteChanged.value == true){
             if (noteTitle.isNotEmpty() || noteDescription.isNotEmpty() || viewModal.todoItems.isNotEmpty()){
-                Log.d(TAG, "saveNote: item saved ${viewModal.todoItems} $textChanged")
 
                 val tags = ArrayList<String>()
                 tags.addAll(viewModal.oldTagList)
@@ -1381,32 +1389,36 @@ class AddEditNoteActivity : AppCompatActivity() ,
         viewModal.todoItems.remove(todoItem)
         todoRVAdapter.notifyItemRemoved(position)
         deletedTodos.add(todoItem)
-        todoRVAdapter.updateTodoItems(ArrayList(viewModal.todoItems))
+        todoRVAdapter.updateTodoItems(viewModal.todoItems)
     }
 
     override fun onItemCheckChanged(position: Int, todoItem: TodoItem) {
         if (!deletedTodos.contains(todoItem)){
             viewModal.noteChanged.value = true
-            val todoItems = ArrayList(viewModal.todoItems)
+            val todoItems = viewModal.todoItems
             todoItems[position] = todoItem
-            viewModal.todoItems = todoItems.toHashSet()
+            viewModal.todoItems = todoItems
+//            todoRVAdapter.notifyItemChanged(position)
+
         }
     }
 
     override fun onItemDescChanged(position: Int, todoItem: TodoItem) {
         viewModal.noteChanged.value = true
-        val todoItems = ArrayList(viewModal.todoItems)
+        val todoItems = viewModal.todoItems
         todoItems[position] = todoItem
-        viewModal.todoItems = todoItems.toHashSet()
+        viewModal.todoItems = todoItems
         todoRVAdapter.updateTodoItems(todoItems)
+//        todoRVAdapter.notifyItemChanged(position)
+
         viewModal.updatedTodos.add(todoItem)
     }
 
     override fun onEnterKeyPressed(position: Int, todoItem: TodoItem) {
         viewModal.noteChanged.value = true
-        val todoItems = ArrayList(viewModal.todoItems)
+        val todoItems = viewModal.todoItems
         todoItems[position] = todoItem
-        viewModal.todoItems = todoItems.toHashSet()
+        viewModal.todoItems = todoItems
         todoRVAdapter.notifyItemChanged(position)
         viewModal.updatedTodos.add(todoItem)
 
@@ -1421,8 +1433,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
     }
 
     override fun onTodoListChanged(todoItems: MutableList<TodoItem>?) {
-        viewModal.todoItems.clear()
-        viewModal.todoItems = todoItems?.let { HashSet(it) }!!
+        Log.d(TAG, "onTodoListChanged: $todoItems")
+        viewModal.todoItems = todoItems?.let { LinkedList(it) }!!
     }
 
 

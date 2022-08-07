@@ -26,7 +26,7 @@ class TodoRVAdapter(
     ) : ItemTouchHelperAdapter , RecyclerView.Adapter<TodoRVAdapter.ViewHolder>() {
 
     lateinit var itemView: View
-    private val allTodoItems = ArrayList<TodoItem>()
+    private var allTodoItems = ArrayList<TodoItem>()
     val TAG = "TodoRVAdapter"
 
 
@@ -76,12 +76,8 @@ class TodoRVAdapter(
             }
         })
 
-//        holder.dragIndicator.setOnTouchListener({ v, event ->
-//            if (MotionEventCompat.getActionMasked(event) == MotionEvent.ACTION_DOWN) {
-//                dragLlistener?.onStartDrag(holder)
-//            }
-//            false
-//        })
+        //TODO fix todo duplicates when the todo items are rearranged
+
         holder.dragIndicator.setOnLongClickListener {
             it.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
 
@@ -104,15 +100,13 @@ class TodoRVAdapter(
 
     }
 
-    override fun getItemCount(): Int {
-        return allTodoItems.size
+
+    override fun getItemViewType(position: Int): Int {
+        return position
     }
 
-
-    fun updateTodoItems( newList: List<TodoItem>){
-        allTodoItems.clear()
-        allTodoItems.addAll(newList)
-        notifyItemRangeChanged(0,newList.size)
+    fun updateTodoItems(newList: List<TodoItem>){
+        allTodoItems = ArrayList(newList)
     }
 
     override fun onItemMove(fromPosition: Int, toPosition: Int) {
@@ -122,6 +116,10 @@ class TodoRVAdapter(
     }
 
     override fun onItemDismiss(position: Int) {
+    }
+
+    override fun getItemCount(): Int {
+        return allTodoItems.size
     }
 
 

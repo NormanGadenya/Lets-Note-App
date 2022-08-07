@@ -36,7 +36,7 @@
             android:id="@+id/tvNoteDesc"
             android:textSize="16sp"
             android:textColor="@color/gunmetal"
-            android:maxLines="4"
+            android:maxLines="10"
             tools:text="Norman is thsssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvNoteTitle"

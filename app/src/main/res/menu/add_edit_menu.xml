@@ -14,6 +14,12 @@
         android:title="Pin Note"
         app:showAsAction="always"/>
 
+    <item
+        android:id="@+id/lockButton"
+        android:icon="@drawable/baseline_lock_open_24"
+        android:title="Lock Note"
+        app:showAsAction="always"/>
+
 
     <item
         android:id="@+id/restoreButton"
