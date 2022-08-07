@@ -32,7 +32,7 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     var searchQuery : MutableLiveData<String> = MutableLiveData<String>()
     var newTagTyped : MutableLiveData<Boolean> = MutableLiveData()
     var backPressed : MutableLiveData<Boolean> = MutableLiveData()
-    var todoItems = ArrayList<TodoItem>()
+    var todoItems = HashSet<TodoItem>()
     var allTodoItems = MutableLiveData<ArrayList<TodoItem>>()
     val updatedTodos = ArrayList<TodoItem>()
     var undoMode : MutableLiveData<Boolean> = MutableLiveData()

@@ -32,6 +32,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.HORIZONTAL
@@ -59,8 +60,11 @@ class AddEditNoteActivity : AppCompatActivity() ,
     GetDateFromPicker,
     GetTagFromDialog,
     LabelClickInterface,
-    TodoItemInterface
+    TodoItemInterface,
+    OnStartDragListener,
+    OnTodoListChangedListener
 {
+    private var mItemTouchHelper: ItemTouchHelper? = null
     private var deleted: Boolean = false
     private var reminderItem : MenuItem? = null
     private var restoreItem : MenuItem? = null
@@ -156,11 +160,13 @@ class AddEditNoteActivity : AppCompatActivity() ,
             if (it.isNotEmpty()){
                 todoRV.visibility = VISIBLE
             }
-            viewModal.todoItems = it
+            viewModal.todoItems = it.toHashSet()
             todoRVAdapter.updateTodoItems(it)
         }
         todoItemDescTV.setOnKeyListener { _, key, _ ->
             if (key == KeyEvent.KEYCODE_ENTER){
+                Log.d(TAG, "onEnterKeyPressed: ${viewModal.todoItems}")
+
                 val todoItemText = todoItemDescTV.text.toString()
                 if(todoItemText.isNotEmpty()){
                     val todoItem = TodoItem(todoItemText,todoItemChecked)
@@ -168,7 +174,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                     todoItemDescTV.text.clear()
                     todoCheckBox.isChecked = false
                     viewModal.noteChanged.value = true
-                    todoRVAdapter.updateTodoItems(viewModal.todoItems)
+                    todoRVAdapter.updateTodoItems(ArrayList(viewModal.todoItems))
                 }
                 return@setOnKeyListener true
             }
@@ -341,6 +347,51 @@ class AddEditNoteActivity : AppCompatActivity() ,
             
         }
 
+        val callback: ItemTouchHelper.Callback = SimpleItemTouchHelperCallback(todoRVAdapter)
+        mItemTouchHelper = ItemTouchHelper(callback)
+        mItemTouchHelper?.attachToRecyclerView(todoRV)
+//
+//        val touchHelper = ItemTouchHelper(object  : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN,0){
+//            override fun onMove(
+//                recyclerView: RecyclerView,
+//                viewHolder: RecyclerView.ViewHolder,
+//                target: RecyclerView.ViewHolder
+//            ): Boolean {
+//                Log.d(TAG, "onSwiped:old pos ${viewHolder.oldPosition} new pos ${viewHolder.adapterPosition}")
+//
+//                return true
+//            }
+//
+//            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+//
+//                when (direction) {
+//                    ItemTouchHelper.UP -> {
+//
+//                    }
+//
+//
+//                    ItemTouchHelper.DOWN -> {
+//
+//                    }
+//                }
+//
+//
+//            }
+//
+//
+//        })
+//        touchHelper.attachToRecyclerView(todoRV)
+
+
+
+
+
+
+
+
+
+
+
 
         viewModal.backPressed.observe(this) { 
             backPressed = it 
@@ -482,7 +533,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 viewModal.todoItems.add(todoItem)
                 viewModal.noteChanged.value = true
                 todoItemDescTV.text.clear()
-                todoRVAdapter.updateTodoItems(viewModal.todoItems)
+                todoRVAdapter.updateTodoItems(ArrayList(viewModal.todoItems))
 
             }
 
@@ -726,7 +777,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         layoutManager.orientation = HORIZONTAL
         tagListAdapter= AddEditTagRVAdapter(applicationContext,this)
         labelListAdapter= AddEditLabelAdapter(applicationContext,this)
-        todoRVAdapter = TodoRVAdapter(applicationContext,this)
+        todoRVAdapter = TodoRVAdapter(applicationContext,this,this,this)
         labelBottomSheet.setContentView(R.layout.note_label_bottom_sheet)
         delLabelBtn = labelBottomSheet.findViewById(R.id.delLabel)!!
         tagListRV.layoutManager= layoutManager
@@ -1199,7 +1250,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                             noteFire.reminderDate = viewModal.reminderTime
                             noteFire.pinned = notePinned
                             noteFire.label = viewModal.labelColor
-                            noteFire.todoItems = viewModal.todoItems
+                            noteFire.todoItems = ArrayList(viewModal.todoItems)
                             noteUid =  viewModal.addFireNote(noteFire)
                             saveOtherEntities()
 
@@ -1296,7 +1347,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         this.calendar[Calendar.HOUR]= calendar[Calendar.HOUR]
         this.calendar[Calendar.MINUTE]= calendar[Calendar.MINUTE]
         this.calendar[Calendar.SECOND]= calendar[Calendar.SECOND]
-        timeTitleTV.text="Time set:" + DateFormat.getTimeFormat(this).format(calendar.time)
+        timeTitleTV.text= "Time set:" + DateFormat.getTimeFormat(this).format(calendar.time)
     }
 
     override fun getDateInfo(calendar : Calendar) {
@@ -1330,40 +1381,48 @@ class AddEditNoteActivity : AppCompatActivity() ,
         viewModal.todoItems.remove(todoItem)
         todoRVAdapter.notifyItemRemoved(position)
         deletedTodos.add(todoItem)
-        todoRVAdapter.updateTodoItems(viewModal.todoItems)
+        todoRVAdapter.updateTodoItems(ArrayList(viewModal.todoItems))
     }
 
     override fun onItemCheckChanged(position: Int, todoItem: TodoItem) {
         if (!deletedTodos.contains(todoItem)){
             viewModal.noteChanged.value = true
-            val todoItems = viewModal.todoItems
+            val todoItems = ArrayList(viewModal.todoItems)
             todoItems[position] = todoItem
-            viewModal.todoItems = todoItems
+            viewModal.todoItems = todoItems.toHashSet()
         }
     }
 
     override fun onItemDescChanged(position: Int, todoItem: TodoItem) {
         viewModal.noteChanged.value = true
-        val todoItems = viewModal.todoItems
+        val todoItems = ArrayList(viewModal.todoItems)
         todoItems[position] = todoItem
-        viewModal.todoItems = todoItems
-        todoRVAdapter.updateTodoItems(viewModal.todoItems)
+        viewModal.todoItems = todoItems.toHashSet()
+        todoRVAdapter.updateTodoItems(todoItems)
         viewModal.updatedTodos.add(todoItem)
     }
 
     override fun onEnterKeyPressed(position: Int, todoItem: TodoItem) {
         viewModal.noteChanged.value = true
-        val todoItems = viewModal.todoItems
+        val todoItems = ArrayList(viewModal.todoItems)
         todoItems[position] = todoItem
-        viewModal.todoItems = todoItems
+        viewModal.todoItems = todoItems.toHashSet()
         todoRVAdapter.notifyItemChanged(position)
         viewModal.updatedTodos.add(todoItem)
 
 
     }
 
-    override fun onItemPositionChanged(oldPosition: Int, newPosition: Int) {
-        TODO("Not yet implemented")
+
+    override fun onStartDrag(viewHolder: RecyclerView.ViewHolder?) {
+        if (viewHolder != null) {
+            mItemTouchHelper?.startDrag(viewHolder)
+        }
+    }
+
+    override fun onTodoListChanged(todoItems: MutableList<TodoItem>?) {
+        viewModal.todoItems.clear()
+        viewModal.todoItems = todoItems?.let { HashSet(it) }!!
     }
 
 
