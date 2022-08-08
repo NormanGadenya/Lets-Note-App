@@ -52,6 +52,7 @@ class NoteFireRepo {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val notes = ArrayList<NoteFire>()
                 for ( s : DataSnapshot in snapshot.children ){
+                    Log.d(TAG, "onDataChange: $s")
                     val note = s.getValue(NoteFire::class.java)
                     if (note != null) {
                         note.noteUid = s.key

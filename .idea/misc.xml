@@ -11,6 +11,8 @@
         <entry key="app/src/main/res/drawable/baseline_format_list_bulleted_24.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/baseline_grid_view_24.xml" value="0.158" />
         <entry key="app/src/main/res/drawable/baseline_line_style_24.xml" value="0.26" />
+        <entry key="app/src/main/res/drawable/baseline_lock_24.xml" value="0.261" />
+        <entry key="app/src/main/res/drawable/baseline_lock_open_24.xml" value="0.261" />
         <entry key="app/src/main/res/drawable/baseline_logout_24.xml" value="0.158" />
         <entry key="app/src/main/res/drawable/baseline_share_24.xml" value="0.158" />
         <entry key="app/src/main/res/drawable/cancel_background.xml" value="0.2095" />

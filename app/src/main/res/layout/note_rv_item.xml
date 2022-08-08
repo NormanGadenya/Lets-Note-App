@@ -59,6 +59,16 @@
             tools:text ="#tag #james #patric"/>
 
         <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:background="@drawable/baseline_lock_24"
+            android:id="@+id/noteLockedIcon"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/selectIcon"
+            app:layout_constraintTop_toBottomOf="@+id/noteTagsTV" />
+
+        <ImageView
             android:layout_width="5dp"
             android:layout_height="5dp"
             android:background="@drawable/circle_delete"

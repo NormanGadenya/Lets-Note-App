@@ -26,7 +26,6 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     var noteLocked = MutableLiveData<Boolean>()
     var deletedNote : MutableLiveData<Boolean> = MutableLiveData()
     var labelChanged : Boolean = false
-    var lockChanged : Boolean = false
     var labelColor : Int = 0
     var pinned : MutableLiveData<Boolean> = MutableLiveData()
     var reminderSet : MutableLiveData<Boolean> = MutableLiveData()

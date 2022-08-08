@@ -135,6 +135,7 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
         intent.putExtra("pinned",note.pinned)
         intent.putExtra("archieved",note.archived)
         intent.putExtra("reminder",note.reminderDate)
+        intent.putExtra("protected",note.protected)
         intent.putExtra("deleted", true)
         val toDoItemString: String = Gson().toJson(note.todoItems)
         intent.putExtra("todoItems", toDoItemString)

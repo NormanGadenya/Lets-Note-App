@@ -117,6 +117,8 @@ class ArchivedFragment : Fragment() , NoteFireClick {
         intent.putExtra("pinned",note.pinned)
         intent.putExtra("archieved",note.archived)
         intent.putExtra("reminder",note.reminderDate)
+        intent.putExtra("protected",note.protected)
+
         val toDoItemString: String = Gson().toJson(note.todoItems)
         intent.putExtra("todoItems", toDoItemString)
         intent.putStringArrayListExtra("tagList", ArrayList(note.tags))

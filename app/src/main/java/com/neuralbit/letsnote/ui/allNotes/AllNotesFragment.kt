@@ -298,6 +298,7 @@ class AllNotesFragment : Fragment() , NoteFireClick {
             intent.putExtra("labelColor",note.label)
             intent.putExtra("pinned",note.pinned)
             intent.putExtra("archieved",note.archived)
+            intent.putExtra("protected",note.protected)
             val c = Calendar.getInstance()
             if (c.timeInMillis < note.reminderDate){
                 intent.putExtra("reminder",note.reminderDate)

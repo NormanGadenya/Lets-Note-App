@@ -3,27 +3,24 @@ package com.neuralbit.letsnote.adapters
 import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.*
+import android.view.KeyEvent
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.ImageButton
 import androidx.recyclerview.widget.RecyclerView
 import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.entities.TodoItem
-import com.neuralbit.letsnote.utilities.ItemTouchHelperAdapter
-import com.neuralbit.letsnote.utilities.ItemTouchHelperViewHolder
-import com.neuralbit.letsnote.utilities.OnStartDragListener
-import com.neuralbit.letsnote.utilities.OnTodoListChangedListener
-import java.util.*
 
 
 class TodoRVAdapter(
     val context: Context,
     private val todoItemInterface: TodoItemInterface,
-    private val dragListener: OnStartDragListener?,
-    private val listChangedListener: OnTodoListChangedListener
 
-    ) : ItemTouchHelperAdapter , RecyclerView.Adapter<TodoRVAdapter.ViewHolder>() {
+
+    ) : RecyclerView.Adapter<TodoRVAdapter.ViewHolder>() {
 
     lateinit var itemView: View
     private var allTodoItems = ArrayList<TodoItem>()
@@ -33,19 +30,12 @@ class TodoRVAdapter(
 
 
 
-    inner class ViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView), ItemTouchHelperViewHolder{
+    inner class ViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView){
         val todoItemDescET: EditText = itemView.findViewById(R.id.todoItemDescET)
         val checkBox : CheckBox = itemView.findViewById(R.id.todoCheckBox)
         val deleteButton : ImageButton = itemView.findViewById(R.id.deleteItemBtn)
         val dragIndicator : ImageButton = itemView.findViewById(R.id.dragTodo)
 
-        override fun onItemSelected() {
-
-        }
-
-        override fun onItemClear() {
-
-        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -78,12 +68,7 @@ class TodoRVAdapter(
 
         //TODO fix todo duplicates when the todo items are rearranged
 
-        holder.dragIndicator.setOnLongClickListener {
-            it.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
 
-            dragListener?.onStartDrag(holder)
-            return@setOnLongClickListener true
-        }
 
         holder.todoItemDescET.setOnKeyListener { _, key, v ->
             if (key == KeyEvent.KEYCODE_ENTER){
@@ -109,14 +94,6 @@ class TodoRVAdapter(
         allTodoItems = ArrayList(newList)
     }
 
-    override fun onItemMove(fromPosition: Int, toPosition: Int) {
-        Collections.swap(allTodoItems, fromPosition, toPosition)
-        listChangedListener.onTodoListChanged(allTodoItems)
-        notifyItemMoved(fromPosition, toPosition)
-    }
-
-    override fun onItemDismiss(position: Int) {
-    }
 
     override fun getItemCount(): Int {
         return allTodoItems.size

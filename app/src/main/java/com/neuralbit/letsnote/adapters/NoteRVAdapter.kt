@@ -50,6 +50,7 @@ class NoteRVAdapter (
         val reminderTV : TextView = itemView.findViewById(R.id.reminderTV)
         val reminderIcon: View = itemView.findViewById(R.id.reminderIcon)
         val daysLeft : TextView = itemView.findViewById(R.id.timeLeftDeleteTV)
+        val lockIcon : ImageView = itemView.findViewById(R.id.noteLockedIcon)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -103,6 +104,12 @@ class NoteRVAdapter (
 
         }else{
             holder.daysLeft.visibility = GONE
+        }
+
+        if (note.protected){
+            holder.lockIcon.visibility = VISIBLE
+        }else{
+            holder.lockIcon.visibility = GONE
         }
 
         if (title.isEmpty()) {
