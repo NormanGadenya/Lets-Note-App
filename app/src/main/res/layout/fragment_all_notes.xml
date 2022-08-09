@@ -21,7 +21,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/pinnedNotesRV"
         android:layout_width="match_parent"
-        android:visibility="visible"
+        android:visibility="gone"
         android:overScrollMode="never"
         tools:listitem="@layout/note_rv_item"
         tools:itemCount="2"
@@ -35,7 +35,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
-        android:visibility="visible"
+        android:visibility="gone"
         android:text="@string/other_notes"
         android:textSize="32sp"
         app:layout_constraintStart_toStartOf="parent"
@@ -54,12 +54,32 @@
         app:layout_constraintBottom_toBottomOf="parent"
         tools:listitem="@layout/note_rv_item" />
 
+    <ImageView
+        android:id="@+id/welcomeIcon"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:src="@drawable/welcome_icon"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/allNotesText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="All your notes appear here"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/welcomeIcon" />
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/FABAddNote"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-
         android:src="@drawable/ic_baseline_note_add_24"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"

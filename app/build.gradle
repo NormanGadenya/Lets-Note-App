@@ -15,12 +15,12 @@ android {
             keyPassword 'normaneg'
         }
     }
-    compileSdk 31
+    compileSdk 33
 
     defaultConfig {
         applicationId "com.neuralbit.letsnote"
         minSdk 23
-        targetSdk 31
+        targetSdk 33
         versionCode 1
         versionName "1.0"
 
@@ -41,10 +41,12 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
-
-    packagingOptions{
-        exclude "META-INF/atomicfu.kotlin_module"
+    packagingOptions {
+        resources {
+            excludes += ['META-INF/atomicfu.kotlin_module']
+        }
     }
+
     buildFeatures {
         viewBinding true
     }
@@ -59,8 +61,11 @@ dependencies {
     implementation 'de.hdodenhof:circleimageview:3.1.0'
     implementation 'com.google.android.gms:play-services-vision:19.0.0'
     implementation 'com.github.QuadFlask:colorpicker:0.0.15'
+    implementation "androidx.biometric:biometric:1.0.1"
+
 
     implementation 'com.github.yalantis:ucrop:2.2.6'
+    implementation 'com.google.code.gson:gson:2.8.9'
 
     // Import the BoM for the Firebase platform
     implementation platform('com.google.firebase:firebase-bom:29.0.3')
@@ -69,15 +74,9 @@ dependencies {
     // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation 'com.google.firebase:firebase-auth'
 
-    // Also declare the dependency for the Google Play services library and specify its version
     implementation 'com.google.android.gms:play-services-auth:20.0.1'
 
 
-    // Dependencies for working with Architecture components
-    // You'll probably have to update the version numbers in build.gradle (Project)
-
-    // Room components
-    implementation "androidx.room:room-ktx:$rootProject.roomVersion"
     implementation 'androidx.navigation:navigation-fragment-ktx:2.3.5'
     implementation 'androidx.navigation:navigation-ui-ktx:2.3.5'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
@@ -85,8 +84,13 @@ dependencies {
     implementation 'androidx.annotation:annotation:1.2.0'
     implementation 'com.google.firebase:firebase-auth-ktx:21.0.1'
     implementation 'com.google.firebase:firebase-storage-ktx:20.0.0'
-    kapt "androidx.room:room-compiler:$rootProject.roomVersion"
-    androidTestImplementation "androidx.room:room-testing:$rootProject.roomVersion"
+    implementation 'com.google.firebase:firebase-firestore:21.4.0'
+    implementation 'com.google.firebase:firebase-firestore-ktx:24.2.0'
+    implementation 'com.google.firebase:firebase-database-ktx:20.0.5'
+    implementation 'com.github.bumptech.glide:glide:4.11.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
+    implementation 'com.firebaseui:firebase-ui-auth:8.0.1'
+    implementation 'com.facebook.android:facebook-login:8.1.0'
 
     // Lifecycle components
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$rootProject.lifecycleVersion"

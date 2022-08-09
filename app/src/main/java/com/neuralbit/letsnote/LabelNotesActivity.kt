@@ -1,26 +1,26 @@
 package com.neuralbit.letsnote
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.neuralbit.letsnote.adapters.NoteClickInterface
+import com.google.gson.Gson
+import com.neuralbit.letsnote.adapters.NoteFireClick
 import com.neuralbit.letsnote.adapters.NoteRVAdapter
-import com.neuralbit.letsnote.entities.Note
+import com.neuralbit.letsnote.entities.NoteFire
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
+import java.util.*
 
-class LabelNotesActivity : AppCompatActivity() , NoteClickInterface {
+class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
     private lateinit var viewModel : LabelNotesViewModel
     private lateinit var allNotesViewModel: AllNotesViewModel
-    private lateinit var notesList : ArrayList<Note>
+    private lateinit var labelViewModel: LabelNotesViewModel
     private lateinit var recyclerView : RecyclerView
     val TAG = "LabelNotesActivity"
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,68 +33,72 @@ class LabelNotesActivity : AppCompatActivity() , NoteClickInterface {
             this,
             ViewModelProvider.AndroidViewModelFactory.getInstance(application)
         ).get(AllNotesViewModel::class.java)
+        labelViewModel = ViewModelProvider(
+            this,
+            ViewModelProvider.AndroidViewModelFactory.getInstance(application)
+        ).get(LabelNotesViewModel::class.java)
         supportActionBar?.title = "Label"
         setContentView(R.layout.activity_label_notes)
         recyclerView = findViewById(R.id.notesRV)
-        val labelID = intent.getIntExtra("labelID",1)
+        val noteUids = intent.getStringArrayListExtra("noteUids")
         val layoutManager = StaggeredGridLayoutManager( 2, LinearLayoutManager.VERTICAL)
         recyclerView.layoutManager = layoutManager
         val noteRVAdapter = NoteRVAdapter(applicationContext,this)
         noteRVAdapter.viewModel = allNotesViewModel
         noteRVAdapter.lifecycleScope = lifecycleScope
         noteRVAdapter.lifecycleOwner = this
-        viewModel.getNotesWithLabel(labelID).observe(this){
-            notesList= ArrayList()
-            for (lwn in it){
-                notesList.add(lwn.notes.first())
+
+        allNotesViewModel.getAllFireNotes().observe(this){
+            val notes = ArrayList<NoteFire>()
+            for(note in it){
+                for (uid in viewModel.noteUids){
+                    if (note.noteUid == uid ){
+                        notes.add(note)
+                    }
+                }
             }
-            noteRVAdapter.updateList(notesList)
-
-
+            labelViewModel.labelNotes = notes
+            noteRVAdapter.updateListFire(notes)
         }
 
         viewModel.searchQuery.observe(this){
 
             if (it!=null){
-                noteRVAdapter.updateList(filterNotes(it))
+                noteRVAdapter.updateListFire(filterNotes(it))
                 noteRVAdapter.searchString = it
 
             }
         }
+        if (noteUids != null){
+            labelViewModel.noteUids = noteUids
+        }
+
         recyclerView.adapter= noteRVAdapter
     }
 
-    fun filterNotes(text : String) : ArrayList<Note>{
-        val newList = ArrayList<Note>()
+    fun filterNotes(text : String) : ArrayList<NoteFire>{
+        val newList = ArrayList<NoteFire>()
 
-        return if(text!=null){
-            val textLower= text.toLowerCase()
-            for ( note in notesList){
+        return run {
+            val textLower= text.toLowerCase(Locale.ROOT)
+            for ( note in labelViewModel.labelNotes){
 
-                if(note.title?.toLowerCase()?.contains(textLower) == true || note.description?.toLowerCase()
-                        ?.contains(textLower) == true
+                if(note.title.lowercase(Locale.ROOT).contains(textLower) || note.description.lowercase(
+                        Locale.ROOT
+                    )
+                    .contains(textLower)
                 ){
                     newList.add(note)
                 }
             }
 
             newList
-        }else{
-            notesList
         }
-    }
-
-    override fun onNoteClick(note: Note) {
-        val intent = Intent( applicationContext, AddEditNoteActivity::class.java)
-        intent.putExtra("noteType","Edit")
-        intent.putExtra("noteID",note.noteID)
-
-        startActivity(intent)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
 
-        menuInflater.inflate(R.menu.labelnotes_activity, menu)
+        menuInflater.inflate(R.menu.label_tag_activity_menu, menu)
         val searchViewMenuItem = menu.findItem(R.id.search)
         val searchView = searchViewMenuItem.actionView as SearchView
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
@@ -115,6 +119,30 @@ class LabelNotesActivity : AppCompatActivity() , NoteClickInterface {
         })
 
         return true
+    }
+
+    override fun onNoteFireClick(note: NoteFire, activated : Boolean) {
+        val intent = Intent( applicationContext, AddEditNoteActivity::class.java)
+        intent.putExtra("noteType","Edit")
+        intent.putExtra("noteTitle",note.title)
+        intent.putExtra("noteDescription",note.description)
+        intent.putExtra("noteUid",note.noteUid)
+        intent.putExtra("timeStamp",note.timeStamp)
+        intent.putExtra("labelColor",note.label)
+        intent.putExtra("pinned",note.pinned)
+        intent.putExtra("archieved",note.archived)
+        val c = Calendar.getInstance()
+        if (c.timeInMillis < note.reminderDate){
+            intent.putExtra("reminder",note.reminderDate)
+        }
+        val toDoItemString: String = Gson().toJson(note.todoItems)
+        intent.putExtra("todoItems", toDoItemString)
+        intent.putStringArrayListExtra("tagList", ArrayList(note.tags))
+        startActivity(intent)
+    }
+
+    override fun onNoteFireLongClick(note: NoteFire) {
+        TODO("Not yet implemented")
     }
 
 }

@@ -1,7 +1,6 @@
-package com.neuralbit.letsnote
+package com.neuralbit.letsnote.adapters
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
@@ -10,7 +9,7 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.neuralbit.letsnote.entities.Tag
+import com.neuralbit.letsnote.R
 
 class AddEditTagRVAdapter (
     val context: Context,
@@ -18,7 +17,7 @@ class AddEditTagRVAdapter (
 
     ) : RecyclerView.Adapter<AddEditTagRVAdapter.ViewHolder>(){
     var deleteIgnored = false
-    private val allTags = ArrayList<Tag>()
+    private val allTags = ArrayList<String>()
     val TAG = " TAG "
 
 
@@ -34,9 +33,8 @@ class AddEditTagRVAdapter (
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val tag = allTags[position]
-        val tagTitle = tag.tagTitle
 
-        holder.tagTitle.text = tagTitle
+        holder.tagTitle.text = tag
         holder.itemView.setOnLongClickListener {
             holder.deleteBtn.visibility = VISIBLE
             return@setOnLongClickListener true
@@ -45,7 +43,7 @@ class AddEditTagRVAdapter (
             tagRVInterface.deleteTag(tag)
         }
 
-        if(deleteIgnored){
+        if (deleteIgnored) {
             holder.deleteBtn.visibility = GONE
         }
 
@@ -55,7 +53,7 @@ class AddEditTagRVAdapter (
         return allTags.size
     }
 
-    fun updateList( newList: ArrayList<Tag>){
+    fun updateList( newList: ArrayList<String>){
         allTags.clear()
         allTags.addAll(newList)
         notifyDataSetChanged()
@@ -65,7 +63,7 @@ class AddEditTagRVAdapter (
 
 }
 interface TagRVInterface{
-    fun deleteTag(tag : Tag)
+    fun deleteTag(tag : String)
 
 
 }

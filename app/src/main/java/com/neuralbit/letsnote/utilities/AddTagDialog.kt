@@ -4,12 +4,10 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import androidx.appcompat.app.AppCompatDialogFragment
 import com.neuralbit.letsnote.R
-import com.neuralbit.letsnote.entities.Tag
 
 
 class AddTagDialog(private val getTagFromDialog: GetTagFromDialog, val ctx: Context): AppCompatDialogFragment() {
@@ -36,7 +34,7 @@ class AddTagDialog(private val getTagFromDialog: GetTagFromDialog, val ctx: Cont
                     tagTitle = if(tagTitle[0]=='#'){
                         tagTitle.substring(1,tagTitle.length)
                     }else "#"+tagTitle.substring(1,tagTitle.length)
-                    getTagFromDialog.getTag(Tag(tagTitle))
+                    getTagFromDialog.getTag(tagTitle)
                 }
             }
         return builder.create()
@@ -44,5 +42,5 @@ class AddTagDialog(private val getTagFromDialog: GetTagFromDialog, val ctx: Cont
 }
 
 interface GetTagFromDialog{
-    fun getTag(tag: Tag)
+    fun getTag(tag: String)
 }

@@ -1,35 +1,31 @@
 package com.neuralbit.letsnote.ui.label
 
-import android.app.AlertDialog
-import android.os.Build
+import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import android.view.*
-import android.widget.Toast
-import androidx.cardview.widget.CardView
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.View
+import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.neuralbit.letsnote.LabelNotesActivity
+import com.neuralbit.letsnote.NoteViewModel
 import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.adapters.LabelRVAdapter
 import com.neuralbit.letsnote.databinding.LabelFragmentBinding
-import com.neuralbit.letsnote.entities.Label
-import com.neuralbit.letsnote.entities.NoteTagCrossRef
-import com.neuralbit.letsnote.utilities.Common
-import kotlinx.coroutines.launch
+import com.neuralbit.letsnote.entities.LabelFire
 
-class LabelFragment : Fragment() {
+class LabelFragment : Fragment(), LabelRVAdapter.LabelClick {
+    private val noteViewModel: NoteViewModel by activityViewModels()
     private val labelViewModel: LabelViewModel by activityViewModels()
-    private var labelCount = HashMap<Int,Int>()
     private var _binding:LabelFragmentBinding ? = null
-    lateinit var labelRV:RecyclerView
+    private lateinit var labelRV:RecyclerView
     private val binding get() = _binding!!
     val TAG = "LabelFragment"
-    private val labelIDs = HashSet<Int>()
 
 
 
@@ -43,109 +39,35 @@ class LabelFragment : Fragment() {
         labelRV = binding.noteLabelRV
         val layoutManager = StaggeredGridLayoutManager( 2, LinearLayoutManager.VERTICAL)
         labelRV.layoutManager =layoutManager
-        val labelRVAdapter = context?.let { LabelRVAdapter(it) }
+        val labelRVAdapter = context?.let { LabelRVAdapter(it,this) }
         labelRV.adapter= labelRVAdapter
 
 
-        labelViewModel.getAllNotes().observe(viewLifecycleOwner){ list ->
-
-            labelCount.clear()
-            labelIDs.clear()
-            for (lwn in list){
-                val label = lwn.label.labelID
-                labelIDs.add(label)
-                labelViewModel.getNotesWithLabel(label).observe(viewLifecycleOwner){
-                    labelCount[label] = it.size
-
-                    labelRVAdapter?.updateLabelCount(labelCount,labelIDs)
-                }
-            }
-            labelRVAdapter?.updateLabelCount(labelCount,labelIDs)
-
-
-        }
-        val touchHelperLabel = ItemTouchHelper(object  : ItemTouchHelper.SimpleCallback(0,
-            ItemTouchHelper.RIGHT){
-            override fun onMove(
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-                target: RecyclerView.ViewHolder
-            ): Boolean {
-
-                return true
-            }
-
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val list = ArrayList(labelIDs)
-                val labelID = list[viewHolder.adapterPosition]
-
-
-
-                    val deleteDialog: AlertDialog? = this.let {
-                        val builder = AlertDialog.Builder(context)
-                        builder.apply {
-                            setPositiveButton("ok"
-                            ) { _, _ ->
-
-                                labelViewModel.deleteLabel(labelID)
-
-                            }
-                            setNegativeButton("cancel"
-                            ) { _, _ ->
-                                labelRVAdapter?.updateLabelCount(labelCount,labelIDs)
-
-
-                            }
-
-                            setTitle("Delete label?")
-
+        noteViewModel.allFireLabels().observe(viewLifecycleOwner){
+            val pref = context?.getSharedPreferences("DeletedNotes", AppCompatActivity.MODE_PRIVATE)
+            val deletedNotes = pref?.getStringSet("noteUids", HashSet())
+            val labelList = HashSet<Label>()
+            val labelFireList = HashSet<LabelFire>()
+            for ( l in it){
+                val label = Label(l.labelColor,l.noteUids.size)
+                if (deletedNotes != null){
+                    for (n in l.noteUids){
+                        if (!deletedNotes.contains(n)){
+                            labelList.add(label)
+                            labelFireList.add(l)
                         }
-                        builder.create()
                     }
-                    deleteDialog?.show()
 
-
-
-
-
-
-            }
-
-            override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
-                super.onSelectedChanged(viewHolder, actionState)
-                if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE){
-                    val iView = viewHolder?.itemView as CardView
-                    iView.setCardBackgroundColor(resources.getColor(R.color.Red))
-
+                }else{
+                    labelList.add(label)
+                    labelFireList.add(l)
                 }
             }
-
-            override fun clearView(
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder
-            ) {
-                super.clearView(recyclerView, viewHolder)
-                val iView = viewHolder.itemView as CardView
-                val list = ArrayList(labelIDs)
-                try {
-                    val labelID = list[viewHolder.adapterPosition]
-                    iView.setCardBackgroundColor(labelID)
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                        iView.outlineSpotShadowColor = labelID
-                    }
-                }catch (e : Exception){
-                    e.printStackTrace()
-                }
-
-
-
-            }
-        })
-
-        touchHelperLabel.attachToRecyclerView(labelRV)
-            
-
-
+            val sortedLabelList = labelList.sortedBy { i -> i.labelCount }.reversed()
+            val sortedLabelFireList = labelFireList.sortedBy { i -> i.noteUids.size }.reversed()
+            labelViewModel.labelFire = sortedLabelFireList
+            labelRVAdapter?.updateLabelList(ArrayList(sortedLabelList))
+        }
 
         return root
     }
@@ -156,6 +78,16 @@ class LabelFragment : Fragment() {
         searchViewMenuItem.isVisible = false
     }
 
+    override fun onLabelClick(labelColor: Int) {
+        for (label in labelViewModel.labelFire){
+            if (label.labelColor == labelColor){
+                val intent = Intent(context, LabelNotesActivity::class.java)
+                intent.putExtra("labelColor",labelColor)
+                intent.putStringArrayListExtra("noteUids", label.noteUids)
+                startActivity(intent)
+            }
+        }
+    }
 
 
 }

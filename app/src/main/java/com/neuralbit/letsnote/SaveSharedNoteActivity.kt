@@ -4,17 +4,14 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import com.neuralbit.letsnote.entities.Note
+import com.neuralbit.letsnote.entities.NoteFireIns
 import com.neuralbit.letsnote.utilities.Common
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlin.system.exitProcess
 
 class SaveSharedNoteActivity : AppCompatActivity() {
@@ -49,7 +46,7 @@ class SaveSharedNoteActivity : AppCompatActivity() {
             }
             builder.create()
         }
-        saveNoteDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+        saveNoteDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         saveNoteDialog.setOnDismissListener {
             dismissApp()
         }
@@ -63,23 +60,20 @@ class SaveSharedNoteActivity : AppCompatActivity() {
         saveNoteBtn.setOnClickListener {
             noteDesc = noteDescEdit?.text.toString()
             noteTitle = noteTitleEdit?.text.toString()
-            if(noteDesc!=null || noteTitle!=null){
-                GlobalScope.launch {
-                    withContext(Dispatchers.IO){
-                        saveNote()
 
-                    }
-                }
-            }
+            saveNote()
+
         }
 
         noteDescEdit?.setText(noteDesc)
         saveNoteDialog.show()
     }
 
-    private suspend fun saveNote() {
+    private fun saveNote() {
         val cm = Common()
-        viewModal.addNote(Note(noteTitle,noteDesc,cm.currentTimeToLong()))
+        viewModal.addFireNote(NoteFireIns(noteTitle,noteDesc, timeStamp = cm.currentTimeToLong()))
+        Thread.sleep(500)
+        Toast.makeText(applicationContext,"Note saved",Toast.LENGTH_SHORT ).show()
         dismissApp()
 
     }

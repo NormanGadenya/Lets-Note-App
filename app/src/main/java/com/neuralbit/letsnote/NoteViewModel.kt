@@ -1,181 +1,65 @@
 package com.neuralbit.letsnote
 
 import android.app.Application
-import android.util.Log
-import androidx.lifecycle.*
-import com.neuralbit.letsnote.entities.*
-import com.neuralbit.letsnote.relationships.LabelWIthNotes
-import com.neuralbit.letsnote.relationships.NotesWithTag
-import com.neuralbit.letsnote.relationships.TagsWithNote
-import com.neuralbit.letsnote.repos.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlin.collections.ArrayList
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import com.neuralbit.letsnote.entities.LabelFire
+import com.neuralbit.letsnote.entities.NoteFireIns
+import com.neuralbit.letsnote.entities.TagFire
+import com.neuralbit.letsnote.entities.TodoItem
+import com.neuralbit.letsnote.repos.LabelFireRepo
+import com.neuralbit.letsnote.repos.NoteFireRepo
+import com.neuralbit.letsnote.repos.TagFireRepo
+import java.util.*
 
 class NoteViewModel(application : Application) : AndroidViewModel(application) {
-    var allNotes: LiveData<List<Note>>
-    var deletedNotes: LiveData<List<Note>>
-    var allTags: LiveData<List<Tag>>
     val TAG = "NoteViewModel"
-    private val noteRepo : NoteRepo
-    private val tagRepo : TagRepo
-    private val noteTagRepo : NoteTagRepo
-    private val reminderRepo : ReminderRepo
-    private val labelRepo : LabelRepo
+    private val noteFireRepo : NoteFireRepo = NoteFireRepo()
+    private val labelFireRepo : LabelFireRepo = LabelFireRepo()
+    private val tagFireRepo : TagFireRepo = TagFireRepo()
+    var oldTagList = ArrayList<String>()
+    var newTags = HashSet<String>()
+    var deletedTags = HashSet<String>()
     var noteChanged = MutableLiveData<Boolean>()
-    var deleted = MutableLiveData<Boolean>()
-    var archived : MutableLiveData<Boolean>
-    var deletedNote : MutableLiveData<Boolean>
-    var pinned : MutableLiveData<Boolean>
-    var reminderSet : MutableLiveData<Boolean>
-    var labelSet : MutableLiveData<Boolean>
-    var searchQurery : MutableLiveData<String>
-    var archivedNote : LiveData<List<Note>>
-    var pinnedNotes : LiveData<List<Note>>
-    var noteDescString : MutableLiveData<String>
-    var newTagTyped : MutableLiveData<Boolean>
-    var backPressed : MutableLiveData<Boolean>
-    var tagList : ArrayList<Tag>
-    var undoMode : MutableLiveData<Boolean>
+    var archived : MutableLiveData<Boolean> = MutableLiveData()
+    var noteLocked = MutableLiveData<Boolean>()
+    var deletedNote : MutableLiveData<Boolean> = MutableLiveData()
+    var labelChanged : Boolean = false
+    var labelColor : Int = 0
+    var pinned : MutableLiveData<Boolean> = MutableLiveData()
+    var reminderSet : MutableLiveData<Boolean> = MutableLiveData()
+    var reminderTime : Long = 0
+    var searchQuery : MutableLiveData<String> = MutableLiveData<String>()
+    var newTagTyped : MutableLiveData<Boolean> = MutableLiveData()
+    var backPressed : MutableLiveData<Boolean> = MutableLiveData()
+    var todoItems = LinkedList<TodoItem>()
+    var allTodoItems = MutableLiveData<ArrayList<TodoItem>>()
+    val updatedTodos = ArrayList<TodoItem>()
+    var undoMode : MutableLiveData<Boolean> = MutableLiveData()
 
-    init{
-
-        val dao = NoteDatabase.getDatabase(application).getNotesDao()
-        val tagDao = NoteDatabase.getDatabase(application).getTagDao()
-        val noteTagDao = NoteDatabase.getDatabase(application).getNoteTagDao()
-        val reminderDao = NoteDatabase.getDatabase(application).getReminderDao()
-        val labelDao = NoteDatabase.getDatabase(application).getLabelDao()
-        noteRepo= NoteRepo(dao)
-        tagRepo = TagRepo(tagDao)
-        noteTagRepo = NoteTagRepo(noteTagDao)
-        reminderRepo = ReminderRepo(reminderDao)
-        labelRepo = LabelRepo(labelDao)
-        allNotes = noteRepo.allNotes
-        archivedNote = noteRepo.archivedNotes
-        pinnedNotes = noteRepo.pinnedNotes
-        deletedNotes = noteRepo.deletedNotes
-        allTags = tagRepo.allTags
-        searchQurery = MutableLiveData<String>()
-        noteDescString = MutableLiveData()
-        newTagTyped = MutableLiveData()
-        backPressed = MutableLiveData()
-        tagList = ArrayList<Tag>()
-        pinned = MutableLiveData()
-        archived = MutableLiveData()
-        deletedNote = MutableLiveData()
-        reminderSet = MutableLiveData()
-        labelSet = MutableLiveData()
-        deleted = MutableLiveData()
-        undoMode = MutableLiveData()
-
+    fun updateFireNote(noteUpdate : Map<String, Any>, noteUid : String) {
+        noteFireRepo.updateNote(noteUpdate,noteUid)
     }
 
-
-
-
-
-    fun addTagToList(tag : Tag) {
-
-        if (!tagList.contains(tag)){
-            tagList.add(tag)
-
-        }
+    fun addFireNote(note: NoteFireIns) : String ?{
+        return noteFireRepo.addNote(note)
     }
 
-
-
-
-    fun  getNote(noteID: Long) : LiveData<Note>{
-        return noteRepo.getNote(noteID)
+    fun allFireTags() : LiveData<List<TagFire>>{
+        return tagFireRepo.getAllTags()
     }
 
-    fun deleteNote(note: Note)= viewModelScope.launch(Dispatchers.IO){
-        noteRepo.delete(note)
-    }
-    fun updateNote(note: Note)= viewModelScope.launch(Dispatchers.IO){
-        noteRepo.update(note)
-    }
-    suspend fun addNote(note: Note) : Long{
-        return noteRepo.insert(note)
-    }
-    suspend fun insertDeleted(deletedNote: DeletedNote) {
-        return noteRepo.insertDeletedNote(deletedNote)
-    }
-    suspend fun restoreDeleted(deletedNote: DeletedNote) {
-        return noteRepo.restoreDeletedNote(deletedNote)
+    fun allFireLabels() : LiveData<List<LabelFire>>{
+        return labelFireRepo.getAllLabels()
     }
 
-    fun archiveNote(archivedNote: ArchivedNote) = viewModelScope.launch(Dispatchers.IO){
-        noteRepo.insertArchive(archivedNote)
+    fun addOrDeleteLabel(labelColor: Int,oldLabel : Int, noteUid: String, add: Boolean){
+        labelFireRepo.addOrDeleteLabels(labelColor,oldLabel,noteUid,add)
     }
 
-    fun removeArchive(archivedNote: ArchivedNote) = viewModelScope.launch(Dispatchers.IO){
-        noteRepo.deleteArchive(archivedNote)
+    fun addOrDeleteTags(newTagsAdded: HashSet<String>, deletedTags: HashSet<String>, noteUid: String) {
+        tagFireRepo.addOrDeleteTags(newTagsAdded,deletedTags,noteUid)
     }
-
-    fun pinNote(pinnedNote: PinnedNote) = viewModelScope.launch(Dispatchers.IO){
-        noteRepo.insertPinned(pinnedNote)
-    }
-
-    fun removePin(pinnedNote: PinnedNote) = viewModelScope.launch(Dispatchers.IO){
-        noteRepo.deletePinned(pinnedNote)
-    }
-
-    fun addTag(tag : Tag) = viewModelScope.launch(Dispatchers.IO){
-        tagRepo.insert(tag)
-    }
-
-    fun deleteTag(tag : Tag) = viewModelScope.launch(Dispatchers.IO){
-        tagRepo.delete(tag)
-    }
-
-    fun insertNoteTagCrossRef(crossRef: NoteTagCrossRef) = viewModelScope.launch(Dispatchers.IO){
-        noteTagRepo.insertNoteTagCrossRef(crossRef)
-    }
-    fun deleteNoteTagCrossRef(crossRef: NoteTagCrossRef) = viewModelScope.launch(Dispatchers.IO){
-        noteTagRepo.deleteNoteTagCrossRef(crossRef)
-    }
-
-
-
-    suspend fun getTagsWithNote(noteID: Long):List<TagsWithNote> {
-        return noteTagRepo.getTagsWithNote(noteID)
-    }
-
-    fun getArchivedNote(noteID: Long):LiveData<ArchivedNote> {
-        return noteRepo.getArchivedNote(noteID)
-    }
-    fun getDeletedNote(noteID: Long):LiveData<DeletedNote> {
-        return noteRepo.getDeletedNote(noteID)
-    }
-
-    fun getPinnedNote(noteID: Long):LiveData<PinnedNote> {
-        return noteRepo.getPinnedNote(noteID)
-    }
-
-    fun insertReminder(reminder: Reminder) = viewModelScope.launch(Dispatchers.IO){
-        reminderRepo.insert(reminder)
-    }
-
-    fun deleteReminder(noteID: Long) = viewModelScope.launch(Dispatchers.IO){
-        reminderRepo.delete(noteID)
-    }
-    fun getReminder(noteID : Long): LiveData<Reminder>  {
-        return reminderRepo.fetchReminder(noteID)
-    }
-
-    fun insertLabel(label: Label) = viewModelScope.launch(Dispatchers.IO){
-        labelRepo.insert(label)
-    }
-
-    fun deleteNoteLabel(noteID: Long) = viewModelScope.launch(Dispatchers.IO){
-        labelRepo.deleteNoteLabel(noteID)
-    }
-
-
-    fun getNoteLabel( noteID : Long) : LiveData <Label> {
-        return labelRepo.getNoteLabel(noteID)
-    }
-
 
 }

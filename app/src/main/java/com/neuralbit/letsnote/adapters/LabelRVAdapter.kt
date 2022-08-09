@@ -1,29 +1,22 @@
 package com.neuralbit.letsnote.adapters
 
 import android.content.Context
-import android.content.Intent
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.appcompat.content.res.AppCompatResources
-import androidx.cardview.widget.CardView
-import androidx.core.graphics.drawable.DrawableCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.neuralbit.letsnote.LabelNotesActivity
 import com.neuralbit.letsnote.R
-import com.neuralbit.letsnote.entities.Label
-import com.neuralbit.letsnote.utilities.Common
+import com.neuralbit.letsnote.ui.label.Label
 import kotlinx.coroutines.*
 
 class LabelRVAdapter(
-    val context: Context
+    val context: Context,
+    private val labelClick: LabelClick
     ): RecyclerView.Adapter<LabelRVAdapter.ViewHolder>() {
     val TAG = "LabelRV"
-    private var labelIDs = ArrayList<Int>()
-    private var labelCount : Map<Int,Int> = HashMap()
+    private var labels = ArrayList<Label>()
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         val noteCountTV: TextView = itemView.findViewById(R.id.noteCount)
@@ -52,38 +45,36 @@ class LabelRVAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
-        val labelID = labelIDs[position]
-        val labelCountVal = labelCount[labelID]
+        val labelColor = labels[position].labelColor
+        val labelCount = labels[position].labelCount
 
-        holder.labelCard.setBackgroundColor(labelID)
+        holder.labelCard.setBackgroundColor(labelColor)
 
 
         GlobalScope.launch {
-            if (labelCountVal != null) {
-                updateNoteCountTV(labelCountVal,holder.noteCountTV)
-            }
+
+            updateNoteCountTV(labelCount,holder.noteCountTV)
         }
 
-
-
-        if (labelCountVal==1){
+        if (labelCount==1){
             holder.noteTV.text = "Note"
         }
         holder.labelCard.setOnClickListener {
-            val intent = Intent(context,LabelNotesActivity::class.java)
-            intent.putExtra("labelID",labelID)
-            context.startActivity(intent)
+            labelClick.onLabelClick(labelColor)
         }
     }
 
     override fun getItemCount(): Int {
-        return labelIDs.size
+        return labels.size
     }
 
-    fun updateLabelCount(labelCountMap : Map<Int,Int>, labelIDs : HashSet<Int>){
-        labelCount = labelCountMap
-        val list = ArrayList<Int>(labelIDs)
-        this.labelIDs = list
-        notifyDataSetChanged()
+    fun updateLabelList(labels : ArrayList<Label>){
+        this.labels.clear()
+        this.labels = labels
+        notifyItemRangeChanged(0,labels.size)
+    }
+
+    interface LabelClick{
+        fun onLabelClick(labelColor : Int)
     }
 }

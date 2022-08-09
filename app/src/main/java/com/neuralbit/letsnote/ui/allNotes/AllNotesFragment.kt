@@ -1,56 +1,53 @@
 package com.neuralbit.letsnote.ui.allNotes
 
-import android.app.AlertDialog
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
-import android.graphics.Canvas
-import android.graphics.Color
-import android.os.Build
+import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
-import android.view.animation.Animation
-import android.view.animation.AnimationUtils
+import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.cardview.widget.CardView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.neuralbit.letsnote.*
-import com.neuralbit.letsnote.adapters.NoteClickInterface
+import com.google.gson.Gson
+import com.neuralbit.letsnote.AddEditNoteActivity
+import com.neuralbit.letsnote.Fingerprint
+import com.neuralbit.letsnote.R
+import com.neuralbit.letsnote.Services.DeleteReceiver
+import com.neuralbit.letsnote.adapters.NoteFireClick
 import com.neuralbit.letsnote.adapters.NoteRVAdapter
 import com.neuralbit.letsnote.databinding.FragmentAllNotesBinding
-import com.neuralbit.letsnote.entities.*
-import com.neuralbit.letsnote.utilities.Common
-import kotlinx.coroutines.launch
+import com.neuralbit.letsnote.entities.NoteFire
+import com.neuralbit.letsnote.utilities.AlertReceiver
+import java.util.*
 
-class AllNotesFragment : Fragment() , NoteClickInterface {
+class AllNotesFragment : Fragment() , NoteFireClick {
 
     private val allNotesViewModel: AllNotesViewModel by activityViewModels()
     private var _binding: FragmentAllNotesBinding? = null
     val TAG = "HOMEFRAGMENT"
-    lateinit var  notesRV: RecyclerView
-    lateinit var  pinnedNotesRV: RecyclerView
-    lateinit var addNoteFAB : FloatingActionButton
-    lateinit var noteTypeFAB : FloatingActionButton
-    lateinit var addClistFAB : FloatingActionButton
+    private lateinit var  notesRV: RecyclerView
+    private lateinit var  pinnedNotesRV: RecyclerView
+    private lateinit var addNoteFAB : FloatingActionButton
+    private lateinit var welcomeIcon : ImageView
+    private lateinit var welcomeText : TextView
     private val binding get() = _binding!!
-    lateinit var pinnedNotesTV: TextView
-    lateinit var otherNotesTV: TextView
-    private lateinit var allNotes: List<Note>
-    private lateinit var pinnedNotes: List<Note>
-    private val rotateOpen: Animation by lazy { AnimationUtils.loadAnimation(context,R.anim.rotate_open_anim)}
-    private val rotateClose: Animation by lazy { AnimationUtils.loadAnimation(context,R.anim.rotate_close_anim)}
-    private val fromBottom: Animation by lazy { AnimationUtils.loadAnimation(context,R.anim.from_bottom_anim)}
-    private val toBottom: Animation by lazy { AnimationUtils.loadAnimation(context,R.anim.to_bottom)}
-    private var clicked = false
+    private lateinit var pinnedNotesTV: TextView
+    private lateinit var otherNotesTV: TextView
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -64,10 +61,31 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
         pinnedNotesRV = binding.pinnedNotesRV
         pinnedNotesTV = binding.pinnedNotesTV
         otherNotesTV = binding.otherNotesTV
-        val layoutManagerAll = StaggeredGridLayoutManager( 2,LinearLayoutManager.VERTICAL)
-        val layoutManagerPinned = StaggeredGridLayoutManager( 2,LinearLayoutManager.VERTICAL)
-        notesRV.layoutManager = layoutManagerAll
-        pinnedNotesRV.layoutManager =layoutManagerPinned
+        welcomeIcon = binding.welcomeIcon
+        welcomeText = binding.allNotesText
+        val settingsSharedPref = context?.getSharedPreferences("Settings", AppCompatActivity.MODE_PRIVATE)
+        val staggeredLayoutManagerAll = StaggeredGridLayoutManager( 2,LinearLayoutManager.VERTICAL)
+        val staggeredLayoutManagerPinned = StaggeredGridLayoutManager( 2,LinearLayoutManager.VERTICAL)
+        notesRV.layoutManager = staggeredLayoutManagerAll
+        pinnedNotesRV.layoutManager =staggeredLayoutManagerPinned
+        allNotesViewModel.deleteFrag.value = false
+        allNotesViewModel.staggeredView.value = settingsSharedPref?.getBoolean("staggered",true)
+        allNotesViewModel.staggeredView.observe(viewLifecycleOwner){
+            val editor: SharedPreferences.Editor ?= settingsSharedPref?.edit()
+            editor?.putBoolean("staggered",it)
+            editor?.apply()
+            if (it){
+                notesRV.layoutManager = staggeredLayoutManagerAll
+                pinnedNotesRV.layoutManager =staggeredLayoutManagerPinned
+            }else{
+
+                notesRV.layoutManager = LinearLayoutManager(context)
+                pinnedNotesRV.layoutManager = LinearLayoutManager(context)
+            }
+        }
+
+
+
         val noteRVAdapter = context?.let { NoteRVAdapter(it,this) }
         val pinnedNoteRVAdapter = context?.let { NoteRVAdapter(it,this) }
         notesRV.adapter= noteRVAdapter
@@ -78,302 +96,153 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
         pinnedNoteRVAdapter?.viewModel = allNotesViewModel
         pinnedNoteRVAdapter?.lifecycleScope = lifecycleScope
         pinnedNoteRVAdapter?.lifecycleOwner = this
+        allNotesViewModel.selectedNotes.clear()
+        allNotesViewModel.getAllFireNotes().observe(viewLifecycleOwner){ notes ->
 
-        allNotesViewModel.allNotes.observe(viewLifecycleOwner) {
-            allNotes = it
-
-            noteRVAdapter?.updateList(it)
-        }
-        allNotesViewModel.pinnedNotes.observe(viewLifecycleOwner) {
-            pinnedNoteRVAdapter?.updateList(it)
-            pinnedNotes = it
-            if (it.isNotEmpty()) {
-                allNotesViewModel.allNotes.observe(viewLifecycleOwner) { allNotes ->
-                    if (allNotes.isNotEmpty()) {
-                        otherNotesTV.visibility = VISIBLE
-                    } else {
-                        otherNotesTV.visibility = GONE
+            val pinnedNotes = LinkedList<NoteFire>()
+            val otherNotes = LinkedList<NoteFire>()
+            for (note in notes) {
+                val pref = context?.getSharedPreferences("DeletedNotes", AppCompatActivity.MODE_PRIVATE)
+                val deletedNotes = pref?.getStringSet("noteUids", HashSet())
+                if (deletedNotes != null){
+                    if (!deletedNotes.contains(note.noteUid)){
+                        if (!note.archived){
+                            if (note.pinned){
+                                pinnedNotes.add(note)
+                            }else{
+                                otherNotes.add(note)
+                            }
+                        }
+                    }
+                }else{
+                    if (!note.archived){
+                        if (note.pinned){
+                            pinnedNotes.add(note)
+                        }else{
+                            otherNotes.add(note)
+                        }
                     }
                 }
+            }
+            if (otherNotes.isEmpty() && pinnedNotes.isEmpty()){
+                welcomeIcon.visibility = VISIBLE
+                welcomeText.visibility = VISIBLE
+            }else{
+                welcomeIcon.visibility = GONE
+                welcomeText.visibility = GONE
+            }
+            otherNotes.sortedWith(compareBy { it.timeStamp }).asReversed()
+            pinnedNotes.sortedWith(compareBy { it.timeStamp })
 
+            allNotesViewModel.otherFireNotesList.value = otherNotes
+            allNotesViewModel.pinnedFireNotesList.value = pinnedNotes
+            if (pinnedNotes.isNotEmpty()){
+                otherNotesTV.visibility = VISIBLE
                 pinnedNotesTV.visibility = VISIBLE
-            } else {
+                pinnedNotesRV.visibility = VISIBLE
+                pinnedNoteRVAdapter?.updateListFire(pinnedNotes)
+
+            }else{
                 otherNotesTV.visibility = GONE
                 pinnedNotesTV.visibility = GONE
+                pinnedNotesRV.visibility = GONE
             }
+            noteRVAdapter?.updateListFire(otherNotes)
         }
-
-        val touchHelperPinned = ItemTouchHelper(object  : ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.RIGHT){
-            override fun onMove(
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-                target: RecyclerView.ViewHolder
-            ): Boolean {
-
-                return true
-            }
-
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val note = pinnedNotes[viewHolder.adapterPosition]
-                when (direction) {
-                    ItemTouchHelper.RIGHT -> {
-                        val alertDialog: AlertDialog? = this.let {
-                            val builder = AlertDialog.Builder(context)
-                            builder.apply {
-                                setPositiveButton("ok"
-                                ) { _, _ ->
-                                    deletePinnedNote(viewHolder, noteRVAdapter)
-
-                                    Toast.makeText(context, "Note Deleted", Toast.LENGTH_SHORT).show()
-
-
-                                }
-                                setNegativeButton("cancel"
-                                ) { _, _ ->
-                                    pinnedNoteRVAdapter?.updateList(pinnedNotes)
-                                }
-                                if ((note.title?.isNotEmpty())==true){
-                                    setTitle("Delete ${note.title}")
-                                }
-                            }
-                            builder.create()
-                        }
-                        alertDialog?.show() }
-                    ItemTouchHelper.LEFT -> {
-                        val alertDialog: AlertDialog? = this.let {
-                            val builder = AlertDialog.Builder(context)
-                            builder.apply {
-                                setPositiveButton("ok"
-                                ) { _, _ ->
-                                    archiveNote(viewHolder, noteRVAdapter)
-
-                                    Toast.makeText(context, "Note Archived", Toast.LENGTH_SHORT).show()
-
-
-                                }
-                                setNegativeButton("cancel"
-                                ) { _, _ ->
-                                    noteRVAdapter?.updateList(allNotes)
-                                }
-                                if ((note.title?.isNotEmpty())==true){
-                                    setTitle("Archive ${note.title} ?")
-                                }else{
-                                    setTitle("Archive note ?")
-                                }
-                            }
-                            builder.create()
-                        }
-                        alertDialog?.show()
-                    }
-                }
-
-
-
-            }
-
-            override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
-                super.onSelectedChanged(viewHolder, actionState)
-                if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE){
-                    val iView = viewHolder?.itemView as CardView
-                    iView.setCardBackgroundColor(resources.getColor(R.color.Red))
-
-                }
-            }
-
-            override fun clearView(
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder
-            ) {
-                super.clearView(recyclerView, viewHolder)
-                val iView = viewHolder.itemView as CardView
-
-                iView.setCardBackgroundColor(resources.getColor(R.color.def_Card_Color))
-                try{
-                    val note = pinnedNotes[viewHolder.adapterPosition]
-                    val cm = Common()
-                    allNotesViewModel.getNoteLabel(note.noteID).observe(viewLifecycleOwner){
-                        if(it!=null) {
-                            iView.setCardBackgroundColor(it.labelID)
-                        }else{
-                            iView.setCardBackgroundColor(resources.getColor(R.color.def_Card_Color))
-
-                        }
-                    }
-                }catch (e : Exception){
-                    e.printStackTrace()
-                }
-
-
-            }
-        })
-        val touchHelperOther = ItemTouchHelper(object  : ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.RIGHT or ItemTouchHelper.LEFT){
-            override fun onMove(
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-                target: RecyclerView.ViewHolder
-            ): Boolean {
-
-                return true
-            }
-
-            override fun onChildDraw(
-                c: Canvas,
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-                dX: Float,
-                dY: Float,
-                actionState: Int,
-                isCurrentlyActive: Boolean
-            ) {
-                super.onChildDraw(
-                    c,
-                    recyclerView,
-                    viewHolder,
-                    dX,
-                    dY,
-                    actionState,
-                    isCurrentlyActive
-                )
-                val iView = viewHolder.itemView as CardView
-                when{
-                    dX > 0 -> iView.setCardBackgroundColor(resources.getColor(R.color.Red))
-                    dX.toInt() == 0 -> {
-                        try{
-                            val note = allNotes[viewHolder.adapterPosition]
-                            allNotesViewModel.getNoteLabel(note.noteID).observe(viewLifecycleOwner){
-                                if(it!=null) {
-                                    iView.setCardBackgroundColor(it.labelID)
-                                }else{
-                                    iView.setCardBackgroundColor(resources.getColor(R.color.def_Card_Color))
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                                        iView.outlineSpotShadowColor = resources.getColor(R.color.def_Card_Color)
-                                    }
-
-                                }
-                            }
-                        }catch (e : Exception){
-                            e.printStackTrace()
-                        }
-
-                    }
-                    dX < 0 -> iView.setCardBackgroundColor(resources.getColor(R.color.teal_200))
-
-                }
-
-            }
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val note = allNotes[viewHolder.adapterPosition]
-
-                when (direction) {
-                    ItemTouchHelper.RIGHT -> {
-                        val alertDialog: AlertDialog? = this.let {
-                            val builder = AlertDialog.Builder(context)
-                            builder.apply {
-                                setPositiveButton("ok"
-                                ) { _, _ ->
-                                    deleteOtherNotes(viewHolder, noteRVAdapter)
-
-                                    Toast.makeText(context, "Note Deleted", Toast.LENGTH_SHORT).show()
-
-
-                                }
-                                setNegativeButton("cancel"
-                                ) { _, _ ->
-                                    noteRVAdapter?.updateList(allNotes)
-                                }
-                                if ((note.title?.isNotEmpty())==true){
-                                    setTitle("Delete ${note.title} ?")
-                                }else{
-                                    setTitle("Delete ?")
-                                }
-                            }
-                            builder.create()
-                        }
-                        alertDialog?.show() }
-                    ItemTouchHelper.LEFT -> {
-                        val alertDialog: AlertDialog? = this.let {
-                            val builder = AlertDialog.Builder(context)
-                            builder.apply {
-                                setPositiveButton("ok"
-                                ) { _, _ ->
-                                    archiveNote(viewHolder, noteRVAdapter)
-
-                                    Toast.makeText(context, "Note Archived", Toast.LENGTH_SHORT).show()
-
-
-                                }
-                                setNegativeButton("cancel"
-                                ) { _, _ ->
-                                    noteRVAdapter?.updateList(allNotes)
-                                }
-                                if ((note.title?.isNotEmpty())==true){
-                                    setTitle("Archive ${note.title} ?")
-                                }else{
-                                    setTitle("Archive ?")
-
-                                }
-                            }
-                            builder.create()
-                        }
-                        alertDialog?.show()
-                    }
-                }
-
-
-            }
-
-            override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
-                super.onSelectedChanged(viewHolder, actionState)
-                if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE){
-                    val iView = viewHolder?.itemView as CardView
-                    iView.setCardBackgroundColor(resources.getColor(R.color.Red))
-
-                }
-            }
-
-            override fun clearView(
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder
-            ) {
-                super.clearView(recyclerView, viewHolder)
-                val iView = viewHolder.itemView as CardView
-
-                try{
-                    val note = allNotes[viewHolder.adapterPosition]
-                    allNotesViewModel.getNoteLabel(note.noteID).observe(viewLifecycleOwner){
-                        if(it!=null) {
-                            iView.setCardBackgroundColor(it.labelID)
-                        }else{
-                            iView.setCardBackgroundColor(resources.getColor(R.color.def_Card_Color))
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                                iView.outlineSpotShadowColor = resources.getColor(R.color.def_Card_Color)
-                            }
-
-                        }
-                    }
-                }catch (e : Exception){
-                    e.printStackTrace()
-                }
-
-
-            }
-        })
-        touchHelperPinned.attachToRecyclerView(pinnedNotesRV)
-        touchHelperOther.attachToRecyclerView(notesRV)
 
 
         allNotesViewModel.searchQuery.observe(viewLifecycleOwner) { str->
-            allNotesViewModel.filterPinnedList().observe(viewLifecycleOwner) {
+            allNotesViewModel.filterPinnedFireList().observe(viewLifecycleOwner) {
                 pinnedNoteRVAdapter?.searchString = str
-                pinnedNoteRVAdapter?.updateList(it)
+                pinnedNoteRVAdapter?.updateListFire(it)
 
             }
-            allNotesViewModel.filterList().observe(viewLifecycleOwner) {
-                noteRVAdapter?.updateList(it)
+            allNotesViewModel.filterOtherFireList().observe(viewLifecycleOwner) {
+                noteRVAdapter?.updateListFire(it)
                 noteRVAdapter?.searchString = str
-
             }
 
+        }
+
+        allNotesViewModel.itemArchiveClicked.observe(viewLifecycleOwner){
+            if (it && allNotesViewModel.selectedNotes.isNotEmpty()){
+
+                for ( note in allNotesViewModel.selectedNotes){
+                    if (note.pinned){
+                        allNotesViewModel.pinnedFireNotesList.value?.remove(note)
+                        cancelAlarm(note.reminderDate.toInt())
+                        pinnedNoteRVAdapter?.notifyDataSetChanged()
+
+                    }else{
+                        allNotesViewModel.otherFireNotesList.value?.remove(note)
+                        cancelAlarm(note.reminderDate.toInt())
+                        noteRVAdapter?.notifyDataSetChanged()
+                    }
+
+                    val noteUpdate = HashMap<String,Any>()
+                    noteUpdate["archived"] = true
+                    note.noteUid?.let { it1 -> allNotesViewModel.updateFireNote(noteUpdate, it1) }
+                }
+
+                allNotesViewModel.otherFireNotesList.value?.let { list ->
+                    noteRVAdapter?.updateListFire(list)
+                }
+                allNotesViewModel.pinnedFireNotesList.value?.let { list ->
+                    pinnedNoteRVAdapter?.updateListFire(list)
+                }
+
+                allNotesViewModel.selectedNotes.clear()
+
+
+                allNotesViewModel.itemSelectEnabled.value = false
+
+                Toast.makeText(context,"Notes archived successfully",Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        allNotesViewModel.itemDeleteClicked.observe(viewLifecycleOwner){
+            if (it && allNotesViewModel.selectedNotes.isNotEmpty()){
+                val pref = context?.getSharedPreferences("DeletedNotes", AppCompatActivity.MODE_PRIVATE)
+
+                for ( note in allNotesViewModel.selectedNotes){
+                    val editor: SharedPreferences.Editor ?= pref?.edit()
+                    val noteUids = pref?.getStringSet("noteUids",HashSet())
+                    val deletedNoteUids = HashSet<String>()
+                    if (noteUids != null){ deletedNoteUids.addAll(noteUids)}
+                    note.noteUid?.let { it1 -> deletedNoteUids.add(it1) }
+
+                    note.noteUid?.let { it1 -> scheduleDelete(it1,note.tags,note.label,note.timeStamp) }
+
+                    editor?.putStringSet("noteUids",deletedNoteUids)
+                    editor?.apply()
+
+                    if (note.pinned){
+                        allNotesViewModel.pinnedFireNotesList.value?.remove(note)
+                        cancelAlarm(note.reminderDate.toInt())
+                        pinnedNoteRVAdapter?.notifyDataSetChanged()
+
+                    }else{
+                        allNotesViewModel.otherFireNotesList.value?.remove(note)
+                        cancelAlarm(note.reminderDate.toInt())
+                        noteRVAdapter?.notifyDataSetChanged()
+                    }
+
+                }
+
+                allNotesViewModel.otherFireNotesList.value?.let { list ->
+                    noteRVAdapter?.updateListFire(list)
+                }
+                allNotesViewModel.pinnedFireNotesList.value?.let { list ->
+                    pinnedNoteRVAdapter?.updateListFire(list)
+                }
+
+                allNotesViewModel.selectedNotes.clear()
+
+
+                allNotesViewModel.itemSelectEnabled.value = false
+
+                Toast.makeText(context,"Notes deleted successfully",Toast.LENGTH_SHORT).show()
+            }
         }
 
 
@@ -387,60 +256,10 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
         return root
     }
 
-
-    private fun archiveNote(viewHolder: RecyclerView.ViewHolder, noteRVAdapter: NoteRVAdapter?) {
-        val note = allNotes[viewHolder.adapterPosition]
-        allNotesViewModel.archiveNote(ArchivedNote(note.noteID))
-        noteRVAdapter?.notifyItemRemoved(viewHolder.adapterPosition)
-
-    }
-
-    private fun deleteOtherNotes(
-        viewHolder: RecyclerView.ViewHolder,
-        noteRVAdapter: NoteRVAdapter?
-    ) {
-        val note = allNotes[viewHolder.adapterPosition]
-        allNotesViewModel.removeArchive(ArchivedNote(note.noteID))
-
-        allNotesViewModel.removePin(PinnedNote(note.noteID))
-
-        allNotesViewModel.deleteNoteLabel(note.noteID)
-
-        allNotesViewModel.deleteReminder(note.noteID)
-        lifecycleScope.launch {
-            allNotesViewModel.insertDeleted(DeletedNote(note.noteID))
-
-            val allTags = allNotesViewModel.getTagsWithNote(note.noteID)
-
-            for (tag in allTags.first().tags) {
-                allNotesViewModel.deleteNoteTagCrossRef(NoteTagCrossRef(note.noteID, tag.tagTitle))
-            }
-//            allNotesViewModel.deleteNote(note)
-            noteRVAdapter?.notifyItemRemoved(viewHolder.adapterPosition)
-        }
-    }
-
-    private fun deletePinnedNote(
-        viewHolder: RecyclerView.ViewHolder,
-        noteRVAdapter: NoteRVAdapter?
-    ) {
-        val note = pinnedNotes[viewHolder.adapterPosition]
-        allNotesViewModel.removeArchive(ArchivedNote(note.noteID))
-
-        allNotesViewModel.removePin(PinnedNote(note.noteID))
-        allNotesViewModel.deleteNoteLabel(note.noteID)
-        allNotesViewModel.deleteReminder(note.noteID)
-        lifecycleScope.launch {
-            allNotesViewModel.insertDeleted(DeletedNote(note.noteID))
-
-            val allTags = allNotesViewModel.getTagsWithNote(note.noteID)
-
-            for (tag in allTags.first().tags) {
-                allNotesViewModel.deleteNoteTagCrossRef(NoteTagCrossRef(note.noteID, tag.tagTitle))
-            }
-//            allNotesViewModel.deleteNote(note)
-            noteRVAdapter?.notifyItemRemoved(viewHolder.adapterPosition)
-        }
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        super.onPrepareOptionsMenu(menu)
+        val trashButton = menu.findItem(R.id.trash)
+        trashButton.isVisible = false
     }
 
     override fun onDestroyView() {
@@ -448,16 +267,67 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
         _binding = null
     }
 
+    private fun cancelAlarm(reminder : Int){
+        val alarmManager = context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(context, AlertReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(context, reminder, intent, PendingIntent.FLAG_IMMUTABLE)
+        alarmManager.cancel(pendingIntent)
+    }
 
 
-    override fun onNoteClick(note: Note) {
-        val intent = Intent( context, AddEditNoteActivity::class.java)
-        intent.putExtra("noteType","Edit")
-        intent.putExtra("noteID",note.noteID)
+    private fun scheduleDelete( noteUid : String, tags : List<String>, label: Int , timeStamp : Long) {
+        val alarmManager = context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(context, DeleteReceiver::class.java)
 
-        startActivity(intent)
+        intent.putExtra("noteUid",noteUid)
+        intent.putExtra("timeStamp",System.currentTimeMillis())
+        intent.putExtra("labelColor", label)
+        intent.putStringArrayListExtra("tagList", ArrayList(tags))
+        val pendingIntent = PendingIntent.getBroadcast(context, timeStamp.toInt(), intent, PendingIntent.FLAG_IMMUTABLE)
+        val timeToDelete = timeStamp + 6.048e+8 // 7 days from the time it is softly deleted
+        alarmManager.set(AlarmManager.RTC_WAKEUP, timeToDelete.toLong(), pendingIntent)
+    }
 
+    override fun onNoteFireClick(note: NoteFire, activated : Boolean) {
+        if (!note.selected && !activated){
+            val intent : Intent = if(note.protected){
+                Intent( context, Fingerprint::class.java)
+            }else{
+                Intent( context, AddEditNoteActivity::class.java)
+            }
+            intent.putExtra("noteType","Edit")
+            intent.putExtra("noteTitle",note.title)
+            intent.putExtra("noteDescription",note.description)
+            intent.putExtra("noteUid",note.noteUid)
+            intent.putExtra("timeStamp",note.timeStamp)
+            intent.putExtra("labelColor",note.label)
+            intent.putExtra("pinned",note.pinned)
+            intent.putExtra("archieved",note.archived)
+            intent.putExtra("protected",note.protected)
+            val c = Calendar.getInstance()
+            if (c.timeInMillis < note.reminderDate){
+                intent.putExtra("reminder",note.reminderDate)
+            }
+            val toDoItemString: String = Gson().toJson(note.todoItems)
+            intent.putExtra("todoItems", toDoItemString)
+            intent.putStringArrayListExtra("tagList", ArrayList(note.tags))
+            startActivity(intent)
+        }else{
+            if (note.selected){
+                allNotesViewModel.selectedNotes.add(note)
+            }else{
+                allNotesViewModel.selectedNotes.remove(note)
+            }
+        }
+    }
 
+    override fun onNoteFireLongClick(note: NoteFire) {
+        if (note.selected){
+            allNotesViewModel.selectedNotes.add(note)
+        }else{
+            allNotesViewModel.selectedNotes.remove(note)
+        }
+        allNotesViewModel.itemSelectEnabled.value = true
     }
 
 }

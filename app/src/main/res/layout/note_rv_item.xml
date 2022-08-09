@@ -6,7 +6,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     app:cardCornerRadius="10dp"
     android:layout_margin="16dp"
-    android:maxHeight="50dp"
     app:cardBackgroundColor="@color/def_Card_Color"
     android:padding="8dp"
     android:focusable="true"
@@ -37,19 +36,22 @@
             android:id="@+id/tvNoteDesc"
             android:textSize="16sp"
             android:textColor="@color/gunmetal"
-            android:maxLines="4"
+            android:maxLines="10"
             tools:text="Norman is thsssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvNoteTitle"
             />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/noteTagsTV"
-            android:maxWidth="200dp"
             android:layout_marginTop="4dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginStart="4dp"
             app:layout_constraintTop_toBottomOf="@id/tvNoteDesc"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/selectIcon"
             android:background="@drawable/tag_background"
             android:padding="4dp"
             android:textColor="@color/gunmetal"
@@ -57,28 +59,63 @@
             tools:text ="#tag #james #patric"/>
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:background="@drawable/baseline_lock_24"
+            android:id="@+id/noteLockedIcon"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/selectIcon"
+            app:layout_constraintTop_toBottomOf="@+id/noteTagsTV" />
+
+        <ImageView
+            android:layout_width="5dp"
+            android:layout_height="5dp"
+            android:background="@drawable/circle_delete"
+            android:id="@+id/selectIcon"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/noteTagsTV" />
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
             android:id="@+id/reminderIcon"
             android:layout_marginTop="4dp"
-
             app:layout_constraintTop_toBottomOf="@id/noteTagsTV"
             app:layout_constraintStart_toStartOf="parent"
             android:background="@drawable/ic_baseline_access_alarm_24"
-            android:visibility="gone"
+            android:visibility="visible"
             />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/reminderTV"
             android:layout_marginTop="4dp"
+            android:layout_marginEnd="8dp"
             android:textColor="@color/gunmetal"
             app:layout_constraintTop_toBottomOf="@id/noteTagsTV"
             app:layout_constraintStart_toEndOf="@id/reminderIcon"
-            android:layout_marginStart="8dp"
-            android:visibility="gone"
+            android:layout_marginStart="4dp"
+            android:visibility="visible"
             android:textSize="12sp"
             tools:text ="#tag #james #patric"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            app:layout_constraintTop_toBottomOf="@id/reminderTV"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginTop="4dp"
+            android:visibility="gone"
+            android:id="@+id/timeLeftDeleteTV"
+            android:textColor="@color/Red"
+            tools:text = "23 days"
+            />
+
+
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
