@@ -69,6 +69,16 @@
             app:layout_constraintTop_toBottomOf="@+id/noteTagsTV" />
 
         <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:background="@drawable/ic_baseline_checklist_rtl_24"
+            android:id="@+id/todoIcon"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/noteLockedIcon"
+            app:layout_constraintTop_toBottomOf="@+id/noteTagsTV" />
+
+        <ImageView
             android:layout_width="5dp"
             android:layout_height="5dp"
             android:background="@drawable/circle_delete"

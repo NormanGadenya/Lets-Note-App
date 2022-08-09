@@ -2,7 +2,9 @@ package com.neuralbit.letsnote.adapters
 
 import android.content.Context
 import android.text.Editable
+import android.text.SpannableString
 import android.text.TextWatcher
+import android.text.style.StrikethroughSpan
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -47,9 +49,25 @@ class TodoRVAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val todoItem = allTodoItems[position]
         holder.checkBox.isChecked = todoItem.checked
-        holder.todoItemDescET.setText(todoItem.item)
-        holder.checkBox.setOnCheckedChangeListener { checkBox, p1 ->
+        if (todoItem.item.isNotEmpty() && todoItem.checked){
+            val spannableString = SpannableString(todoItem.item)
+            val strikethroughSpan = StrikethroughSpan()
+            spannableString.setSpan(strikethroughSpan, 0, spannableString.length , SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
+            holder.todoItemDescET.setText(spannableString)
+        }else{
+            holder.todoItemDescET.setText(todoItem.item)
+        }
+        holder.checkBox.setOnCheckedChangeListener { _, p1 ->
             todoItem.checked = p1
+            if (todoItem.checked){
+                val spannableString = SpannableString(todoItem.item)
+                val strikethroughSpan = StrikethroughSpan()
+                spannableString.setSpan(strikethroughSpan, 0, spannableString.length , SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
+                holder.todoItemDescET.setText(spannableString)
+            }else{
+                holder.todoItemDescET.setText(todoItem.item)
+
+            }
             todoItemInterface.onItemCheckChanged(holder.adapterPosition, todoItem)
         }
         holder.todoItemDescET.addTextChangedListener(object : TextWatcher {
