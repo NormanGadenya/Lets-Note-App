@@ -174,7 +174,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                     todoCheckBox.isChecked = false
                     viewModal.noteChanged.value = true
                     todoRVAdapter.updateTodoItems(viewModal.todoItems)
-                    todoRVAdapter.notifyDataSetChanged()
+                    todoRVAdapter.notifyItemInserted(todoRVAdapter.itemCount)
 
                     todoRV.scrollToPosition(viewModal.todoItems.size - 1)
 
@@ -370,7 +370,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 //        mItemTouchHelper?.attachToRecyclerView(todoRV)
         todoRV.isNestedScrollingEnabled = false
 
-        val touchHelper = ItemTouchHelper(object  : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.START or ItemTouchHelper.END,0){
+        val touchHelper = ItemTouchHelper(object  : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.START or ItemTouchHelper.END,ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT){
             override fun onMove(
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder,
@@ -393,6 +393,12 @@ class AddEditNoteActivity : AppCompatActivity() ,
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                viewModal.noteChanged.value = true
+                val todoItem = viewModal.todoItems[viewHolder.adapterPosition]
+                deletedTodos.add(todoItem)
+                viewModal.todoItems.removeAt(viewHolder.adapterPosition)
+                todoRVAdapter.updateTodoItems(viewModal.todoItems)
+                todoRVAdapter.notifyItemRemoved(viewHolder.adapterPosition)
             }
 
             override fun isLongPressDragEnabled(): Boolean {
@@ -400,7 +406,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
             }
 
             override fun isItemViewSwipeEnabled(): Boolean {
-                return false
+                return true
             }
         })
         touchHelper.attachToRecyclerView(todoRV)
@@ -1406,9 +1412,9 @@ class AddEditNoteActivity : AppCompatActivity() ,
     override fun onItemDelete(position: Int, todoItem: TodoItem) {
         viewModal.noteChanged.value = true
         viewModal.todoItems.remove(todoItem)
+        todoRVAdapter.updateTodoItems(viewModal.todoItems)
         todoRVAdapter.notifyItemRemoved(position)
         deletedTodos.add(todoItem)
-        todoRVAdapter.updateTodoItems(viewModal.todoItems)
     }
 
     override fun onItemCheckChanged(position: Int, todoItem: TodoItem) {

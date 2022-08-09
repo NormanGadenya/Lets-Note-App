@@ -66,8 +66,6 @@ class TodoRVAdapter(
             }
         })
 
-        //TODO fix todo duplicates when the todo items are rearranged
-
 
 
         holder.todoItemDescET.setOnKeyListener { _, key, v ->
@@ -85,10 +83,6 @@ class TodoRVAdapter(
 
     }
 
-//
-//    override fun getItemViewType(position: Int): Int {
-//        return position
-//    }
 
     fun updateTodoItems(newList: List<TodoItem>){
         allTodoItems = ArrayList(newList)
