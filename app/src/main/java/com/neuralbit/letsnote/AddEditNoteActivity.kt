@@ -11,6 +11,7 @@ import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.hardware.fingerprint.FingerprintManager
 import android.os.Bundle
 import android.speech.RecognizerIntent
 import android.text.Editable
@@ -271,6 +272,12 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 pinItem?.setIcon(R.drawable.ic_baseline_push_pin_24)
             }
         }
+
+        // Check if we're running on Android 6.0 (M) or higher
+        // Check if we're running on Android 6.0 (M) or higher
+        //Fingerprint API only available on from Android 6.0 (M)
+        val fingerprintManager : FingerprintManager = getSystemService(FINGERPRINT_SERVICE) as FingerprintManager
+        lockNoteItem?.isVisible = !(!fingerprintManager.isHardwareDetected || !fingerprintManager.hasEnrolledFingerprints())
 
         viewModal.deletedNote.observe(lifecycleOwner){
             val editor: SharedPreferences.Editor = pref.edit()
@@ -543,6 +550,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
         }
     }
+
 
     private fun deleteNote(){
         val alertDialog: AlertDialog? = this.let {

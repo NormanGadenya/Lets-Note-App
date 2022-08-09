@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.gson.Gson
 import com.neuralbit.letsnote.AddEditNoteActivity
+import com.neuralbit.letsnote.Fingerprint
 import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.Services.DeleteReceiver
 import com.neuralbit.letsnote.adapters.NoteFireClick
@@ -289,7 +290,11 @@ class AllNotesFragment : Fragment() , NoteFireClick {
 
     override fun onNoteFireClick(note: NoteFire, activated : Boolean) {
         if (!note.selected && !activated){
-            val intent = Intent( context, AddEditNoteActivity::class.java)
+            val intent : Intent = if(note.protected){
+                Intent( context, Fingerprint::class.java)
+            }else{
+                Intent( context, AddEditNoteActivity::class.java)
+            }
             intent.putExtra("noteType","Edit")
             intent.putExtra("noteTitle",note.title)
             intent.putExtra("noteDescription",note.description)
