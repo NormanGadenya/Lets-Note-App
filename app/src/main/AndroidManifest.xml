@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.neuralbit.letsnote">
+    package="com.neuralbit.letsnote" >
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -13,21 +13,12 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher1_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.LetsNote">
-        <activity
-            android:name=".SplashActivity"
-            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"
-            android:exported="true" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+        android:theme="@style/Theme.LetsNote" >
         <activity
             android:name=".SaveSharedNoteActivity"
             android:exported="true"
-            android:theme="@style/Theme.AppCompat.Transparent.NoActionBar">
+            android:theme="@style/Theme.AppCompat.Transparent.NoActionBar"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
 
@@ -35,15 +26,6 @@
 
                 <data android:mimeType="text/plain" />
             </intent-filter>
-        </activity>
-        <activity
-            android:name="com.yalantis.ucrop.UCropActivity"
-            android:screenOrientation="fullSensor"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
-        <activity
-            android:name=".SignInActivity"
-            android:exported="true"
-            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
 
         </activity>
         <activity
@@ -58,18 +40,23 @@
             android:name=".MainActivity"
             android:exported="true"
             android:launchMode="singleTop"
-            android:theme="@style/Theme.LetsNote.NoActionBar" />
+            android:theme="@style/Theme.LetsNote.NoActionBar" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
+            android:theme="@style/Base.Theme.AppCompat" />
         <activity
             android:name=".AddEditNoteActivity"
             android:exported="true"
-            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" >
+        </activity>
 
         <receiver android:name=".utilities.AlertReceiver" />
-        <receiver android:name=".utilities.DatabaseBackUp" />
-
-        <meta-data
-            android:name="preloaded_fonts"
-            android:resource="@array/preloaded_fonts" />
     </application>
 
 </manifest>

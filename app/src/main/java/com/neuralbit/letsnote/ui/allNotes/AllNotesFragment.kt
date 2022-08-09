@@ -157,8 +157,6 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
                                 }
                                 if ((note.title?.isNotEmpty())==true){
                                     setTitle("Archive ${note.title} ?")
-                                }else{
-                                    setTitle("Archive note ?")
                                 }
                             }
                             builder.create()
@@ -234,6 +232,7 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
                     actionState,
                     isCurrentlyActive
                 )
+                Log.d(TAG, "onChildDraw: $dX")
                 val iView = viewHolder.itemView as CardView
                 when{
                     dX > 0 -> iView.setCardBackgroundColor(resources.getColor(R.color.Red))
@@ -282,9 +281,7 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
                                     noteRVAdapter?.updateList(allNotes)
                                 }
                                 if ((note.title?.isNotEmpty())==true){
-                                    setTitle("Delete ${note.title} ?")
-                                }else{
-                                    setTitle("Delete ?")
+                                    setTitle("Delete ${note.title}")
                                 }
                             }
                             builder.create()
@@ -308,9 +305,6 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
                                 }
                                 if ((note.title?.isNotEmpty())==true){
                                     setTitle("Archive ${note.title} ?")
-                                }else{
-                                    setTitle("Archive ?")
-
                                 }
                             }
                             builder.create()
@@ -408,14 +402,12 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
 
         allNotesViewModel.deleteReminder(note.noteID)
         lifecycleScope.launch {
-            allNotesViewModel.insertDeleted(DeletedNote(note.noteID))
-
             val allTags = allNotesViewModel.getTagsWithNote(note.noteID)
 
             for (tag in allTags.first().tags) {
                 allNotesViewModel.deleteNoteTagCrossRef(NoteTagCrossRef(note.noteID, tag.tagTitle))
             }
-//            allNotesViewModel.deleteNote(note)
+            allNotesViewModel.deleteNote(note)
             noteRVAdapter?.notifyItemRemoved(viewHolder.adapterPosition)
         }
     }
@@ -431,14 +423,12 @@ class AllNotesFragment : Fragment() , NoteClickInterface {
         allNotesViewModel.deleteNoteLabel(note.noteID)
         allNotesViewModel.deleteReminder(note.noteID)
         lifecycleScope.launch {
-            allNotesViewModel.insertDeleted(DeletedNote(note.noteID))
-
             val allTags = allNotesViewModel.getTagsWithNote(note.noteID)
 
             for (tag in allTags.first().tags) {
                 allNotesViewModel.deleteNoteTagCrossRef(NoteTagCrossRef(note.noteID, tag.tagTitle))
             }
-//            allNotesViewModel.deleteNote(note)
+            allNotesViewModel.deleteNote(note)
             noteRVAdapter?.notifyItemRemoved(viewHolder.adapterPosition)
         }
     }

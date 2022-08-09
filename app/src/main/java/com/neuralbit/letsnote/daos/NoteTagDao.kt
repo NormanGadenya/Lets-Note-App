@@ -14,11 +14,11 @@ interface NoteTagDao {
     suspend fun deleteNoteTagCrossRef(crossRef: NoteTagCrossRef)
 
     @Transaction
-    @Query("select * from Tag where tagTitle = :tagTitle ")
+    @Query("select * from Tag where tagTitle = :tagTitle")
     suspend fun getNotesWithTag(tagTitle:String) : List<NotesWithTag>
 
     @Transaction
-    @Query("select * from Note where noteID = :noteID ")
+    @Query("select * from Note where noteID = :noteID")
     suspend fun getTagsWithNote(noteID: Long) : List<TagsWithNote>
 
 

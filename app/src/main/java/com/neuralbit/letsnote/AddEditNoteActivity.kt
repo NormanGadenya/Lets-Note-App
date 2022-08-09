@@ -1,6 +1,7 @@
 package com.neuralbit.letsnote
 
 import android.Manifest
+import android.R.attr
 import android.app.AlarmManager
 import android.app.AlertDialog
 import android.app.PendingIntent
@@ -11,7 +12,6 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Rect
-import android.inputmethodservice.Keyboard
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -41,23 +41,25 @@ import com.flask.colorpicker.ColorPickerView
 import com.google.android.gms.vision.Frame
 import com.google.android.gms.vision.text.TextBlock
 import com.google.android.gms.vision.text.TextRecognizer
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.neuralbit.letsnote.adapters.AddEditLabelAdapter
 import com.neuralbit.letsnote.adapters.LabelClickInterface
-import com.neuralbit.letsnote.databinding.ActivityAddEditNoteBinding
-import com.neuralbit.letsnote.databinding.FragmentAllNotesBinding
 import com.neuralbit.letsnote.entities.*
 import com.neuralbit.letsnote.ui.label.LabelViewModel
 import com.neuralbit.letsnote.utilities.*
-
-import kotlinx.coroutines.Dispatchers
+import com.teamwork.autocomplete.MultiAutoComplete
+import com.teamwork.autocomplete.adapter.AutoCompleteTypeAdapter
+import com.teamwork.autocomplete.tokenizer.PrefixTokenizer
+import com.teamwork.autocomplete.view.MultiAutoCompleteEditText
+import com.theartofdev.edmodo.cropper.CropImage
+import com.theartofdev.edmodo.cropper.CropImageView
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.IOException
+import java.security.Key
 import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.collections.HashSet
 
 
 class AddEditNoteActivity : AppCompatActivity() ,
@@ -67,19 +69,17 @@ class AddEditNoteActivity : AppCompatActivity() ,
     GetTagFromDialog,
     LabelClickInterface
 {
-    private var deleted: Boolean = false
     private lateinit var restoreButton: ImageButton
     private lateinit var archiveButton: ImageButton
+    private lateinit var optionsButton: FloatingActionButton
     private lateinit var deleteButton: ImageButton
     private lateinit var backButton: ImageButton
     private lateinit var pinButton: ImageButton
     private lateinit var alertButton: ImageButton
     private lateinit var ocrButton: ImageButton
     private lateinit var sttButton: ImageButton
-    private lateinit var undoButton: ImageButton
-    private lateinit var redoButton: ImageButton
     private lateinit var noteTitleEdit : EditText
-    private lateinit var noteDescriptionEdit : MultiAutoCompleteTextView
+    private lateinit var noteDescriptionEdit : MultiAutoCompleteEditText
     private lateinit var addTagBtn : ImageButton
     private lateinit var delLabelBtn : ImageButton
     private lateinit var reminderIcon : ImageView
@@ -87,27 +87,26 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private var noteID : Long= -1
     private lateinit var viewModal : NoteViewModel
     private lateinit var labelViewModel : LabelViewModel
-    private var noteDescOrig : String? = null
-    private var noteDescOrigList = ArrayList<String>()
-    private var noteDescNew : String? = null
-    private var noteDescNewList : List<String> ? = null
-
     private lateinit var noteType : String
+    private val TAG = "AddNoteActivity"
     private var deletable : Boolean = false
     private lateinit var tvTimeStamp : TextView
     private var textChanged : Boolean = false
     private var archived = false
     private lateinit var cm : Common
-    private var noteDesc : String? = null
+    private lateinit var noteDesc : String
     private lateinit var noteTitle : String
     private var noteTimeStamp : Long = 0
     private lateinit var coordinatorlayout : View
+    private var wordStart = 0
+    private var wordEnd = 0
     private var tagString : String ? = null
     private var newTagTyped = false
     private var backPressed  = false
     private lateinit var tagListRV : RecyclerView
     private lateinit var labelListRV : RecyclerView
     private var isKeyBoardShowing = false
+    private var tagDeleted = false
     private lateinit var tagListAdapter : AddEditTagRVAdapter
     private lateinit var labelListAdapter : AddEditLabelAdapter
     private lateinit var alertBottomSheet : BottomSheetDialog
@@ -115,7 +114,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private lateinit var labelBtn : ImageButton
     private  var reminder: Reminder? = null
     private  var label: Label? = null
-    var TAG = "AddEditNoteActivity"
     private val REQUEST_CAMERA_CODE = 100
     private lateinit var lifecycleOwner : LifecycleOwner
     private lateinit var calendar: Calendar
@@ -129,10 +127,10 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private var reminderNoteSet = false
     private var labelNoteSet = false
     private lateinit var infoContainer : View
+    private lateinit var bottomSheet : BottomSheetBehavior<View>
     private var bitmap : Bitmap? = null
     private val REQUEST_CODE_SPEECH_INPUT = 1
     private lateinit var colorPickerView: ColorPickerView
-    private val tagListSet : HashSet<String> = HashSet()
 
     override fun onCreate(savedInstanceState: Bundle?)  {
         super.onCreate(savedInstanceState)
@@ -146,7 +144,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
             if("text/plain" == intent.type){
                 intent.getStringExtra(Intent.EXTRA_TEXT)?.let {
                     noteDesc = it
-                    viewModal.noteChanged.value = true
+                    viewModal.texChanged.value = true
                     noteDescriptionEdit.setText(it)
                 }
             }
@@ -159,6 +157,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
         manipulateNoteDescLines()
         val labelIDs = HashSet<Int>()
+
 
         labelViewModel.getAllNotes().observe(lifecycleOwner){ list ->
             for (lwn in list){
@@ -174,9 +173,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
         }
 
-        viewModal.getDeletedNote(noteID).observe(this){
-            viewModal.deletedNote.value = it!=null
-        }
+//        KeyboardUtils.addKeyboardToggleListener(this) { onKeyboardVisibilityChanged(it) }
 
         viewModal.allTags.observe(lifecycleOwner){
             
@@ -196,7 +193,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
             addTagDialog.show(supportFragmentManager,"addTagDialog")
 
         }
-        //TODO fix archivedNotes Bug
+
         when (noteType) {
             "Edit" -> {
                 viewModal.getNote(noteID).observe(this){
@@ -209,16 +206,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
                         noteTitleEdit.setText(noteTitle)
                         noteDescriptionEdit.setText(noteDesc)
                         if(archived) {
-                            tvTimeStamp.text= getString(R.string.archivedTime,cm.convertLongToTime(noteTimeStamp)[0],cm.convertLongToTime(noteTimeStamp)[1])
-
-                            pinButton.visibility = GONE
                             archiveButton.visibility = GONE
-                            alertButton.visibility = GONE
                             restoreButton.visibility = VISIBLE
-                            noteDescriptionEdit.isEnabled = false
-                            noteTitleEdit.isEnabled = false
-                            infoContainer.visibility = GONE
-
                         }
                         lifecycleScope.launch {
                             for (tag in viewModal.getTagsWithNote(noteID).last().tags){
@@ -265,7 +254,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
         delLabelBtn.setOnClickListener {
             viewModal.labelSet.value = false
-            viewModal.noteChanged.value = true
+            viewModal.texChanged.value = true
 
             if (label!=null && noteID>=0){
 
@@ -273,11 +262,15 @@ class AddEditNoteActivity : AppCompatActivity() ,
             }
         }
 
-
+        optionsButton.setOnClickListener {
+            bottomSheet.state = BottomSheetBehavior.STATE_EXPANDED
+        }
 
         viewModal.reminderSet.observe(lifecycleOwner){
             reminderNoteSet = it
             if(it){
+                bottomSheet.state = BottomSheetBehavior.STATE_EXPANDED
+
                 alertButton.setImageResource(R.drawable.ic_baseline_add_alert_24)
                 reminderTV.visibility =  VISIBLE
                 reminderIcon.visibility = VISIBLE
@@ -310,59 +303,19 @@ class AddEditNoteActivity : AppCompatActivity() ,
             }
         }
 
-        viewModal.deletedNote.observe(lifecycleOwner){
-
-            deleted = it
+        viewModal.archived.observe(lifecycleOwner){
+            archived = it
             if (it) {
-                if(noteType=="Edit"){
-                    viewModal.getNote(noteID).observe(this){ note ->
-                        tvTimeStamp.text= getString(R.string.deletedTime,cm.convertLongToTime(note.timeStamp)[0],cm.convertLongToTime(note.timeStamp)[1])
-
-                    }
-
-                }
                 pinButton.visibility = GONE
                 archiveButton.visibility = GONE
                 alertButton.visibility = GONE
                 restoreButton.visibility = VISIBLE
-                noteDescriptionEdit.isEnabled = false
-                noteTitleEdit.isEnabled = false
-                infoContainer.visibility = GONE
             } else {
                 pinButton.visibility = VISIBLE
                 archiveButton.visibility = VISIBLE
                 alertButton.visibility = VISIBLE
                 restoreButton.visibility = GONE
-                infoContainer.visibility = VISIBLE
-                noteDescriptionEdit.isEnabled = true
-                noteTitleEdit.isEnabled = true
-
             }
-        }
-        viewModal.archived.observe(lifecycleOwner){
-            archived = it
-
-//            if (it) {
-//                Log.d(TAG, "onCreate: Archived $it")
-//
-//                pinButton.visibility = GONE
-//                archiveButton.visibility = GONE
-//                alertButton.visibility = GONE
-//                restoreButton.visibility = VISIBLE
-//                noteDescriptionEdit.isEnabled = false
-//                noteTitleEdit.isEnabled = false
-//                infoContainer.visibility = GONE
-//            } else {
-//                pinButton.visibility = VISIBLE
-//                archiveButton.visibility = VISIBLE
-//                alertButton.visibility = VISIBLE
-//                restoreButton.visibility = GONE
-//                infoContainer.visibility = VISIBLE
-//                noteDescriptionEdit.isEnabled = true
-//                noteTitleEdit.isEnabled = true
-//
-//            }
-
         }
 
         alertButton.setOnClickListener {
@@ -376,77 +329,51 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 reminder = null
             }
         }
-        
-        val tagListStr = ArrayList<String>()
-        
-        viewModal.allTags.observe(this){
-            tagListStr.clear()
-            for (tag in it){
-                tagListStr.add(tag.tagTitle)
-            }
-            val adapter = ArrayAdapter(applicationContext,android.R.layout.simple_dropdown_item_1line,tagListStr)
-            noteDescriptionEdit.setAdapter(adapter)
-            noteDescriptionEdit.setTokenizer(SpaceTokenizer())
-            
-        }
 
 
-        viewModal.backPressed.observe(this) { 
-            backPressed = it 
-            viewModal.undoMode.value = it
-        }   
+        viewModal.wordEnd.observe(this) { wordEnd = it }
 
+        viewModal.backPressed.observe(this) { backPressed = it }
 
-        viewModal.newTagTyped.observe(this){
+        viewModal.wordStart.observe(this) { wordStart = it }
 
-                for (tagStr in tagListSet){
-                    if (noteDesc != null){
-
-                        if (!noteDesc?.contains(tagStr)!!){
-                            viewModal.addTag(Tag(tagStr))
-                            viewModal.addTagToList(Tag(tagStr))
-                            tagListAdapter.updateList(viewModal.tagList)
-
-                        }
-                    }else{
-                        viewModal.addTag(Tag(tagStr))
-                        viewModal.addTagToList(Tag(tagStr))
-                        tagListAdapter.updateList(viewModal.tagList)
-
-                    }
-
-
-                }
-
-        }
         viewModal.noteDescString.observe(this) { noteDescStr ->
-            Log.d(TAG, "onCreate: $noteDescStr")
-
             if (newTagTyped) {
-                if (noteDescStr.isNotEmpty()) {
-                    if (noteDescStr.length >= 2) {
 
-                        if (noteDescStr[noteDescStr.length - 1] == ' ') {
-                            val tagString = noteDescStr.substring(0,noteDescStr.length -1)
-                            val tag : Tag  = if(tagString.contains('#')){
-                                Tag(noteDescStr.substring(0, noteDescStr.length - 1))
-                            }else{
-                                Tag("#" +noteDescStr.substring(0, noteDescStr.length - 1))
+                viewModal.allTags.observe(this) {
 
+                    val adapter: AutoCompleteTypeAdapter<Tag> =
+                        AutoCompleteTypeAdapter.Build.from(TagViewBinder(), TagTokenFilter())
+                    it?.let { adapter.setItems(it) }
+                    val multiAutoComplete = MultiAutoComplete.Builder()
+                        .tokenizer(PrefixTokenizer('#'))
+                        .addTypeAdapter(adapter)
+                        .build()
+                    multiAutoComplete.onViewAttached(noteDescriptionEdit)
+
+                    if (noteDescStr.isNotEmpty()) {
+                        if (noteDescStr.length >= 2) {
+
+                            if (noteDescStr[noteDescStr.length - 1] == ' ') {
+                                val tag = Tag(noteDescStr.substring(0, noteDescStr.length - 1))
+                                if (tag !in it) {
+                                    viewModal.addTag(tag)
+                                }
+                                viewModal.addTagToList(tag)
+                                tagListAdapter.updateList(viewModal.tagList)
                             }
 
-                            viewModal.addTag(tag)
-
-                            viewModal.addTagToList(tag)
-                            tagListAdapter.updateList(viewModal.tagList)
                         }
-
                     }
+
+
                 }
 
 
+                if (noteDescStr != null) {
+                    tagString = noteDescStr
 
-                if (noteDescStr != null) { tagString = noteDescStr }
+                }
             }
 
         }
@@ -455,28 +382,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         labelBtn.setOnClickListener {
             showLabelBottomSheetDialog()
         }
-        undoButton.setOnClickListener {
-            noteDescNew = noteDescriptionEdit.text.toString()
-            noteDescriptionEdit.setText(noteDescOrig)
-            viewModal.undoMode.value = false
-            redoButton.isEnabled = true
 
-        }
-        viewModal.undoMode.value = false
-        viewModal.undoMode.observe(lifecycleOwner){
-            if (it){
-                undoButton.isEnabled = true
-                redoButton.isEnabled = false
-            }else{
-                undoButton.isEnabled = false
-                redoButton.isEnabled = false
-            }
-        }
-        redoButton.setOnClickListener {
-            noteDescriptionEdit.setText(noteDescNew)
-            redoButton.isEnabled = false
-            undoButton.isEnabled = true
-        }
         noteTitleEdit.addTextChangedListener(object : TextWatcher{
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
@@ -499,18 +405,13 @@ class AddEditNoteActivity : AppCompatActivity() ,
         noteDescriptionEdit.addTextChangedListener(object : TextWatcher{
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
 
-                if (!backPressed ) {
-                    noteDescOrigList.clear()
-                    noteDescOrig = p0?.toString()
-                    noteDescOrig?.split(" ")?.let { noteDescOrigList.addAll(it) }
-                }
-
             }
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 if(p0?.length!! > 0){
 
-                    noteListBullet()
+
+
 
                     getTagFromString(p0,p3)
 
@@ -524,58 +425,112 @@ class AddEditNoteActivity : AppCompatActivity() ,
         })
 
 
-        noteDescriptionEdit.setOnKeyListener { _, key, _ ->
-            viewModal.noteChanged.value = true
-            viewModal.backPressed.value = key == KeyEvent.KEYCODE_DEL
-//            viewModal.undoMode.value = true
-
+        noteDescriptionEdit.setOnKeyListener { _, p1, _ ->
+            viewModal.noteChanged(true)
+            viewModal.backPressed.value = p1 == KeyEvent.KEYCODE_DEL
+            viewModal.enterPressed.value = p1 == KeyEvent.KEYCODE_ENTER
             false
         }
 
         noteTitleEdit.setOnKeyListener { _, _, _ ->
-            viewModal.noteChanged.value = true
+            viewModal.noteChanged(true)
 
             false
         }
 
-        viewModal.noteChanged.observe(this) {
+        viewModal.texChanged.observe(this) {
             textChanged = it
-            if(it){
-                tvTimeStamp.visibility = GONE
-            }else{
-                tvTimeStamp.visibility = VISIBLE
-
-            }
         }
         viewModal.deleted.observe(this) {
             deletable = it
         }
+        if (bottomSheet.state == BottomSheetBehavior.STATE_HIDDEN){
+            optionsButton.visibility = VISIBLE
+        }else{
+            optionsButton.visibility = GONE
 
+        }
+        bottomSheet.addBottomSheetCallback(object :
+            BottomSheetBehavior.BottomSheetCallback() {
 
-        backButton.setOnClickListener { goToMain() }
-
-        deleteButton.setOnClickListener {
-
-            val alertDialog: AlertDialog? = this.let {
-                val builder = AlertDialog.Builder(this)
-                builder.apply {
-                    setPositiveButton("ok"
-                    ) { _, _ ->
-                        viewModal.deleted.value = true
-                        viewModal.noteChanged.value = true
-                        goToMain()
-                        }
-
-                    setNegativeButton("cancel"
-                    ) { _, _ ->
-                    }
-                    setTitle("Delete Note")
-
-                }
-                builder.create()
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                // handle onSlide
             }
 
-            alertDialog?.show()
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                when (newState) {
+                    BottomSheetBehavior.STATE_HIDDEN -> optionsButton.visibility = VISIBLE
+                    BottomSheetBehavior.STATE_EXPANDED -> optionsButton.visibility = GONE
+                    BottomSheetBehavior.STATE_COLLAPSED -> optionsButton.visibility = GONE
+                }
+            }
+        })
+        viewModal.enterPressed.observe(this){
+            
+            val noteContent = noteDescriptionEdit.text
+            val noteContentSplit = noteContent.split("\n")
+            var lineIndex = 0
+            if (noteContentSplit.size>2){
+                lineIndex = noteContentSplit.lastIndex-1
+            }
+            if (it){
+
+                if(noteContentSplit.isNotEmpty()){
+                        val prefix = listOf(" ","->","-","+","*",">")
+                        for (p in prefix){
+                            addBulletin(noteContentSplit,lineIndex,noteContent, p)
+                        }
+                        if (noteContentSplit[lineIndex].endsWith(":")) {
+                            if (noteContent.endsWith("\n")) {
+                                if (!backPressed){
+                                    noteDescriptionEdit.append("-> ")
+
+                                }
+                            }
+                        }
+
+
+                    }
+
+            }
+        }
+
+
+
+        backButton.setOnClickListener {
+            Log.d(TAG, "onCreate: presseed")
+            goToMain()
+            
+        }
+
+        deleteButton.setOnClickListener {
+            if(noteType == "Edit"){
+
+                viewModal.removeArchive(ArchivedNote(noteID))
+
+                viewModal.removePin(PinnedNote(noteID))
+
+                label?.let { viewModal.deleteNoteLabel(noteID) }
+
+                reminder?.let {
+                    cancelAlarm()
+                    viewModal.deleteReminder(noteID) }
+
+                for(tag in viewModal.tagList){
+                    viewModal.deleteNoteTagCrossRef(NoteTagCrossRef(noteID,tag.tagTitle))
+                }
+                viewModal.getNote(noteID).observe(this){
+                    if (it!=null){
+                        viewModal.deleteNote(it)
+
+                    }
+                }
+
+
+                Toast.makeText(this,"Note deleted",Toast.LENGTH_SHORT).show()
+                viewModal.deleted.value = true
+                goToMain()
+            }
 
         }
 
@@ -588,7 +543,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 requestCameraPermission()
 
             } else {
-                //TODO FIX OCR FUNCTION
+                CropImage.activity().setGuidelines(CropImageView.Guidelines.ON).start(this@AddEditNoteActivity)
+
             }
         }
 
@@ -617,43 +573,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
         pinButton.setOnClickListener { pinOrUnPinNote() }
 
-        restoreButton.setOnClickListener {
-            unArchiveNote()
-            unDelete()
-        }
-    }
-
-    private fun noteListBullet() {
-        val noteContent = noteDescriptionEdit.text
-        val noteContentSplit = noteContent.split("\n")
-        var lineIndex = 0
-        if (noteContentSplit.size > 2) {
-            lineIndex = noteContentSplit.lastIndex - 1
-        }
-
-        if (noteContentSplit.size > 1) {
-
-            if (noteContentSplit.isNotEmpty()) {
-                val prefix = listOf(" ", "->", "-", "+", "*", ">")
-                for (p in prefix) {
-                    if (!backPressed) {
-                        addBulletin(noteContentSplit, lineIndex, noteContent, p)
-
-                    }
-                }
-                if (noteContentSplit[lineIndex].endsWith(":")) {
-                    if (noteContent.endsWith("\n")) {
-                        if (!backPressed) {
-                            noteDescriptionEdit.append("-> ")
-
-                        }
-                    }
-                }
-
-
-            }
-
-        }
+        restoreButton.setOnClickListener { unArchiveNote() }
     }
 
     private fun checkCameraPermission() {
@@ -669,26 +589,26 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-//        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE){
-//            val result = CropImage.getActivityResult(data)
-//            if(resultCode == RESULT_OK){
-//                val resultUri : Uri = result.uri
-//                try {
-//                    bitmap = MediaStore.Images.Media.getBitmap(contentResolver,resultUri)
-//                    recognizeText()
-//                }catch (e : IOException){
-//                    e.printStackTrace()
-//                }
-//            }
-//        }
-        if (requestCode == REQUEST_CODE_SPEECH_INPUT) {
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE){
+            val result = CropImage.getActivityResult(data)
+            if(resultCode == RESULT_OK){
+                val resultUri : Uri = result.uri
+                try {
+                    bitmap = MediaStore.Images.Media.getBitmap(contentResolver,resultUri)
+                    recognizeText()
+                }catch (e : IOException){
+                    e.printStackTrace()
+                }
+            }
+        }
+        else if (requestCode == REQUEST_CODE_SPEECH_INPUT) {
             if (resultCode == RESULT_OK && data != null) {
                 val result: ArrayList<String> = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)!!
                 val noteDesc = result[0]
                 noteDescriptionEdit.append("\n")
 
                 noteDescriptionEdit.append(noteDesc)
-                viewModal.noteChanged.value = true
+                viewModal.texChanged.value = true
             }
 
         }
@@ -705,7 +625,9 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 .setPositiveButton(
                     "ok"
                 ) { _: DialogInterface?, _: Int ->
-                    ActivityCompat.requestPermissions(this@AddEditNoteActivity, arrayOf(Manifest.permission.CAMERA), REQUEST_CAMERA_CODE)
+                    ActivityCompat.requestPermissions(
+                        this@AddEditNoteActivity, arrayOf(Manifest.permission.CAMERA), REQUEST_CAMERA_CODE)
+                    CropImage.activity().setGuidelines(CropImageView.Guidelines.ON).start(this@AddEditNoteActivity)
 
                 }
                 .setNegativeButton(
@@ -731,7 +653,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 val sparseArray = recognizer.detect(frame) as SparseArray<TextBlock>
                 val stringBuilder = StringBuilder()
                 for (i in 0 until sparseArray.size()){
-                    val textBlock = sparseArray.valueAt(i)
+                    var textBlock = sparseArray.valueAt(i)
                     stringBuilder.append(textBlock.value)
                     stringBuilder.append("\n")
                 }
@@ -742,7 +664,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
     private fun archiveNote(){
         archivedNote = ArchivedNote(noteID)
-        viewModal.noteChanged.value = true
+        viewModal.texChanged.value = true
 
         viewModal.archived.value = true
         var snackbar = Snackbar.make(coordinatorlayout,"Note Achieved",Snackbar.LENGTH_LONG)
@@ -765,37 +687,23 @@ class AddEditNoteActivity : AppCompatActivity() ,
     }
 
     private fun unArchiveNote(){
-        viewModal.noteChanged.value = true
-        if(viewModal.archived.value == true) {
-            viewModal.archived.value = false
-            var snackbar = Snackbar.make(coordinatorlayout, "Note unarchived", Snackbar.LENGTH_LONG)
-            snackbar.setAction(
-                "UNDO"
-            ) {
-                viewModal.archived.value = true
-                snackbar = Snackbar.make(coordinatorlayout, "Note archived", Snackbar.LENGTH_SHORT)
-            }
-            snackbar.show()
+        viewModal.texChanged.value = true
+
+        viewModal.archived.value = false
+        var snackbar = Snackbar.make(coordinatorlayout,"Note unarchived",Snackbar.LENGTH_LONG)
+        snackbar.setAction("UNDO"
+        ) {
+            viewModal.archived.value= true
+            snackbar = Snackbar.make(coordinatorlayout,"Note archived",Snackbar.LENGTH_SHORT)
         }
-    }
-    private fun unDelete(){
-        viewModal.noteChanged.value = true
-        if(viewModal.deletedNote.value == true) {
-            viewModal.deletedNote.value = false
-            var snackbar = Snackbar.make(coordinatorlayout, "Note recovered", Snackbar.LENGTH_LONG)
-            snackbar.setAction(
-                "UNDO"
-            ) {
-                viewModal.deletedNote.value = true
-                snackbar = Snackbar.make(coordinatorlayout, "Note deleted", Snackbar.LENGTH_SHORT)
-            }
-            snackbar.show()
-        }
+        snackbar.show()
+
     }
 
     private fun initControllers(){
         cm= Common()
         noteTitleEdit = findViewById(R.id.noteEditTitle)
+
         layoutManager = LinearLayoutManager(applicationContext,LinearLayoutManager.HORIZONTAL,false)
         calendar = Calendar.getInstance()
         noteDescriptionEdit = findViewById(R.id.noteEditDesc)
@@ -815,9 +723,11 @@ class AddEditNoteActivity : AppCompatActivity() ,
         restoreButton = findViewById(R.id.restoreButton)
         ocrButton = findViewById(R.id.ocrButton)
         sttButton = findViewById(R.id.sttButton)
-        undoButton = findViewById(R.id.undoButton)
-        redoButton = findViewById(R.id.redoButton)
         infoContainer = findViewById(R.id.infoContainer)
+        bottomSheet= BottomSheetBehavior.from(infoContainer)
+        bottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
+        bottomSheet.peekHeight = 72
+        optionsButton = findViewById(R.id.optionsFB)
         alertBottomSheet =  BottomSheetDialog(this)
         labelBottomSheet = BottomSheetDialog(this)
         coordinatorlayout = findViewById(R.id.coordinatorlayout)
@@ -844,7 +754,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
     private fun pinOrUnPinNote(){
         pinnedNote = PinnedNote(noteID)
-        viewModal.noteChanged.value = true
+        viewModal.texChanged.value = true
             if(notePinned){
                 viewModal.pinned.value = false
                 var snackbar = Snackbar.make(coordinatorlayout,"Note unpinned",Snackbar.LENGTH_LONG)
@@ -877,18 +787,35 @@ class AddEditNoteActivity : AppCompatActivity() ,
     }
 
     private fun getTagFromString(p0: CharSequence?, p3: Int) {
-        val strL = p0?.toString()?.split(" ")
-        if (!backPressed) {
-            if (strL != null && strL.size > 1) {
-                val word = strL[strL.lastIndex - 1]
-                if (word.contains("#")) {
-                    tagListSet.add(word)
-                    viewModal.newTagTyped.value = true
-                }
-            }
-        }
+        if(p3>0){
+            if(!tagListAdapter.deleteIgnored){
+                tagListAdapter.deleteIgnored = true
+                tagListAdapter.notifyDataSetChanged()
 
+            }
+
+        }
+        if(!backPressed){
+            tagDeleted = false
+            if(p0?.get(p0.length - 1) == '#'){
+                viewModal.wordStart.value = p0.length
+                viewModal.newTagTyped.value = true
+            }
+
+            if(wordStart> 0) {
+                viewModal.wordEnd.value = p0?.length
+                viewModal.getTagString(p0.toString())
+
+                if(p0?.get(p0.length - 1) == ' '){
+                    viewModal.newTagTyped.value = false
+                }
+
+
+            }
+
+        }
     }
+
 
 
 
@@ -925,10 +852,11 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 val hex = ColorTransparentUtils.transparentColor(it,30)
                 label = Label(noteID,Color.parseColor(hex))
                 viewModal.labelSet.value = true
-                viewModal.noteChanged.value = true
+                viewModal.texChanged.value = true
                 coordinatorlayout.setBackgroundColor(Color.parseColor(hex))
                 window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
                 window.statusBarColor = Color.parseColor(hex)
+                bottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
             }
 
 
@@ -942,9 +870,10 @@ class AddEditNoteActivity : AppCompatActivity() ,
             coordinatorlayout.getWindowVisibleDisplayFrame(r)
             val screenHeight =  coordinatorlayout.rootView.height
             val keypadHeight = screenHeight - r.bottom
-            if (keypadHeight > screenHeight * 0.15) {
+            if (keypadHeight > screenHeight * 0.15) { // 0.15 ratio is perhaps enough to determine keypad height.
                 if (!isKeyBoardShowing) {
                     isKeyBoardShowing = true
+                    bottomSheet.state = BottomSheetBehavior.STATE_HIDDEN
                 }
             }
             else {
@@ -1004,7 +933,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
         opt1?.setOnClickListener {
             if(noteDescriptionEdit.length() > 0 || noteTitleEdit.length() >0 ){
-                viewModal.noteChanged.value = true
+                viewModal.texChanged.value = true
 
             }
             alertBottomSheet.dismiss()
@@ -1037,6 +966,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
             reminder = Reminder(noteID, calendar.timeInMillis)
             viewModal.reminderSet.value = true
 
+//            viewModal.insertReminder(Reminder(noteID, c.timeInMillis))
         }
 
         opt2?.setOnClickListener {
@@ -1046,11 +976,12 @@ class AddEditNoteActivity : AppCompatActivity() ,
             calendar[Calendar.HOUR_OF_DAY] = 8
             calendar[Calendar.MINUTE] = 0
             if(noteDescriptionEdit.length() > 0 || noteTitleEdit.length() >0 ){
-                viewModal.noteChanged.value = true
+                viewModal.texChanged.value = true
 
             }
             Toast.makeText(this, "Reminder set for tomorrow at 8:00am", Toast.LENGTH_SHORT).show()
 
+//            viewModal.insertReminder(Reminder(noteID, c.timeInMillis))
             reminder = Reminder(noteID, calendar.timeInMillis)
             viewModal.reminderSet.value = true
 
@@ -1062,7 +993,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
             calendar[Calendar.HOUR_OF_DAY] = 18
             calendar[Calendar.MINUTE] = 0
             if(noteDescriptionEdit.length() > 0 || noteTitleEdit.length() >0 ){
-                viewModal.noteChanged.value = true
+                viewModal.texChanged.value = true
 
             }
             reminder = Reminder(noteID, calendar.timeInMillis)
@@ -1082,8 +1013,9 @@ class AddEditNoteActivity : AppCompatActivity() ,
             builder.apply {
                 setPositiveButton("ok"
                 ) { _, _ ->
+                    // User clicked OK button
                     if(noteDescriptionEdit.length() > 0 || noteTitleEdit.length() >0 ){
-                        viewModal.noteChanged.value = true
+                        viewModal.texChanged.value = true
 
                     }
                     Toast.makeText(context, "Reminder set", Toast.LENGTH_SHORT).show()
@@ -1123,7 +1055,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private fun startAlarm() {
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(this, AlertReceiver::class.java)
-        viewModal.noteChanged.value = true
+        viewModal.texChanged.value = true
         val noteTitle = noteTitleEdit.text.toString()
         val noteDescription = noteDescriptionEdit.text.toString()
         if (noteTitle.isNotEmpty()){
@@ -1150,52 +1082,27 @@ class AddEditNoteActivity : AppCompatActivity() ,
         val noteTitle = noteTitleEdit.text.toString()
         val noteDescription = noteDescriptionEdit.text.toString()
         val currentDate= cm.currentTimeToLong()
-
+        if(!deletable){
             if(textChanged){
                 if (noteTitle.isNotEmpty() || noteDescription.isNotEmpty()){
-
+                    Log.d(TAG, "saveNote: $noteID")
                     val note = Note(noteTitle,noteDescription,currentDate)
                     if(noteType == "Edit"){
                         note.noteID = noteID
                         viewModal.updateNote(note)
-
-                        if (!deletable || !archived){
-                            saveOtherEntities()
-
-                            Toast.makeText(this,"Note updated .. " , Toast.LENGTH_SHORT).show()
-                        }
+                        saveOtherEntities()
+                        Toast.makeText(this,"Note updated .. " , Toast.LENGTH_SHORT).show()
 
                     }else{
                         lifecycleScope.launch {
                            noteID =  viewModal.addNote(note)
-                            if (!deletable){
-                                saveOtherEntities()
-                            }
+                            saveOtherEntities()
 
                         }
 
-                        if(!deletable){
-                            Toast.makeText(this,"Note added .. " , Toast.LENGTH_SHORT).show()
 
-                        }
-
-                    }
-                    if(deletable){
-
-                        lifecycleScope.launch {
-                            withContext(Dispatchers.IO) {
-                                viewModal.insertDeleted(DeletedNote(noteID))
-                            }
-                        }
-                        Toast.makeText(this@AddEditNoteActivity,"Note Deleted",Toast.LENGTH_SHORT).show()
-
-                    }else{
-                        lifecycleScope.launch {
-                            withContext(Dispatchers.IO) {
-                                viewModal.restoreDeleted(DeletedNote(noteID))
-                            }
-                        }
-
+                        Toast.makeText(this,"Note added .. " , Toast.LENGTH_SHORT).show()
+                        
                     }
 
 
@@ -1203,13 +1110,17 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
 
             }
+        }
+        val intent = Intent(this@AddEditNoteActivity, MainActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP;
+
+        startActivity(intent)
+
+        finish()
     }
 
 
-
-
     private fun saveOtherEntities(){
-
         if (pinnedNote!=null){
             pinnedNote?.noteID = noteID
             if (notePinned){
@@ -1235,16 +1146,13 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 viewModal.removeArchive(archivedNote!!)
             }
         }
-
         if (reminder!=null){
             reminder?.noteID = noteID
 
             if (reminderNoteSet){
-                if (!deletable){
-                    startAlarm()
-                    viewModal.insertReminder(reminder!!)
-                }
-
+                Log.d(TAG, "saveNote: Reminder set")
+                startAlarm()
+                viewModal.insertReminder(reminder!!)
             }else{
                 viewModal.deleteReminder(noteID)
                 cancelAlarm()
@@ -1264,15 +1172,9 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private fun goToMain() {
         
         saveNote()
-        val intent = Intent(this@AddEditNoteActivity, MainActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP;
 
-        startActivity(intent)
 
-        finish()
     }
-
-
 
     override fun onBackPressed() {
 
@@ -1287,6 +1189,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
             viewModal.deleteNoteTagCrossRef(NoteTagCrossRef(noteID,tag.tagTitle))
         }
         tagListAdapter.updateList(viewModal.tagList)
+
     }
 
     override fun getTimeInfo(calendar : Calendar) {
@@ -1310,14 +1213,14 @@ class AddEditNoteActivity : AppCompatActivity() ,
         viewModal.addTag(tag)
         viewModal.addTagToList(tag)
         tagListAdapter.updateList(viewModal.tagList)
-        viewModal.noteChanged.value = true
+        viewModal.noteChanged(true)
 
     }
 
     override fun onLabelItemClick(labelID: Int) {
         label = Label(noteID,labelID)
         viewModal.labelSet.value = true
-        viewModal.noteChanged.value = true
+        viewModal.texChanged.value = true
         coordinatorlayout.setBackgroundColor(labelID)
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
         window.statusBarColor = labelID

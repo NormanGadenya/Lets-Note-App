@@ -63,6 +63,7 @@ class NoteRVAdapter (
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        Log.d(TAG, "onBindViewHolder: $allNotes")
         var title = allNotes[position].title
         var desc = allNotes[position].description
         val cm = Common()
@@ -84,7 +85,14 @@ class NoteRVAdapter (
 
         }
         
+        holder.itemView.setOnLongClickListener {
+            holder.itemView.setOnDragListener { view, dragEvent ->
+                Log.d(TAG, "onBindViewHolder: $allNotes")
+                return@setOnDragListener true
+            }
 
+            return@setOnLongClickListener true
+        }
         lifecycleScope?.launch {
             if (viewModel!=null){
                 val tagList = viewModel?.getTagsWithNote(noteID)?.last()
@@ -96,7 +104,7 @@ class NoteRVAdapter (
                 var tagStr : String? = null
 
                 for (t in tagList.tags) {
-                    tagStr = t.tagTitle + " "
+                    tagStr = "#" + t.tagTitle + " "
                 }
                 if (tagStr!=null){
                     holder.tagsTV.text = tagStr
@@ -144,7 +152,9 @@ class NoteRVAdapter (
 
                         val noteCardColor = it.labelID
                         holder.noteCard.setBackgroundColor(noteCardColor)
-
+//                        holder.noteTitleTV.setTextColor(context.getColor(cm.getFontColor(noteCardColor)))
+//                        holder.noteTextTV.setTextColor(context.getColor(cm.getFontColor(noteCardColor)))
+//                        holder.reminderTV.setTextColor(context.getColor(cm.getFontColor(noteCardColor)))
                     }
 
                 }
@@ -152,6 +162,8 @@ class NoteRVAdapter (
                 labelViewModel?.getNoteLabel(noteID)?.observe(owner) {
                     val noteCardColor = context.getColor(it.labelID)
                     holder.noteCard.setBackgroundColor(noteCardColor)
+//                    holder.noteTitleTV.setTextColor(context.getColor(cm.getFontColor(noteCardColor)))
+//                    holder.noteTextTV.setTextColor(context.getColor(cm.getFontColor(noteCardColor)))
                 }
 
             }
@@ -186,7 +198,6 @@ class NoteRVAdapter (
     fun updateList( newList: List<Note>){
         allNotes.clear()
         allNotes.addAll(newList)
-
         notifyDataSetChanged()
     }
     fun undoDelete( swipedNote: Note,oldPosition : Int){

@@ -22,9 +22,6 @@
         android:id="@+id/pinnedNotesRV"
         android:layout_width="match_parent"
         android:visibility="visible"
-        android:overScrollMode="never"
-        tools:listitem="@layout/note_rv_item"
-        tools:itemCount="2"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/pinnedNotesTV"
         />
@@ -35,31 +32,30 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
-        android:visibility="visible"
+        android:visibility="gone"
         android:text="@string/other_notes"
         android:textSize="32sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/pinnedNotesRV" />
 
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/notesRV"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
         android:layout_marginTop="8dp"
-        android:overScrollMode="never"
         android:visibility="visible"
-        tools:itemCount="2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/otherNotesTV"
-        app:layout_constraintBottom_toBottomOf="parent"
-        tools:listitem="@layout/note_rv_item" />
+        />
+
+
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/FABAddNote"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-
+        android:layout_marginEnd="304dp"
+        android:layout_marginBottom="596dp"
         android:src="@drawable/ic_baseline_note_add_24"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"

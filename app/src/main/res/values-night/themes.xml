@@ -33,11 +33,9 @@
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowIsFloating">true</item>
-        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
     </style>
-    <style name="Theme.LetsNote.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
-    <style name="Theme.LetsNote.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
 
 </resources>

@@ -3,7 +3,6 @@ plugins {
     id 'kotlin-android'
     id 'kotlin-kapt'
     id 'org.jetbrains.kotlin.android'
-    id 'com.google.gms.google-services'
 }
 
 android {
@@ -58,19 +57,8 @@ dependencies {
     implementation "androidx.activity:activity-ktx:$rootProject.activityVersion"
     implementation 'de.hdodenhof:circleimageview:3.1.0'
     implementation 'com.google.android.gms:play-services-vision:19.0.0'
+    implementation 'com.theartofdev.edmodo:android-image-cropper:2.8.0'
     implementation 'com.github.QuadFlask:colorpicker:0.0.15'
-
-    implementation 'com.github.yalantis:ucrop:2.2.6'
-
-    // Import the BoM for the Firebase platform
-    implementation platform('com.google.firebase:firebase-bom:29.0.3')
-
-    // Declare the dependency for the Firebase Authentication library
-    // When using the BoM, you don't specify versions in Firebase library dependencies
-    implementation 'com.google.firebase:firebase-auth'
-
-    // Also declare the dependency for the Google Play services library and specify its version
-    implementation 'com.google.android.gms:play-services-auth:20.0.1'
 
 
     // Dependencies for working with Architecture components
@@ -82,9 +70,6 @@ dependencies {
     implementation 'androidx.navigation:navigation-ui-ktx:2.3.5'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'com.google.android.gms:play-services-mlkit-text-recognition-common:16.1.0'
-    implementation 'androidx.annotation:annotation:1.2.0'
-    implementation 'com.google.firebase:firebase-auth-ktx:21.0.1'
-    implementation 'com.google.firebase:firebase-storage-ktx:20.0.0'
     kapt "androidx.room:room-compiler:$rootProject.roomVersion"
     androidTestImplementation "androidx.room:room-testing:$rootProject.roomVersion"
 
@@ -110,4 +95,5 @@ dependencies {
     })
     androidTestImplementation "androidx.test.ext:junit:$rootProject.androidxJunitVersion"
     implementation 'androidx.recyclerview:recyclerview-selection:1.0.0'
+    implementation 'com.teamwork.multiautocomplete:android-multiautocomplete:0.4.0'
 }

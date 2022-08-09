@@ -119,10 +119,6 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
         labelRepo.deleteLabel(labelID)
     }
 
-    suspend fun insertDeleted(deletedNote: DeletedNote) {
-        return noteRepo.insertDeletedNote(deletedNote)
-    }
-
     fun deleteReminder(noteID: Long) = viewModelScope.launch(Dispatchers.IO){
         reminderRepo.delete(noteID)
     }
