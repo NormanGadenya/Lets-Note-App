@@ -2,10 +2,7 @@ package com.neuralbit.letsnote.daos
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.neuralbit.letsnote.entities.ArchivedNote
-import com.neuralbit.letsnote.entities.Note
-import com.neuralbit.letsnote.entities.PinnedNote
-import com.neuralbit.letsnote.entities.Tag
+import com.neuralbit.letsnote.entities.*
 
 @Dao
 interface NotesDao {
@@ -30,26 +27,36 @@ interface NotesDao {
     @Delete
     suspend fun deletePinned(noteId : PinnedNote)
 
+    @Insert(onConflict= OnConflictStrategy.REPLACE )
+    suspend fun insertDeleted(noteId : DeletedNote)
+
+    @Delete
+    suspend fun restoreDeleted(noteId : DeletedNote)
+
+    @Transaction
+    @Query("select * from DeletedNote join Note on DeletedNote.noteID = Note.noteID")
+    fun getDeletedNotes(): LiveData<List<Note>>
+
     @Transaction
     @Query("select * from Note where noteID = :noteID")
     fun getNote(noteID : Long) : LiveData<Note>
 
     @Transaction
-    @Query("Select * from Note where not exists (select * from ArchivedNote where ArchivedNote.noteID = Note.noteID) and not exists (select * from PinnedNote where PinnedNote.noteID= Note.noteID) order by timeStamp DESC")
+    @Query("Select * from Note where not exists (select * from ArchivedNote where ArchivedNote.noteID = Note.noteID) and not exists (select * from PinnedNote where PinnedNote.noteID= Note.noteID) and not exists (select * from DeletedNote where DeletedNote.noteID = Note.noteID) order by timeStamp DESC")
     fun getNotesWithoutPinArc(): LiveData<List<Note>>
 
     @Transaction
-    @Query("Select * from Note  order by timeStamp DESC")
+    @Query("Select * from Note where not exists (select * from DeletedNote where DeletedNote.noteID = Note.noteID) order by timeStamp DESC ")
     fun getAllNotes(): LiveData<List<Note>>
 
 
 
     @Transaction
-    @Query("Select * from ArchivedNote join Note on ArchivedNote.noteID = Note.noteID ")
+    @Query("Select * from ArchivedNote join Note on ArchivedNote.noteID = Note.noteID and  not exists (select * from DeletedNote where DeletedNote.noteID = ArchivedNote.noteID)")
     fun getArchivedNotes() : LiveData<List<Note>>
 
     @Transaction
-    @Query("Select * from PinnedNote  join Note on PinnedNote.noteID = Note.noteID where not exists (select * from ArchivedNote where ArchivedNote.noteID = PinnedNote.noteID ) ")
+    @Query("Select * from PinnedNote  join Note on PinnedNote.noteID = Note.noteID where not exists (select * from ArchivedNote where ArchivedNote.noteID = PinnedNote.noteID ) and not exists (select * from DeletedNote where DeletedNote.noteID = PinnedNote.noteID)")
     fun getPinnedNotes() : LiveData<List<Note>>
 
     @Transaction
@@ -59,6 +66,10 @@ interface NotesDao {
     @Transaction
     @Query("Select * from ArchivedNote where noteID = :noteID")
     fun getArchivedNote(noteID : Long) : LiveData<ArchivedNote>
+
+    @Transaction
+    @Query("Select * from DeletedNote where noteID = :noteID")
+    fun getDeletedNote(noteID : Long) : LiveData<DeletedNote>
 
 
 }

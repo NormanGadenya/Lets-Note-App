@@ -35,7 +35,7 @@ class TagRVAdapter (
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val tagTitle = tagList[position].tagTitle
-        holder.tagNameTV.text = context.getString(R.string.tagTitle,tagTitle)
+        holder.tagNameTV.text = tagTitle
         val noteCount = tagCount[tagTitle]
         var cm = Common()
         if(noteCount==1){

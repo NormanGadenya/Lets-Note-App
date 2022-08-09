@@ -12,7 +12,7 @@ import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.entities.Tag
 
 
-class AddTagDialog(val getTagFromDialog: GetTagFromDialog,val ctx: Context): AppCompatDialogFragment() {
+class AddTagDialog(private val getTagFromDialog: GetTagFromDialog, val ctx: Context): AppCompatDialogFragment() {
     var tagList : ArrayList<String> = ArrayList()
     val TAG = "AddTagDialog"
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -31,10 +31,11 @@ class AddTagDialog(val getTagFromDialog: GetTagFromDialog,val ctx: Context): App
             ) { _, _ -> dismiss() }
             .setPositiveButton("ok"){_, _ ->
                 run {
+
                     var tagTitle = addTagET?.text.toString()
-                    if(tagTitle[0]=='#'){
-                        tagTitle= tagTitle.substring(1,tagTitle.length)
-                    }
+                    tagTitle = if(tagTitle[0]=='#'){
+                        tagTitle.substring(1,tagTitle.length)
+                    }else "#"+tagTitle.substring(1,tagTitle.length)
                     getTagFromDialog.getTag(Tag(tagTitle))
                 }
             }

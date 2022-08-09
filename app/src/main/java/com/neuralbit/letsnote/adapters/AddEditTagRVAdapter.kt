@@ -36,7 +36,7 @@ class AddEditTagRVAdapter (
         val tag = allTags[position]
         val tagTitle = tag.tagTitle
 
-        holder.tagTitle.text = context.getString(R.string.tagTitle,tagTitle)
+        holder.tagTitle.text = tagTitle
         holder.itemView.setOnLongClickListener {
             holder.deleteBtn.visibility = VISIBLE
             return@setOnLongClickListener true
@@ -44,7 +44,6 @@ class AddEditTagRVAdapter (
         holder.deleteBtn.setOnClickListener {
             tagRVInterface.deleteTag(tag)
         }
-        Log.d(TAG, "onBindViewHolder: $deleteIgnored")
 
         if(deleteIgnored){
             holder.deleteBtn.visibility = GONE

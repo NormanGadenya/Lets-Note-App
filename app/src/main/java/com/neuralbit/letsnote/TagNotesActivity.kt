@@ -46,7 +46,7 @@ class TagNotesActivity : AppCompatActivity() , NoteClickInterface {
         noteRVAdapter.viewModel = allNotesViewModel
         noteRVAdapter.lifecycleScope = lifecycleScope
         noteRVAdapter.lifecycleOwner = this
-        supportActionBar?.title = resources.getString(R.string.tagTitle,tagTitle)
+        supportActionBar?.title = tagTitle
         lifecycleScope.launch {
             val it = viewModel.getNotesWithTag(tagTitle!!)
             notesList = ArrayList()

@@ -52,7 +52,7 @@ public class NotificationHelper extends ContextWrapper {
                         .setSmallIcon(R.mipmap.ic_launcher1_round);
             }else{
                 return new NotificationCompat.Builder(getApplicationContext(), channelID)
-                        .setContentTitle(getResources().getString(R.string.app_name))
+                        .setContentTitle("Reminder")
                         .setContentText(noteDesc)
                         .setSmallIcon(R.mipmap.ic_launcher1_round);
             }
