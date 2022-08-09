@@ -61,6 +61,8 @@ dependencies {
     implementation 'de.hdodenhof:circleimageview:3.1.0'
     implementation 'com.google.android.gms:play-services-vision:19.0.0'
     implementation 'com.github.QuadFlask:colorpicker:0.0.15'
+    implementation "androidx.biometric:biometric:1.0.1"
+
 
     implementation 'com.github.yalantis:ucrop:2.2.6'
     implementation 'com.google.code.gson:gson:2.8.9'

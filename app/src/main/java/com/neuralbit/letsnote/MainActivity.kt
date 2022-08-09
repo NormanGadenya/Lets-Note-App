@@ -196,6 +196,12 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
+    override fun onBackPressed() {
+        val a = Intent(Intent.ACTION_MAIN)
+        a.addCategory(Intent.CATEGORY_HOME)
+        a.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(a)
+    }
     private inner class MActionModeCallBack : ActionMode.Callback {
         override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
             mode?.menuInflater?.inflate(R.menu.action_menu,menu)

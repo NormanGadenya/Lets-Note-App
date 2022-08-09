@@ -65,7 +65,6 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:launchMode="singleTop"
             android:theme="@style/Theme.LetsNote.NoActionBar" />
         <activity
             android:name=".AddEditNoteActivity"
