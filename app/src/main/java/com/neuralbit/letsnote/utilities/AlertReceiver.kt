@@ -11,7 +11,8 @@ class AlertReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val noteTitle = intent.getStringExtra("noteTitle")
         val noteDesc = intent.getStringExtra("noteDesc")
-        val notificationHelper = NotificationHelper(context,noteTitle,noteDesc)
+        val protected = intent.getBooleanExtra("protected",false)
+        val notificationHelper = NotificationHelper(context,noteTitle,noteDesc,protected)
         val noteType = intent.getStringExtra("noteType")
         val noteUid = intent.getStringExtra("noteUid")
         val timeStamp = intent.getLongExtra("timeStamp",0)
@@ -34,6 +35,7 @@ class AlertReceiver : BroadcastReceiver() {
         i.putExtra("pinned",pinned)
         i.putExtra("archieved",archived)
         i.putExtra("todoItems",todoItems)
+        i.putExtra("protected",protected)
         i.putStringArrayListExtra("tagList", tagList)
         val pendingIntent = PendingIntent.getActivity(context, timeStamp.toInt(), i, PendingIntent.FLAG_IMMUTABLE)
         nb.setContentIntent(pendingIntent)

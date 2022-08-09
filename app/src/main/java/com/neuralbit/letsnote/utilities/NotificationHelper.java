@@ -1,6 +1,7 @@
 package com.neuralbit.letsnote.utilities;
 
 import android.annotation.TargetApi;
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
@@ -17,12 +18,14 @@ public class NotificationHelper extends ContextWrapper {
     public static final String channelName = "Channel Name";
     private String noteTitle;
     private String noteDesc;
+    private Boolean noteProtected;
     private NotificationManager mManager;
 
-    public NotificationHelper(Context base,String noteTitle, String noteDesc) {
+    public NotificationHelper(Context base,String noteTitle, String noteDesc,Boolean noteProtected) {
         super(base);
         this.noteTitle = noteTitle;
         this.noteDesc = noteDesc;
+        this.noteProtected = noteProtected;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createChannel();
         }
@@ -50,7 +53,36 @@ public class NotificationHelper extends ContextWrapper {
                         .setContentTitle(getResources().getString(R.string.app_name))
                         .setContentText(noteTitle)
                         .setPriority(NotificationCompat.PRIORITY_MAX)
+                        .setDefaults(Notification.DEFAULT_SOUND)
                         .setSmallIcon(R.mipmap.ic_launcher1_round)
+                        .setAutoCancel(true);
+            }else{
+                if (noteProtected){
+                    return new NotificationCompat.Builder(getApplicationContext(), channelID)
+                            .setContentTitle("Reminder")
+                            .setContentText("**Protected**")
+                            .setPriority(NotificationCompat.PRIORITY_MAX)
+                            .setDefaults(Notification.DEFAULT_SOUND)
+                            .setSmallIcon(R.mipmap.ic_launcher1_round)
+                            .setAutoCancel(true);
+                }else{
+                    return new NotificationCompat.Builder(getApplicationContext(), channelID)
+                            .setContentTitle("Reminder")
+                            .setContentText(noteDesc)
+                            .setPriority(NotificationCompat.PRIORITY_MAX)
+                            .setDefaults(Notification.DEFAULT_SOUND)
+                            .setSmallIcon(R.mipmap.ic_launcher1_round)
+                            .setAutoCancel(true);
+                }
+            }
+        }else{
+            if (noteProtected){
+                return new NotificationCompat.Builder(getApplicationContext(), channelID)
+                        .setContentTitle("Reminder")
+                        .setContentText("**Protected**")
+                        .setPriority(NotificationCompat.PRIORITY_MAX)
+                        .setSmallIcon(R.mipmap.ic_launcher1_round)
+                        .setDefaults(Notification.DEFAULT_SOUND)
                         .setAutoCancel(true);
             }else{
                 return new NotificationCompat.Builder(getApplicationContext(), channelID)
@@ -58,15 +90,9 @@ public class NotificationHelper extends ContextWrapper {
                         .setContentText(noteDesc)
                         .setPriority(NotificationCompat.PRIORITY_MAX)
                         .setSmallIcon(R.mipmap.ic_launcher1_round)
+                        .setDefaults(Notification.DEFAULT_SOUND)
                         .setAutoCancel(true);
             }
-        }else{
-            return new NotificationCompat.Builder(getApplicationContext(), channelID)
-                    .setContentTitle(getResources().getString(R.string.app_name))
-                    .setContentText(noteDesc)
-                    .setPriority(NotificationCompat.PRIORITY_MAX)
-                    .setSmallIcon(R.mipmap.ic_launcher1_round)
-                    .setAutoCancel(true);
         }
 
     }

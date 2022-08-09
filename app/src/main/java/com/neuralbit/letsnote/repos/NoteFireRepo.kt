@@ -11,6 +11,7 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.neuralbit.letsnote.entities.NoteFire
 import com.neuralbit.letsnote.entities.NoteFireIns
+import com.neuralbit.letsnote.utilities.NoteComparator
 
 class NoteFireRepo {
 
@@ -59,7 +60,9 @@ class NoteFireRepo {
                         notes.add(note)
                     }
                 }
-                live.value = ArrayList(notes.reversed())
+
+                notes.sortWith(NoteComparator())
+                live.value = notes
             }
 
             override fun onCancelled(error: DatabaseError) {

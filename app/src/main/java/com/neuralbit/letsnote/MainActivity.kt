@@ -47,6 +47,7 @@ class MainActivity : AppCompatActivity() {
     var fUser : FirebaseUser? = null
 
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mAuth = FirebaseAuth.getInstance()

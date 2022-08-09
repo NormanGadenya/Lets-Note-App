@@ -64,7 +64,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
     TodoItemInterface
 
 {
-    private var mItemTouchHelper: ItemTouchHelper? = null
     private var deleted: Boolean = false
     private var reminderItem : MenuItem? = null
     private var lockNoteItem : MenuItem? = null
@@ -878,6 +877,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
             return@setOnMenuItemClickListener true
         }
         reminderItem?.setOnMenuItemClickListener {
+            viewModal.noteChanged.value = true
             val reminderTime = viewModal.reminderTime
             if (reminderTime == (0).toLong()) {
                 showAlertSheetDialog()
@@ -1196,6 +1196,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         intent.putExtra("labelColor",viewModal.labelColor)
         intent.putExtra("pinned",viewModal.pinned.value)
         intent.putExtra("archieved",viewModal.archived.value)
+        intent.putExtra("protected",protected)
         val tags = ArrayList<String>()
         tags.addAll(viewModal.oldTagList)
         tags.addAll(viewModal.newTags)
@@ -1290,9 +1291,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
                 }
 
-
             }
-
 
         }
     }

@@ -131,8 +131,7 @@ class AllNotesFragment : Fragment() , NoteFireClick {
                 welcomeIcon.visibility = GONE
                 welcomeText.visibility = GONE
             }
-            otherNotes.sortedWith(compareBy { it.timeStamp }).asReversed()
-            pinnedNotes.sortedWith(compareBy { it.timeStamp })
+
 
             allNotesViewModel.otherFireNotesList.value = otherNotes
             allNotesViewModel.pinnedFireNotesList.value = pinnedNotes

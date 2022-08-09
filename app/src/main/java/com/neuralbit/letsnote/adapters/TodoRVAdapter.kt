@@ -36,8 +36,6 @@ class TodoRVAdapter(
         val todoItemDescET: EditText = itemView.findViewById(R.id.todoItemDescET)
         val checkBox : CheckBox = itemView.findViewById(R.id.todoCheckBox)
         val deleteButton : ImageButton = itemView.findViewById(R.id.deleteItemBtn)
-        val dragIndicator : ImageButton = itemView.findViewById(R.id.dragTodo)
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
