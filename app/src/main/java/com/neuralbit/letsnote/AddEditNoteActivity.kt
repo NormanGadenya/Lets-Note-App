@@ -388,7 +388,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
                     }
                 }
                 Log.d(TAG, "onMove: $fromPosition  $toPosition")
-                todoRVAdapter.updateTodoItems(viewModal.todoItems)
                 todoRVAdapter.notifyItemMoved(viewHolder.adapterPosition,target.adapterPosition)
                 return false
             }
@@ -1418,7 +1417,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
             val todoItems = viewModal.todoItems
             todoItems[position] = todoItem
             viewModal.todoItems = todoItems
-            todoRVAdapter.notifyItemChanged(position)
 
         }
     }

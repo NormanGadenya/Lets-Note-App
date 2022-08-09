@@ -62,23 +62,38 @@ class NoteRVAdapter (
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val note = allNotesFire[position]
         var title = note.title
-        var desc = note.description
+        if (!note.protected){
+            var desc = note.description
+            if (desc.length > 250) {
+                desc = desc.substring(0, 250) + "..."
+            }
+            val todoItems = note.todoItems
+
+            for (todoItem in todoItems) {
+                desc += if (todoItem.checked){
+                    "\n + ${todoItem.item} "
+                }else{
+
+                    "\n - ${todoItem.item} "
+                }
+            }
+            if (desc.isEmpty()) {
+                holder.noteTextTV.visibility = GONE
+            } else {
+                holder.noteTextTV.text = desc
+                holder.noteTextTV.visibility = VISIBLE
+            }
+        }else{
+            holder.noteTextTV.text = "**protected**"
+
+        }
         val cm = Common()
         if (title.length > 20) {
             title = title.substring(0, 15) + "..."
         }
-        if (desc.length > 250) {
-            desc = desc.substring(0, 250) + "..."
-        }
-        val todoItems = note.todoItems
-        for (todoItem in todoItems) {
-            desc += if (todoItem.checked){
-                "\n + ${todoItem.item} "
-            }else{
 
-                "\n - ${todoItem.item} "
-            }
-        }
+
+
         val c = Calendar.getInstance()
 
         lifecycleOwner?.let {
@@ -119,12 +134,7 @@ class NoteRVAdapter (
             holder.noteTitleTV.visibility = VISIBLE
 
         }
-        if (desc.isEmpty()) {
-            holder.noteTextTV.visibility = GONE
-        } else {
-            holder.noteTextTV.text = desc
-            holder.noteTextTV.visibility = VISIBLE
-        }
+
         var tagStr = ""
         for (tag in note.tags) {
             tagStr = "$tagStr $tag "

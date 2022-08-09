@@ -85,10 +85,10 @@ class TodoRVAdapter(
 
     }
 
-
-    override fun getItemViewType(position: Int): Int {
-        return position
-    }
+//
+//    override fun getItemViewType(position: Int): Int {
+//        return position
+//    }
 
     fun updateTodoItems(newList: List<TodoItem>){
         allTodoItems = ArrayList(newList)
