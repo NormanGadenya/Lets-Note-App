@@ -72,8 +72,8 @@ class MainActivity : AppCompatActivity() {
         )
         allNotesViewModal.itemSelectEnabled.observe(this){
             if (it){
-                actionMode = startSupportActionMode(MActionModeCallBack())
                 supportActionBar?.hide()
+                actionMode = startSupportActionMode(MActionModeCallBack())
             }else{
                 actionMode?.finish()
 

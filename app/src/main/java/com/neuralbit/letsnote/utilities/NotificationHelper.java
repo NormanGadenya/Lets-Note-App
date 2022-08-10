@@ -6,6 +6,8 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Build;
 
 import androidx.core.app.NotificationCompat;
@@ -34,7 +36,9 @@ public class NotificationHelper extends ContextWrapper {
     @TargetApi(Build.VERSION_CODES.O)
     private void createChannel() {
         NotificationChannel channel = new NotificationChannel(channelID, channelName, NotificationManager.IMPORTANCE_HIGH);
-
+        channel.enableVibration(true);
+        channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+        channel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
         getManager().createNotificationChannel(channel);
     }
 
@@ -47,13 +51,16 @@ public class NotificationHelper extends ContextWrapper {
     }
 
     public NotificationCompat.Builder getChannelNotification() {
+        Uri ringingSound= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
         if (noteTitle!=null ){
             if (!noteTitle.isEmpty()){
                 return new NotificationCompat.Builder(getApplicationContext(), channelID)
                         .setContentTitle(getResources().getString(R.string.app_name))
                         .setContentText(noteTitle)
+                        .setGroup("REMINDERS")
                         .setPriority(NotificationCompat.PRIORITY_MAX)
                         .setDefaults(Notification.DEFAULT_SOUND)
+                        .setSound(ringingSound)
                         .setSmallIcon(R.mipmap.ic_launcher1_round)
                         .setAutoCancel(true);
             }else{
@@ -61,16 +68,18 @@ public class NotificationHelper extends ContextWrapper {
                     return new NotificationCompat.Builder(getApplicationContext(), channelID)
                             .setContentTitle("Reminder")
                             .setContentText("**Protected**")
+                            .setGroup("REMINDERS")
                             .setPriority(NotificationCompat.PRIORITY_MAX)
-                            .setDefaults(Notification.DEFAULT_SOUND)
+                            .setSound(ringingSound)
                             .setSmallIcon(R.mipmap.ic_launcher1_round)
                             .setAutoCancel(true);
                 }else{
                     return new NotificationCompat.Builder(getApplicationContext(), channelID)
                             .setContentTitle("Reminder")
                             .setContentText(noteDesc)
+                            .setGroup("REMINDERS")
                             .setPriority(NotificationCompat.PRIORITY_MAX)
-                            .setDefaults(Notification.DEFAULT_SOUND)
+                            .setSound(ringingSound)
                             .setSmallIcon(R.mipmap.ic_launcher1_round)
                             .setAutoCancel(true);
                 }
@@ -80,17 +89,19 @@ public class NotificationHelper extends ContextWrapper {
                 return new NotificationCompat.Builder(getApplicationContext(), channelID)
                         .setContentTitle("Reminder")
                         .setContentText("**Protected**")
+                        .setGroup("REMINDERS")
                         .setPriority(NotificationCompat.PRIORITY_MAX)
+                        .setSound(ringingSound)
                         .setSmallIcon(R.mipmap.ic_launcher1_round)
-                        .setDefaults(Notification.DEFAULT_SOUND)
                         .setAutoCancel(true);
             }else{
                 return new NotificationCompat.Builder(getApplicationContext(), channelID)
                         .setContentTitle("Reminder")
                         .setContentText(noteDesc)
+                        .setGroup("REMINDERS")
                         .setPriority(NotificationCompat.PRIORITY_MAX)
+                        .setSound(ringingSound)
                         .setSmallIcon(R.mipmap.ic_launcher1_round)
-                        .setDefaults(Notification.DEFAULT_SOUND)
                         .setAutoCancel(true);
             }
         }

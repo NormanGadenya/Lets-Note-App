@@ -4,53 +4,89 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+
+    android:background="#2A3439"
     tools:context=".SignInActivity">
 
     <TextView
-        android:id="@+id/signInTV"
+        android:id="@+id/appName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Sign in to continue"
-        android:textSize="30sp"
+        android:layout_marginTop="100dp"
+        android:text="Let's Note"
+        android:textColor="#A9BA9D"
+        android:textSize="50sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.444"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView5" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/imageView5"
         android:layout_width="200dp"
         android:layout_height="200dp"
-        android:src="@drawable/icons_google"
-        app:layout_constraintBottom_toTopOf="@+id/signInWithGoogleBtn"
+        android:src="@drawable/ic_launcher1_foreground"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/appName" />
+
+    <TextView
+        android:id="@+id/signInTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Lets get started"
+        android:textColor="#A9BA9D"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView5" />
 
     <Button
         android:id="@+id/signInWithGoogleBtn"
         android:layout_width="200dp"
         android:layout_height="50dp"
+        android:layout_marginTop="50dp"
         android:background="@drawable/sign_in_bgnd"
-        android:text="Sign in with google"
-        android:textColor="@color/white"
+        android:drawableLeft="@drawable/icons_google"
+        android:text="Sign in"
+        android:textColor="#2A3439"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/signInTV" />
+
+
+
+    <TextView
+        android:id="@+id/textViewTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="16dp"
+        android:paddingLeft="16dp"
+        android:text="By signing in you are accepting the terms and conditions "
+        android:textColor="#A9BA9D"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/termsAndConditionTV"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/signInWithGoogleBtn" />
+
+    <TextView
+        android:id="@+id/termsAndConditionTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:paddingStart="16dp"
+        android:paddingLeft="16dp"
+        android:text="@string/termsAndConditions"
+
+        android:textColor="#A9BA9D"
+        android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView5" />
-
-    <Button
-        android:id="@+id/skipBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin"
-        android:background="@android:color/transparent"
-        android:text="Skip"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/textViewTV" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

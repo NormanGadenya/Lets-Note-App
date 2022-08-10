@@ -51,42 +51,31 @@
             android:layout_marginStart="4dp"
             app:layout_constraintTop_toBottomOf="@id/tvNoteDesc"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/selectIcon"
+            app:layout_constraintEnd_toStartOf="@id/noteLockedIcon"
             android:background="@drawable/tag_background"
             android:padding="4dp"
             android:textColor="@color/gunmetal"
-            android:visibility="gone"
+            android:visibility="visible"
             tools:text ="#tag #james #patric"/>
 
         <ImageView
+            android:id="@+id/noteLockedIcon"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:background="@drawable/baseline_lock_24"
-            android:id="@+id/noteLockedIcon"
-            android:visibility="gone"
+            android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/selectIcon"
-            app:layout_constraintTop_toBottomOf="@+id/noteTagsTV" />
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <ImageView
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:background="@drawable/ic_baseline_checklist_rtl_24"
             android:id="@+id/todoIcon"
-            android:visibility="gone"
+            android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/noteLockedIcon"
-            app:layout_constraintTop_toBottomOf="@+id/noteTagsTV" />
-
-        <ImageView
-            android:layout_width="5dp"
-            android:layout_height="5dp"
-            android:background="@drawable/circle_delete"
-            android:id="@+id/selectIcon"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/noteTagsTV" />
+            app:layout_constraintTop_toBottomOf="@+id/reminderTV" />
 
         <ImageView
             android:layout_width="20dp"

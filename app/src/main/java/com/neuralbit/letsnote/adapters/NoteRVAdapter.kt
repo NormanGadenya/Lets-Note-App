@@ -43,7 +43,6 @@ class NoteRVAdapter (
 
     inner class ViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView){
         val noteTitleTV: TextView = itemView.findViewById(R.id.tvNoteTitle)
-        val selectIcon: ImageView = itemView.findViewById(R.id.selectIcon)
         val noteTextTV: TextView = itemView.findViewById(R.id.tvNoteDesc)
         val noteCard : View = itemView.findViewById(R.id.noteCard)
         val tagsTV : TextView = itemView.findViewById(R.id.noteTagsTV)
@@ -108,7 +107,7 @@ class NoteRVAdapter (
             viewModel?.itemSelectEnabled?.observe(it){ i ->
 
                 if (!i){
-                    holder.selectIcon.visibility = GONE
+                    holder.noteCard.elevation = 0F
                     note.selected = false
                     viewModel?.selectedNotes?.clear()
                 }
@@ -201,14 +200,15 @@ class NoteRVAdapter (
         holder.itemView.setOnClickListener {
             if (multipleActivated){
                 if (!note.selected){
-                    holder.selectIcon.visibility = VISIBLE
+                    holder.noteCard.elevation = 50F
                     note.selected = true
                     note.itemPosition = holder.adapterPosition
                     viewModel?.selectedNotes?.add(note)
 
                 }else{
-                    holder.selectIcon.visibility = GONE
                     note.selected = false
+                    holder.noteCard.elevation = 0F
+
                     viewModel?.selectedNotes?.remove(note)
 
                 }
@@ -227,7 +227,7 @@ class NoteRVAdapter (
                 multipleActivated = true
                 note.selected = true
                 note.itemPosition = holder.adapterPosition
-                holder.selectIcon.visibility = VISIBLE
+                holder.noteCard.elevation = 50F
                 viewModel?.selectedNotes?.add(note)
                 noteFireClick.onNoteFireLongClick(note)
                 return@setOnLongClickListener true

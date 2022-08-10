@@ -19,8 +19,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher1_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.LetsNote"
-        tools:targetApi="o">
+        android:theme="@style/Theme.LetsNote">
         <activity
             android:name=".Fingerprint"
             android:exported="false" />
@@ -53,7 +52,7 @@
         <activity
             android:name=".SignInActivity"
             android:exported="true"
-            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"></activity>
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
         <activity
             android:name=".LabelNotesActivity"
             android:exported="true"

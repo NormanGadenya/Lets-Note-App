@@ -29,22 +29,6 @@ class NoteFireRepo {
         return key
     }
 
-    fun getNote( noteUid : String) : LiveData<NoteFire?> {
-        val live = MutableLiveData<NoteFire?>()
-        val notesRef = fUser?.let { database.getReference(it.uid).child("notes").child(noteUid) }
-        notesRef?.addValueEventListener(object : ValueEventListener{
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val note = snapshot.getValue(NoteFire::class.java)
-                live.value = note
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                Log.e(TAG, "onCancelled: ${error.message}" )
-            }
-        })
-        fUser?.let { database.getReference(it.uid).keepSynced(true) }
-        return live
-    }
 
     fun getAllNotes () : LiveData<ArrayList<NoteFire>> {
         val live = MutableLiveData<ArrayList<NoteFire>>()
@@ -66,7 +50,7 @@ class NoteFireRepo {
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Log.e(TAG, "onCancelled: ${error.message}" )
+                throw error.toException()
             }
         })
         return live

@@ -288,6 +288,7 @@ class AllNotesFragment : Fragment() , NoteFireClick {
     }
 
     override fun onNoteFireClick(note: NoteFire, activated : Boolean) {
+
         if (!note.selected && !activated){
             val intent : Intent = if(note.protected){
                 Intent( context, Fingerprint::class.java)
