@@ -13,6 +13,7 @@ import java.util.*
 class AllNotesViewModel (application : Application) : AndroidViewModel(application) {
     var otherFireNotesList = MutableLiveData<LinkedList<NoteFire>>()
     var pinnedFireNotesList = MutableLiveData<LinkedList<NoteFire>>()
+    var allFireNotes = MutableLiveData<ArrayList<NoteFire>>()
     private val noteFireRepo: NoteFireRepo = NoteFireRepo()
     var searchQuery : MutableLiveData<String> = MutableLiveData()
     var itemSelectEnabled : MutableLiveData<Boolean> = MutableLiveData()

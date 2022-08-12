@@ -47,6 +47,15 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
         noteRVAdapter.viewModel = allNotesViewModel
         noteRVAdapter.lifecycleScope = lifecycleScope
         noteRVAdapter.lifecycleOwner = this
+        val settingsSharedPref = getSharedPreferences("Settings", MODE_PRIVATE)
+        val staggeredLayoutManagerAll = StaggeredGridLayoutManager( 2,LinearLayoutManager.VERTICAL)
+        recyclerView.layoutManager = staggeredLayoutManagerAll
+        val staggered = settingsSharedPref?.getBoolean("staggered",true)
+        if (staggered == true){
+            recyclerView.layoutManager = staggeredLayoutManagerAll
+        }else{
+            recyclerView.layoutManager = LinearLayoutManager(applicationContext)
+        }
 
         allNotesViewModel.getAllFireNotes().observe(this){
             val notes = ArrayList<NoteFire>()

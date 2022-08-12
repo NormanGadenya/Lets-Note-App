@@ -61,7 +61,7 @@ class ArchivedFragment : Fragment() , NoteFireClick {
                 notesRV.layoutManager = LinearLayoutManager(context)
             }
         }
-        allNotesViewModel.getAllFireNotes().observe(viewLifecycleOwner) {
+        allNotesViewModel.allFireNotes.observe(viewLifecycleOwner) {
             val pref = context?.getSharedPreferences("DeletedNotes", AppCompatActivity.MODE_PRIVATE)
             val deletedNotes = pref?.getStringSet("noteUids", HashSet())
             val archivedNotes = ArrayList<NoteFire>()

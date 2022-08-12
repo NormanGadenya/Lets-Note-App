@@ -38,6 +38,8 @@ class TagNotesActivity : AppCompatActivity() , NoteFireClick {
         val tagTitle = intent.getStringExtra("tagTitle")
         val noteUids = intent.getStringArrayListExtra("noteUids")
 
+
+
         val layoutManager = StaggeredGridLayoutManager( 2, LinearLayoutManager.VERTICAL)
         recyclerView.layoutManager = layoutManager
         val noteRVAdapter = NoteRVAdapter(applicationContext,this)
@@ -47,6 +49,16 @@ class TagNotesActivity : AppCompatActivity() , NoteFireClick {
         supportActionBar?.title = tagTitle
         if (noteUids != null){
             viewModel.noteUids = noteUids
+        }
+        val settingsSharedPref = getSharedPreferences("Settings", MODE_PRIVATE)
+        val staggeredLayoutManagerAll = StaggeredGridLayoutManager( 2,LinearLayoutManager.VERTICAL)
+        recyclerView.layoutManager = staggeredLayoutManagerAll
+        allNotesViewModel.deleteFrag.value = false
+        val staggered = settingsSharedPref?.getBoolean("staggered",true)
+        if (staggered == true){
+            recyclerView.layoutManager = staggeredLayoutManagerAll
+        }else{
+            recyclerView.layoutManager = LinearLayoutManager(applicationContext)
         }
         allNotesViewModel.getAllFireNotes().observe(this){
             val notes = ArrayList<NoteFire>()

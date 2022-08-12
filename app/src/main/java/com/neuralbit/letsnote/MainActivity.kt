@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.appcompat.widget.SearchView
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -41,6 +42,7 @@ class MainActivity : AppCompatActivity() {
     private val allNotesViewModal : AllNotesViewModel by viewModels()
     private val archivedViewModel : ArchivedViewModel by viewModels()
     private val deleteVieModel : DeletedNotesViewModel by viewModels()
+    private lateinit var viewModal : MainActivityViewModel
     private val tagViewModel : TagViewModel by viewModels()
     private lateinit var mAuth: FirebaseAuth
     private var actionMode : ActionMode? = null
@@ -70,6 +72,10 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_home, R.id.nav_arch , R.id.nav_tags ,R.id.nav_labels , R.id.nav_deleted , R.id.nav_settings
             ), drawerLayout
         )
+        viewModal = ViewModelProvider(
+            this,
+            ViewModelProvider.AndroidViewModelFactory.getInstance(application)
+        ).get(MainActivityViewModel::class.java)
         allNotesViewModal.itemSelectEnabled.observe(this){
             if (it){
                 supportActionBar?.hide()
@@ -79,9 +85,13 @@ class MainActivity : AppCompatActivity() {
 
             }
         }
+        viewModal.getAllFireNotes().observe(this){
+            allNotesViewModal.allFireNotes.value = it
+        }
 
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+
         val profileUrl = fUser?.photoUrl
         val headerLayout = navView.getHeaderView(0)
         val profileIV = headerLayout.findViewById<ImageView>(R.id.profilePic)

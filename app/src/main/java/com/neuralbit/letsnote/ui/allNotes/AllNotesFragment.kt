@@ -97,7 +97,7 @@ class AllNotesFragment : Fragment() , NoteFireClick {
         pinnedNoteRVAdapter?.lifecycleScope = lifecycleScope
         pinnedNoteRVAdapter?.lifecycleOwner = this
         allNotesViewModel.selectedNotes.clear()
-        allNotesViewModel.getAllFireNotes().observe(viewLifecycleOwner){ notes ->
+        allNotesViewModel.allFireNotes.observe(viewLifecycleOwner){ notes ->
 
             val pinnedNotes = LinkedList<NoteFire>()
             val otherNotes = LinkedList<NoteFire>()

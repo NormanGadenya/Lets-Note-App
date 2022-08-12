@@ -72,7 +72,7 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
                 deletedRV.layoutManager = LinearLayoutManager(context)
             }
         }
-        allNotesViewModel.getAllFireNotes().observe(viewLifecycleOwner){
+        allNotesViewModel.allFireNotes.observe(viewLifecycleOwner){
             val deletedNotes = pref?.getStringSet("noteUids", HashSet())
 
             val filteredNotes = HashSet<NoteFire>()

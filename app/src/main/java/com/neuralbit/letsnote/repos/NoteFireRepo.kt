@@ -1,6 +1,5 @@
 package com.neuralbit.letsnote.repos
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
@@ -37,7 +36,6 @@ class NoteFireRepo {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val notes = ArrayList<NoteFire>()
                 for ( s : DataSnapshot in snapshot.children ){
-                    Log.d(TAG, "onDataChange: $s")
                     val note = s.getValue(NoteFire::class.java)
                     if (note != null) {
                         note.noteUid = s.key

@@ -1,6 +1,7 @@
 package com.neuralbit.letsnote.ui.tag
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,12 +16,14 @@ import com.neuralbit.letsnote.NoteViewModel
 import com.neuralbit.letsnote.TagNotesActivity
 import com.neuralbit.letsnote.databinding.FragmentTagBinding
 import com.neuralbit.letsnote.entities.TagFire
+import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import java.util.*
 
 class TagFragment : Fragment(), TagRVAdapter.TagItemClick {
 
     private val tagViewModel: TagViewModel by activityViewModels()
     private val noteViewModel: NoteViewModel by activityViewModels()
+    private val allNotesViewModel : AllNotesViewModel by activityViewModels()
     private var tagCount = HashMap<String,Int>()
     private var _binding: FragmentTagBinding? = null
     lateinit var tagRV: RecyclerView
@@ -37,6 +40,24 @@ class TagFragment : Fragment(), TagRVAdapter.TagItemClick {
         _binding = FragmentTagBinding.inflate(inflater, container, false)
         val root: View = binding.root
         tagRV = binding.noteTagRV
+
+        val settingsSharedPref = context?.getSharedPreferences("Settings", AppCompatActivity.MODE_PRIVATE)
+        val staggeredLayoutManagerAll = StaggeredGridLayoutManager( 2,LinearLayoutManager.VERTICAL)
+        tagRV.layoutManager = staggeredLayoutManagerAll
+        allNotesViewModel.deleteFrag.value = false
+        allNotesViewModel.staggeredView.value = settingsSharedPref?.getBoolean("staggered",true)
+        allNotesViewModel.staggeredView.observe(viewLifecycleOwner){
+            val editor: SharedPreferences.Editor ?= settingsSharedPref?.edit()
+            editor?.putBoolean("staggered",it)
+            editor?.apply()
+            if (it){
+                tagRV.layoutManager = staggeredLayoutManagerAll
+            }else{
+
+                tagRV.layoutManager = LinearLayoutManager(context)
+            }
+        }
+
         val layoutManager = StaggeredGridLayoutManager( 2, LinearLayoutManager.VERTICAL)
         tagRV.layoutManager =layoutManager
         val tagRVAdapter = context?.let { TagRVAdapter(it,this) }
