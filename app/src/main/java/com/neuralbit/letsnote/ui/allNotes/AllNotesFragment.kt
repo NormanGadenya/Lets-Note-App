@@ -83,9 +83,7 @@ class AllNotesFragment : Fragment() , NoteFireClick {
                 pinnedNotesRV.layoutManager = LinearLayoutManager(context)
             }
         }
-
-
-
+        val fontStyle = settingsSharedPref?.getString("font",null)
         val noteRVAdapter = context?.let { NoteRVAdapter(it,this) }
         val pinnedNoteRVAdapter = context?.let { NoteRVAdapter(it,this) }
         notesRV.adapter= noteRVAdapter
@@ -93,9 +91,12 @@ class AllNotesFragment : Fragment() , NoteFireClick {
         noteRVAdapter?.viewModel = allNotesViewModel
         noteRVAdapter?.lifecycleScope = lifecycleScope
         noteRVAdapter?.lifecycleOwner = this
+        noteRVAdapter?.fontStyle = fontStyle
         pinnedNoteRVAdapter?.viewModel = allNotesViewModel
         pinnedNoteRVAdapter?.lifecycleScope = lifecycleScope
         pinnedNoteRVAdapter?.lifecycleOwner = this
+        pinnedNoteRVAdapter?.fontStyle = fontStyle
+
         allNotesViewModel.selectedNotes.clear()
         allNotesViewModel.allFireNotes.observe(viewLifecycleOwner){ notes ->
 

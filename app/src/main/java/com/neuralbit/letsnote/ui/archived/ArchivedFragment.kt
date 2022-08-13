@@ -53,7 +53,9 @@ class ArchivedFragment : Fragment() , NoteFireClick {
         archiveIcon = binding.archivedIcon
         archiveText = binding.archivedText
         allNotesViewModel.deleteFrag.value = false
-
+        val settingsSharedPref = context?.getSharedPreferences("Settings", AppCompatActivity.MODE_PRIVATE)
+        val fontStyle = settingsSharedPref?.getString("font",null)
+        noteRVAdapter?.fontStyle = fontStyle
         val staggeredLayoutManagerAll = StaggeredGridLayoutManager( 2,LinearLayoutManager.VERTICAL)
         allNotesViewModel.staggeredView.observe(viewLifecycleOwner){
             if (it){

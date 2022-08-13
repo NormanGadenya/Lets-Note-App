@@ -48,6 +48,8 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
         noteRVAdapter.lifecycleScope = lifecycleScope
         noteRVAdapter.lifecycleOwner = this
         val settingsSharedPref = getSharedPreferences("Settings", MODE_PRIVATE)
+        val fontStyle = settingsSharedPref?.getString("font",null)
+        noteRVAdapter.fontStyle = fontStyle
         val staggeredLayoutManagerAll = StaggeredGridLayoutManager( 2,LinearLayoutManager.VERTICAL)
         recyclerView.layoutManager = staggeredLayoutManagerAll
         val staggered = settingsSharedPref?.getBoolean("staggered",true)

@@ -4,6 +4,7 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.graphics.Typeface
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
@@ -11,6 +12,7 @@ import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
@@ -38,6 +40,7 @@ class NoteRVAdapter (
     var searchString: String? =null
     var multipleActivated = false
     val TAG = "NoteRVAdapter"
+    var fontStyle : String? = null
 
 
     inner class ViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView){
@@ -61,6 +64,25 @@ class NoteRVAdapter (
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val note = allNotesFire[position]
         var title = note.title
+        val typeface: Typeface? = when (fontStyle) {
+            "Architects daughter" -> {
+                ResourcesCompat.getFont(context, R.font.architects_daughter)
+            }
+            "Abreeze" -> {
+                ResourcesCompat.getFont(context, R.font.abeezee)
+            }
+            "Adamina" -> {
+                ResourcesCompat.getFont(context, R.font.adamina)
+            }
+            else -> {
+                ResourcesCompat.getFont(context, R.font.roboto)
+            }
+        }
+        holder.noteTextTV.typeface = typeface
+        holder.noteTitleTV.typeface = typeface
+        holder.daysLeft.typeface = typeface
+        holder.reminderTV.typeface = typeface
+        holder.tagsTV.typeface = typeface
         if (!note.protected){
             var desc = note.description
             if (desc.length > 250) {
@@ -77,6 +99,7 @@ class NoteRVAdapter (
                 }
             }
 
+
             if (todoItems.isEmpty()){
                 holder.todoIcon.visibility = GONE
             }else{
@@ -91,6 +114,13 @@ class NoteRVAdapter (
             }
         }else{
             holder.noteTextTV.text = "**protected**"
+            val todoItems = note.todoItems
+            if (todoItems.isEmpty()){
+                holder.todoIcon.visibility = GONE
+            }else{
+                holder.todoIcon.visibility = VISIBLE
+
+            }
 
         }
         val cm = Common()

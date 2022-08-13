@@ -11,6 +11,7 @@ import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.graphics.Typeface
 import android.hardware.fingerprint.FingerprintManager
 import android.os.Bundle
 import android.speech.RecognizerIntent
@@ -29,6 +30,7 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
@@ -775,6 +777,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         archived = intent.getBooleanExtra("archieved",false)
         deleted = intent.getBooleanExtra("deleted",false)
         protected = intent.getBooleanExtra("protected", false)
+
         val tagIntentList = intent.getStringArrayListExtra("tagList")
         oldLabel = intent.getIntExtra("labelColor",0)
         val reminderTime = intent.getLongExtra("reminder",0)
@@ -832,6 +835,26 @@ class AddEditNoteActivity : AppCompatActivity() ,
         viewModal.archived.value = archived
         viewModal.deletedNote.value = deleted
         viewModal.noteLocked.value = protected
+        val fontStyle = settingsPref.getString("font",null)
+        val typeface: Typeface? = when (fontStyle) {
+            "Architects daughter" -> {
+                ResourcesCompat.getFont(applicationContext, R.font.architects_daughter)
+            }
+            "Abreeze" -> {
+                ResourcesCompat.getFont(applicationContext, R.font.abeezee)
+            }
+            "Adamina" -> {
+                ResourcesCompat.getFont(applicationContext, R.font.adamina)
+            }
+            else -> {
+                ResourcesCompat.getFont(applicationContext, R.font.roboto)
+            }
+        }
+        todoRVAdapter.fontStyle = fontStyle
+        noteDescriptionEdit.typeface = typeface
+        noteTitleEdit.typeface = typeface
+        reminderTV.typeface = typeface
+        tvTimeStamp.typeface = typeface
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

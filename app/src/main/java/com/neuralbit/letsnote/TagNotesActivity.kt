@@ -51,6 +51,8 @@ class TagNotesActivity : AppCompatActivity() , NoteFireClick {
             viewModel.noteUids = noteUids
         }
         val settingsSharedPref = getSharedPreferences("Settings", MODE_PRIVATE)
+        val fontStyle = settingsSharedPref?.getString("font",null)
+        noteRVAdapter.fontStyle = fontStyle
         val staggeredLayoutManagerAll = StaggeredGridLayoutManager( 2,LinearLayoutManager.VERTICAL)
         recyclerView.layoutManager = staggeredLayoutManagerAll
         allNotesViewModel.deleteFrag.value = false

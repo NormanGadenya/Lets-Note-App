@@ -1,6 +1,7 @@
 package com.neuralbit.letsnote.adapters
 
 import android.content.Context
+import android.graphics.Typeface
 import android.text.Editable
 import android.text.SpannableString
 import android.text.TextWatcher
@@ -12,6 +13,7 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.ImageButton
+import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.entities.TodoItem
@@ -27,6 +29,7 @@ class TodoRVAdapter(
     lateinit var itemView: View
     private var allTodoItems = ArrayList<TodoItem>()
     val TAG = "TodoRVAdapter"
+    var fontStyle : String? = null
 
 
 
@@ -47,6 +50,21 @@ class TodoRVAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val todoItem = allTodoItems[position]
         holder.checkBox.isChecked = todoItem.checked
+        val typeface: Typeface? = when (fontStyle) {
+            "Architects daughter" -> {
+                ResourcesCompat.getFont(context, R.font.architects_daughter)
+            }
+            "Abreeze" -> {
+                ResourcesCompat.getFont(context, R.font.abeezee)
+            }
+            "Adamina" -> {
+                ResourcesCompat.getFont(context, R.font.adamina)
+            }
+            else -> {
+                ResourcesCompat.getFont(context, R.font.roboto)
+            }
+        }
+        holder.todoItemDescET.typeface = typeface
         if (todoItem.item.isNotEmpty() && todoItem.checked){
             val spannableString = SpannableString(todoItem.item)
             val strikethroughSpan = StrikethroughSpan()
