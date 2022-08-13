@@ -62,4 +62,10 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         tagFireRepo.addOrDeleteTags(newTagsAdded,deletedTags,noteUid)
     }
 
+    fun deleteNote (noteUid : String, labelColor : Int, tagList : List<String> ){
+        noteFireRepo.deleteNote(noteUid)
+        tagFireRepo.deleteNoteFromTags(tagList,noteUid)
+        labelFireRepo.deleteNoteFromLabel(labelColor,noteUid)
+    }
+
 }

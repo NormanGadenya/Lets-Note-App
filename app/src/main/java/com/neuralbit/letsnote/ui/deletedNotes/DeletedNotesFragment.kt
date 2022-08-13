@@ -103,7 +103,6 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
                 for (deletedNote in deletedNotesViewModel.deletedNotes) {
                     deletedNote.noteUid?.let { uid -> deletedNotesViewModel.deleteNote(uid,deletedNote.label,deletedNote.tags)
                         cancelDelete(deletedNote.timeStamp.toInt())
-
                     }
                 }
                 val editor: SharedPreferences.Editor ?= pref?.edit()

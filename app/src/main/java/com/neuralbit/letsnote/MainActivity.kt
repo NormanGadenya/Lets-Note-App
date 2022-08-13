@@ -12,6 +12,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.view.ActionMode
 import androidx.appcompat.widget.SearchView
 import androidx.drawerlayout.widget.DrawerLayout
@@ -67,6 +68,13 @@ class MainActivity : AppCompatActivity() {
         val navView: NavigationView = binding.navView
         val navController = findNavController(R.id.nav_host_fragment_content_main)
 
+        val settingsPref = getSharedPreferences("Settings", MODE_PRIVATE)!!
+        val darkMode = settingsPref.getBoolean("darkMode",false)
+        if (darkMode){
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        }else{
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        }
         appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.nav_home, R.id.nav_arch , R.id.nav_tags ,R.id.nav_labels , R.id.nav_deleted , R.id.nav_settings
@@ -221,6 +229,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+            val restoreItem = menu?.findItem(R.id.restore)
+            restoreItem?.isVisible = allNotesViewModal.deleteFrag.value == true
             return false
         }
 

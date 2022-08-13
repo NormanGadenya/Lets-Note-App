@@ -21,6 +21,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.LetsNote">
         <activity
+            android:name=".TermsAndConditions"
+            android:parentActivityName=".MainActivity"
+            android:exported="false" />
+        <activity
             android:name=".Fingerprint"
             android:exported="false" />
         <activity

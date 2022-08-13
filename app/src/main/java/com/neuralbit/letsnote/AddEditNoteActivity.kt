@@ -125,7 +125,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private val REQUEST_CODE_SPEECH_INPUT = 1
     private lateinit var colorPickerView: ColorPickerView
     private val deletedTodos = ArrayList<TodoItem>()
-    private lateinit var pref : SharedPreferences
+    private lateinit var deletedNotePrefs : SharedPreferences
+    private lateinit var settingsPref : SharedPreferences
     private var protected = false
 
     override fun onCreate(savedInstanceState: Bundle?)  {
@@ -279,8 +280,10 @@ class AddEditNoteActivity : AppCompatActivity() ,
         lockNoteItem?.isVisible = !(!fingerprintManager.isHardwareDetected || !fingerprintManager.hasEnrolledFingerprints())
 
         viewModal.deletedNote.observe(lifecycleOwner){
-            val editor: SharedPreferences.Editor = pref.edit()
-            val noteUids = pref.getStringSet("noteUids",HashSet())
+            val emptyTrashImmediately = settingsPref.getBoolean("EmptyTrashImmediately",false)
+
+            val editor: SharedPreferences.Editor = deletedNotePrefs.edit()
+            val noteUids = deletedNotePrefs.getStringSet("noteUids",HashSet())
             val deletedNoteUids = HashSet<String>()
             if (it) {
 
@@ -293,13 +296,15 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 infoContainer.visibility = GONE
                 reminderTV.visibility =  GONE
                 reminderIcon.visibility = GONE
-                if (noteUids != null){
-                    deletedNoteUids.addAll(noteUids)
-                    noteUid?.let { deletedNoteUids.add(it) }
+                if (!emptyTrashImmediately){
+                    if (noteUids != null){
+                        deletedNoteUids.addAll(noteUids)
+                        noteUid?.let { deletedNoteUids.add(it) }
+                    }
+                    editor.putStringSet("noteUids",deletedNoteUids)
+                    editor.apply()
                 }
                 cancelAlarm(viewModal.reminderTime.toInt())
-                editor.putStringSet("noteUids",deletedNoteUids)
-                editor.apply()
 
 
 
@@ -747,7 +752,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
     private fun initControllers(){
         cm= Common()
-        pref = applicationContext.getSharedPreferences("DeletedNotes", MODE_PRIVATE)
+        deletedNotePrefs = applicationContext.getSharedPreferences("DeletedNotes", MODE_PRIVATE)
+        settingsPref = applicationContext.getSharedPreferences("Settings", MODE_PRIVATE)
         noteTitleEdit = findViewById(R.id.noteEditTitle)
         layoutManager = LinearLayoutManager(applicationContext,LinearLayoutManager.HORIZONTAL,false)
         calendar = Calendar.getInstance()
@@ -1286,7 +1292,12 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
                     }
                 }else{
-                    noteUid?.let { scheduleDelete(it, tags,viewModal.labelColor,noteTimeStamp) }
+                    val emptyTrashImmediately = settingsPref.getBoolean("EmptyTrashImmediately",false)
+                    if (!emptyTrashImmediately){
+                        noteUid?.let { scheduleDelete(it, tags,viewModal.labelColor,noteTimeStamp) }
+                    }else{
+                        noteUid?.let { viewModal.deleteNote(it, viewModal.labelColor,tags) }
+                    }
                     Toast.makeText(this@AddEditNoteActivity,"Note Deleted",Toast.LENGTH_SHORT).show()
 
                 }
@@ -1355,7 +1366,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        // do your stuff
         goToMain()
 
         return super.onSupportNavigateUp()

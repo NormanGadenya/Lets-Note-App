@@ -62,7 +62,7 @@
             android:id="@+id/noteLockedIcon"
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:background="@drawable/baseline_lock_24"
+            android:background="@drawable/note_lock_24"
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
