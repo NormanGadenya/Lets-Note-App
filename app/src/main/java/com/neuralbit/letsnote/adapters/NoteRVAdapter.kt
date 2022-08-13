@@ -4,7 +4,6 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
@@ -158,7 +157,7 @@ class NoteRVAdapter (
         if (note.label > 0){
             holder.noteCard.setBackgroundColor(note.label)
         }else{
-            holder.noteCard.setBackgroundColor(Color.parseColor("#80EBF0F4"))
+            holder.noteCard.setBackgroundColor(context.resources.getColor(R.color.def_Card_Color,null))
         }
 
         val reminderDate = note.reminderDate
@@ -200,14 +199,20 @@ class NoteRVAdapter (
         holder.itemView.setOnClickListener {
             if (multipleActivated){
                 if (!note.selected){
-                    holder.noteCard.elevation = 50F
+                    holder.noteCard.setBackgroundColor(context.resources.getColor(R.color.sel_card_color,null))
+
                     note.selected = true
                     note.itemPosition = holder.adapterPosition
                     viewModel?.selectedNotes?.add(note)
 
                 }else{
                     note.selected = false
-                    holder.noteCard.elevation = 0F
+                    if (note.label > 0){
+                        holder.noteCard.setBackgroundColor(note.label)
+
+                    }else{
+                        holder.noteCard.setBackgroundColor(context.resources.getColor(R.color.def_Card_Color,null))
+                    }
 
                     viewModel?.selectedNotes?.remove(note)
 
@@ -227,7 +232,8 @@ class NoteRVAdapter (
                 multipleActivated = true
                 note.selected = true
                 note.itemPosition = holder.adapterPosition
-                holder.noteCard.elevation = 50F
+                holder.noteCard.setBackgroundColor(context.resources.getColor(R.color.sel_card_color,null))
+
                 viewModel?.selectedNotes?.add(note)
                 noteFireClick.onNoteFireLongClick(note)
                 return@setOnLongClickListener true

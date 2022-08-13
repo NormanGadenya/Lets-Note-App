@@ -23,6 +23,7 @@
     <color name="darkGrey">#D33B3C3C</color>
     <color name="Red">#B3F01302</color>
     <color name="def_Card_Color">#80EBF0F4</color>
+    <color name="sel_card_color">#80727373</color>
     <color name="gunmetal">#2C363F</color>
     <color name="blush">#E75A7C</color>
     <color name="ivory">#F2F5EA</color>
