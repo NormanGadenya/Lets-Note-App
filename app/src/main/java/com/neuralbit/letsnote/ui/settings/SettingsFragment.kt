@@ -3,6 +3,7 @@ package com.neuralbit.letsnote.ui.settings
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RadioButton
@@ -15,7 +16,6 @@ import com.neuralbit.letsnote.databinding.SettingsFragmentBinding
 class SettingsFragment : Fragment() {
 
     private var _binding: SettingsFragmentBinding? = null
-    private lateinit var viewModel: SettingsViewModel
     private lateinit var settingsPref : SharedPreferences
     private val binding get() = _binding!!
     private lateinit var editor : SharedPreferences.Editor
@@ -29,29 +29,18 @@ class SettingsFragment : Fragment() {
         settingsPref = context?.getSharedPreferences("Settings", AppCompatActivity.MODE_PRIVATE)!!
         editor = settingsPref.edit()
         val emptyTrashImmediately = settingsPref.getBoolean("EmptyTrashImmediately",false)
-        val darkMode = settingsPref.getBoolean("darkMode",false)
+        val darkMode = settingsPref.getInt("darkModePosition",R.id.defaultMode)
         val radioPosition = settingsPref.getInt("radioPosition", R.id.fontDef)
         val emptyTrashSwitch = binding.emptyTrashSwitch
-        val darkModeSwitch = binding.darkModeSwitch
+        val lightModeGroup = binding.dayNightRadioGroup
         val fontRadioGroup = binding.radioGroup
         emptyTrashSwitch.isChecked = emptyTrashImmediately
-        darkModeSwitch.isChecked = darkMode
         emptyTrashSwitch.setOnCheckedChangeListener { _,_ ->
             editor.putBoolean("EmptyTrashImmediately",!emptyTrashImmediately)
             editor.apply()
         }
-
-        darkModeSwitch.setOnCheckedChangeListener { _, _ ->
-            if (!darkMode){
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            }else{
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-            }
-            editor.putBoolean("darkMode",!darkMode)
-            editor.apply()
-        }
         fontRadioGroup.check(radioPosition)
-        fontRadioGroup.setOnCheckedChangeListener { p0, p1 ->
+        fontRadioGroup.setOnCheckedChangeListener { _, p1 ->
             run {
                 val chosen = container?.findViewById<RadioButton>(p1)
                 val font = chosen?.text.toString()
@@ -62,9 +51,43 @@ class SettingsFragment : Fragment() {
             }
         }
 
+        lightModeGroup.check(darkMode)
+        lightModeGroup.setOnCheckedChangeListener { _, p1 ->
+            run {
+                val chosen = container?.findViewById<RadioButton>(p1)
+                val mode = chosen?.text.toString()
+                editor.putInt("darkModePosition",p1)
+                editor.putString("mode",mode)
+                editor.apply()
+                when (mode) {
+                    "Dark mode" -> {
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                    }
+                    "Light mode" -> {
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                    }
+                    else -> {
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+                    }
+                }
+
+            }
+        }
 
 
         return root
+
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        super.onPrepareOptionsMenu(menu)
+        val searchViewMenuItem = menu.findItem(R.id.search)
+        val layoutViewBtn = menu.findItem(R.id.layoutStyle)
+        val deleteButton = menu.findItem(R.id.trash)
+
+        deleteButton.isVisible = false
+        layoutViewBtn.isVisible = false
+        searchViewMenuItem.isVisible = false
     }
 
 

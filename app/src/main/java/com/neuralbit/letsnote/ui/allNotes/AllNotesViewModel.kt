@@ -17,6 +17,7 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
     private val noteFireRepo: NoteFireRepo = NoteFireRepo()
     var searchQuery : MutableLiveData<String> = MutableLiveData()
     var itemSelectEnabled : MutableLiveData<Boolean> = MutableLiveData()
+    var notesToDelete : MutableLiveData<NoteFire> = MutableLiveData()
     var itemDeleteClicked : MutableLiveData<Boolean> = MutableLiveData()
     var itemArchiveClicked : MutableLiveData<Boolean> = MutableLiveData()
     var staggeredView : MutableLiveData<Boolean> = MutableLiveData()
@@ -83,4 +84,5 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
         }
 
     }
+
 }

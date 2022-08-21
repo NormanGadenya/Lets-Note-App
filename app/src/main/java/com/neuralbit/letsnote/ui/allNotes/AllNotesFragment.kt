@@ -203,18 +203,26 @@ class AllNotesFragment : Fragment() , NoteFireClick {
         allNotesViewModel.itemDeleteClicked.observe(viewLifecycleOwner){
             if (it && allNotesViewModel.selectedNotes.isNotEmpty()){
                 val pref = context?.getSharedPreferences("DeletedNotes", AppCompatActivity.MODE_PRIVATE)
+                val settings = context?.getSharedPreferences("Settings", AppCompatActivity.MODE_PRIVATE)
+                val emptyTrashImmediately = settings?.getBoolean("EmptyTrashImmediately",false)
 
                 for ( note in allNotesViewModel.selectedNotes){
                     val editor: SharedPreferences.Editor ?= pref?.edit()
                     val noteUids = pref?.getStringSet("noteUids",HashSet())
                     val deletedNoteUids = HashSet<String>()
                     if (noteUids != null){ deletedNoteUids.addAll(noteUids)}
-                    note.noteUid?.let { it1 -> deletedNoteUids.add(it1) }
 
-                    note.noteUid?.let { it1 -> scheduleDelete(it1,note.tags,note.label,note.timeStamp) }
+                    if (emptyTrashImmediately != true){
 
-                    editor?.putStringSet("noteUids",deletedNoteUids)
-                    editor?.apply()
+                        note.noteUid?.let { it1 -> deletedNoteUids.add(it1) }
+
+                        note.noteUid?.let { it1 -> scheduleDelete(it1,note.tags,note.label,note.timeStamp) }
+
+                        editor?.putStringSet("noteUids",deletedNoteUids)
+                        editor?.apply()
+                    }else{
+                        allNotesViewModel.notesToDelete.value =  note
+                    }
 
                     if (note.pinned){
                         allNotesViewModel.pinnedFireNotesList.value?.remove(note)
@@ -229,14 +237,16 @@ class AllNotesFragment : Fragment() , NoteFireClick {
 
                 }
 
+
                 allNotesViewModel.otherFireNotesList.value?.let { list ->
                     noteRVAdapter?.updateListFire(list)
                 }
                 allNotesViewModel.pinnedFireNotesList.value?.let { list ->
                     pinnedNoteRVAdapter?.updateListFire(list)
                 }
-
-                allNotesViewModel.selectedNotes.clear()
+                if (emptyTrashImmediately != true){
+                    allNotesViewModel.selectedNotes.clear()
+                }
 
 
                 allNotesViewModel.itemSelectEnabled.value = false
@@ -244,6 +254,7 @@ class AllNotesFragment : Fragment() , NoteFireClick {
                 Toast.makeText(context,"Notes deleted successfully",Toast.LENGTH_SHORT).show()
             }
         }
+
 
 
         addNoteFAB.setOnClickListener{

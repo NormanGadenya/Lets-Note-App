@@ -5,6 +5,7 @@ import android.app.AlertDialog
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -12,7 +13,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.view.ActionMode
 import androidx.appcompat.widget.SearchView
 import androidx.drawerlayout.widget.DrawerLayout
@@ -47,7 +47,9 @@ class MainActivity : AppCompatActivity() {
     private val tagViewModel : TagViewModel by viewModels()
     private lateinit var mAuth: FirebaseAuth
     private var actionMode : ActionMode? = null
-    var fUser : FirebaseUser? = null
+    private var fUser : FirebaseUser? = null
+    private lateinit var settingsPref: SharedPreferences
+    val lifecycleOwner = this
 
 
 
@@ -56,7 +58,6 @@ class MainActivity : AppCompatActivity() {
         mAuth = FirebaseAuth.getInstance()
         fUser= mAuth.currentUser
         if (fUser == null) {
-
             val intent = Intent(applicationContext, SignInActivity::class.java)
             startActivity(intent)
         }
@@ -68,13 +69,18 @@ class MainActivity : AppCompatActivity() {
         val navView: NavigationView = binding.navView
         val navController = findNavController(R.id.nav_host_fragment_content_main)
 
-        val settingsPref = getSharedPreferences("Settings", MODE_PRIVATE)!!
-        val darkMode = settingsPref.getBoolean("darkMode",false)
-        if (darkMode){
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-        }else{
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-        }
+        settingsPref =  getSharedPreferences("Settings", MODE_PRIVATE)
+//        when (settingsPref.getString("mode","default")) {
+//            "Dark mode" -> {
+//                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+//            }
+//            "Light mode" -> {
+//                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+//            }
+//            else -> {
+//                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+//            }
+//        }
         appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.nav_home, R.id.nav_arch , R.id.nav_tags ,R.id.nav_labels , R.id.nav_deleted , R.id.nav_settings
@@ -128,7 +134,6 @@ class MainActivity : AppCompatActivity() {
         val layoutViewBtn = menu.findItem(R.id.layoutStyle)
         val signOutButton = menu.findItem(R.id.signOut)
         val deleteButton = menu.findItem(R.id.trash)
-//
         allNotesViewModal.deleteFrag.observe(this){
             deleteButton.isVisible = it
         }
@@ -212,6 +217,15 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+        val emptyTrashImmediately = settingsPref.getBoolean("EmptyTrashImmediately",false)
+        if (emptyTrashImmediately){
+            allNotesViewModal.notesToDelete.observe(lifecycleOwner){
+                it.noteUid?.let { uid -> viewModal.deleteNote(uid,it.label,it.tags) }
+
+            }
+            allNotesViewModal.selectedNotes.clear()
+        }
+
         return true
     }
 
@@ -241,6 +255,7 @@ class MainActivity : AppCompatActivity() {
                 return true
             }else if (item?.itemId == R.id.delete){
                 allNotesViewModal.itemDeleteClicked.value = true
+
                 mode?.finish()
                 return true
             }
@@ -249,6 +264,7 @@ class MainActivity : AppCompatActivity() {
 
         override fun onDestroyActionMode(mode: ActionMode?) {
             allNotesViewModal.itemSelectEnabled.value = false
+            allNotesViewModal.selectedNotes.clear()
             supportActionBar?.show()
             actionMode = null
         }

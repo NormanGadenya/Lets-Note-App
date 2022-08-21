@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.gson.Gson
 import com.neuralbit.letsnote.AddEditNoteActivity
+import com.neuralbit.letsnote.Fingerprint
 import com.neuralbit.letsnote.NoteViewModel
 import com.neuralbit.letsnote.Services.DeleteReceiver
 import com.neuralbit.letsnote.adapters.NoteFireClick
@@ -28,6 +29,7 @@ import com.neuralbit.letsnote.adapters.NoteRVAdapter
 import com.neuralbit.letsnote.databinding.DeletedNotesFragmentBinding
 import com.neuralbit.letsnote.entities.NoteFire
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
+import java.util.*
 
 class DeletedNotesFragment : Fragment() , NoteFireClick {
     private val noteViewModel: NoteViewModel by activityViewModels()
@@ -116,6 +118,32 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
             }
         }
 
+
+        deletedNotesViewModel.itemRestoreClicked.observe(viewLifecycleOwner){
+            if (it && allNotesViewModel.selectedNotes.isNotEmpty()){
+                val noteUids = pref?.getStringSet("noteUids", HashSet())
+                val deletedNoteUids = HashSet<String>()
+                if (noteUids != null){
+                    deletedNoteUids.addAll(noteUids)
+                }
+                for ( note in allNotesViewModel.selectedNotes){
+                    val editor: SharedPreferences.Editor ?= pref?.edit()
+                    note.noteUid?.let { it1 -> deletedNoteUids.remove(it1) }
+                    cancelDelete(note.timeStamp.toInt())
+                    editor?.putStringSet("noteUids",deletedNoteUids)
+                    editor?.apply()
+                    deletedNotesViewModel.deletedNotes.remove(note)
+
+                }
+                noteRVAdapter?.updateListFire(ArrayList(deletedNotesViewModel.deletedNotes))
+
+                allNotesViewModel.selectedNotes.clear()
+                allNotesViewModel.itemSelectEnabled.value = false
+
+                Toast.makeText(context,"Notes restored successfully",Toast.LENGTH_SHORT).show()
+            }
+        }
+
         return root
 
     }
@@ -127,26 +155,46 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
     }
 
     override fun onNoteFireClick(note: NoteFire, activated : Boolean) {
-        val intent = Intent( context, AddEditNoteActivity::class.java)
-        intent.putExtra("noteType","Edit")
-        intent.putExtra("noteTitle",note.title)
-        intent.putExtra("noteDescription",note.description)
-        intent.putExtra("noteUid",note.noteUid)
-        intent.putExtra("timeStamp",note.timeStamp)
-        intent.putExtra("labelColor",note.label)
-        intent.putExtra("pinned",note.pinned)
-        intent.putExtra("archieved",note.archived)
-        intent.putExtra("reminder",note.reminderDate)
-        intent.putExtra("protected",note.protected)
-        intent.putExtra("deleted", true)
-        val toDoItemString: String = Gson().toJson(note.todoItems)
-        intent.putExtra("todoItems", toDoItemString)
-        intent.putStringArrayListExtra("tagList", ArrayList(note.tags))
-        startActivity(intent)
+        if (!note.selected && !activated){
+            val intent : Intent = if(note.protected){
+                Intent( context, Fingerprint::class.java)
+            }else{
+                Intent( context, AddEditNoteActivity::class.java)
+            }
+            intent.putExtra("noteType","Edit")
+            intent.putExtra("noteTitle",note.title)
+            intent.putExtra("noteDescription",note.description)
+            intent.putExtra("noteUid",note.noteUid)
+            intent.putExtra("timeStamp",note.timeStamp)
+            intent.putExtra("labelColor",note.label)
+            intent.putExtra("pinned",note.pinned)
+            intent.putExtra("archieved",note.archived)
+            intent.putExtra("protected",note.protected)
+            val c = Calendar.getInstance()
+            if (c.timeInMillis < note.reminderDate){
+                intent.putExtra("reminder",note.reminderDate)
+            }
+            val toDoItemString: String = Gson().toJson(note.todoItems)
+            intent.putExtra("todoItems", toDoItemString)
+            intent.putStringArrayListExtra("tagList", ArrayList(note.tags))
+            startActivity(intent)
+        }else{
+            if (note.selected){
+                allNotesViewModel.selectedNotes.add(note)
+            }else{
+                allNotesViewModel.selectedNotes.remove(note)
+            }
+        }
+
     }
 
     override fun onNoteFireLongClick(note: NoteFire) {
-
+        if (note.selected){
+            allNotesViewModel.selectedNotes.add(note)
+        }else{
+            allNotesViewModel.selectedNotes.remove(note)
+        }
+        allNotesViewModel.itemSelectEnabled.value = true
     }
 
 }

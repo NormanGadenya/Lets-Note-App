@@ -28,4 +28,10 @@ class MainActivityViewModel(application : Application) : AndroidViewModel(applic
         return labelFireRepo.getAllLabels()
     }
 
+    fun deleteNote (noteUid : String, labelColor : Int, tagList : List<String> ){
+        noteFireRepo.deleteNote(noteUid)
+        tagFireRepo.deleteNoteFromTags(tagList,noteUid)
+        labelFireRepo.deleteNoteFromLabel(labelColor,noteUid)
+    }
+
 }

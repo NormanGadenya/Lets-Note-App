@@ -136,9 +136,14 @@ class NoteRVAdapter (
             viewModel?.itemSelectEnabled?.observe(it){ i ->
 
                 if (!i){
-                    holder.noteCard.elevation = 0F
                     note.selected = false
+
                     viewModel?.selectedNotes?.clear()
+                    if (note.label > 0){
+                        holder.noteCard.setBackgroundColor(note.label)
+                    }else{
+                        holder.noteCard.setBackgroundColor(context.resources.getColor(R.color.def_Card_Color,null))
+                    }
                 }
             }
         }
