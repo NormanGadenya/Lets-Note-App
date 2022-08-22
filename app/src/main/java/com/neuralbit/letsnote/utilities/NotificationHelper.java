@@ -17,10 +17,10 @@ import com.neuralbit.letsnote.R;
 
 public class NotificationHelper extends ContextWrapper {
     public static final String channelID = "channelID";
-    public static final String channelName = "Channel Name";
-    private String noteTitle;
-    private String noteDesc;
-    private Boolean noteProtected;
+    public static final String channelName = "Reminders";
+    private final String noteTitle;
+    private final String noteDesc;
+    private final Boolean noteProtected;
     private NotificationManager mManager;
 
     public NotificationHelper(Context base,String noteTitle, String noteDesc,Boolean noteProtected) {
@@ -36,9 +36,7 @@ public class NotificationHelper extends ContextWrapper {
     @TargetApi(Build.VERSION_CODES.O)
     private void createChannel() {
         NotificationChannel channel = new NotificationChannel(channelID, channelName, NotificationManager.IMPORTANCE_HIGH);
-        channel.enableVibration(true);
         channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
-        channel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
         getManager().createNotificationChannel(channel);
     }
 
@@ -59,7 +57,6 @@ public class NotificationHelper extends ContextWrapper {
                         .setContentText(noteTitle)
                         .setGroup("REMINDERS")
                         .setPriority(NotificationCompat.PRIORITY_MAX)
-                        .setDefaults(Notification.DEFAULT_SOUND)
                         .setSound(ringingSound)
                         .setSmallIcon(R.mipmap.ic_launcher1_round)
                         .setAutoCancel(true);
