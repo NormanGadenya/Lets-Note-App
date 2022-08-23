@@ -93,6 +93,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private var noteDescOrigList = ArrayList<String>()
     private lateinit var noteType : String
     private lateinit var tvTimeStamp : TextView
+    private lateinit var redoUndoGroup: View
     private var textChanged : Boolean = false
     private var archived = false
     private lateinit var cm : Common
@@ -204,8 +205,10 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 viewModal.pinned.value = notePinned
 
                 noteDescriptionEdit.setText(noteDesc)
-                tvTimeStamp.text= getString(R.string.timeStamp,cm.convertLongToTime(noteTimeStamp)[0],cm.convertLongToTime(noteTimeStamp)[1])
                 tvTimeStamp.visibility =VISIBLE
+                redoUndoGroup.visibility = GONE
+
+                tvTimeStamp.text= getString(R.string.timeStamp,cm.convertLongToTime(noteTimeStamp)[0],cm.convertLongToTime(noteTimeStamp)[1])
                 val labelColor = viewModal.labelColor
                 if(labelColor > 0){
                     coordinatorlayout.setBackgroundColor(labelColor)
@@ -218,6 +221,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 tagListAdapter.updateList(viewModal.oldTagList)
             }
             else -> {
+                redoUndoGroup.visibility = VISIBLE
 
                 tvTimeStamp.visibility =GONE
             }
@@ -265,19 +269,15 @@ class AddEditNoteActivity : AppCompatActivity() ,
             }
         }
 
-        viewModal.pinned.observe(lifecycleOwner){
+        viewModal.pinned.observe(lifecycleOwner) {
             notePinned = it
 
-            if (!it){
+            if (!it) {
                 pinItem?.setIcon(R.drawable.ic_outline_push_pin_24)
-            }else{
+            } else {
                 pinItem?.setIcon(R.drawable.ic_baseline_push_pin_24)
             }
         }
-
-        // Check if we're running on Android 6.0 (M) or higher
-        // Check if we're running on Android 6.0 (M) or higher
-        //Fingerprint API only available on from Android 6.0 (M)
         val fingerprintManager : FingerprintManager = getSystemService(FINGERPRINT_SERVICE) as FingerprintManager
         lockNoteItem?.isVisible = !(!fingerprintManager.isHardwareDetected || !fingerprintManager.hasEnrolledFingerprints())
 
@@ -371,9 +371,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
             
         }
 
-//        val callback: ItemTouchHelper.Callback = SimpleItemTouchHelperCallback(todoRVAdapter)
-//        mItemTouchHelper = ItemTouchHelper(callback)
-//        mItemTouchHelper?.attachToRecyclerView(todoRV)
         todoRV.isNestedScrollingEnabled = false
 
         val touchHelper = ItemTouchHelper(object  : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.START or ItemTouchHelper.END,ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT){
@@ -450,6 +447,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
         noteTitleEdit.addTextChangedListener(object : TextWatcher{
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                tvTimeStamp.visibility =GONE
+                redoUndoGroup.visibility = VISIBLE
                 if(p3>0){
 
                     if(!tagListAdapter.deleteIgnored){
@@ -479,7 +478,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
             }
 
             override fun onTextChanged(p0: CharSequence?, start: Int, before: Int, count: Int) {
-
+                tvTimeStamp.visibility =GONE
+                redoUndoGroup.visibility = VISIBLE
                 if(p0?.length!! > 0){
 
                     noteListBullet()
@@ -498,6 +498,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
         noteDescriptionEdit.setOnKeyListener { _, key, _ ->
             viewModal.noteChanged.value = true
+
             viewModal.backPressed.value = key == KeyEvent.KEYCODE_DEL
 
             false
@@ -505,6 +506,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
         noteTitleEdit.setOnKeyListener { _, _, _ ->
             viewModal.noteChanged.value = true
+            tvTimeStamp.visibility = GONE
+            redoUndoGroup.visibility = VISIBLE
 
             false
         }
@@ -513,9 +516,10 @@ class AddEditNoteActivity : AppCompatActivity() ,
             textChanged = it
             if(it){
                 tvTimeStamp.visibility = GONE
+                redoUndoGroup.visibility = VISIBLE
             }else{
                 tvTimeStamp.visibility = VISIBLE
-
+                redoUndoGroup.visibility = GONE
             }
         }
 
@@ -761,6 +765,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         calendar = Calendar.getInstance()
         noteDescriptionEdit = findViewById(R.id.noteEditDesc)
         tvTimeStamp = findViewById(R.id.tvTimeStamp)
+        redoUndoGroup = findViewById(R.id.redoUndoGroup)
         tagListRV = findViewById(R.id.tagListRV)
         labelBtn = findViewById(R.id.labelBtn)
         coordinatorlayout = findViewById(R.id.coordinatorlayout)

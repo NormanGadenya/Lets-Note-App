@@ -157,7 +157,8 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_baseline_access_alarm_24"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/tvTimeStamp" />
+            app:layout_constraintBottom_toTopOf="@id/infoContainer"
+            />
 
         <TextView
             android:id="@+id/reminderTV"
@@ -169,17 +170,6 @@
             tools:text="Edite on sjjsndjncjdjcnjndjcjd"
             app:layout_constraintStart_toEndOf="@id/reminderIcon"
             app:layout_constraintTop_toTopOf="@id/reminderIcon" />
-
-        <TextView
-            android:id="@+id/tvTimeStamp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="Edite on sjjsndjncjdjcnjndjcjd"
-            android:layout_margin="@dimen/margin"
-            android:visibility="visible"
-            app:layout_constraintBottom_toTopOf="@id/infoContainer"
-            app:layout_constraintStart_toStartOf="parent"
-            />
 
         <include
             layout="@layout/info_container"

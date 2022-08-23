@@ -32,10 +32,6 @@
     <string name="labels">Labels</string>
     <string name="note_content">Note content</string>
     <string name="trash">Trash</string>
-    <string name="dbFileLoc">/data/data/com.neuralbit.letsnote/databases/letsNoteDB1</string>
-    <string name="databaseLoc">/data/data/com.neuralbit.letsnote/databases</string>
-    <string name="dbShmFileLoc">/data/data/com.neuralbit.letsnote/databases/letsNoteDB1-shm</string>
-    <string name="dbWalFileLoc">/data/data/com.neuralbit.letsnote/databases/letsNoteDB1-wal</string>
     <string name="settings">Settings</string>
     <string name="termsAndConditions"><u>Terms and Conditions</u></string>
     <string name="title_activity_splash_screen">SplashScreen</string>
