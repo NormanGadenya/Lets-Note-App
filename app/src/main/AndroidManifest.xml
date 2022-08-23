@@ -72,6 +72,7 @@
         <activity
             android:name=".AddEditNoteActivity"
             android:exported="true"
+            android:windowSoftInputMode="adjustPan"
             android:parentActivityName=".MainActivity" />
 
         <receiver android:name=".utilities.AlertReceiver" />
