@@ -4,6 +4,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
 class SettingsViewModel : ViewModel() {
-    var settingsFrag : MutableLiveData<Boolean> = MutableLiveData()
+    var settingsFrag = MutableLiveData<Boolean>()
 
 }

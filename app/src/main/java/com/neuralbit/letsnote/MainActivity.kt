@@ -31,6 +31,7 @@ import com.neuralbit.letsnote.databinding.ActivityMainBinding
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import com.neuralbit.letsnote.ui.archived.ArchivedViewModel
 import com.neuralbit.letsnote.ui.deletedNotes.DeletedNotesViewModel
+import com.neuralbit.letsnote.ui.settings.SettingsViewModel
 import com.neuralbit.letsnote.ui.tag.TagViewModel
 import com.neuralbit.letsnote.utilities.AlertReceiver
 
@@ -42,6 +43,7 @@ class MainActivity : AppCompatActivity() {
     private val TAG = "MainActivity"
     private val allNotesViewModal : AllNotesViewModel by viewModels()
     private val archivedViewModel : ArchivedViewModel by viewModels()
+    private val settingsViewModel : SettingsViewModel by viewModels()
     private val deleteVieModel : DeletedNotesViewModel by viewModels()
     private lateinit var viewModal : MainActivityViewModel
     private val tagViewModel : TagViewModel by viewModels()
@@ -70,17 +72,6 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
 
         settingsPref =  getSharedPreferences("Settings", MODE_PRIVATE)
-//        when (settingsPref.getString("mode","default")) {
-//            "Dark mode" -> {
-//                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-//            }
-//            "Light mode" -> {
-//                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-//            }
-//            else -> {
-//                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
-//            }
-//        }
         appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.nav_home, R.id.nav_arch , R.id.nav_tags ,R.id.nav_labels , R.id.nav_deleted , R.id.nav_settings
@@ -92,7 +83,6 @@ class MainActivity : AppCompatActivity() {
         ).get(MainActivityViewModel::class.java)
         allNotesViewModal.itemSelectEnabled.observe(this){
             if (it){
-//                supportActionBar?.hide()
                 actionMode = startSupportActionMode(MActionModeCallBack())
             }else{
                 actionMode?.finish()
@@ -136,6 +126,10 @@ class MainActivity : AppCompatActivity() {
         val deleteButton = menu.findItem(R.id.trash)
         allNotesViewModal.deleteFrag.observe(this){
             deleteButton.isVisible = it
+        }
+        settingsViewModel.settingsFrag.observe(this){
+            searchViewMenuItem.isVisible = !it
+            layoutViewBtn.isVisible = !it
         }
 
 
@@ -265,7 +259,6 @@ class MainActivity : AppCompatActivity() {
         override fun onDestroyActionMode(mode: ActionMode?) {
             allNotesViewModal.itemSelectEnabled.value = false
             allNotesViewModal.selectedNotes.clear()
-//            supportActionBar?.show()
             actionMode = null
         }
 

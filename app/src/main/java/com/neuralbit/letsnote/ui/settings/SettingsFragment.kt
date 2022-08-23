@@ -10,12 +10,14 @@ import android.widget.RadioButton
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.databinding.SettingsFragmentBinding
 
 class SettingsFragment : Fragment() {
 
     private var _binding: SettingsFragmentBinding? = null
+    private val settingsViewModel: SettingsViewModel by activityViewModels()
     private lateinit var settingsPref : SharedPreferences
     private val binding get() = _binding!!
     private lateinit var editor : SharedPreferences.Editor
@@ -25,9 +27,9 @@ class SettingsFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = SettingsFragmentBinding.inflate(inflater, container, false)
         val root: View = binding.root
-
         settingsPref = context?.getSharedPreferences("Settings", AppCompatActivity.MODE_PRIVATE)!!
         editor = settingsPref.edit()
+        settingsViewModel.settingsFrag.value = true
         val emptyTrashImmediately = settingsPref.getBoolean("EmptyTrashImmediately",false)
         val darkMode = settingsPref.getInt("darkModePosition",R.id.defaultMode)
         val radioPosition = settingsPref.getInt("radioPosition", R.id.fontDef)

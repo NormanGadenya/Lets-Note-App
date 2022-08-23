@@ -22,12 +22,14 @@ import com.neuralbit.letsnote.adapters.NoteRVAdapter
 import com.neuralbit.letsnote.databinding.FragmentArchivedNotesBinding
 import com.neuralbit.letsnote.entities.NoteFire
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
+import com.neuralbit.letsnote.ui.settings.SettingsViewModel
 import java.util.*
 
 class ArchivedFragment : Fragment() , NoteFireClick {
 
     private val archivedViewModel: ArchivedViewModel by activityViewModels()
     private val allNotesViewModel: AllNotesViewModel by activityViewModels()
+    private val settingsViewModel: SettingsViewModel by activityViewModels()
     private var _binding: FragmentArchivedNotesBinding? = null
     private lateinit var  notesRV: RecyclerView
     private lateinit var archiveIcon : ImageView
@@ -50,6 +52,7 @@ class ArchivedFragment : Fragment() , NoteFireClick {
         noteRVAdapter?.viewModel = allNotesViewModel
         noteRVAdapter?.lifecycleScope = lifecycleScope
         noteRVAdapter?.lifecycleOwner = this
+        settingsViewModel.settingsFrag.value = false
         archiveIcon = binding.archivedIcon
         archiveText = binding.archivedText
         allNotesViewModel.deleteFrag.value = false

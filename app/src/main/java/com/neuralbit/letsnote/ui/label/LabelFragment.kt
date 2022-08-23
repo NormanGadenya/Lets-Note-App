@@ -20,11 +20,13 @@ import com.neuralbit.letsnote.adapters.LabelRVAdapter
 import com.neuralbit.letsnote.databinding.LabelFragmentBinding
 import com.neuralbit.letsnote.entities.LabelFire
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
+import com.neuralbit.letsnote.ui.settings.SettingsViewModel
 
 class LabelFragment : Fragment(), LabelRVAdapter.LabelClick {
     private val noteViewModel: NoteViewModel by activityViewModels()
     private val labelViewModel: LabelViewModel by activityViewModels()
     private val allNotesViewModel: AllNotesViewModel by activityViewModels()
+    private val settingsViewModel: SettingsViewModel by activityViewModels()
     private var _binding:LabelFragmentBinding ? = null
     private lateinit var labelRV:RecyclerView
     private val binding get() = _binding!!
@@ -46,6 +48,7 @@ class LabelFragment : Fragment(), LabelRVAdapter.LabelClick {
         val staggeredLayoutManagerAll = StaggeredGridLayoutManager( 2,LinearLayoutManager.VERTICAL)
         labelRV.layoutManager = staggeredLayoutManagerAll
         allNotesViewModel.deleteFrag.value = false
+        settingsViewModel.settingsFrag.value = false
         allNotesViewModel.staggeredView.value = settingsSharedPref?.getBoolean("staggered",true)
         allNotesViewModel.staggeredView.observe(viewLifecycleOwner){
             val editor: SharedPreferences.Editor ?= settingsSharedPref?.edit()

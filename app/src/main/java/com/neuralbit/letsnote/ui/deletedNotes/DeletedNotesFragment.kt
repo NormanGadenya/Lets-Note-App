@@ -22,19 +22,20 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.gson.Gson
 import com.neuralbit.letsnote.AddEditNoteActivity
 import com.neuralbit.letsnote.Fingerprint
-import com.neuralbit.letsnote.NoteViewModel
 import com.neuralbit.letsnote.Services.DeleteReceiver
 import com.neuralbit.letsnote.adapters.NoteFireClick
 import com.neuralbit.letsnote.adapters.NoteRVAdapter
 import com.neuralbit.letsnote.databinding.DeletedNotesFragmentBinding
 import com.neuralbit.letsnote.entities.NoteFire
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
+import com.neuralbit.letsnote.ui.settings.SettingsViewModel
 import java.util.*
 
 class DeletedNotesFragment : Fragment() , NoteFireClick {
-    private val noteViewModel: NoteViewModel by activityViewModels()
     private val allNotesViewModel: AllNotesViewModel by activityViewModels()
     private val deletedNotesViewModel: DeletedNotesViewModel by activityViewModels()
+    private val settingsViewModel: SettingsViewModel by activityViewModels()
+
     private lateinit var deletedRV : RecyclerView
     private var _binding : DeletedNotesFragmentBinding? = null
     private val binding get() = _binding!!
@@ -54,6 +55,8 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
         val root: View = binding.root
         trashIcon = binding.trashIcon
         trashText = binding.trashText
+        settingsViewModel.settingsFrag.value = false
+
         val noteRVAdapter = context?.let { NoteRVAdapter(it,this) }
         deletedRV.layoutManager = LinearLayoutManager(context)
 

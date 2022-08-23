@@ -785,6 +785,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         deleted = intent.getBooleanExtra("deleted",false)
         protected = intent.getBooleanExtra("protected", false)
 
+
         val tagIntentList = intent.getStringArrayListExtra("tagList")
         oldLabel = intent.getIntExtra("labelColor",0)
         val reminderTime = intent.getLongExtra("reminder",0)
@@ -793,6 +794,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
         if (todoItemStr != null){
             todoDoItemList = Gson().fromJson(todoItemStr, object : TypeToken<List<TodoItem?>?>() {}.type)
         }
+        val noteChanged = intent.getBooleanExtra("noteChanged",false)
+
         supportActionBar?.title = ""
 
         noteTimeStamp = intent.getLongExtra("timeStamp",-1)
@@ -843,6 +846,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         viewModal.archived.value = archived
         viewModal.deletedNote.value = deleted
         viewModal.noteLocked.value = protected
+        viewModal.noteChanged.value = noteChanged
         val fontStyle = settingsPref.getString("font",null)
         val typeface: Typeface? = when (fontStyle) {
             "Architects daughter" -> {
@@ -1212,9 +1216,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
             newFragment.show(supportFragmentManager, "datePicker")
         }
 
-
-
     }
+
 
     private fun startAlarm(requestCode: Int) {
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
@@ -1338,7 +1341,38 @@ class AddEditNoteActivity : AppCompatActivity() ,
         }
     }
 
+    override fun onResume() {
+        Log.d(TAG, "onResume: ")
+        if (protected && viewModal.appPaused){
+            val intent = Intent( applicationContext, Fingerprint::class.java)
+            val noteTitle = noteTitleEdit.text.toString()
+            val noteDescription = noteDescriptionEdit.text.toString()
+            intent.putExtra("noteType","Edit")
+            intent.putExtra("noteTitle",noteTitle)
+            intent.putExtra("noteDescription",noteDescription)
+            intent.putExtra("noteUid",noteUid)
+            intent.putExtra("timeStamp",noteTimeStamp)
+            intent.putExtra("labelColor",viewModal.labelColor)
+            intent.putExtra("pinned",viewModal.pinned.value)
+            intent.putExtra("archieved",viewModal.archived.value)
+            intent.putExtra("protected",true)
+            intent.putExtra("reminder",viewModal.reminderTime)
+            val tags = ArrayList<String>()
+            tags.addAll(viewModal.oldTagList)
+            tags.addAll(viewModal.newTags)
+            tags.removeAll(viewModal.deletedTags.toSet())
+            intent.putExtra("tags",tags)
+            val toDoItemString: String = Gson().toJson(viewModal.todoItems)
+            intent.putExtra("todoItems", toDoItemString)
+            startActivity(intent)
+        }
+        super.onResume()
+    }
 
+    override fun onPause() {
+        viewModal.appPaused = true
+        super.onPause()
+    }
 
 
     private fun saveOtherEntities(){
@@ -1485,7 +1519,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
         viewModal.todoItems = todoItems
         todoRVAdapter.notifyItemChanged(position)
         viewModal.updatedTodos.add(todoItem)
-
 
     }
 

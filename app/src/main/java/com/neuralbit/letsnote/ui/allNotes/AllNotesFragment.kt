@@ -32,12 +32,14 @@ import com.neuralbit.letsnote.adapters.NoteFireClick
 import com.neuralbit.letsnote.adapters.NoteRVAdapter
 import com.neuralbit.letsnote.databinding.FragmentAllNotesBinding
 import com.neuralbit.letsnote.entities.NoteFire
+import com.neuralbit.letsnote.ui.settings.SettingsViewModel
 import com.neuralbit.letsnote.utilities.AlertReceiver
 import java.util.*
 
 class AllNotesFragment : Fragment() , NoteFireClick {
 
     private val allNotesViewModel: AllNotesViewModel by activityViewModels()
+    private val settingsViewModel: SettingsViewModel by activityViewModels()
     private var _binding: FragmentAllNotesBinding? = null
     val TAG = "HOMEFRAGMENT"
     private lateinit var  notesRV: RecyclerView
@@ -69,6 +71,7 @@ class AllNotesFragment : Fragment() , NoteFireClick {
         notesRV.layoutManager = staggeredLayoutManagerAll
         pinnedNotesRV.layoutManager =staggeredLayoutManagerPinned
         allNotesViewModel.deleteFrag.value = false
+        settingsViewModel.settingsFrag.value = false
         allNotesViewModel.staggeredView.value = settingsSharedPref?.getBoolean("staggered",true)
         allNotesViewModel.staggeredView.observe(viewLifecycleOwner){
             val editor: SharedPreferences.Editor ?= settingsSharedPref?.edit()
