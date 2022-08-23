@@ -92,7 +92,7 @@ class MainActivity : AppCompatActivity() {
         ).get(MainActivityViewModel::class.java)
         allNotesViewModal.itemSelectEnabled.observe(this){
             if (it){
-                supportActionBar?.hide()
+//                supportActionBar?.hide()
                 actionMode = startSupportActionMode(MActionModeCallBack())
             }else{
                 actionMode?.finish()
@@ -265,7 +265,7 @@ class MainActivity : AppCompatActivity() {
         override fun onDestroyActionMode(mode: ActionMode?) {
             allNotesViewModal.itemSelectEnabled.value = false
             allNotesViewModal.selectedNotes.clear()
-            supportActionBar?.show()
+//            supportActionBar?.show()
             actionMode = null
         }
 

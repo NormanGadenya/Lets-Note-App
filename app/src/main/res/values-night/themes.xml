@@ -8,6 +8,7 @@
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/teal_200</item>
         <item name="colorSecondaryVariant">@color/teal_200</item>
+        <item name="windowActionModeOverlay">true</item>
         <item name="colorOnSecondary">@color/black</item>
         <item name="android:statusBarColor" >@color/black</item>
         <item name="android:navigationBarColor">@color/black</item>
@@ -41,6 +42,7 @@
     </style>
     <style name="Theme.LetsNote.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" >
         <item name="android:statusBarColor" >@color/black</item>
+
         <item name="android:navigationBarColor">@color/black</item>
     </style>
 
