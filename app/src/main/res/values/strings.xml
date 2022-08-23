@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Lets note</string>
+    <string name="app_name">Let\'s note</string>
     <string name="timeStamp"> Edited on %1$s at %2$s</string>
     <string name="deletedTime"> Deleted on %1$s at %2$s</string>
     <string name="archivedTime"> Archived on %1$s at %2$s</string>

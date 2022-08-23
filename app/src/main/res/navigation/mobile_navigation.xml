@@ -35,6 +35,6 @@
     <fragment
         android:id="@+id/nav_settings"
         android:name="com.neuralbit.letsnote.ui.settings.SettingsFragment"
-        android:label="settings_fragment"
+        android:label="@string/settings"
         tools:layout="@layout/settings_fragment" />
 </navigation>
