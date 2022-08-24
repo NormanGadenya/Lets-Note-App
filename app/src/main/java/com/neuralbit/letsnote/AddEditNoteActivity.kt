@@ -20,10 +20,7 @@ import android.text.TextWatcher
 import android.text.format.DateFormat
 import android.util.Log
 import android.util.SparseArray
-import android.view.KeyEvent
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
+import android.view.*
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.*
@@ -136,6 +133,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
     override fun onCreate(savedInstanceState: Bundle?)  {
         super.onCreate(savedInstanceState)
+        window.setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE)
         setContentView(R.layout.activity_add_edit_note)
 
         initControllers()
@@ -272,12 +270,15 @@ class AddEditNoteActivity : AppCompatActivity() ,
         }
 
         viewModal.pinned.observe(lifecycleOwner) {
+            Log.d(TAG, "onCreate: Pinned $it")
             notePinned = it
 
-            if (!it) {
-                pinItem?.setIcon(R.drawable.ic_outline_push_pin_24)
-            } else {
+            if (it) {
                 pinItem?.setIcon(R.drawable.ic_baseline_push_pin_24)
+
+            } else {
+                pinItem?.setIcon(R.drawable.ic_outline_push_pin_24)
+
             }
         }
         val fingerprintManager : FingerprintManager = getSystemService(FINGERPRINT_SERVICE) as FingerprintManager
@@ -847,6 +848,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         viewModal.deletedNote.value = deleted
         viewModal.noteLocked.value = protected
         viewModal.noteChanged.value = noteChanged
+        viewModal.pinned.value = notePinned
         val fontStyle = settingsPref.getString("font",null)
         val typeface: Typeface? = when (fontStyle) {
             "Architects daughter" -> {

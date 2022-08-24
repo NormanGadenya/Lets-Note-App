@@ -44,7 +44,7 @@
         <entry key="app/src/main/res/layout/custom_datetime_dialog.xml" value="0.18" />
         <entry key="app/src/main/res/layout/deleted_notes_fragment.xml" value="0.35885416666666664" />
         <entry key="app/src/main/res/layout/fragment_add_edit.xml" value="0.2625" />
-        <entry key="app/src/main/res/layout/fragment_all_notes.xml" value="0.12" />
+        <entry key="app/src/main/res/layout/fragment_all_notes.xml" value="0.33" />
         <entry key="app/src/main/res/layout/fragment_archived_notes.xml" value="0.3328125" />
         <entry key="app/src/main/res/layout/fragment_gallery.xml" value="0.33" />
         <entry key="app/src/main/res/layout/fragment_home.xml" value="0.25" />

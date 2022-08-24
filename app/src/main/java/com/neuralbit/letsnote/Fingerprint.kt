@@ -27,7 +27,7 @@ class Fingerprint : AppCompatActivity() {
         val noteUid = intent.getStringExtra("noteUid")
         val timeStamp = intent.getLongExtra("timeStamp",0)
         val labelColor = intent.getIntExtra("labelColor",0)
-        val pinned = intent.getStringExtra("pinned")
+        val pinned = intent.getBooleanExtra("pinned",false)
         val archived = intent.getBooleanExtra("archieved",false)
         val protected = intent.getBooleanExtra("protected",false)
         val tagList = intent.getStringArrayListExtra("tagList")
@@ -82,7 +82,7 @@ class Fingerprint : AppCompatActivity() {
         noteUid: String?,
         timeStamp: Long,
         labelColor: Int,
-        pinned: String?,
+        pinned: Boolean?,
         archived: Boolean,
         protected: Boolean,
         reminder: String?,
