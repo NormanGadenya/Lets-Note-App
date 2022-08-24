@@ -130,6 +130,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private lateinit var deletedNotePrefs : SharedPreferences
     private lateinit var settingsPref : SharedPreferences
     private var protected = false
+    private var noteChanged = false
+    private var tagList : ArrayList<String> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?)  {
         super.onCreate(savedInstanceState)
@@ -195,7 +197,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
         addTagBtn.setOnClickListener {
             val addTagDialog = AddTagDialog(this,applicationContext)
-            addTagDialog.tagList = viewModal.oldTagList
+            addTagDialog.tagList = tagList
             addTagDialog.show(supportFragmentManager,"addTagDialogs")
 
         }
@@ -270,7 +272,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
         }
 
         viewModal.pinned.observe(lifecycleOwner) {
-            Log.d(TAG, "onCreate: Pinned $it")
             notePinned = it
 
             if (it) {
@@ -362,13 +363,14 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
 
         
-        val tagListStr = ArrayList<String>()
         viewModal.allFireTags().observe(this){
-            tagListStr.clear()
+
+            tagList.clear()
             for (tag in it){
-                tagListStr.add(tag.tagName)
+                tagList.add(tag.tagName)
             }
-            val adapter = ArrayAdapter(applicationContext,android.R.layout.simple_dropdown_item_1line,tagListStr)
+
+            val adapter = ArrayAdapter(applicationContext,android.R.layout.simple_dropdown_item_1line,tagList)
             noteDescriptionEdit.setAdapter(adapter)
             noteDescriptionEdit.setTokenizer(SpaceTokenizer())
             
@@ -481,6 +483,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
             }
 
             override fun onTextChanged(p0: CharSequence?, start: Int, before: Int, count: Int) {
+                viewModal.noteChanged.value = true
+
                 tvTimeStamp.visibility =GONE
                 redoUndoGroup.visibility = VISIBLE
                 if(p0?.length!! > 0){
@@ -500,12 +504,12 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
 
         noteDescriptionEdit.setOnKeyListener { _, key, _ ->
-            viewModal.noteChanged.value = true
 
             viewModal.backPressed.value = key == KeyEvent.KEYCODE_DEL
 
             false
         }
+
 
         noteTitleEdit.setOnKeyListener { _, _, _ ->
             viewModal.noteChanged.value = true
@@ -795,7 +799,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         if (todoItemStr != null){
             todoDoItemList = Gson().fromJson(todoItemStr, object : TypeToken<List<TodoItem?>?>() {}.type)
         }
-        val noteChanged = intent.getBooleanExtra("noteChanged",false)
+        noteChanged = intent.getBooleanExtra("noteChanged",false)
 
         supportActionBar?.title = ""
 
@@ -893,6 +897,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
             archiveItem?.isVisible = false
         }
 
+
         shareItem?.setOnMenuItemClickListener {
             shareNote()
             return@setOnMenuItemClickListener true
@@ -935,6 +940,12 @@ class AddEditNoteActivity : AppCompatActivity() ,
             lockNoteItem?.setIcon(R.drawable.baseline_lock_24)
         }else{
             lockNoteItem?.setIcon(R.drawable.baseline_lock_open_24)
+        }
+
+        if (notePinned){
+            pinItem?.setIcon(R.drawable.ic_baseline_push_pin_24)
+        }else{
+            pinItem?.setIcon(R.drawable.ic_outline_push_pin_24)
         }
 
         lockNoteItem?.setOnMenuItemClickListener {
@@ -1278,10 +1289,13 @@ class AddEditNoteActivity : AppCompatActivity() ,
     }
 
     private fun saveNote(){
+
         val noteTitle = noteTitleEdit.text.toString()
         val noteDescription = noteDescriptionEdit.text.toString()
         val currentDate= cm.currentTimeToLong()
-        if(viewModal.noteChanged.value == true){
+
+        if(textChanged){
+
             if (noteTitle.isNotEmpty() || noteDescription.isNotEmpty() || viewModal.todoItems.isNotEmpty()){
 
                 val tags = ArrayList<String>()
@@ -1344,7 +1358,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
     }
 
     override fun onResume() {
-        Log.d(TAG, "onResume: ")
         if (protected && viewModal.appPaused){
             val intent = Intent( applicationContext, Fingerprint::class.java)
             val noteTitle = noteTitleEdit.text.toString()
@@ -1414,7 +1427,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
 
     private fun goToMain() {
-        
         saveNote()
         val intent = Intent(this@AddEditNoteActivity, MainActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
@@ -1464,13 +1476,15 @@ class AddEditNoteActivity : AppCompatActivity() ,
         this.calendar[Calendar.MONTH] = calendar[Calendar.MONTH]
         this.calendar[Calendar.YEAR] = calendar[Calendar.YEAR]
         dateTitleTV.text="Date set:" + DateFormat.getDateFormat(this).format(calendar.time)
-
-
     }
 
     override fun getTag(tag: String) {
+
+        val tags = HashSet<String>()
+        tags.addAll(viewModal.oldTagList)
         viewModal.newTags.add(tag)
-        tagListAdapter.updateList(viewModal.oldTagList)
+        tags.addAll(viewModal.newTags)
+        tagListAdapter.updateList(ArrayList(tags))
         viewModal.noteChanged.value = true
 
     }

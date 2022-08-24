@@ -21,6 +21,7 @@
     <style name="Theme.LetsNote.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        <item name="android:textColorPrimary">@color/timberwolf</item>
     </style>
 
     <style name = "BottomSheetBehaviour" parent="ThemeOverlay.MaterialComponents">
