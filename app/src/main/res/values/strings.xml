@@ -45,4 +45,6 @@
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <string name="_hint">Todo item</string>
     <string name="add_todo_item">Add todo item</string>
+    <string name="shortcut_short_label">New note</string>
+    <string name="shortcut_long_label">Take a note</string>
 </resources>

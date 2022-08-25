@@ -36,6 +36,7 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
         <activity
             android:name=".SaveSharedNoteActivity"
@@ -67,11 +68,6 @@
             android:name=".MainActivity"
             android:exported="true"
             android:theme="@style/Theme.LetsNote.NoActionBar" />
-        <activity
-            android:name=".AddEditNoteActivity"
-            android:exported="true"
-            android:windowSoftInputMode="adjustPan"
-            android:parentActivityName=".MainActivity" />
 
         <receiver android:name=".utilities.AlertReceiver" />
         <receiver
@@ -82,6 +78,8 @@
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
+
+
     </application>
 
 </manifest>

@@ -834,6 +834,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
     private fun initControllers(){
         cm= Common()
+
         deletedNotePrefs = applicationContext.getSharedPreferences("DeletedNotes", MODE_PRIVATE)
         settingsPref = applicationContext.getSharedPreferences("Settings", MODE_PRIVATE)
         noteTitleEdit = findViewById(R.id.noteEditTitle)
@@ -953,6 +954,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
         reminderTV.typeface = typeface
         tvTimeStamp.typeface = typeface
     }
+
+
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.add_edit_menu, menu)
