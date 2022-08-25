@@ -13,8 +13,9 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Typeface
 import android.hardware.fingerprint.FingerprintManager
+import android.net.Uri
 import android.os.Bundle
-import android.speech.RecognizerIntent
+import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
 import android.text.format.DateFormat
@@ -24,6 +25,8 @@ import android.view.*
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.*
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContract
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -37,6 +40,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.HORIZONTAL
+import com.canhub.cropper.CropImage
 import com.flask.colorpicker.ColorPickerView
 import com.google.android.gms.vision.Frame
 import com.google.android.gms.vision.text.TextBlock
@@ -52,6 +56,7 @@ import com.neuralbit.letsnote.entities.TodoItem
 import com.neuralbit.letsnote.ui.label.LabelViewModel
 import com.neuralbit.letsnote.utilities.*
 import kotlinx.coroutines.launch
+import java.io.IOException
 import java.util.*
 
 
@@ -70,6 +75,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private var restoreItem : MenuItem? = null
     private var pinItem: MenuItem? = null
     private var archiveItem: MenuItem? = null
+    private val CAMERA_REQUEST = 1888
+    private val GALLERY_REQUEST = 100
     private var deleteItem: MenuItem? = null
     private lateinit var dismissTodoButton: ImageButton
     private lateinit var ocrButton: ImageButton
@@ -124,7 +131,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private var reminderNoteSet = false
     private lateinit var infoContainer : View
     private var bitmap : Bitmap? = null
-    private val REQUEST_CODE_SPEECH_INPUT = 1
     private lateinit var colorPickerView: ColorPickerView
     private val deletedTodos = ArrayList<TodoItem>()
     private lateinit var deletedNotePrefs : SharedPreferences
@@ -132,6 +138,19 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private var protected = false
     private var noteChanged = false
     private var tagList : ArrayList<String> = ArrayList()
+
+    private val cropActivityResultContract = object : ActivityResultContract<Any?,Uri?>(){
+        override fun createIntent(context: Context, input: Any?): Intent {
+
+            return CropImage.activity()
+                .getIntent(this@AddEditNoteActivity)
+        }
+
+        override fun parseResult(resultCode: Int, intent: Intent?): Uri? {
+            return CropImage.getActivityResult(intent)?.uriContent
+        }
+    }
+    private lateinit var cropActivityResultLauncher: ActivityResultLauncher<Any?>
 
     override fun onCreate(savedInstanceState: Bundle?)  {
         super.onCreate(savedInstanceState)
@@ -538,9 +557,10 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 ) != PackageManager.PERMISSION_GRANTED
             ) {
                 requestCameraPermission()
+                requestStoragePermission()
 
             } else {
-                //TODO FIX OCR FUNCTION
+                cropActivityResultLauncher.launch(null)
             }
         }
 
@@ -570,6 +590,65 @@ class AddEditNoteActivity : AppCompatActivity() ,
             }
 
 
+        }
+    }
+
+
+    private fun getImageFromCamera() {
+        if (ContextCompat.checkSelfPermission(
+                applicationContext,
+                Manifest.permission.CAMERA
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            startActivityForResult(cameraIntent, CAMERA_REQUEST)
+        } else {
+            requestCameraPermission()
+        }
+    }
+
+    private fun getImageFromGallery() {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+            startActivityForResult(intent, GALLERY_REQUEST)
+        } else {
+            requestStoragePermission()
+        }
+    }
+
+
+    private fun requestStoragePermission() {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(
+                this,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            )
+        ) {
+            androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Permission needed")
+                .setMessage("This permission is needed because we need to access your storage")
+                .setPositiveButton(
+                    "ok"
+                ) { dialog: DialogInterface?, which: Int ->
+                    ActivityCompat.requestPermissions(
+                        this,
+                        arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                        GALLERY_REQUEST
+                    )
+                }
+                .setNegativeButton(
+                    "cancel"
+                ) { dialog: DialogInterface, which: Int -> dialog.dismiss() }
+                .create().show()
+        } else {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                GALLERY_REQUEST
+            )
         }
     }
 
@@ -636,9 +715,9 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
         }
     }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
+//
+//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+//        super.onActivityResult(requestCode, resultCode, data)
 //        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE){
 //            val result = CropImage.getActivityResult(data)
 //            if(resultCode == RESULT_OK){
@@ -651,18 +730,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
 //                }
 //            }
 //        }
-        if (requestCode == REQUEST_CODE_SPEECH_INPUT) {
-            if (resultCode == RESULT_OK && data != null) {
-                val result: ArrayList<String> = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)!!
-                val noteDesc = result[0]
-                noteDescriptionEdit.append("\n")
-
-                noteDescriptionEdit.append(noteDesc)
-                viewModal.noteChanged.value = true
-            }
-
-        }
-    }
+//
+//    }
 
     private fun requestCameraPermission() {
         if (ActivityCompat.shouldShowRequestPermissionRationale(
@@ -802,6 +871,16 @@ class AddEditNoteActivity : AppCompatActivity() ,
         noteChanged = intent.getBooleanExtra("noteChanged",false)
 
         supportActionBar?.title = ""
+        cropActivityResultLauncher = registerForActivityResult(cropActivityResultContract){
+            it?.let { uri ->
+                try {
+                    bitmap = MediaStore.Images.Media.getBitmap(contentResolver,uri)
+                    recognizeText()
+                }catch (e : IOException){
+                    e.printStackTrace()
+                }
+            }
+        }
 
         noteTimeStamp = intent.getLongExtra("timeStamp",-1)
         ocrButton = findViewById(R.id.ocrButton)

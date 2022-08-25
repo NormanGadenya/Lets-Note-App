@@ -125,4 +125,7 @@ dependencies {
     })
     androidTestImplementation "androidx.test.ext:junit:$rootProject.androidxJunitVersion"
     implementation 'androidx.recyclerview:recyclerview-selection:1.0.0'
+
+    implementation "androidx.activity:activity-ktx:1.6.0-rc01"
+    implementation "com.github.CanHub:Android-Image-Cropper:3.3.6"
 }
