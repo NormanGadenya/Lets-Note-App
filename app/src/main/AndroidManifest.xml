@@ -27,6 +27,13 @@
         <activity
             android:name=".Fingerprint"
             android:exported="false" />
+
+        <activity
+            android:name=".AddEditNoteActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustPan"
+            android:parentActivityName=".MainActivity" />
+
         <activity
             android:name=".SplashActivity"
             android:exported="true"

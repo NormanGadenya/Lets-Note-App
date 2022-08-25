@@ -1,14 +1,11 @@
 package com.neuralbit.letsnote
 
-import android.annotation.TargetApi
 import android.app.AlarmManager
 import android.app.AlertDialog
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.content.pm.ShortcutManager
-import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -19,8 +16,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
-import androidx.core.content.pm.ShortcutInfoCompat
-import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
@@ -68,11 +63,6 @@ class MainActivity : AppCompatActivity() {
         if (fUser == null) {
             val intent = Intent(applicationContext, SignInActivity::class.java)
             startActivity(intent)
-        }
-        if (Build.VERSION.SDK_INT >= 25) {
-            createShortcut();
-        }else{
-            removeShortcuts();
         }
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -127,37 +117,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    @TargetApi(25)
-    private fun createShortcut() {
-//        val sM = getSystemService(ShortcutManager::class.java)
-//        val intent1 = Intent(applicationContext, AddEditNoteActivity::class.java)
-//        intent1.action = Intent.ACTION_VIEW
-//        val shortcut1 = ShortcutInfo.Builder(this, "newNote")
-//            .setIntent(intent1)
-//            .setShortLabel(getString(R.string.shortcut_short_label))
-//            .setLongLabel(getString(R.string.shortcut_long_label))
-//            .setIcon(Icon.createWithResource(this, R.mipmap.shortcut_icon))
-//            .build()
-//        sM.dynamicShortcuts = listOf(shortcut1)
 
-        val intent = Intent(applicationContext, AddEditNoteActivity::class.java)
-        intent.action = Intent.ACTION_VIEW
-        val shortcutInfo = ShortcutInfoCompat.Builder(applicationContext, "newNote")
-            .setShortLabel(getString(R.string.shortcut_short_label))
-            .setLongLabel(getString(R.string.shortcut_long_label))
-            .setIntent(intent) // Push the shortcut
-            .build()
-
-// Push the shortcut
-        ShortcutManagerCompat.pushDynamicShortcut(applicationContext, shortcutInfo)
-    }
-
-    @TargetApi(25)
-    private fun removeShortcuts() {
-        val shortcutManager = getSystemService(ShortcutManager::class.java)
-        shortcutManager.disableShortcuts(listOf("newNote"))
-        shortcutManager.removeAllDynamicShortcuts()
-    }
 
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -248,7 +208,7 @@ class MainActivity : AppCompatActivity() {
         allNotesViewModal.staggeredView.observe(this){
             if (layoutViewBtn != null){
                 if (it){
-                    layoutViewBtn.setIcon(R.drawable.baseline_format_list_bulleted_24)
+                    layoutViewBtn.setIcon(R.drawable.ic_baseline_table_rows_24)
                 }else{
                     layoutViewBtn.setIcon(R.drawable.baseline_grid_view_24)
 

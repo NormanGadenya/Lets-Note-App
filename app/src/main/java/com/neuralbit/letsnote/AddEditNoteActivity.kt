@@ -1,6 +1,7 @@
 package com.neuralbit.letsnote
 
 import android.Manifest
+import android.annotation.TargetApi
 import android.app.AlarmManager
 import android.app.AlertDialog
 import android.app.PendingIntent
@@ -9,11 +10,14 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.content.pm.ShortcutManager
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Typeface
 import android.hardware.fingerprint.FingerprintManager
+import android.net.ConnectivityManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.Editable
@@ -30,6 +34,8 @@ import androidx.activity.result.contract.ActivityResultContract
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.pm.ShortcutInfoCompat
+import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.NestedScrollView
@@ -551,16 +557,21 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
 
         ocrButton.setOnClickListener {
-            if (ContextCompat.checkSelfPermission(
-                    this@AddEditNoteActivity,
-                    Manifest.permission.CAMERA
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                requestCameraPermission()
-                requestStoragePermission()
 
-            } else {
-                cropActivityResultLauncher.launch(null)
+            if(isNetworkConnected()){
+                if (ContextCompat.checkSelfPermission(
+                        this@AddEditNoteActivity,
+                        Manifest.permission.CAMERA
+                    ) != PackageManager.PERMISSION_GRANTED
+                ) {
+                    requestCameraPermission()
+                    requestStoragePermission()
+
+                } else {
+                    cropActivityResultLauncher.launch(null)
+                }
+            }else{
+                Snackbar.make(coordinatorlayout, "No internet connection", Snackbar.LENGTH_SHORT).show()
             }
         }
 
@@ -715,23 +726,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
         }
     }
-//
-//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-//        super.onActivityResult(requestCode, resultCode, data)
-//        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE){
-//            val result = CropImage.getActivityResult(data)
-//            if(resultCode == RESULT_OK){
-//                val resultUri : Uri = result.uri
-//                try {
-//                    bitmap = MediaStore.Images.Media.getBitmap(contentResolver,resultUri)
-//                    recognizeText()
-//                }catch (e : IOException){
-//                    e.printStackTrace()
-//                }
-//            }
-//        }
-//
-//    }
 
     private fun requestCameraPermission() {
         if (ActivityCompat.shouldShowRequestPermissionRationale(
@@ -832,8 +826,18 @@ class AddEditNoteActivity : AppCompatActivity() ,
         }
     }
 
+    private fun isNetworkConnected(): Boolean {
+        val cm = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
+        return cm.activeNetworkInfo != null && cm.activeNetworkInfo!!.isConnected
+    }
+
     private fun initControllers(){
         cm= Common()
+        if (Build.VERSION.SDK_INT >= 25) {
+            createShortcut();
+        }else{
+            removeShortcuts();
+        }
 
         deletedNotePrefs = applicationContext.getSharedPreferences("DeletedNotes", MODE_PRIVATE)
         settingsPref = applicationContext.getSharedPreferences("Settings", MODE_PRIVATE)
@@ -912,12 +916,12 @@ class AddEditNoteActivity : AppCompatActivity() ,
         viewModal = ViewModelProvider(
             this,
             ViewModelProvider.AndroidViewModelFactory.getInstance(application)
-        ).get(NoteViewModel::class.java)
+        )[NoteViewModel::class.java]
 
         labelViewModel = ViewModelProvider(
             this,
             ViewModelProvider.AndroidViewModelFactory.getInstance(application)
-        ).get(LabelViewModel::class.java)
+        )[LabelViewModel::class.java]
         if (tagIntentList != null){
             viewModal.oldTagList = tagIntentList
         }
@@ -1091,6 +1095,40 @@ class AddEditNoteActivity : AppCompatActivity() ,
         }
 
     }
+
+    @TargetApi(25)
+    private fun createShortcut() {
+//        val sM = getSystemService(ShortcutManager::class.java)
+//        val intent1 = Intent(applicationContext, AddEditNoteActivity::class.java)
+//        intent1.action = Intent.ACTION_VIEW
+//        val shortcut1 = ShortcutInfo.Builder(this, "newNote")
+//            .setIntent(intent1)
+//            .setShortLabel(getString(R.string.shortcut_short_label))
+//            .setLongLabel(getString(R.string.shortcut_long_label))
+//            .setIcon(Icon.createWithResource(this, R.mipmap.shortcut_icon))
+//            .build()
+//        sM.dynamicShortcuts = listOf(shortcut1)
+
+        val intent = Intent(applicationContext, AddEditNoteActivity::class.java)
+        intent.action = Intent.ACTION_VIEW
+        val shortcutInfo = ShortcutInfoCompat.Builder(applicationContext, "newNote")
+            .setShortLabel(getString(R.string.shortcut_short_label))
+            .setLongLabel(getString(R.string.shortcut_long_label))
+            .setIntent(intent) // Push the shortcut
+            .build()
+
+// Push the shortcut
+        ShortcutManagerCompat.pushDynamicShortcut(applicationContext, shortcutInfo)
+    }
+
+
+    @TargetApi(25)
+    private fun removeShortcuts() {
+        val shortcutManager = getSystemService(ShortcutManager::class.java)
+        shortcutManager.disableShortcuts(listOf("newNote"))
+        shortcutManager.removeAllDynamicShortcuts()
+    }
+
 
     private fun getTagFromString(p0: CharSequence?) {
         val strL = p0?.toString()?.split(" ")
