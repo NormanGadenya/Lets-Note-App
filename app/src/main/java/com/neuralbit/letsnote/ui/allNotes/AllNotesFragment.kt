@@ -16,6 +16,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -154,15 +155,32 @@ class AllNotesFragment : Fragment() , NoteFireClick {
         }
 
 
-        allNotesViewModel.searchQuery.observe(viewLifecycleOwner) { str->
-            allNotesViewModel.filterPinnedFireList().observe(viewLifecycleOwner) {
-                pinnedNoteRVAdapter?.searchString = str
-                pinnedNoteRVAdapter?.updateListFire(it)
 
-            }
+        allNotesViewModel.searchQuery.observe(viewLifecycleOwner) { str->
+
             allNotesViewModel.filterOtherFireList().observe(viewLifecycleOwner) {
+                if (it.isEmpty()){
+                    notesRV.isVisible = false
+                    otherNotesTV.isVisible = false
+                }else{
+                    notesRV.isVisible = true
+                    otherNotesTV.isVisible = true
+                }
                 noteRVAdapter?.updateListFire(it)
                 noteRVAdapter?.searchString = str
+            }
+            allNotesViewModel.filterPinnedFireList().observe(viewLifecycleOwner) {
+                if (it.isEmpty()){
+                    pinnedNotesTV.isVisible = false
+                    pinnedNotesRV.isVisible = false
+                    otherNotesTV.isVisible = false
+                }else{
+                    pinnedNotesTV.isVisible = true
+                    pinnedNotesRV.isVisible = true
+                    otherNotesTV.isVisible = true
+                }
+                pinnedNoteRVAdapter?.searchString = str
+                pinnedNoteRVAdapter?.updateListFire(it)
             }
 
         }

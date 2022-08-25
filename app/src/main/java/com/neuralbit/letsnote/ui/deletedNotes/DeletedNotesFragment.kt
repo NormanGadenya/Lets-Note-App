@@ -29,7 +29,6 @@ import com.neuralbit.letsnote.databinding.DeletedNotesFragmentBinding
 import com.neuralbit.letsnote.entities.NoteFire
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import com.neuralbit.letsnote.ui.settings.SettingsViewModel
-import java.util.*
 
 class DeletedNotesFragment : Fragment() , NoteFireClick {
     private val allNotesViewModel: AllNotesViewModel by activityViewModels()
@@ -173,10 +172,7 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
             intent.putExtra("pinned",note.pinned)
             intent.putExtra("archieved",note.archived)
             intent.putExtra("protected",note.protected)
-            val c = Calendar.getInstance()
-            if (c.timeInMillis < note.reminderDate){
-                intent.putExtra("reminder",note.reminderDate)
-            }
+            intent.putExtra("deleted",true)
             val toDoItemString: String = Gson().toJson(note.todoItems)
             intent.putExtra("todoItems", toDoItemString)
             intent.putStringArrayListExtra("tagList", ArrayList(note.tags))

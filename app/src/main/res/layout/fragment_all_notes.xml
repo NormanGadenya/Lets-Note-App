@@ -33,9 +33,8 @@
                 android:id="@+id/pinnedNotesRV"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layoutAnimation="@anim/layout_anim"
                 android:overScrollMode="never"
-                android:visibility="gone"
+                android:visibility="visible"
                 app:layout_constraintTop_toBottomOf="@+id/pinnedNotesTV"
                 tools:itemCount="2"
                 tools:listitem="@layout/note_rv_item" />
@@ -56,7 +55,6 @@
                 android:id="@+id/notesRV"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layoutAnimation="@anim/layout_anim"
                 android:overScrollMode="never"
                 android:visibility="visible"
                 tools:itemCount="2"
