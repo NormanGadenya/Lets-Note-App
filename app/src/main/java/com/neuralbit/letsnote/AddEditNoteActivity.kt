@@ -1398,7 +1398,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 tags.removeAll(viewModal.deletedTags.toSet())
 
                 if (viewModal.deletedNote.value != true){
-                    if(noteType == "Edit"){
+                    if(noteType == "Edit" && noteUid!= null){
                         cancelDelete(viewModal.reminderTime.toInt())
                         val noteUpdate = HashMap<String,Any>()
                         noteUpdate["title"] = noteTitle

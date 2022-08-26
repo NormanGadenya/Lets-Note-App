@@ -21,6 +21,7 @@ class SettingsFragment : Fragment() {
     private lateinit var settingsPref : SharedPreferences
     private val binding get() = _binding!!
     private lateinit var editor : SharedPreferences.Editor
+    private val TAG = "SETTINGS"
 
 
 
