@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -120,25 +121,62 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
             }
         }
 
-
-        deletedNotesViewModel.itemRestoreClicked.observe(viewLifecycleOwner){
+        deletedNotesViewModel.itemDeleteClicked.observe(viewLifecycleOwner){
             if (it && allNotesViewModel.selectedNotes.isNotEmpty()){
+                Log.d(TAG, "onCreateView: ${allNotesViewModel.selectedNotes}")
+
                 val noteUids = pref?.getStringSet("noteUids", HashSet())
                 val deletedNoteUids = HashSet<String>()
                 if (noteUids != null){
                     deletedNoteUids.addAll(noteUids)
                 }
-                for ( note in allNotesViewModel.selectedNotes){
-                    val editor: SharedPreferences.Editor ?= pref?.edit()
-                    note.noteUid?.let { it1 -> deletedNoteUids.remove(it1) }
-                    cancelDelete(note.timeStamp.toInt())
-                    editor?.putStringSet("noteUids",deletedNoteUids)
-                    editor?.apply()
-                    deletedNotesViewModel.deletedNotes.remove(note)
-
+                val notes = ArrayList(deletedNotesViewModel.deletedNotes)
+                for ( deletedNote in allNotesViewModel.selectedNotes){
+                    if (deletedNote.selected){
+                        val editor: SharedPreferences.Editor ?= pref?.edit()
+                        deletedNote.noteUid?.let { it1 -> deletedNoteUids.remove(it1) }
+                        editor?.putStringSet("noteUids",deletedNoteUids)
+                        editor?.remove(deletedNote.noteUid)
+                        editor?.apply()
+                        deletedNotesViewModel.deletedNotes.remove(deletedNote)
+                        notes.remove(deletedNote)
+                        deletedNote.noteUid?.let { uid -> deletedNotesViewModel.deleteNote(uid,deletedNote.label,deletedNote.tags)
+                            cancelDelete(deletedNote.timeStamp.toInt())
+                        }
+                    }
                 }
-                noteRVAdapter?.updateListFire(ArrayList(deletedNotesViewModel.deletedNotes))
+                noteRVAdapter?.updateListFire(notes)
+                allNotesViewModel.selectedNotes.clear()
+                allNotesViewModel.itemSelectEnabled.value = false
 
+                Toast.makeText(context,"Notes deleted successfully",Toast.LENGTH_SHORT).show()
+            }
+        }
+
+
+        deletedNotesViewModel.itemRestoreClicked.observe(viewLifecycleOwner){
+            if (it && allNotesViewModel.selectedNotes.isNotEmpty()){
+                Log.d(TAG, "onCreateView: ${allNotesViewModel.selectedNotes}")
+
+                val noteUids = pref?.getStringSet("noteUids", HashSet())
+                val deletedNoteUids = HashSet<String>()
+                if (noteUids != null){
+                    deletedNoteUids.addAll(noteUids)
+                }
+                val notes = ArrayList(deletedNotesViewModel.deletedNotes)
+                for ( note in allNotesViewModel.selectedNotes){
+                    if (note.selected){
+                        val editor: SharedPreferences.Editor ?= pref?.edit()
+                        note.noteUid?.let { it1 -> deletedNoteUids.remove(it1) }
+                        cancelDelete(note.timeStamp.toInt())
+                        editor?.putStringSet("noteUids",deletedNoteUids)
+                        editor?.remove(note.noteUid)
+                        editor?.apply()
+                        deletedNotesViewModel.deletedNotes.remove(note)
+                        notes.remove(note)
+                    }
+                }
+                noteRVAdapter?.updateListFire(notes)
                 allNotesViewModel.selectedNotes.clear()
                 allNotesViewModel.itemSelectEnabled.value = false
 

@@ -82,7 +82,7 @@
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                android:max="3"
+                android:max="4"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -93,7 +93,8 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
                 android:text="Note"
-                android:textSize="20sp"
+                android:textSize="32sp"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@id/seekBar"
                 app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>

@@ -24,6 +24,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/tvTimeStamp"
         android:visibility="gone"
+        android:textSize="12sp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/addTagBtn"

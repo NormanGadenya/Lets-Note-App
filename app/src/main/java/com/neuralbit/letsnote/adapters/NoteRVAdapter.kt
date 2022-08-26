@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.Typeface
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
@@ -12,6 +13,7 @@ import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.LifecycleOwner
@@ -41,6 +43,7 @@ class NoteRVAdapter (
     var multipleActivated = false
     val TAG = "NoteRVAdapter"
     var fontStyle : String? = null
+    private val deletedNotePrefs = context.getSharedPreferences("DeletedNotes", AppCompatActivity.MODE_PRIVATE)
 
 
     inner class ViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView){
@@ -78,6 +81,12 @@ class NoteRVAdapter (
                 ResourcesCompat.getFont(context, R.font.roboto)
             }
         }
+        val settingsPref = context.getSharedPreferences("Settings", AppCompatActivity.MODE_PRIVATE)
+        val fontMultiplier = settingsPref.getInt("fontMultiplier",2)
+        holder.noteTextTV.setTextSize(TypedValue.COMPLEX_UNIT_SP,18f+ ((fontMultiplier-2)*4).toFloat())
+        holder.noteTitleTV.setTextSize(TypedValue.COMPLEX_UNIT_SP,24f+ ((fontMultiplier-2)*4).toFloat())
+        holder.reminderTV.setTextSize(TypedValue.COMPLEX_UNIT_SP,12f+ ((fontMultiplier-2)).toFloat())
+        holder.tagsTV.setTextSize(TypedValue.COMPLEX_UNIT_SP,12f+ ((fontMultiplier-2)).toFloat())
         holder.noteTextTV.typeface = typeface
         holder.noteTitleTV.typeface = typeface
         holder.daysLeft.typeface = typeface
@@ -150,7 +159,8 @@ class NoteRVAdapter (
 
         if (deleteFrag){
             holder.daysLeft.visibility = VISIBLE
-            val timeLeftMS = note.timeStamp +  6.048e+8 - System.currentTimeMillis()
+            val deletedTime = deletedNotePrefs.getLong(note.noteUid,0)
+            val timeLeftMS = deletedTime +  6.048e+8 - System.currentTimeMillis()
             val daysLeft = floor(timeLeftMS * 1.1574E-8)
             if (daysLeft >1 || daysLeft== (0).toDouble()){
                 holder.daysLeft.text = "${daysLeft.toInt()} days left "

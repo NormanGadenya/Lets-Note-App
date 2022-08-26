@@ -80,7 +80,7 @@ class MainActivity : AppCompatActivity() {
         viewModal = ViewModelProvider(
             this,
             ViewModelProvider.AndroidViewModelFactory.getInstance(application)
-        ).get(MainActivityViewModel::class.java)
+        )[MainActivityViewModel::class.java]
         allNotesViewModal.itemSelectEnabled.observe(this){
             if (it){
                 actionMode = startSupportActionMode(MActionModeCallBack())
@@ -251,9 +251,25 @@ class MainActivity : AppCompatActivity() {
                 allNotesViewModal.itemArchiveClicked.value = true
                 mode?.finish()
                 return true
+            }else if (item?.itemId == R.id.restore){
+                deleteVieModel.itemRestoreClicked.value = true
+                mode?.finish()
+                return true
             }else if (item?.itemId == R.id.delete){
-                allNotesViewModal.itemDeleteClicked.value = true
+                deleteVieModel.itemDeleteClicked.value = true
 
+//                val alertDialog: AlertDialog.Builder = AlertDialog.Builder(applicationContext)
+//                alertDialog.setTitle("Are you sure about this ?")
+//                alertDialog.setPositiveButton("Yes"
+//                ) { _, _ ->
+//                }
+//                alertDialog.setNegativeButton("Cancel"
+//                ) { dialog, _ ->
+//
+//                    dialog.cancel() }
+//                alertDialog.show()
+//
+//
                 mode?.finish()
                 return true
             }

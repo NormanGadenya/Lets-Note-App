@@ -16,6 +16,7 @@ class DeletedNotesViewModel (application: Application): AndroidViewModel(applica
     var deleteFrag : MutableLiveData<Boolean> = MutableLiveData()
     var deletedNotes : HashSet<NoteFire> = HashSet()
     var itemRestoreClicked : MutableLiveData<Boolean> = MutableLiveData()
+    var itemDeleteClicked : MutableLiveData<Boolean> = MutableLiveData()
 
 
     private val noteRepo = NoteFireRepo()

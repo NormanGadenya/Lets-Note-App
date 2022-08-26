@@ -6,6 +6,7 @@ import android.text.Editable
 import android.text.SpannableString
 import android.text.TextWatcher
 import android.text.style.StrikethroughSpan
+import android.util.TypedValue
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -30,6 +31,7 @@ class TodoRVAdapter(
     private var allTodoItems = ArrayList<TodoItem>()
     val TAG = "TodoRVAdapter"
     var fontStyle : String? = null
+    var fontMultiplier : Int = 2
 
 
 
@@ -64,6 +66,7 @@ class TodoRVAdapter(
                 ResourcesCompat.getFont(context, R.font.roboto)
             }
         }
+        holder.todoItemDescET.setTextSize(TypedValue.COMPLEX_UNIT_SP,24f+ ((fontMultiplier-2)*4).toFloat())
         holder.todoItemDescET.typeface = typeface
         if (todoItem.item.isNotEmpty() && todoItem.checked){
             val spannableString = SpannableString(todoItem.item)

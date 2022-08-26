@@ -7,6 +7,7 @@ import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RadioButton
+import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
@@ -33,10 +34,13 @@ class SettingsFragment : Fragment() {
         settingsViewModel.settingsFrag.value = true
         val emptyTrashImmediately = settingsPref.getBoolean("EmptyTrashImmediately",false)
         val darkMode = settingsPref.getInt("darkModePosition",R.id.defaultMode)
+        val fontPosition = settingsPref.getInt("fontMultiplier",2)
         val radioPosition = settingsPref.getInt("radioPosition", R.id.fontDef)
         val emptyTrashSwitch = binding.emptyTrashSwitch
         val lightModeGroup = binding.dayNightRadioGroup
         val fontRadioGroup = binding.radioGroup
+        val fontSeekBar = binding.seekBar
+        val dummyText = binding.fontSizeDummyT
         emptyTrashSwitch.isChecked = emptyTrashImmediately
         emptyTrashSwitch.setOnCheckedChangeListener { _,_ ->
             editor.putBoolean("EmptyTrashImmediately",!emptyTrashImmediately)
@@ -53,6 +57,23 @@ class SettingsFragment : Fragment() {
 
             }
         }
+        fontSeekBar.progress = fontPosition
+        dummyText.textSize = 32f+((fontPosition-2)*4)
+
+        fontSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
+            override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
+                editor.putInt("fontMultiplier",p1)
+                editor.apply()
+                dummyText.textSize = 32f+((p1-2)*4)
+            }
+
+            override fun onStartTrackingTouch(p0: SeekBar?) {
+            }
+
+            override fun onStopTrackingTouch(p0: SeekBar?) {
+            }
+
+        })
 
         lightModeGroup.check(darkMode)
         lightModeGroup.setOnCheckedChangeListener { _, p1 ->

@@ -25,6 +25,7 @@ import android.text.TextWatcher
 import android.text.format.DateFormat
 import android.util.Log
 import android.util.SparseArray
+import android.util.TypedValue
 import android.view.*
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -76,6 +77,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
     TodoItemInterface
 
 {
+    private var fontMultiplier: Int = 2
     private var deleted: Boolean = false
     private var reminderItem : MenuItem? = null
     private var lockNoteItem : MenuItem? = null
@@ -317,6 +319,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                         noteUid?.let { deletedNoteUids.add(it) }
                     }
                     editor.putStringSet("noteUids",deletedNoteUids)
+                    editor.putLong(noteUid,calendar.timeInMillis)
                     editor.apply()
                 }
                 cancelAlarm(viewModal.reminderTime.toInt())
@@ -831,6 +834,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
         deletedNotePrefs = applicationContext.getSharedPreferences("DeletedNotes", MODE_PRIVATE)
         settingsPref = applicationContext.getSharedPreferences("Settings", MODE_PRIVATE)
+        fontMultiplier = settingsPref.getInt("fontMultiplier",2)
+
         noteTitleEdit = findViewById(R.id.noteEditTitle)
         layoutManager = LinearLayoutManager(applicationContext,LinearLayoutManager.HORIZONTAL,false)
         calendar = Calendar.getInstance()
@@ -843,6 +848,9 @@ class AddEditNoteActivity : AppCompatActivity() ,
         addTagBtn = findViewById(R.id.addTagBtn)
         reminderTV = findViewById(R.id.reminderTV)
         reminderIcon = findViewById(R.id.reminderIcon)
+        noteTitleEdit.setTextSize(TypedValue.COMPLEX_UNIT_SP,32f+ ((fontMultiplier-2)*4).toFloat())
+        noteDescriptionEdit.setTextSize(TypedValue.COMPLEX_UNIT_SP,24f+ ((fontMultiplier-2)*4).toFloat())
+        tvTimeStamp.setTextSize(TypedValue.COMPLEX_UNIT_SP,10f+ ((fontMultiplier-2)*4).toFloat())
         noteID = intent.getLongExtra("noteID",-1)
         noteType = intent.getStringExtra("noteType").toString()
         intent.putExtra("noteType","Edit")
@@ -938,7 +946,10 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 ResourcesCompat.getFont(applicationContext, R.font.roboto)
             }
         }
+        todoItemDescTV.setTextSize(TypedValue.COMPLEX_UNIT_SP,24f+ ((fontMultiplier-2)*4).toFloat())
+        todoItemDescTV.typeface = typeface
         todoRVAdapter.fontStyle = fontStyle
+        todoRVAdapter.fontMultiplier = fontMultiplier
         noteDescriptionEdit.typeface = typeface
         noteTitleEdit.typeface = typeface
         reminderTV.typeface = typeface
@@ -1007,6 +1018,12 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 viewModal.reminderTime = 0
             }
             return@setOnMenuItemClickListener true
+        }
+
+        if (reminderNoteSet){
+            reminderItem?.setIcon(R.drawable.ic_baseline_add_alert_24)
+        }else{
+            reminderItem?.setIcon(R.drawable.ic_outline_add_alert_24)
         }
         if (protected){
             lockNoteItem?.setIcon(R.drawable.baseline_lock_24)
