@@ -34,6 +34,46 @@
         <item name="android:textColor">@color/gunmetal</item>
         <item name="android:background">@color/Apricot</item>
     </style>
+
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <!-- Set the splash screen background, animated icon, and animation duration. -->
+        <item name="windowSplashScreenBackground">@color/gunmetal</item>
+
+        <!-- Use windowSplashScreenAnimatedIcon to add either a drawable or an
+             animated drawable. One of these is required. -->
+        <item name="windowSplashScreenAnimatedIcon">@drawable/welcome_icon</item>
+        <!-- Required for animated icons -->
+        <item name="windowSplashScreenAnimationDuration">200</item>
+
+        <!-- Set the theme of the Activity that directly follows your splash screen. -->
+        <!-- Required -->
+        <item name="postSplashScreenTheme">@style/Theme.LetsNote</item>
+    </style>
+    <style name="Theme.App.Activity" parent="Theme.AppCompat.DayNight.DarkActionBar">
+        <item name="colorPrimary">@color/gunmetal</item>
+        <item name="colorPrimaryVariant">@color/gunmetal</item>
+        <item name="colorOnPrimary">@color/timberwolf</item>
+
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondaryVariant">@color/teal_200</item>
+        <item name="windowActionModeOverlay">true</item>
+
+        <!--        <item name="toolbarNavigationButtonStyle">@style/ActivityToolbarNavButtonStyle</item>-->
+
+        <item name="colorOnSecondary">@color/timberwolf</item>
+        <item name="android:statusBarColor" >@color/gunmetal</item>
+        <item name="android:navigationBarColor">@color/gunmetal</item>
+
+
+    </style>
+
+    <style name="ActivityToolbarNavButtonStyle" parent="Widget.AppCompat.Toolbar.Button.Navigation">
+        <item name="tint">@color/timberwolf</item>
+        <item name="android:textColorPrimary">@color/timberwolf</item>
+        <item name="colorOnSecondary">@color/timberwolf</item>
+
+    </style>
     <style name="Theme.AppCompat.Transparent.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>

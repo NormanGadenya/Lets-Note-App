@@ -10,6 +10,8 @@
         <entry key="app/src/main/res/drawable/baseline_drag_indicator_24.xml" value="0.307" />
         <entry key="app/src/main/res/drawable/baseline_format_list_bulleted_24.xml" value="0.307" />
         <entry key="app/src/main/res/drawable/baseline_grid_view_24.xml" value="0.307" />
+        <entry key="app/src/main/res/drawable/baseline_lock_24.xml" value="0.179" />
+        <entry key="app/src/main/res/drawable/baseline_lock_open_24.xml" value="0.254" />
         <entry key="app/src/main/res/drawable/cancel_background.xml" value="0.2095" />
         <entry key="app/src/main/res/drawable/celadon_tag.xml" value="0.22291666666666668" />
         <entry key="app/src/main/res/drawable/celadon_toolbar.xml" value="0.1225" />
@@ -21,17 +23,26 @@
         <entry key="app/src/main/res/drawable/honey_dew.xml" value="0.22291666666666668" />
         <entry key="app/src/main/res/drawable/honey_drew_toolbar.xml" value="0.1225" />
         <entry key="app/src/main/res/drawable/ic_apricot_24.xml" value="0.353125" />
+        <entry key="app/src/main/res/drawable/ic_baseline_access_alarm_24.xml" value="0.179" />
+        <entry key="app/src/main/res/drawable/ic_baseline_access_time_24.xml" value="0.254" />
+        <entry key="app/src/main/res/drawable/ic_baseline_add_alert_24.xml" value="0.254" />
         <entry key="app/src/main/res/drawable/ic_baseline_bookmark_24.xml" value="0.353125" />
+        <entry key="app/src/main/res/drawable/ic_baseline_bookmark_add_24.xml" value="0.31" />
         <entry key="app/src/main/res/drawable/ic_baseline_bookmark_remove_24.xml" value="0.1125" />
         <entry key="app/src/main/res/drawable/ic_baseline_more_vert_24.xml" value="0.307" />
+        <entry key="app/src/main/res/drawable/ic_baseline_push_pin_24.xml" value="0.179" />
         <entry key="app/src/main/res/drawable/ic_baseline_search_24.xml" value="0.191" />
         <entry key="app/src/main/res/drawable/ic_baseline_settings_24.xml" value="0.307" />
         <entry key="app/src/main/res/drawable/ic_baseline_table_rows_24.xml" value="0.31" />
+        <entry key="app/src/main/res/drawable/ic_baseline_unarchive_24.xml" value="0.254" />
         <entry key="app/src/main/res/drawable/ic_ev_24.xml" value="0.353125" />
         <entry key="app/src/main/res/drawable/ic_launcher1_foreground.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_menu_camera.xml" value="0.307" />
         <entry key="app/src/main/res/drawable/ic_menu_gallery.xml" value="0.307" />
         <entry key="app/src/main/res/drawable/ic_menu_slideshow.xml" value="0.307" />
+        <entry key="app/src/main/res/drawable/ic_outline_add_alert_24.xml" value="0.179" />
+        <entry key="app/src/main/res/drawable/ic_outline_archive_24.xml" value="0.179" />
+        <entry key="app/src/main/res/drawable/ic_outline_push_pin_24.xml" value="0.179" />
         <entry key="app/src/main/res/drawable/main_tool_back.xml" value="0.33" />
         <entry key="app/src/main/res/drawable/nav_acc_detail_background.xml" value="0.306" />
         <entry key="app/src/main/res/drawable/note_lock_24.xml" value="0.307" />
@@ -48,6 +59,7 @@
         <entry key="app/src/main/res/layout/activity_label_notes.xml" value="0.17" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_main2.xml" value="0.3697916666666667" />
+        <entry key="app/src/main/res/layout/activity_splash.xml" value="0.2484375" />
         <entry key="app/src/main/res/layout/activity_terms_and_conditions.xml" value="0.35885416666666664" />
         <entry key="app/src/main/res/layout/add_label_dialog.xml" value="0.2" />
         <entry key="app/src/main/res/layout/add_tag_dialog.xml" value="0.22644927536231885" />
@@ -99,17 +111,10 @@
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_16" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_X" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">
     <option name="id" value="Android" />
-  </component>
-  <component name="VisualizationToolProject">
-    <option name="state">
-      <ProjectState>
-        <option name="scale" value="0.22" />
-      </ProjectState>
-    </option>
   </component>
 </project>

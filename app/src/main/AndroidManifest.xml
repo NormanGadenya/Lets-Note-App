@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     package="com.neuralbit.letsnote">
 
     <uses-permission android:name="android.permission.CAMERA" />
@@ -19,25 +18,28 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher1_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.LetsNote">
+        android:theme="@style/Theme.App.Starting">
         <activity
             android:name=".TermsAndConditions"
+            android:theme="@style/Theme.App.Activity"
             android:parentActivityName=".MainActivity"
             android:exported="false" />
         <activity
             android:name=".Fingerprint"
+            android:theme="@style/Theme.App.Activity"
             android:exported="false" />
 
         <activity
             android:name=".AddEditNoteActivity"
             android:exported="true"
+            android:theme="@style/Theme.App.Activity"
             android:windowSoftInputMode="adjustPan"
             android:parentActivityName=".MainActivity" />
 
         <activity
             android:name=".SplashActivity"
             android:exported="true"
-            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -66,10 +68,12 @@
         <activity
             android:name=".LabelNotesActivity"
             android:exported="true"
+            android:theme="@style/Theme.App.Activity"
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".TagNotesActivity"
             android:exported="true"
+            android:theme="@style/Theme.App.Activity"
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".MainActivity"

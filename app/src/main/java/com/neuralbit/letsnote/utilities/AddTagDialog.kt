@@ -31,9 +31,10 @@ class AddTagDialog(private val getTagFromDialog: GetTagFromDialog, val ctx: Cont
                 run {
 
                     var tagTitle = addTagET?.text.toString()
-                    tagTitle = if(tagTitle[0]=='#'){
-                        tagTitle.substring(1,tagTitle.length)
-                    }else "#"+tagTitle.substring(1,tagTitle.length)
+                    if (tagTitle[0] == '#'){
+                        tagTitle = tagTitle.substring(1,tagTitle.length)
+                    }
+
                     getTagFromDialog.getTag(tagTitle)
                 }
             }

@@ -31,6 +31,7 @@ import android.view.View.VISIBLE
 import android.widget.*
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContract
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -81,7 +82,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private var restoreItem : MenuItem? = null
     private var pinItem: MenuItem? = null
     private var archiveItem: MenuItem? = null
-    private val CAMERA_REQUEST = 1888
     private val GALLERY_REQUEST = 100
     private var deleteItem: MenuItem? = null
     private lateinit var dismissTodoButton: ImageButton
@@ -98,7 +98,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private lateinit var reminderTV : TextView
     private var noteID : Long= -1
     private var noteUid : String? = null
-    private lateinit var viewModal : NoteViewModel
+    private val viewModal : NoteViewModel by viewModels()
     private lateinit var labelViewModel : LabelViewModel
     private var oldLabel : Int = -1
     private var noteDescOrig : String? = null
@@ -142,6 +142,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private lateinit var deletedNotePrefs : SharedPreferences
     private lateinit var settingsPref : SharedPreferences
     private var protected = false
+    private var labelColor = 0
     private var noteChanged = false
     private var tagList : ArrayList<String> = ArrayList()
 
@@ -236,15 +237,17 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 redoUndoGroup.visibility = GONE
 
                 tvTimeStamp.text= getString(R.string.timeStamp,cm.convertLongToTime(noteTimeStamp)[0],cm.convertLongToTime(noteTimeStamp)[1])
-                val labelColor = viewModal.labelColor
-                if(labelColor > 0){
-                    coordinatorlayout.setBackgroundColor(labelColor)
-                    delLabelBtn.visibility = VISIBLE
-                }else{
-                    coordinatorlayout.setBackgroundColor(Color.TRANSPARENT)
-
-                    delLabelBtn.visibility = GONE
-                }
+//                val labelColor = viewModal.labelColor.value
+//                if (labelColor != null) {
+//                    if(labelColor > 0){
+//                        coordinatorlayout.setBackgroundColor(labelColor)
+//                        delLabelBtn.visibility = VISIBLE
+//                    }else{
+//                        coordinatorlayout.setBackgroundColor(Color.TRANSPARENT)
+//
+//                        delLabelBtn.visibility = GONE
+//                    }
+//                }
                 tagListAdapter.updateList(viewModal.oldTagList)
             }
             else -> {
@@ -257,7 +260,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         delLabelBtn.setOnClickListener {
             viewModal.noteChanged.value = true
             viewModal.labelChanged = true
-            viewModal.labelColor = 0
+            viewModal.labelColor.value = 0
 
 
         }
@@ -287,26 +290,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 reminderIcon.visibility = GONE
             }
         }
-        viewModal.noteLocked.observe(lifecycleOwner){
-            protected = it
-            if (it){
-                lockNoteItem?.setIcon(R.drawable.baseline_lock_24)
-            }else{
-                lockNoteItem?.setIcon(R.drawable.baseline_lock_open_24)
-            }
-        }
 
-        viewModal.pinned.observe(lifecycleOwner) {
-            notePinned = it
-
-            if (it) {
-                pinItem?.setIcon(R.drawable.ic_baseline_push_pin_24)
-
-            } else {
-                pinItem?.setIcon(R.drawable.ic_outline_push_pin_24)
-
-            }
-        }
         val fingerprintManager : FingerprintManager = getSystemService(FINGERPRINT_SERVICE) as FingerprintManager
         lockNoteItem?.isVisible = !(!fingerprintManager.isHardwareDetected || !fingerprintManager.hasEnrolledFingerprints())
 
@@ -535,6 +519,39 @@ class AddEditNoteActivity : AppCompatActivity() ,
             false
         }
 
+        viewModal.noteLocked.observe(lifecycleOwner){
+            protected = it
+            if (it){
+                lockNoteItem?.setIcon(R.drawable.baseline_lock_24)
+            }else{
+                lockNoteItem?.setIcon(R.drawable.baseline_lock_open_24)
+            }
+        }
+
+        viewModal.pinned.observe(lifecycleOwner) {
+            notePinned = it
+
+            if (it) {
+                pinItem?.setIcon(R.drawable.ic_baseline_push_pin_24)
+
+            } else {
+                pinItem?.setIcon(R.drawable.ic_outline_push_pin_24)
+            }
+        }
+
+        viewModal.labelColor.observe(this){
+            labelColor = it
+            if (it>0){
+                coordinatorlayout.setBackgroundColor(it)
+                delLabelBtn.visibility = VISIBLE
+
+            }else{
+                coordinatorlayout.setBackgroundColor(Color.TRANSPARENT)
+                delLabelBtn.visibility = GONE
+
+            }
+        }
+
 
         noteTitleEdit.setOnKeyListener { _, _, _ ->
             viewModal.noteChanged.value = true
@@ -601,33 +618,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
             }
 
 
-        }
-    }
-
-
-    private fun getImageFromCamera() {
-        if (ContextCompat.checkSelfPermission(
-                applicationContext,
-                Manifest.permission.CAMERA
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-            startActivityForResult(cameraIntent, CAMERA_REQUEST)
-        } else {
-            requestCameraPermission()
-        }
-    }
-
-    private fun getImageFromGallery() {
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-            startActivityForResult(intent, GALLERY_REQUEST)
-        } else {
-            requestStoragePermission()
         }
     }
 
@@ -862,7 +852,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         notePinned = intent.getBooleanExtra("pinned",false)
         archived = intent.getBooleanExtra("archieved",false)
         deleted = intent.getBooleanExtra("deleted",false)
-        protected = intent.getBooleanExtra("protected", false)
+        viewModal.noteLocked.value = intent.getBooleanExtra("protected", false)
 
 
         val tagIntentList = intent.getStringArrayListExtra("tagList")
@@ -913,10 +903,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
         todoCheckBox = findViewById(R.id.todoCheckBox)
         todoItemDescTV = findViewById(R.id.todoItemDescTV)
         lifecycleOwner = this
-        viewModal = ViewModelProvider(
-            this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(application)
-        )[NoteViewModel::class.java]
 
         labelViewModel = ViewModelProvider(
             this,
@@ -930,11 +916,11 @@ class AddEditNoteActivity : AppCompatActivity() ,
             viewModal.reminderSet.value = true
         }
         viewModal.allTodoItems.value = todoDoItemList
-
-        viewModal.labelColor = oldLabel
+        if (oldLabel > 0){
+            viewModal.labelColor.value = oldLabel
+        }
         viewModal.archived.value = archived
         viewModal.deletedNote.value = deleted
-        viewModal.noteLocked.value = protected
         viewModal.noteChanged.value = noteChanged
         viewModal.pinned.value = notePinned
         val fontStyle = settingsPref.getString("font",null)
@@ -1098,17 +1084,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
     @TargetApi(25)
     private fun createShortcut() {
-//        val sM = getSystemService(ShortcutManager::class.java)
-//        val intent1 = Intent(applicationContext, AddEditNoteActivity::class.java)
-//        intent1.action = Intent.ACTION_VIEW
-//        val shortcut1 = ShortcutInfo.Builder(this, "newNote")
-//            .setIntent(intent1)
-//            .setShortLabel(getString(R.string.shortcut_short_label))
-//            .setLongLabel(getString(R.string.shortcut_long_label))
-//            .setIcon(Icon.createWithResource(this, R.mipmap.shortcut_icon))
-//            .build()
-//        sM.dynamicShortcuts = listOf(shortcut1)
-
         val intent = Intent(applicationContext, AddEditNoteActivity::class.java)
         intent.action = Intent.ACTION_VIEW
         val shortcutInfo = ShortcutInfoCompat.Builder(applicationContext, "newNote")
@@ -1117,7 +1092,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
             .setIntent(intent) // Push the shortcut
             .build()
 
-// Push the shortcut
         ShortcutManagerCompat.pushDynamicShortcut(applicationContext, shortcutInfo)
     }
 
@@ -1179,10 +1153,10 @@ class AddEditNoteActivity : AppCompatActivity() ,
             colorPickerView = labelDialog.findViewById(R.id.colorPicker)
             colorPickerView.addOnColorSelectedListener{
                 val hex = ColorTransparentUtils.transparentColor(it,30)
-                viewModal.labelColor = Color.parseColor(hex)
+                viewModal.labelColor.value = Color.parseColor(hex)
                 viewModal.labelChanged = true
                 viewModal.noteChanged.value = true
-                coordinatorlayout.setBackgroundColor(Color.parseColor(hex))
+                delLabelBtn.visibility = VISIBLE
 
             }
 
@@ -1366,7 +1340,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         }
         intent.putExtra("noteUid",noteUid)
         intent.putExtra("timeStamp",System.currentTimeMillis())
-        intent.putExtra("labelColor",viewModal.labelColor)
+        intent.putExtra("labelColor",labelColor)
         intent.putExtra("pinned",viewModal.pinned.value)
         intent.putExtra("archieved",viewModal.archived.value)
         intent.putExtra("protected",protected)
@@ -1422,6 +1396,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 tags.addAll(viewModal.oldTagList)
                 tags.addAll(viewModal.newTags)
                 tags.removeAll(viewModal.deletedTags.toSet())
+
                 if (viewModal.deletedNote.value != true){
                     if(noteType == "Edit"){
                         cancelDelete(viewModal.reminderTime.toInt())
@@ -1429,7 +1404,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                         noteUpdate["title"] = noteTitle
                         noteUpdate["description"] = noteDescription
                         noteUpdate["timeStamp"] = currentDate
-                        noteUpdate["label"] = viewModal.labelColor
+                        noteUpdate["label"] = labelColor
                         noteUpdate["pinned"] = notePinned
                         noteUpdate["archived"] = archived
                         noteUpdate["reminderDate"] = viewModal.reminderTime
@@ -1451,7 +1426,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                             noteFire.tags = ArrayList(tags)
                             noteFire.reminderDate = viewModal.reminderTime
                             noteFire.pinned = notePinned
-                            noteFire.label = viewModal.labelColor
+                            noteFire.label = labelColor
                             noteFire.protected = protected
                             noteFire.todoItems = ArrayList(viewModal.todoItems)
                             noteUid =  viewModal.addFireNote(noteFire)
@@ -1464,9 +1439,9 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 }else{
                     val emptyTrashImmediately = settingsPref.getBoolean("EmptyTrashImmediately",false)
                     if (!emptyTrashImmediately){
-                        noteUid?.let { scheduleDelete(it, tags,viewModal.labelColor,noteTimeStamp) }
+                        noteUid?.let { scheduleDelete(it, tags,labelColor,noteTimeStamp) }
                     }else{
-                        noteUid?.let { viewModal.deleteNote(it, viewModal.labelColor,tags) }
+                        noteUid?.let { viewModal.deleteNote(it, labelColor,tags) }
                     }
                     Toast.makeText(this@AddEditNoteActivity,"Note Deleted",Toast.LENGTH_SHORT).show()
 
@@ -1487,7 +1462,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
             intent.putExtra("noteDescription",noteDescription)
             intent.putExtra("noteUid",noteUid)
             intent.putExtra("timeStamp",noteTimeStamp)
-            intent.putExtra("labelColor",viewModal.labelColor)
+            intent.putExtra("labelColor",labelColor)
             intent.putExtra("pinned",viewModal.pinned.value)
             intent.putExtra("archieved",viewModal.archived.value)
             intent.putExtra("protected",true)
@@ -1518,13 +1493,15 @@ class AddEditNoteActivity : AppCompatActivity() ,
             viewModal.addOrDeleteTags(newTagsAdded,deletedTags,it)
         }
 
-        val labelColor = viewModal.labelColor
+        val labelColor = viewModal.labelColor.value
         if (viewModal.labelChanged){
-            if (labelColor > 0){
-                noteUid?.let { viewModal.addOrDeleteLabel(labelColor,oldLabel, it,true) }
-            }else{
-                noteUid?.let { viewModal.addOrDeleteLabel(labelColor, oldLabel, it, false) }
+            if (labelColor != null) {
+                if (labelColor > 0){
+                    noteUid?.let { viewModal.addOrDeleteLabel(labelColor,oldLabel, it,true) }
+                }else{
+                    noteUid?.let { viewModal.addOrDeleteLabel(labelColor, oldLabel, it, false) }
 
+                }
             }
         }
 
@@ -1610,11 +1587,10 @@ class AddEditNoteActivity : AppCompatActivity() ,
     }
 
     override fun onLabelItemClick(labelColor: Int) {
-        viewModal.labelColor = labelColor
+        viewModal.labelColor.value = labelColor
         viewModal.labelChanged = true
         viewModal.noteChanged.value = true
         textChanged = true
-        coordinatorlayout.setBackgroundColor(labelColor)
 
     }
 
