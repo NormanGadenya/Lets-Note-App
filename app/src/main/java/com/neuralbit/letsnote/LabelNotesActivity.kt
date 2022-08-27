@@ -1,6 +1,7 @@
 package com.neuralbit.letsnote
 
 import android.app.AlarmManager
+import android.app.AlertDialog
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -132,9 +133,26 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
                 mode?.finish()
                 return true
             }else if (item?.itemId == R.id.delete){
-                deleteNotes()
-                mode?.finish()
+
+                val alertDialog: AlertDialog.Builder = AlertDialog.Builder(this@LabelNotesActivity)
+                alertDialog.setTitle("Are you sure about this ?")
+                alertDialog.setPositiveButton("Yes"
+                ) { _, _ ->
+                    deleteNotes()
+                    mode?.finish()
+                }
+                alertDialog.setNegativeButton("Cancel"
+                ) { dialog, _ ->
+                    run {
+                        mode?.finish()
+                        dialog.cancel()
+                    }
+                }
+                alertDialog.show()
+
+
                 return true
+
             }
             return false
         }

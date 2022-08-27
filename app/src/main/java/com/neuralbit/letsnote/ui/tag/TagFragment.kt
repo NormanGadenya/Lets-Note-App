@@ -63,33 +63,84 @@ class TagFragment : Fragment(), TagRVAdapter.TagItemClick {
         val tagRVAdapter = context?.let { TagRVAdapter(it,this) }
         tagRV.adapter= tagRVAdapter
 
-        noteViewModel.allFireTags().observe(viewLifecycleOwner){ it ->
-            val tagFireList = HashSet<TagFire>()
+        noteViewModel.allFireTags().observe(viewLifecycleOwner){
             val pref = context?.getSharedPreferences("DeletedNotes", AppCompatActivity.MODE_PRIVATE)
             val deletedNotes = pref?.getStringSet("noteUids", HashSet())
             val tagList = HashSet<Tag>()
-            for (t in it){
-                val tag = Tag(t.tagName,t.noteUids.size)
-                if (deletedNotes != null){
-                    for (n in t.noteUids){
-                        if (!deletedNotes.contains(n)){
-                            tagList.add(tag)
-                            tagFireList.add(t)
+            val tagFireList = HashSet<TagFire>()
+            allNotesViewModel.allFireNotes.observe(viewLifecycleOwner){ allNotes ->
+
+                val archivedNotes = ArrayList<String>()
+                for ( n in allNotes){
+                    if (n.archived){
+                        n.noteUid?.let { it1 -> archivedNotes.add(it1) }
+                    }
+                }
+                for ( t in it){
+                    val tag = Tag(t.tagName,t.noteUids.size)
+
+                    for ( n in t.noteUids){
+                        if(archivedNotes.contains(n) || deletedNotes?.contains(n) == true){
+                            tag.noteCount-=1
                         }
+                        if (!archivedNotes.contains(n)){
+                            if (deletedNotes != null){
+
+                                if (!deletedNotes.contains(n)){
+                                    tagList.add(tag)
+                                    tagFireList.add(t)
+                                }
+
+
+                            }else{
+                                tagList.add(tag)
+                                tagFireList.add(t)
+                            }
+                        }
+
                     }
 
-                }else{
-                    tagList.add(tag)
-                    tagFireList.add(t)
                 }
-
+                val sortedTagList = tagList.sortedBy { i -> i.noteCount }.reversed()
+                val sortedTagFireList = tagFireList.sortedBy { i -> i.noteUids.size }.reversed()
+                tagViewModel.allTagFire = ArrayList(sortedTagFireList)
+                tagViewModel.allTags = ArrayList(sortedTagList)
+                tagRVAdapter?.updateTagList(ArrayList(sortedTagList))
             }
-            val sortedTagList = tagList.sortedBy { i -> i.noteCount }.reversed()
-            val sortedTagFireList = tagFireList.sortedBy { i -> i.noteUids.size }.reversed()
-            tagViewModel.allTagFire = ArrayList(sortedTagFireList)
-            tagViewModel.allTags = ArrayList(sortedTagList)
-            tagRVAdapter?.updateTagList(ArrayList(sortedTagList))
+
         }
+
+
+//        noteViewModel.allFireTags().observe(viewLifecycleOwner){ it ->
+//            val tagFireList = HashSet<TagFire>()
+//            val pref = context?.getSharedPreferences("DeletedNotes", AppCompatActivity.MODE_PRIVATE)
+//            val deletedNotes = pref?.getStringSet("noteUids", HashSet())
+//            val tagList = HashSet<Tag>()
+//            for (t in it){
+//                val tag = Tag(t.tagName,t.noteUids.size)
+//                if (deletedNotes != null){
+//                    for (n in t.noteUids){
+//                        if (!deletedNotes.contains(n)){
+//                            tagList.add(tag)
+//                            tagFireList.add(t)
+//                        }
+//                    }
+//
+//                }else{
+//                    tagList.add(tag)
+//                    tagFireList.add(t)
+//                }
+//
+//            }
+//
+//
+//
+//            val sortedTagList = tagList.sortedBy { i -> i.noteCount }.reversed()
+//            val sortedTagFireList = tagFireList.sortedBy { i -> i.noteUids.size }.reversed()
+//            tagViewModel.allTagFire = ArrayList(sortedTagFireList)
+//            tagViewModel.allTags = ArrayList(sortedTagList)
+//            tagRVAdapter?.updateTagList(ArrayList(sortedTagList))
+//        }
 
         tagViewModel.searchQuery.observe(viewLifecycleOwner){
             if(it!=null){
