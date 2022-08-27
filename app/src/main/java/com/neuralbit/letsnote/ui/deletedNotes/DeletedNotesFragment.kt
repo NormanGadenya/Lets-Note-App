@@ -126,7 +126,7 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
 
         deletedNotesViewModel.itemDeleteClicked.observe(viewLifecycleOwner){
             if (it && allNotesViewModel.selectedNotes.isNotEmpty()){
-
+                val selectedNotesCount = allNotesViewModel.selectedNotes.size
                 val alertDialog: AlertDialog.Builder = AlertDialog.Builder(context)
                 alertDialog.setTitle("Are you sure about this ?")
                 alertDialog.setPositiveButton("Yes"
@@ -161,7 +161,11 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
                         allNotesViewModel.selectedNotes.clear()
                         allNotesViewModel.itemSelectEnabled.value = false
                         deletedNotesViewModel.itemDeleteClicked.value = false
-                        Toast.makeText(context,"Notes deleted successfully",Toast.LENGTH_SHORT).show()
+                        if (selectedNotesCount == 1){
+                            Toast.makeText(context,"Note deleted successfully",Toast.LENGTH_SHORT).show()
+                        }else{
+                            Toast.makeText(context,"Notes deleted successfully",Toast.LENGTH_SHORT).show()
+                        }
 
                         noteRVAdapter?.updateListFire(notes)
 
@@ -186,8 +190,7 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
 
         deletedNotesViewModel.itemRestoreClicked.observe(viewLifecycleOwner){
             if (it && allNotesViewModel.selectedNotes.isNotEmpty()){
-                Log.d(TAG, "onCreateView: ${allNotesViewModel.selectedNotes}")
-
+                val selectedNotesCount = allNotesViewModel.selectedNotes.size
                 val noteUids = pref?.getStringSet("noteUids", HashSet())
                 val deletedNoteUids = HashSet<String>()
                 if (noteUids != null){
@@ -209,8 +212,12 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
                 noteRVAdapter?.updateListFire(notes)
                 allNotesViewModel.selectedNotes.clear()
                 allNotesViewModel.itemSelectEnabled.value = false
+                if (selectedNotesCount == 1){
+                    Toast.makeText(context,"Note restored successfully",Toast.LENGTH_SHORT).show()
+                }else{
+                    Toast.makeText(context,"Notes restored successfully",Toast.LENGTH_SHORT).show()
 
-                Toast.makeText(context,"Notes restored successfully",Toast.LENGTH_SHORT).show()
+                }
             }
         }
 

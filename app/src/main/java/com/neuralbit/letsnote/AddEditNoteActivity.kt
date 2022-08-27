@@ -301,6 +301,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 infoContainer.visibility = GONE
                 reminderTV.visibility =  GONE
                 reminderIcon.visibility = GONE
+                addTodoButton.visibility = GONE
+                todoRV.isEnabled = false
                 if (!emptyTrashImmediately){
                     if (noteUids != null){
                         deletedNoteUids.addAll(noteUids)
@@ -326,6 +328,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
                     reminderTV.visibility =  VISIBLE
                     reminderIcon.visibility = VISIBLE
                 }
+                addTodoButton.visibility = VISIBLE
+                todoRV.isEnabled = true
                 if (noteUids != null){
                     deletedNoteUids.addAll(noteUids)
                     noteUid?.let { uid -> deletedNoteUids.remove(uid) }
@@ -346,16 +350,22 @@ class AddEditNoteActivity : AppCompatActivity() ,
                     reminderItem?.isVisible = false
                     noteDescriptionEdit.isEnabled = false
                     noteTitleEdit.isEnabled = false
+                    todoCheckBox.isEnabled = false
                     infoContainer.visibility = GONE
+                    addTodoButton.visibility = GONE
+
+                    todoRV.isEnabled = false
                 } else {
                     pinItem?.isVisible = true
                     archiveItem?.isVisible = true
                     restoreItem?.isVisible = false
                     reminderItem?.isVisible = true
-
+                    todoCheckBox.isEnabled = true
                     infoContainer.visibility = VISIBLE
                     noteDescriptionEdit.isEnabled = true
                     noteTitleEdit.isEnabled = true
+                    addTodoButton.visibility = VISIBLE
+                    todoRV.isEnabled = true
 
                 }
             }
@@ -1337,6 +1347,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
 
     private fun startAlarm(requestCode: Int) {
+       
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(this, AlertReceiver::class.java)
         viewModal.noteChanged.value = true
@@ -1362,7 +1373,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         intent.putExtra("noteType","Edit")
 
         val pendingIntent = PendingIntent.getBroadcast(this, requestCode, intent, PendingIntent.FLAG_IMMUTABLE)
-        alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
+        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
     }
 
     private fun scheduleDelete( noteUid : String, tags : ArrayList<String>, label: Int , timeStamp : Long) {

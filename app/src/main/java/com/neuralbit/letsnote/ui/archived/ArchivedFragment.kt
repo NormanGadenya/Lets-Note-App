@@ -106,6 +106,7 @@ class ArchivedFragment : Fragment() , NoteFireClick {
 
         archivedViewModel.itemDeleteClicked.observe(viewLifecycleOwner){
             if (it && allNotesViewModel.selectedNotes.isNotEmpty()){
+                val selectedNotesCount = allNotesViewModel.selectedNotes.size
                 val pref = context?.getSharedPreferences("DeletedNotes", AppCompatActivity.MODE_PRIVATE)
                 val settings = context?.getSharedPreferences("Settings", AppCompatActivity.MODE_PRIVATE)
                 val emptyTrashImmediately = settings?.getBoolean("EmptyTrashImmediately",false)
@@ -141,15 +142,20 @@ class ArchivedFragment : Fragment() , NoteFireClick {
 
                 allNotesViewModel.itemSelectEnabled.value = false
                 allNotesViewModel.itemDeleteClicked.value = false
+                if (selectedNotesCount == 1){
+                    Toast.makeText(context,"Note deleted successfully", Toast.LENGTH_SHORT).show()
 
-                Toast.makeText(context,"Notes deleted successfully", Toast.LENGTH_SHORT).show()
+                }else{
+                    Toast.makeText(context,"Notes deleted successfully", Toast.LENGTH_SHORT).show()
+                }
+
             }
         }
 
         archivedViewModel.itemRestoreClicked.observe(viewLifecycleOwner){
             if (it && allNotesViewModel.selectedNotes.isNotEmpty()){
 
-
+                val selectedNotesCount = allNotesViewModel.selectedNotes.size
                 for ( note in allNotesViewModel.selectedNotes){
                     archivedViewModel.notesToRestore.value = note
                     archivedViewModel.archivedFireNotes.value?.remove(note)
@@ -161,8 +167,12 @@ class ArchivedFragment : Fragment() , NoteFireClick {
 
                 allNotesViewModel.itemSelectEnabled.value = false
                 allNotesViewModel.itemDeleteClicked.value = false
-
-                Toast.makeText(context,"Notes restored successfully", Toast.LENGTH_SHORT).show()
+                allNotesViewModel.selectedNotes.clear()
+                if (selectedNotesCount == 1){
+                    Toast.makeText(context,"Note restored successfully", Toast.LENGTH_SHORT).show()
+                }else{
+                    Toast.makeText(context,"Notes restored successfully", Toast.LENGTH_SHORT).show()
+                }
             }
 
         }

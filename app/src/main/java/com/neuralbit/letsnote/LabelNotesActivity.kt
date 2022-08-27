@@ -171,6 +171,7 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
             val settings = applicationContext?.getSharedPreferences("Settings", MODE_PRIVATE)
             val emptyTrashImmediately = settings?.getBoolean("EmptyTrashImmediately",false)
 
+            val selectedNotesCount = allNotesViewModel.selectedNotes.size
             for ( note in allNotesViewModel.selectedNotes){
                 val editor: SharedPreferences.Editor ?= pref?.edit()
                 val noteUids = pref?.getStringSet("noteUids",HashSet())
@@ -206,14 +207,19 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
 
 
             allNotesViewModel.itemSelectEnabled.value = false
+            if (selectedNotesCount == 1){
+                Toast.makeText(applicationContext,"Note deleted successfully",Toast.LENGTH_SHORT).show()
+            }else{
+                Toast.makeText(applicationContext,"Notes deleted successfully",Toast.LENGTH_SHORT).show()
+            }
 
-            Toast.makeText(applicationContext,"Notes deleted successfully",Toast.LENGTH_SHORT).show()
         }
 
     }
 
     private fun archiveNotes() {
         if (allNotesViewModel.selectedNotes.isNotEmpty()){
+            val selectedNotesCount = allNotesViewModel.selectedNotes.size
 
             for ( note in allNotesViewModel.selectedNotes){
                 labelViewModel.labelNotes.remove(note)
@@ -229,8 +235,14 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
             allNotesViewModel.selectedNotes.clear()
 
             allNotesViewModel.itemSelectEnabled.value = false
+            if (selectedNotesCount == 1){
+                Toast.makeText(applicationContext,"Note archived successfully", Toast.LENGTH_SHORT).show()
 
-            Toast.makeText(applicationContext,"Notes archived successfully", Toast.LENGTH_SHORT).show()
+            }else{
+                Toast.makeText(applicationContext,"Notes archived successfully", Toast.LENGTH_SHORT).show()
+
+            }
+
         }
     }
 

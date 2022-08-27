@@ -75,18 +75,6 @@ class TagNotesActivity : AppCompatActivity() , NoteFireClick {
         }else{
             recyclerView.layoutManager = LinearLayoutManager(applicationContext)
         }
-//        allNotesViewModel.getAllFireNotes().observe(this){
-//            val notes = ArrayList<NoteFire>()
-//            for(note in it){
-//                for (uid in viewModel.noteUids){
-//                    if (note.noteUid == uid ){
-//                        notes.add(note)
-//                    }
-//                }
-//            }
-//            viewModel.allTagNotes = notes
-//            noteRVAdapter.updateListFire(notes)
-//        }
 
         allNotesViewModel.itemSelectEnabled.observe(this){
             if (it){
@@ -266,7 +254,7 @@ class TagNotesActivity : AppCompatActivity() , NoteFireClick {
 
     private fun archiveNotes() {
         if (allNotesViewModel.selectedNotes.isNotEmpty()){
-
+            val selectedNotesCount = allNotesViewModel.selectedNotes.size
             for ( note in allNotesViewModel.selectedNotes){
                 viewModel.allTagNotes.remove(note)
                 cancelAlarm(note.reminderDate.toInt())
@@ -281,8 +269,13 @@ class TagNotesActivity : AppCompatActivity() , NoteFireClick {
             allNotesViewModel.selectedNotes.clear()
 
             allNotesViewModel.itemSelectEnabled.value = false
+            if(selectedNotesCount == 1){
+                Toast.makeText(applicationContext,"Note archived successfully", Toast.LENGTH_SHORT).show()
 
-            Toast.makeText(applicationContext,"Notes archived successfully", Toast.LENGTH_SHORT).show()
+            }else{
+                Toast.makeText(applicationContext,"Notes archived successfully", Toast.LENGTH_SHORT).show()
+
+            }
         }
     }
 
