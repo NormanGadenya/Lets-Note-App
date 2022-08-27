@@ -188,7 +188,7 @@ class AllNotesFragment : Fragment() , NoteFireClick {
 
         allNotesViewModel.itemArchiveClicked.observe(viewLifecycleOwner){
             if (it && allNotesViewModel.selectedNotes.isNotEmpty()){
-
+                val selectedNotesCount = allNotesViewModel.selectedNotes.size
                 for ( note in allNotesViewModel.selectedNotes){
                     if (note.pinned){
                         allNotesViewModel.pinnedFireNotesList.value?.remove(note)
@@ -217,13 +217,18 @@ class AllNotesFragment : Fragment() , NoteFireClick {
 
 
                 allNotesViewModel.itemSelectEnabled.value = false
+                if (selectedNotesCount ==1){
+                    Toast.makeText(context,"Note archived successfully",Toast.LENGTH_SHORT).show()
+                }else{
+                    Toast.makeText(context,"Notes archived successfully",Toast.LENGTH_SHORT).show()
+                }
 
-                Toast.makeText(context,"Notes archived successfully",Toast.LENGTH_SHORT).show()
             }
         }
 
         allNotesViewModel.itemDeleteClicked.observe(viewLifecycleOwner){
             if (it && allNotesViewModel.selectedNotes.isNotEmpty()){
+                val selectedNotesCount = allNotesViewModel.selectedNotes.size
                 val pref = context?.getSharedPreferences("DeletedNotes", AppCompatActivity.MODE_PRIVATE)
                 val settings = context?.getSharedPreferences("Settings", AppCompatActivity.MODE_PRIVATE)
                 val emptyTrashImmediately = settings?.getBoolean("EmptyTrashImmediately",false)
@@ -275,7 +280,11 @@ class AllNotesFragment : Fragment() , NoteFireClick {
                 allNotesViewModel.itemSelectEnabled.value = false
                 allNotesViewModel.itemDeleteClicked.value = false
 
-                Toast.makeText(context,"Notes deleted successfully",Toast.LENGTH_SHORT).show()
+                if (selectedNotesCount ==1){
+                    Toast.makeText(context,"Note deleted successfully",Toast.LENGTH_SHORT).show()
+                }else{
+                    Toast.makeText(context,"Notes deleted successfully",Toast.LENGTH_SHORT).show()
+                }
             }
         }
 

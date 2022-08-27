@@ -68,25 +68,45 @@ class LabelFragment : Fragment(), LabelRVAdapter.LabelClick {
             val deletedNotes = pref?.getStringSet("noteUids", HashSet())
             val labelList = HashSet<Label>()
             val labelFireList = HashSet<LabelFire>()
-            for ( l in it){
-                val label = Label(l.labelColor,l.noteUids.size)
-                if (deletedNotes != null){
-                    for (n in l.noteUids){
-                        if (!deletedNotes.contains(n)){
-                            labelList.add(label)
-                            labelFireList.add(l)
+            allNotesViewModel.allFireNotes.observe(viewLifecycleOwner){ allNotes ->
+                
+                val archivedNotes = ArrayList<String>()
+                for ( n in allNotes){
+                    if (n.archived){
+                        n.noteUid?.let { it1 -> archivedNotes.add(it1) }
+                    }
+                }
+                for ( l in it){
+                    val label = Label(l.labelColor,l.noteUids.size)
+
+                    for ( n in l.noteUids){
+                        if(archivedNotes.contains(n) || deletedNotes?.contains(n) == true){
+                            label.labelCount-=1
                         }
+                        if (!archivedNotes.contains(n)){
+                            if (deletedNotes != null){
+
+                                if (!deletedNotes.contains(n)){
+                                    labelList.add(label)
+                                    labelFireList.add(l)
+                                }
+
+
+                            }else{
+                                labelList.add(label)
+                                labelFireList.add(l)
+                            }
+                        }
+
                     }
 
-                }else{
-                    labelList.add(label)
-                    labelFireList.add(l)
                 }
+                val sortedLabelList = labelList.sortedBy { i -> i.labelCount }.reversed()
+                val sortedLabelFireList = labelFireList.sortedBy { i -> i.noteUids.size }.reversed()
+                labelViewModel.labelFire = sortedLabelFireList
+                labelRVAdapter?.updateLabelList(ArrayList(sortedLabelList))
             }
-            val sortedLabelList = labelList.sortedBy { i -> i.labelCount }.reversed()
-            val sortedLabelFireList = labelFireList.sortedBy { i -> i.noteUids.size }.reversed()
-            labelViewModel.labelFire = sortedLabelFireList
-            labelRVAdapter?.updateLabelList(ArrayList(sortedLabelList))
+
         }
 
         return root

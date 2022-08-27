@@ -274,34 +274,37 @@ class MainActivity : AppCompatActivity() {
         }
 
         override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
-            if (item?.itemId == R.id.archive ){
-                allNotesViewModal.itemArchiveClicked.value = true
-                mode?.finish()
-                return true
-            }else if (item?.itemId == R.id.restore){
-                if (allNotesViewModal.deleteFrag.value == true){
-                    deleteVieModel.itemRestoreClicked.value = true
-                }else{
-                    archivedViewModel.itemRestoreClicked.value = true
-
+            when (item?.itemId) {
+                R.id.archive -> {
+                    allNotesViewModal.itemArchiveClicked.value = true
+                    mode?.finish()
+                    return true
                 }
-                mode?.finish()
-                return true
-            }else if (item?.itemId == R.id.delete){
-                if(allNotesViewModal.deleteFrag.value == true){
-                    deleteVieModel.itemDeleteClicked.value = true
-                }else if (allNotesViewModal.archiveFrag){
-                    archivedViewModel.itemDeleteClicked.value = true
+                R.id.restore -> {
+                    if (allNotesViewModal.deleteFrag.value == true){
+                        deleteVieModel.itemRestoreClicked.value = true
+                    }else{
+                        archivedViewModel.itemRestoreClicked.value = true
+
+                    }
+                    mode?.finish()
+                    return true
                 }
-                else{
-                    allNotesViewModal.itemDeleteClicked.value = true
-                }
+                R.id.delete -> {
+                    if(allNotesViewModal.deleteFrag.value == true){
+                        deleteVieModel.itemDeleteClicked.value = true
+                    }else if (allNotesViewModal.archiveFrag){
+                        archivedViewModel.itemDeleteClicked.value = true
+                    } else{
+                        allNotesViewModal.itemDeleteClicked.value = true
+                    }
 
 
-                mode?.finish()
-                return true
+                    mode?.finish()
+                    return true
+                }
+                else -> return false
             }
-            return false
         }
 
         override fun onDestroyActionMode(mode: ActionMode?) {
