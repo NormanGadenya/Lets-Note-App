@@ -11,11 +11,15 @@ import java.util.*
 
 class ArchivedViewModel (application : Application): AndroidViewModel(application) {
 
-    var archivedFireNotes = MutableLiveData<List<NoteFire>>()
+    var archivedFireNotes = MutableLiveData<ArrayList<NoteFire>>()
 
     var searchQuery : MutableLiveData<String> = MutableLiveData()
+    var itemRestoreClicked : MutableLiveData<Boolean> = MutableLiveData()
+    var itemDeleteClicked : MutableLiveData<Boolean> = MutableLiveData()
+    var notesToRestore : MutableLiveData<NoteFire> = MutableLiveData()
 
-    fun filterArchivedFireList () : LiveData<List<NoteFire>>{
+
+    fun filterArchivedFireList () : LiveData<ArrayList<NoteFire>>{
         val textLower = searchQuery.value
         Log.d("LOG", "filterList:${searchQuery.value} ")
         return if (searchQuery.value!=null){
@@ -27,7 +31,7 @@ class ArchivedViewModel (application : Application): AndroidViewModel(applicatio
         }
     }
 
-    private fun filterList(list : List<NoteFire>, text: String?) : List<NoteFire>{
+    private fun filterList(list : ArrayList<NoteFire>, text: String?) : ArrayList<NoteFire>{
         val newList = ArrayList<NoteFire>()
 
         return if (text != null) {
@@ -45,5 +49,7 @@ class ArchivedViewModel (application : Application): AndroidViewModel(applicatio
         }
 
     }
+
+
 
 }

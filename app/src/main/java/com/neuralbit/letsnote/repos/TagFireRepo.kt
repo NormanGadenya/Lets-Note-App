@@ -36,7 +36,8 @@ class TagFireRepo {
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Log.e(TAG, "onCancelled: ${error.message}" )
+                throw error.toException()
+
             }
         })
         fUser?.let { database.getReference(it.uid).keepSynced(true) }
@@ -71,7 +72,7 @@ class TagFireRepo {
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    Log.e(TAG, "onCancelled: $error", )
+                    throw error.toException()
                 }
             })
         }

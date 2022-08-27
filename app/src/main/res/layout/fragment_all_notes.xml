@@ -6,74 +6,87 @@
     android:layout_height="match_parent"
     tools:context=".ui.allNotes.AllNotesFragment">
 
-    <TextView
-        android:id="@+id/pinnedNotesTV"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/pinned_notes"
-        android:textSize="32sp"
-        android:layout_margin="8dp"
-        android:visibility="gone"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/pinnedNotesRV"
-        android:layout_width="match_parent"
-        android:visibility="gone"
-        android:overScrollMode="never"
-        tools:listitem="@layout/note_rv_item"
-        tools:itemCount="2"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/pinnedNotesTV"
-        />
-
-
-    <TextView
-        android:id="@+id/otherNotesTV"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:visibility="gone"
-        android:text="@string/other_notes"
-        android:textSize="32sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/pinnedNotesRV" />
-
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/notesRV"
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="8dp"
-        android:overScrollMode="never"
-        android:visibility="visible"
-        tools:itemCount="2"
-        app:layout_constraintTop_toBottomOf="@+id/otherNotesTV"
         app:layout_constraintBottom_toBottomOf="parent"
-        tools:listitem="@layout/note_rv_item" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <ImageView
-        android:id="@+id/welcomeIcon"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:src="@drawable/welcome_icon"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/allNotesText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="All your notes appear here"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/welcomeIcon" />
+            <TextView
+                android:id="@+id/pinnedNotesTV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:layout_marginBottom="8dp"
+                android:text="@string/pinned_notes"
+                android:textSize="32sp"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/pinnedNotesRV"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:overScrollMode="never"
+                android:visibility="visible"
+                app:layout_constraintTop_toBottomOf="@+id/pinnedNotesTV"
+                tools:itemCount="2"
+                tools:listitem="@layout/note_rv_item" />
+
+
+            <TextView
+                android:id="@+id/otherNotesTV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:text="@string/other_notes"
+                android:textSize="32sp"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/pinnedNotesRV" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/notesRV"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:overScrollMode="never"
+                android:visibility="visible"
+                tools:itemCount="2"
+                app:layout_constraintTop_toBottomOf="@id/otherNotesTV"
+                tools:listitem="@layout/note_rv_item" />
+
+            <ImageView
+                android:id="@+id/welcomeIcon"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@drawable/welcome_icon"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/allNotesText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="All your notes appear here"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/welcomeIcon" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
+
+
+
+
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/FABAddNote"

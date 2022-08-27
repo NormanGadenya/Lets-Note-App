@@ -5,13 +5,15 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import com.neuralbit.letsnote.AddEditNoteActivity
+import com.neuralbit.letsnote.Fingerprint
 
 class AlertReceiver : BroadcastReceiver() {
     val TAG = "tag"
     override fun onReceive(context: Context, intent: Intent) {
         val noteTitle = intent.getStringExtra("noteTitle")
         val noteDesc = intent.getStringExtra("noteDesc")
-        val notificationHelper = NotificationHelper(context,noteTitle,noteDesc)
+        val protected = intent.getBooleanExtra("protected",false)
+        val notificationHelper = NotificationHelper(context,noteTitle,noteDesc,protected)
         val noteType = intent.getStringExtra("noteType")
         val noteUid = intent.getStringExtra("noteUid")
         val timeStamp = intent.getLongExtra("timeStamp",0)
@@ -23,7 +25,11 @@ class AlertReceiver : BroadcastReceiver() {
 
         val nb = notificationHelper.channelNotification
 
-        val i = Intent(context,AddEditNoteActivity::class.java)
+        val i : Intent = if (protected){
+            Intent(context,Fingerprint::class.java)
+        }else{
+            Intent(context,AddEditNoteActivity::class.java)
+        }
         i.putExtra("noteType",noteType)
         i.putExtra("noteType","Edit")
         i.putExtra("noteTitle",noteTitle)
@@ -32,8 +38,10 @@ class AlertReceiver : BroadcastReceiver() {
         i.putExtra("timeStamp",timeStamp)
         i.putExtra("labelColor",label)
         i.putExtra("pinned",pinned)
+        i.putExtra("protected", protected)
         i.putExtra("archieved",archived)
         i.putExtra("todoItems",todoItems)
+        i.putExtra("protected",protected)
         i.putStringArrayListExtra("tagList", tagList)
         val pendingIntent = PendingIntent.getActivity(context, timeStamp.toInt(), i, PendingIntent.FLAG_IMMUTABLE)
         nb.setContentIntent(pendingIntent)

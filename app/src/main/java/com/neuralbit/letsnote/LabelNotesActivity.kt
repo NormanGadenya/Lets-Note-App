@@ -47,6 +47,17 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
         noteRVAdapter.viewModel = allNotesViewModel
         noteRVAdapter.lifecycleScope = lifecycleScope
         noteRVAdapter.lifecycleOwner = this
+        val settingsSharedPref = getSharedPreferences("Settings", MODE_PRIVATE)
+        val fontStyle = settingsSharedPref?.getString("font",null)
+        noteRVAdapter.fontStyle = fontStyle
+        val staggeredLayoutManagerAll = StaggeredGridLayoutManager( 2,LinearLayoutManager.VERTICAL)
+        recyclerView.layoutManager = staggeredLayoutManagerAll
+        val staggered = settingsSharedPref?.getBoolean("staggered",true)
+        if (staggered == true){
+            recyclerView.layoutManager = staggeredLayoutManagerAll
+        }else{
+            recyclerView.layoutManager = LinearLayoutManager(applicationContext)
+        }
 
         allNotesViewModel.getAllFireNotes().observe(this){
             val notes = ArrayList<NoteFire>()
@@ -122,7 +133,11 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
     }
 
     override fun onNoteFireClick(note: NoteFire, activated : Boolean) {
-        val intent = Intent( applicationContext, AddEditNoteActivity::class.java)
+        val intent : Intent = if(note.protected){
+            Intent( applicationContext, Fingerprint::class.java)
+        }else{
+            Intent( applicationContext, AddEditNoteActivity::class.java)
+        }
         intent.putExtra("noteType","Edit")
         intent.putExtra("noteTitle",note.title)
         intent.putExtra("noteDescription",note.description)
@@ -131,6 +146,8 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
         intent.putExtra("labelColor",note.label)
         intent.putExtra("pinned",note.pinned)
         intent.putExtra("archieved",note.archived)
+        intent.putExtra("protected", note.protected)
+
         val c = Calendar.getInstance()
         if (c.timeInMillis < note.reminderDate){
             intent.putExtra("reminder",note.reminderDate)

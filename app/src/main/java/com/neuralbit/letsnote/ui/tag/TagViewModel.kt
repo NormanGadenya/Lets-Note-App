@@ -9,9 +9,6 @@ class TagViewModel (application: Application): AndroidViewModel(application) {
     var allTags  = ArrayList<Tag>()
     var allTagFire : List<TagFire>  = ArrayList()
     var noteUids = ArrayList<String>()
-    var searchQuery : MutableLiveData <String>
-    init {
-        searchQuery = MutableLiveData()
-    }
-
+    var searchQuery : MutableLiveData <String> = MutableLiveData()
+    var staggeredView : MutableLiveData<Boolean> = MutableLiveData()
 }

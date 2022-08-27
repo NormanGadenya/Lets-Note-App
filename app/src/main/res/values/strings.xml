@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Lets note</string>
+    <string name="app_name">Let\'s note</string>
     <string name="timeStamp"> Edited on %1$s at %2$s</string>
     <string name="deletedTime"> Deleted on %1$s at %2$s</string>
     <string name="archivedTime"> Archived on %1$s at %2$s</string>
@@ -32,11 +32,8 @@
     <string name="labels">Labels</string>
     <string name="note_content">Note content</string>
     <string name="trash">Trash</string>
-    <string name="dbFileLoc">/data/data/com.neuralbit.letsnote/databases/letsNoteDB1</string>
-    <string name="databaseLoc">/data/data/com.neuralbit.letsnote/databases</string>
-    <string name="dbShmFileLoc">/data/data/com.neuralbit.letsnote/databases/letsNoteDB1-shm</string>
-    <string name="dbWalFileLoc">/data/data/com.neuralbit.letsnote/databases/letsNoteDB1-wal</string>
     <string name="settings">Settings</string>
+    <string name="termsAndConditions"><u>Terms and Conditions</u></string>
     <string name="title_activity_splash_screen">SplashScreen</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
@@ -48,4 +45,6 @@
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <string name="_hint">Todo item</string>
     <string name="add_todo_item">Add todo item</string>
+    <string name="shortcut_short_label">New note</string>
+    <string name="shortcut_long_label">Take a note</string>
 </resources>

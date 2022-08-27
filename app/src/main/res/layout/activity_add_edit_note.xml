@@ -33,7 +33,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginTop="@dimen/margin"
-            android:layout_marginBottom="32dp"
+            android:layout_marginBottom="4dp"
             app:layout_constraintBottom_toTopOf="@id/reminderIcon"
             app:layout_constraintTop_toBottomOf="@id/noteEditTitle"
             tools:ignore="NotSibling"
@@ -51,14 +51,16 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@android:color/transparent"
-                    android:completionHint="Create new Tag"
                     android:completionThreshold="1"
+                    android:autoLink="web"
                     android:gravity="top"
                     android:visibility="visible"
                     android:hint="@string/note_content"
                     android:importantForAutofill="no"
                     android:inputType="textMultiLine"
                     android:lineSpacingMultiplier="1.1"
+                    android:textSize="24sp"
+
                     android:minHeight="60dp"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -157,29 +159,18 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_baseline_access_alarm_24"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/tvTimeStamp" />
+            app:layout_constraintBottom_toTopOf="@id/infoContainer"
+            />
 
         <TextView
             android:id="@+id/reminderTV"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:padding="8dp"
+            android:layout_margin="@dimen/margin"
             android:visibility="gone"
             tools:text="Edite on sjjsndjncjdjcnjndjcjd"
             app:layout_constraintStart_toEndOf="@id/reminderIcon"
-            app:layout_constraintTop_toTopOf="@id/reminderIcon" />
-
-        <TextView
-            android:id="@+id/tvTimeStamp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="Edite on sjjsndjncjdjcnjndjcjd"
-            android:layout_margin="@dimen/margin"
-            android:visibility="visible"
-            app:layout_constraintBottom_toTopOf="@id/infoContainer"
-            app:layout_constraintStart_toStartOf="parent"
-            />
+            app:layout_constraintBottom_toTopOf="@id/infoContainer" />
 
         <include
             layout="@layout/info_container"

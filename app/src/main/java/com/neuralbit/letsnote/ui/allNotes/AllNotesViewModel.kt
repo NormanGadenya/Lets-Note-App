@@ -13,14 +13,17 @@ import java.util.*
 class AllNotesViewModel (application : Application) : AndroidViewModel(application) {
     var otherFireNotesList = MutableLiveData<LinkedList<NoteFire>>()
     var pinnedFireNotesList = MutableLiveData<LinkedList<NoteFire>>()
+    var allFireNotes = MutableLiveData<ArrayList<NoteFire>>()
     private val noteFireRepo: NoteFireRepo = NoteFireRepo()
     var searchQuery : MutableLiveData<String> = MutableLiveData()
     var itemSelectEnabled : MutableLiveData<Boolean> = MutableLiveData()
+    var notesToDelete : MutableLiveData<NoteFire> = MutableLiveData()
     var itemDeleteClicked : MutableLiveData<Boolean> = MutableLiveData()
     var itemArchiveClicked : MutableLiveData<Boolean> = MutableLiveData()
     var staggeredView : MutableLiveData<Boolean> = MutableLiveData()
     var selectedNotes = HashSet<NoteFire>()
     var deleteFrag : MutableLiveData<Boolean> = MutableLiveData()
+    var archiveFrag = false
 
 
     fun filterOtherFireList () : LiveData<LinkedList<NoteFire>>{
@@ -82,4 +85,5 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
         }
 
     }
+
 }

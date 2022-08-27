@@ -1,13 +1,182 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.SettingsFragment">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="8dp"
+    tools:context=".ui.settings.SettingsFragment">
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="Day or Night mode"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:padding="8dp"
+        app:cardCornerRadius="10dp"
+        app:layout_constraintTop_toBottomOf="@id/textView"
+       >
+
+        <RadioGroup
+            android:id="@+id/dayNightRadioGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textView">
+
+            <RadioButton
+                android:id="@+id/darkMode"
+                android:text="Dark mode" />
+
+            <RadioButton
+                android:id="@+id/lightMode"
+                android:text="Light mode" />
+
+            <RadioButton
+                android:id="@+id/defaultMode"
+                android:text="Default" />
+        </RadioGroup>
+    </androidx.cardview.widget.CardView>
 
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Hello" />
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="Font size"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cardView" />
 
-</FrameLayout>
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardView2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:padding="8dp"
+        android:layout_margin="16dp"
+        app:cardCornerRadius="10dp"
+        app:layout_constraintTop_toBottomOf="@id/textView3"
+        >
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <SeekBar
+                android:id="@+id/seekBar"
+                style="@style/Widget.AppCompat.SeekBar.Discrete"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:max="4"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/fontSizeDummyT"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:text="Note"
+                android:textSize="32sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/seekBar"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+
+    <TextView
+        android:id="@+id/fontStyleDummyT"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="Font style"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cardView2" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardView3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:padding="8dp"
+        app:cardCornerRadius="10dp"
+        app:layout_constraintTop_toBottomOf="@+id/fontStyleDummyT"
+        tools:layout_editor_absoluteX="24dp">
+
+        <RadioGroup
+            android:id="@+id/radioGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/fontStyleDummyT">
+
+            <RadioButton
+                android:id="@+id/fontA"
+                android:fontFamily="@font/architects_daughter"
+                android:text="Architects daughter" />
+
+            <RadioButton
+                android:id="@+id/fontB"
+                android:fontFamily="@font/abeezee"
+                android:text="Abreeze" />
+
+            <RadioButton
+                android:id="@+id/fontC"
+                android:fontFamily="@font/adamina"
+                android:text="Adamina" />
+
+            <RadioButton
+                android:id="@+id/fontDef"
+                android:fontFamily="@font/roboto"
+                android:text="Default" />
+
+        </RadioGroup>
+    </androidx.cardview.widget.CardView>
+
+
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/emptyTrashSwitch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="Empty trash automatically"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cardView3" />
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="App version 1.0"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/emptyTrashSwitch" />
+
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

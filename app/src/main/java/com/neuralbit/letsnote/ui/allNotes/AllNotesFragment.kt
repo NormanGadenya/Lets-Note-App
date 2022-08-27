@@ -16,6 +16,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -32,12 +33,14 @@ import com.neuralbit.letsnote.adapters.NoteFireClick
 import com.neuralbit.letsnote.adapters.NoteRVAdapter
 import com.neuralbit.letsnote.databinding.FragmentAllNotesBinding
 import com.neuralbit.letsnote.entities.NoteFire
+import com.neuralbit.letsnote.ui.settings.SettingsViewModel
 import com.neuralbit.letsnote.utilities.AlertReceiver
 import java.util.*
 
 class AllNotesFragment : Fragment() , NoteFireClick {
 
     private val allNotesViewModel: AllNotesViewModel by activityViewModels()
+    private val settingsViewModel: SettingsViewModel by activityViewModels()
     private var _binding: FragmentAllNotesBinding? = null
     val TAG = "HOMEFRAGMENT"
     private lateinit var  notesRV: RecyclerView
@@ -69,6 +72,8 @@ class AllNotesFragment : Fragment() , NoteFireClick {
         notesRV.layoutManager = staggeredLayoutManagerAll
         pinnedNotesRV.layoutManager =staggeredLayoutManagerPinned
         allNotesViewModel.deleteFrag.value = false
+        settingsViewModel.settingsFrag.value = false
+        allNotesViewModel.archiveFrag = false
         allNotesViewModel.staggeredView.value = settingsSharedPref?.getBoolean("staggered",true)
         allNotesViewModel.staggeredView.observe(viewLifecycleOwner){
             val editor: SharedPreferences.Editor ?= settingsSharedPref?.edit()
@@ -83,9 +88,7 @@ class AllNotesFragment : Fragment() , NoteFireClick {
                 pinnedNotesRV.layoutManager = LinearLayoutManager(context)
             }
         }
-
-
-
+        val fontStyle = settingsSharedPref?.getString("font",null)
         val noteRVAdapter = context?.let { NoteRVAdapter(it,this) }
         val pinnedNoteRVAdapter = context?.let { NoteRVAdapter(it,this) }
         notesRV.adapter= noteRVAdapter
@@ -93,11 +96,14 @@ class AllNotesFragment : Fragment() , NoteFireClick {
         noteRVAdapter?.viewModel = allNotesViewModel
         noteRVAdapter?.lifecycleScope = lifecycleScope
         noteRVAdapter?.lifecycleOwner = this
+        noteRVAdapter?.fontStyle = fontStyle
         pinnedNoteRVAdapter?.viewModel = allNotesViewModel
         pinnedNoteRVAdapter?.lifecycleScope = lifecycleScope
         pinnedNoteRVAdapter?.lifecycleOwner = this
+        pinnedNoteRVAdapter?.fontStyle = fontStyle
+
         allNotesViewModel.selectedNotes.clear()
-        allNotesViewModel.getAllFireNotes().observe(viewLifecycleOwner){ notes ->
+        allNotesViewModel.allFireNotes.observe(viewLifecycleOwner){ notes ->
 
             val pinnedNotes = LinkedList<NoteFire>()
             val otherNotes = LinkedList<NoteFire>()
@@ -131,8 +137,7 @@ class AllNotesFragment : Fragment() , NoteFireClick {
                 welcomeIcon.visibility = GONE
                 welcomeText.visibility = GONE
             }
-            otherNotes.sortedWith(compareBy { it.timeStamp }).asReversed()
-            pinnedNotes.sortedWith(compareBy { it.timeStamp })
+
 
             allNotesViewModel.otherFireNotesList.value = otherNotes
             allNotesViewModel.pinnedFireNotesList.value = pinnedNotes
@@ -151,15 +156,32 @@ class AllNotesFragment : Fragment() , NoteFireClick {
         }
 
 
-        allNotesViewModel.searchQuery.observe(viewLifecycleOwner) { str->
-            allNotesViewModel.filterPinnedFireList().observe(viewLifecycleOwner) {
-                pinnedNoteRVAdapter?.searchString = str
-                pinnedNoteRVAdapter?.updateListFire(it)
 
-            }
+        allNotesViewModel.searchQuery.observe(viewLifecycleOwner) { str->
+
             allNotesViewModel.filterOtherFireList().observe(viewLifecycleOwner) {
+                if (it.isEmpty()){
+                    notesRV.isVisible = false
+                    otherNotesTV.isVisible = false
+                }else{
+                    notesRV.isVisible = true
+                    otherNotesTV.isVisible = true
+                }
                 noteRVAdapter?.updateListFire(it)
                 noteRVAdapter?.searchString = str
+            }
+            allNotesViewModel.filterPinnedFireList().observe(viewLifecycleOwner) {
+                if (it.isEmpty()){
+                    pinnedNotesTV.isVisible = false
+                    pinnedNotesRV.isVisible = false
+                    otherNotesTV.isVisible = false
+                }else{
+                    pinnedNotesTV.isVisible = true
+                    pinnedNotesRV.isVisible = true
+                    otherNotesTV.isVisible = true
+                }
+                pinnedNoteRVAdapter?.searchString = str
+                pinnedNoteRVAdapter?.updateListFire(it)
             }
 
         }
@@ -203,18 +225,27 @@ class AllNotesFragment : Fragment() , NoteFireClick {
         allNotesViewModel.itemDeleteClicked.observe(viewLifecycleOwner){
             if (it && allNotesViewModel.selectedNotes.isNotEmpty()){
                 val pref = context?.getSharedPreferences("DeletedNotes", AppCompatActivity.MODE_PRIVATE)
+                val settings = context?.getSharedPreferences("Settings", AppCompatActivity.MODE_PRIVATE)
+                val emptyTrashImmediately = settings?.getBoolean("EmptyTrashImmediately",false)
 
                 for ( note in allNotesViewModel.selectedNotes){
                     val editor: SharedPreferences.Editor ?= pref?.edit()
                     val noteUids = pref?.getStringSet("noteUids",HashSet())
                     val deletedNoteUids = HashSet<String>()
                     if (noteUids != null){ deletedNoteUids.addAll(noteUids)}
-                    note.noteUid?.let { it1 -> deletedNoteUids.add(it1) }
 
-                    note.noteUid?.let { it1 -> scheduleDelete(it1,note.tags,note.label,note.timeStamp) }
+                    if (emptyTrashImmediately != true){
+                        editor?.putLong(note.noteUid,System.currentTimeMillis())
 
-                    editor?.putStringSet("noteUids",deletedNoteUids)
-                    editor?.apply()
+                        note.noteUid?.let { it1 -> deletedNoteUids.add(it1) }
+
+                        note.noteUid?.let { it1 -> scheduleDelete(it1,note.tags,note.label,note.timeStamp) }
+
+                        editor?.putStringSet("noteUids",deletedNoteUids)
+                        editor?.apply()
+                    }else{
+                        allNotesViewModel.notesToDelete.value =  note
+                    }
 
                     if (note.pinned){
                         allNotesViewModel.pinnedFireNotesList.value?.remove(note)
@@ -229,21 +260,25 @@ class AllNotesFragment : Fragment() , NoteFireClick {
 
                 }
 
+
                 allNotesViewModel.otherFireNotesList.value?.let { list ->
                     noteRVAdapter?.updateListFire(list)
                 }
                 allNotesViewModel.pinnedFireNotesList.value?.let { list ->
                     pinnedNoteRVAdapter?.updateListFire(list)
                 }
-
-                allNotesViewModel.selectedNotes.clear()
+                if (emptyTrashImmediately != true){
+                    allNotesViewModel.selectedNotes.clear()
+                }
 
 
                 allNotesViewModel.itemSelectEnabled.value = false
+                allNotesViewModel.itemDeleteClicked.value = false
 
                 Toast.makeText(context,"Notes deleted successfully",Toast.LENGTH_SHORT).show()
             }
         }
+
 
 
         addNoteFAB.setOnClickListener{
@@ -289,6 +324,7 @@ class AllNotesFragment : Fragment() , NoteFireClick {
     }
 
     override fun onNoteFireClick(note: NoteFire, activated : Boolean) {
+
         if (!note.selected && !activated){
             val intent : Intent = if(note.protected){
                 Intent( context, Fingerprint::class.java)

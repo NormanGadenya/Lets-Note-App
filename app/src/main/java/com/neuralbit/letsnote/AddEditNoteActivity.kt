@@ -1,6 +1,7 @@
 package com.neuralbit.letsnote
 
 import android.Manifest
+import android.annotation.TargetApi
 import android.app.AlarmManager
 import android.app.AlertDialog
 import android.app.PendingIntent
@@ -9,27 +10,37 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.content.pm.ShortcutManager
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.graphics.Typeface
 import android.hardware.fingerprint.FingerprintManager
+import android.net.ConnectivityManager
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
-import android.speech.RecognizerIntent
+import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
 import android.text.format.DateFormat
 import android.util.Log
 import android.util.SparseArray
-import android.view.KeyEvent
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
+import android.util.TypedValue
+import android.view.*
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.*
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContract
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.pm.ShortcutInfoCompat
+import androidx.core.content.pm.ShortcutManagerCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
+import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -37,6 +48,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.HORIZONTAL
+import com.canhub.cropper.CropImage
 import com.flask.colorpicker.ColorPickerView
 import com.google.android.gms.vision.Frame
 import com.google.android.gms.vision.text.TextBlock
@@ -52,6 +64,7 @@ import com.neuralbit.letsnote.entities.TodoItem
 import com.neuralbit.letsnote.ui.label.LabelViewModel
 import com.neuralbit.letsnote.utilities.*
 import kotlinx.coroutines.launch
+import java.io.IOException
 import java.util.*
 
 
@@ -64,18 +77,20 @@ class AddEditNoteActivity : AppCompatActivity() ,
     TodoItemInterface
 
 {
-    private var mItemTouchHelper: ItemTouchHelper? = null
+    private var fontMultiplier: Int = 2
     private var deleted: Boolean = false
     private var reminderItem : MenuItem? = null
     private var lockNoteItem : MenuItem? = null
     private var restoreItem : MenuItem? = null
     private var pinItem: MenuItem? = null
     private var archiveItem: MenuItem? = null
+    private val GALLERY_REQUEST = 100
     private var deleteItem: MenuItem? = null
     private lateinit var dismissTodoButton: ImageButton
     private lateinit var ocrButton: ImageButton
     private lateinit var addTodoButton: ImageButton
     private lateinit var undoButton: ImageButton
+    private lateinit var noteDescScrollView : NestedScrollView
     private lateinit var redoButton: ImageButton
     private lateinit var noteTitleEdit : EditText
     private lateinit var noteDescriptionEdit : MultiAutoCompleteTextView
@@ -83,15 +98,15 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private lateinit var delLabelBtn : ImageButton
     private lateinit var reminderIcon : ImageView
     private lateinit var reminderTV : TextView
-    private var noteID : Long= -1
     private var noteUid : String? = null
-    private lateinit var viewModal : NoteViewModel
+    private val viewModal : NoteViewModel by viewModels()
     private lateinit var labelViewModel : LabelViewModel
     private var oldLabel : Int = -1
     private var noteDescOrig : String? = null
     private var noteDescOrigList = ArrayList<String>()
     private lateinit var noteType : String
     private lateinit var tvTimeStamp : TextView
+    private lateinit var redoUndoGroup: View
     private var textChanged : Boolean = false
     private var archived = false
     private lateinit var cm : Common
@@ -123,14 +138,31 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private var reminderNoteSet = false
     private lateinit var infoContainer : View
     private var bitmap : Bitmap? = null
-    private val REQUEST_CODE_SPEECH_INPUT = 1
     private lateinit var colorPickerView: ColorPickerView
     private val deletedTodos = ArrayList<TodoItem>()
-    private lateinit var pref : SharedPreferences
+    private lateinit var deletedNotePrefs : SharedPreferences
+    private lateinit var settingsPref : SharedPreferences
     private var protected = false
+    private var labelColor = 0
+    private var noteChanged = false
+    private var tagList : ArrayList<String> = ArrayList()
+
+    private val cropActivityResultContract = object : ActivityResultContract<Any?,Uri?>(){
+        override fun createIntent(context: Context, input: Any?): Intent {
+
+            return CropImage.activity()
+                .getIntent(this@AddEditNoteActivity)
+        }
+
+        override fun parseResult(resultCode: Int, intent: Intent?): Uri? {
+            return CropImage.getActivityResult(intent)?.uriContent
+        }
+    }
+    private lateinit var cropActivityResultLauncher: ActivityResultLauncher<Any?>
 
     override fun onCreate(savedInstanceState: Bundle?)  {
         super.onCreate(savedInstanceState)
+        window.setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE)
         setContentView(R.layout.activity_add_edit_note)
 
         initControllers()
@@ -174,7 +206,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                     todoCheckBox.isChecked = false
                     viewModal.noteChanged.value = true
                     todoRVAdapter.updateTodoItems(viewModal.todoItems)
-                    todoRVAdapter.notifyDataSetChanged()
+                    todoRVAdapter.notifyItemInserted(todoRVAdapter.itemCount)
 
                     todoRV.scrollToPosition(viewModal.todoItems.size - 1)
 
@@ -192,30 +224,24 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
         addTagBtn.setOnClickListener {
             val addTagDialog = AddTagDialog(this,applicationContext)
-            addTagDialog.tagList = viewModal.oldTagList
+            addTagDialog.tagList = tagList
             addTagDialog.show(supportFragmentManager,"addTagDialogs")
 
         }
         when (noteType) {
             "Edit" -> {
                 noteTitleEdit.setText(noteTitle)
-                viewModal.pinned.value = notePinned
 
                 noteDescriptionEdit.setText(noteDesc)
-                tvTimeStamp.text= getString(R.string.timeStamp,cm.convertLongToTime(noteTimeStamp)[0],cm.convertLongToTime(noteTimeStamp)[1])
                 tvTimeStamp.visibility =VISIBLE
-                val labelColor = viewModal.labelColor
-                if(labelColor > 0){
-                    coordinatorlayout.setBackgroundColor(labelColor)
-                    delLabelBtn.visibility = VISIBLE
-                }else{
-                    coordinatorlayout.setBackgroundColor(Color.TRANSPARENT)
+                redoUndoGroup.visibility = GONE
 
-                    delLabelBtn.visibility = GONE
-                }
+                tvTimeStamp.text= getString(R.string.timeStamp,cm.convertLongToTime(noteTimeStamp)[0],cm.convertLongToTime(noteTimeStamp)[1])
+
                 tagListAdapter.updateList(viewModal.oldTagList)
             }
             else -> {
+                redoUndoGroup.visibility = VISIBLE
 
                 tvTimeStamp.visibility =GONE
             }
@@ -224,7 +250,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         delLabelBtn.setOnClickListener {
             viewModal.noteChanged.value = true
             viewModal.labelChanged = true
-            viewModal.labelColor = 0
+            viewModal.labelColor.value = 0
 
 
         }
@@ -254,34 +280,15 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 reminderIcon.visibility = GONE
             }
         }
-        viewModal.noteLocked.observe(lifecycleOwner){
-            protected = it
-            if (it){
-                lockNoteItem?.setIcon(R.drawable.baseline_lock_24)
-            }else{
-                lockNoteItem?.setIcon(R.drawable.baseline_lock_open_24)
-            }
-        }
 
-        viewModal.pinned.observe(lifecycleOwner){
-            notePinned = it
-
-            if (!it){
-                pinItem?.setIcon(R.drawable.ic_outline_push_pin_24)
-            }else{
-                pinItem?.setIcon(R.drawable.ic_baseline_push_pin_24)
-            }
-        }
-
-        // Check if we're running on Android 6.0 (M) or higher
-        // Check if we're running on Android 6.0 (M) or higher
-        //Fingerprint API only available on from Android 6.0 (M)
         val fingerprintManager : FingerprintManager = getSystemService(FINGERPRINT_SERVICE) as FingerprintManager
         lockNoteItem?.isVisible = !(!fingerprintManager.isHardwareDetected || !fingerprintManager.hasEnrolledFingerprints())
 
         viewModal.deletedNote.observe(lifecycleOwner){
-            val editor: SharedPreferences.Editor = pref.edit()
-            val noteUids = pref.getStringSet("noteUids",HashSet())
+            val emptyTrashImmediately = settingsPref.getBoolean("EmptyTrashImmediately",false)
+
+            val editor: SharedPreferences.Editor = deletedNotePrefs.edit()
+            val noteUids = deletedNotePrefs.getStringSet("noteUids",HashSet())
             val deletedNoteUids = HashSet<String>()
             if (it) {
 
@@ -294,13 +301,16 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 infoContainer.visibility = GONE
                 reminderTV.visibility =  GONE
                 reminderIcon.visibility = GONE
-                if (noteUids != null){
-                    deletedNoteUids.addAll(noteUids)
-                    noteUid?.let { deletedNoteUids.add(it) }
+                if (!emptyTrashImmediately){
+                    if (noteUids != null){
+                        deletedNoteUids.addAll(noteUids)
+                        noteUid?.let { deletedNoteUids.add(it) }
+                    }
+                    editor.putStringSet("noteUids",deletedNoteUids)
+                    editor.putLong(noteUid,calendar.timeInMillis)
+                    editor.apply()
                 }
                 cancelAlarm(viewModal.reminderTime.toInt())
-                editor.putStringSet("noteUids",deletedNoteUids)
-                editor.apply()
 
 
 
@@ -353,24 +363,22 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
 
         
-        val tagListStr = ArrayList<String>()
         viewModal.allFireTags().observe(this){
-            tagListStr.clear()
+
+            tagList.clear()
             for (tag in it){
-                tagListStr.add(tag.tagName)
+                tagList.add(tag.tagName)
             }
-            val adapter = ArrayAdapter(applicationContext,android.R.layout.simple_dropdown_item_1line,tagListStr)
+
+            val adapter = ArrayAdapter(applicationContext,android.R.layout.simple_dropdown_item_1line,tagList)
             noteDescriptionEdit.setAdapter(adapter)
             noteDescriptionEdit.setTokenizer(SpaceTokenizer())
             
         }
 
-//        val callback: ItemTouchHelper.Callback = SimpleItemTouchHelperCallback(todoRVAdapter)
-//        mItemTouchHelper = ItemTouchHelper(callback)
-//        mItemTouchHelper?.attachToRecyclerView(todoRV)
         todoRV.isNestedScrollingEnabled = false
 
-        val touchHelper = ItemTouchHelper(object  : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.START or ItemTouchHelper.END,0){
+        val touchHelper = ItemTouchHelper(object  : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.START or ItemTouchHelper.END,ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT){
             override fun onMove(
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder,
@@ -393,6 +401,12 @@ class AddEditNoteActivity : AppCompatActivity() ,
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                viewModal.noteChanged.value = true
+                val todoItem = viewModal.todoItems[viewHolder.adapterPosition]
+                deletedTodos.add(todoItem)
+                viewModal.todoItems.removeAt(viewHolder.adapterPosition)
+                todoRVAdapter.updateTodoItems(viewModal.todoItems)
+                todoRVAdapter.notifyItemRemoved(viewHolder.adapterPosition)
             }
 
             override fun isLongPressDragEnabled(): Boolean {
@@ -400,7 +414,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
             }
 
             override fun isItemViewSwipeEnabled(): Boolean {
-                return false
+                return true
             }
         })
         touchHelper.attachToRecyclerView(todoRV)
@@ -438,6 +452,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
         noteTitleEdit.addTextChangedListener(object : TextWatcher{
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                tvTimeStamp.visibility =GONE
+                redoUndoGroup.visibility = VISIBLE
                 if(p3>0){
 
                     if(!tagListAdapter.deleteIgnored){
@@ -467,7 +483,10 @@ class AddEditNoteActivity : AppCompatActivity() ,
             }
 
             override fun onTextChanged(p0: CharSequence?, start: Int, before: Int, count: Int) {
+                viewModal.noteChanged.value = true
 
+                tvTimeStamp.visibility =GONE
+                redoUndoGroup.visibility = VISIBLE
                 if(p0?.length!! > 0){
 
                     noteListBullet()
@@ -485,14 +504,52 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
 
         noteDescriptionEdit.setOnKeyListener { _, key, _ ->
-            viewModal.noteChanged.value = true
+
             viewModal.backPressed.value = key == KeyEvent.KEYCODE_DEL
 
             false
         }
 
+        viewModal.noteLocked.observe(lifecycleOwner){
+
+            Log.d(TAG, "onCreate: protected $it")
+            protected = it
+            if (it){
+                lockNoteItem?.setIcon(R.drawable.baseline_lock_24)
+            }else{
+                lockNoteItem?.setIcon(R.drawable.baseline_lock_open_24)
+            }
+        }
+
+        viewModal.pinned.observe(lifecycleOwner) {
+            notePinned = it
+            Log.d(TAG, "onCreate: $pinItem")
+            if (it) {
+                pinItem?.setIcon(R.drawable.ic_baseline_push_pin_24)
+
+            } else {
+                pinItem?.setIcon(R.drawable.ic_outline_push_pin_24)
+            }
+        }
+
+        viewModal.labelColor.observe(this){
+            labelColor = it
+            if (it>0){
+                coordinatorlayout.setBackgroundColor(it)
+                delLabelBtn.visibility = VISIBLE
+
+            }else{
+                coordinatorlayout.setBackgroundColor(Color.TRANSPARENT)
+                delLabelBtn.visibility = GONE
+
+            }
+        }
+
+
         noteTitleEdit.setOnKeyListener { _, _, _ ->
             viewModal.noteChanged.value = true
+            tvTimeStamp.visibility = GONE
+            redoUndoGroup.visibility = VISIBLE
 
             false
         }
@@ -501,23 +558,30 @@ class AddEditNoteActivity : AppCompatActivity() ,
             textChanged = it
             if(it){
                 tvTimeStamp.visibility = GONE
+                redoUndoGroup.visibility = VISIBLE
             }else{
                 tvTimeStamp.visibility = VISIBLE
-
+                redoUndoGroup.visibility = GONE
             }
         }
 
 
         ocrButton.setOnClickListener {
-            if (ContextCompat.checkSelfPermission(
-                    this@AddEditNoteActivity,
-                    Manifest.permission.CAMERA
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                requestCameraPermission()
 
-            } else {
-                //TODO FIX OCR FUNCTION
+            if(isNetworkConnected()){
+                if (ContextCompat.checkSelfPermission(
+                        this@AddEditNoteActivity,
+                        Manifest.permission.CAMERA
+                    ) != PackageManager.PERMISSION_GRANTED
+                ) {
+                    requestCameraPermission()
+                    requestStoragePermission()
+
+                } else {
+                    cropActivityResultLauncher.launch(null)
+                }
+            }else{
+                Snackbar.make(coordinatorlayout, "No internet connection", Snackbar.LENGTH_SHORT).show()
             }
         }
 
@@ -547,6 +611,38 @@ class AddEditNoteActivity : AppCompatActivity() ,
             }
 
 
+        }
+    }
+
+
+    private fun requestStoragePermission() {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(
+                this,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            )
+        ) {
+            androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Permission needed")
+                .setMessage("This permission is needed because we need to access your storage")
+                .setPositiveButton(
+                    "ok"
+                ) { dialog: DialogInterface?, which: Int ->
+                    ActivityCompat.requestPermissions(
+                        this,
+                        arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                        GALLERY_REQUEST
+                    )
+                }
+                .setNegativeButton(
+                    "cancel"
+                ) { dialog: DialogInterface, which: Int -> dialog.dismiss() }
+                .create().show()
+        } else {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                GALLERY_REQUEST
+            )
         }
     }
 
@@ -610,33 +706,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
             ) != PackageManager.PERMISSION_GRANTED
         ) {
             requestCameraPermission()
-
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-//        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE){
-//            val result = CropImage.getActivityResult(data)
-//            if(resultCode == RESULT_OK){
-//                val resultUri : Uri = result.uri
-//                try {
-//                    bitmap = MediaStore.Images.Media.getBitmap(contentResolver,resultUri)
-//                    recognizeText()
-//                }catch (e : IOException){
-//                    e.printStackTrace()
-//                }
-//            }
-//        }
-        if (requestCode == REQUEST_CODE_SPEECH_INPUT) {
-            if (resultCode == RESULT_OK && data != null) {
-                val result: ArrayList<String> = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)!!
-                val noteDesc = result[0]
-                noteDescriptionEdit.append("\n")
-
-                noteDescriptionEdit.append(noteDesc)
-                viewModal.noteChanged.value = true
-            }
 
         }
     }
@@ -740,30 +809,56 @@ class AddEditNoteActivity : AppCompatActivity() ,
         }
     }
 
+    private fun isNetworkConnected(): Boolean {
+        val cm = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
+        return cm.activeNetworkInfo != null && cm.activeNetworkInfo!!.isConnected
+    }
+
     private fun initControllers(){
         cm= Common()
-        pref = applicationContext.getSharedPreferences("DeletedNotes", MODE_PRIVATE)
+        if (Build.VERSION.SDK_INT >= 25) {
+            createShortcut();
+        }else{
+            removeShortcuts();
+        }
+
+        deletedNotePrefs = applicationContext.getSharedPreferences("DeletedNotes", MODE_PRIVATE)
+        settingsPref = applicationContext.getSharedPreferences("Settings", MODE_PRIVATE)
+        fontMultiplier = settingsPref.getInt("fontMultiplier",2)
+
         noteTitleEdit = findViewById(R.id.noteEditTitle)
         layoutManager = LinearLayoutManager(applicationContext,LinearLayoutManager.HORIZONTAL,false)
         calendar = Calendar.getInstance()
         noteDescriptionEdit = findViewById(R.id.noteEditDesc)
         tvTimeStamp = findViewById(R.id.tvTimeStamp)
+        redoUndoGroup = findViewById(R.id.redoUndoGroup)
         tagListRV = findViewById(R.id.tagListRV)
         labelBtn = findViewById(R.id.labelBtn)
         coordinatorlayout = findViewById(R.id.coordinatorlayout)
         addTagBtn = findViewById(R.id.addTagBtn)
         reminderTV = findViewById(R.id.reminderTV)
         reminderIcon = findViewById(R.id.reminderIcon)
-        noteID = intent.getLongExtra("noteID",-1)
+        noteTitleEdit.setTextSize(TypedValue.COMPLEX_UNIT_SP,32f+ ((fontMultiplier-2)*2).toFloat())
+        noteDescriptionEdit.setTextSize(TypedValue.COMPLEX_UNIT_SP,18f+ ((fontMultiplier-2)*2).toFloat())
+        tvTimeStamp.setTextSize(TypedValue.COMPLEX_UNIT_SP,15f+ ((fontMultiplier-2)*2).toFloat())
         noteType = intent.getStringExtra("noteType").toString()
         intent.putExtra("noteType","Edit")
         noteTitle = intent.getStringExtra("noteTitle")
         noteUid = intent.getStringExtra("noteUid")
         noteDesc = intent.getStringExtra("noteDescription")
+
         notePinned = intent.getBooleanExtra("pinned",false)
         archived = intent.getBooleanExtra("archieved",false)
         deleted = intent.getBooleanExtra("deleted",false)
-        protected = intent.getBooleanExtra("protected", false)
+        if (viewModal.noteChanged.value != true){
+            viewModal.archived.value = archived
+            viewModal.deletedNote.value = deleted
+            viewModal.noteChanged.value = noteChanged
+            viewModal.pinned.value = notePinned
+            viewModal.noteLocked.value = intent.getBooleanExtra("protected", false)
+        }
+
+
         val tagIntentList = intent.getStringArrayListExtra("tagList")
         oldLabel = intent.getIntExtra("labelColor",0)
         val reminderTime = intent.getLongExtra("reminder",0)
@@ -772,7 +867,20 @@ class AddEditNoteActivity : AppCompatActivity() ,
         if (todoItemStr != null){
             todoDoItemList = Gson().fromJson(todoItemStr, object : TypeToken<List<TodoItem?>?>() {}.type)
         }
+        noteChanged = intent.getBooleanExtra("noteChanged",false)
+        viewModal.noteChanged.value = noteChanged
+
         supportActionBar?.title = ""
+        cropActivityResultLauncher = registerForActivityResult(cropActivityResultContract){
+            it?.let { uri ->
+                try {
+                    bitmap = MediaStore.Images.Media.getBitmap(contentResolver,uri)
+                    recognizeText()
+                }catch (e : IOException){
+                    e.printStackTrace()
+                }
+            }
+        }
 
         noteTimeStamp = intent.getLongExtra("timeStamp",-1)
         ocrButton = findViewById(R.id.ocrButton)
@@ -792,6 +900,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         tagListRV.adapter = tagListAdapter
         addTodoButton = findViewById(R.id.addTodo)
         dismissTodoButton = findViewById(R.id.dismissTodoBtn)
+        noteDescScrollView = findViewById(R.id.scrollView2)
         todoRV = findViewById(R.id.todoRV)
         val layoutManagerTodo = LinearLayoutManager(applicationContext,LinearLayoutManager.VERTICAL,false)
         todoRV.layoutManager = layoutManagerTodo
@@ -799,15 +908,11 @@ class AddEditNoteActivity : AppCompatActivity() ,
         todoCheckBox = findViewById(R.id.todoCheckBox)
         todoItemDescTV = findViewById(R.id.todoItemDescTV)
         lifecycleOwner = this
-        viewModal = ViewModelProvider(
-            this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(application)
-        ).get(NoteViewModel::class.java)
 
         labelViewModel = ViewModelProvider(
             this,
             ViewModelProvider.AndroidViewModelFactory.getInstance(application)
-        ).get(LabelViewModel::class.java)
+        )[LabelViewModel::class.java]
         if (tagIntentList != null){
             viewModal.oldTagList = tagIntentList
         }
@@ -816,12 +921,36 @@ class AddEditNoteActivity : AppCompatActivity() ,
             viewModal.reminderSet.value = true
         }
         viewModal.allTodoItems.value = todoDoItemList
+        if (oldLabel > 0){
+            viewModal.labelColor.value = oldLabel
+        }
 
-        viewModal.labelColor = oldLabel
-        viewModal.archived.value = archived
-        viewModal.deletedNote.value = deleted
-        viewModal.noteLocked.value = protected
+        val fontStyle = settingsPref.getString("font",null)
+        val typeface: Typeface? = when (fontStyle) {
+            "Architects daughter" -> {
+                ResourcesCompat.getFont(applicationContext, R.font.architects_daughter)
+            }
+            "Abreeze" -> {
+                ResourcesCompat.getFont(applicationContext, R.font.abeezee)
+            }
+            "Adamina" -> {
+                ResourcesCompat.getFont(applicationContext, R.font.adamina)
+            }
+            else -> {
+                ResourcesCompat.getFont(applicationContext, R.font.roboto)
+            }
+        }
+        todoItemDescTV.setTextSize(TypedValue.COMPLEX_UNIT_SP,18+ ((fontMultiplier-2)*2).toFloat())
+        todoItemDescTV.typeface = typeface
+        todoRVAdapter.fontStyle = fontStyle
+        todoRVAdapter.fontMultiplier = fontMultiplier
+        noteDescriptionEdit.typeface = typeface
+        noteTitleEdit.typeface = typeface
+        reminderTV.typeface = typeface
+        tvTimeStamp.typeface = typeface
     }
+
+
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.add_edit_menu, menu)
@@ -845,6 +974,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
             archiveItem?.isVisible = false
         }
 
+
         shareItem?.setOnMenuItemClickListener {
             shareNote()
             return@setOnMenuItemClickListener true
@@ -857,6 +987,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         }
 
         pinItem?.setOnMenuItemClickListener {
+
             pinOrUnPinNote()
             return@setOnMenuItemClickListener true
         }
@@ -872,6 +1003,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
             return@setOnMenuItemClickListener true
         }
         reminderItem?.setOnMenuItemClickListener {
+            viewModal.noteChanged.value = true
             val reminderTime = viewModal.reminderTime
             if (reminderTime == (0).toLong()) {
                 showAlertSheetDialog()
@@ -882,10 +1014,22 @@ class AddEditNoteActivity : AppCompatActivity() ,
             }
             return@setOnMenuItemClickListener true
         }
+
+        if (reminderNoteSet){
+            reminderItem?.setIcon(R.drawable.ic_baseline_add_alert_24)
+        }else{
+            reminderItem?.setIcon(R.drawable.ic_outline_add_alert_24)
+        }
         if (protected){
             lockNoteItem?.setIcon(R.drawable.baseline_lock_24)
         }else{
             lockNoteItem?.setIcon(R.drawable.baseline_lock_open_24)
+        }
+
+        if (notePinned){
+            pinItem?.setIcon(R.drawable.ic_baseline_push_pin_24)
+        }else{
+            pinItem?.setIcon(R.drawable.ic_outline_push_pin_24)
         }
 
         lockNoteItem?.setOnMenuItemClickListener {
@@ -950,6 +1094,28 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
     }
 
+    @TargetApi(25)
+    private fun createShortcut() {
+        val intent = Intent(applicationContext, AddEditNoteActivity::class.java)
+        intent.action = Intent.ACTION_VIEW
+        val shortcutInfo = ShortcutInfoCompat.Builder(applicationContext, "newNote")
+            .setShortLabel(getString(R.string.shortcut_short_label))
+            .setLongLabel(getString(R.string.shortcut_long_label))
+            .setIntent(intent) // Push the shortcut
+            .build()
+
+        ShortcutManagerCompat.pushDynamicShortcut(applicationContext, shortcutInfo)
+    }
+
+
+    @TargetApi(25)
+    private fun removeShortcuts() {
+        val shortcutManager = getSystemService(ShortcutManager::class.java)
+        shortcutManager.disableShortcuts(listOf("newNote"))
+        shortcutManager.removeAllDynamicShortcuts()
+    }
+
+
     private fun getTagFromString(p0: CharSequence?) {
         val strL = p0?.toString()?.split(" ")
         if (!backPressed) {
@@ -999,10 +1165,10 @@ class AddEditNoteActivity : AppCompatActivity() ,
             colorPickerView = labelDialog.findViewById(R.id.colorPicker)
             colorPickerView.addOnColorSelectedListener{
                 val hex = ColorTransparentUtils.transparentColor(it,30)
-                viewModal.labelColor = Color.parseColor(hex)
+                viewModal.labelColor.value = Color.parseColor(hex)
                 viewModal.labelChanged = true
                 viewModal.noteChanged.value = true
-                coordinatorlayout.setBackgroundColor(Color.parseColor(hex))
+                delLabelBtn.visibility = VISIBLE
 
             }
 
@@ -1169,9 +1335,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
             newFragment.show(supportFragmentManager, "datePicker")
         }
 
-
-
     }
+
 
     private fun startAlarm(requestCode: Int) {
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
@@ -1187,9 +1352,10 @@ class AddEditNoteActivity : AppCompatActivity() ,
         }
         intent.putExtra("noteUid",noteUid)
         intent.putExtra("timeStamp",System.currentTimeMillis())
-        intent.putExtra("labelColor",viewModal.labelColor)
+        intent.putExtra("labelColor",labelColor)
         intent.putExtra("pinned",viewModal.pinned.value)
         intent.putExtra("archieved",viewModal.archived.value)
+        intent.putExtra("protected",protected)
         val tags = ArrayList<String>()
         tags.addAll(viewModal.oldTagList)
         tags.addAll(viewModal.newTags)
@@ -1229,29 +1395,33 @@ class AddEditNoteActivity : AppCompatActivity() ,
     }
 
     private fun saveNote(){
+
         val noteTitle = noteTitleEdit.text.toString()
         val noteDescription = noteDescriptionEdit.text.toString()
         val currentDate= cm.currentTimeToLong()
+
         if(viewModal.noteChanged.value == true){
+
             if (noteTitle.isNotEmpty() || noteDescription.isNotEmpty() || viewModal.todoItems.isNotEmpty()){
 
                 val tags = ArrayList<String>()
                 tags.addAll(viewModal.oldTagList)
                 tags.addAll(viewModal.newTags)
                 tags.removeAll(viewModal.deletedTags.toSet())
+
                 if (viewModal.deletedNote.value != true){
-                    if(noteType == "Edit"){
+                    if(noteType == "Edit" && noteUid!= null){
                         cancelDelete(viewModal.reminderTime.toInt())
                         val noteUpdate = HashMap<String,Any>()
                         noteUpdate["title"] = noteTitle
                         noteUpdate["description"] = noteDescription
                         noteUpdate["timeStamp"] = currentDate
                         noteUpdate["label"] = viewModal.labelColor
-                        noteUpdate["pinned"] = notePinned
-                        noteUpdate["archived"] = archived
+                        noteUpdate["pinned"] = viewModal.pinned.value == true
+                        noteUpdate["archived"] = viewModal.archived.value == true
                         noteUpdate["reminderDate"] = viewModal.reminderTime
                         noteUpdate["todoItems"] = viewModal.todoItems
-                        noteUpdate["protected"] = protected
+                        noteUpdate["protected"] = viewModal.noteLocked.value == true
                         noteUpdate["tags"] = tags
                         noteUid?.let { viewModal.updateFireNote(noteUpdate, it) }
 
@@ -1267,9 +1437,9 @@ class AddEditNoteActivity : AppCompatActivity() ,
                             val noteFire = NoteFireIns(noteTitle, noteDescription, currentDate)
                             noteFire.tags = ArrayList(tags)
                             noteFire.reminderDate = viewModal.reminderTime
-                            noteFire.pinned = notePinned
-                            noteFire.label = viewModal.labelColor
-                            noteFire.protected = protected
+                            noteFire.pinned = viewModal.pinned.value == true
+                            noteFire.label = labelColor
+                            noteFire.protected = viewModal.noteLocked.value == true
                             noteFire.todoItems = ArrayList(viewModal.todoItems)
                             noteUid =  viewModal.addFireNote(noteFire)
                             saveOtherEntities()
@@ -1279,19 +1449,52 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
                     }
                 }else{
-                    noteUid?.let { scheduleDelete(it, tags,viewModal.labelColor,noteTimeStamp) }
+                    val emptyTrashImmediately = settingsPref.getBoolean("EmptyTrashImmediately",false)
+                    if (!emptyTrashImmediately){
+                        noteUid?.let { scheduleDelete(it, tags,labelColor,noteTimeStamp) }
+                    }else{
+                        noteUid?.let { viewModal.deleteNote(it, labelColor,tags) }
+                    }
                     Toast.makeText(this@AddEditNoteActivity,"Note Deleted",Toast.LENGTH_SHORT).show()
 
                 }
 
-
             }
-
 
         }
     }
 
+    override fun onResume() {
+        if (protected && viewModal.appPaused){
+            val intent = Intent( applicationContext, Fingerprint::class.java)
+            val noteTitle = noteTitleEdit.text.toString()
+            val noteDescription = noteDescriptionEdit.text.toString()
+            intent.putExtra("noteType","Edit")
+            intent.putExtra("noteTitle",noteTitle)
+            intent.putExtra("noteDescription",noteDescription)
+            intent.putExtra("noteUid",noteUid)
+            intent.putExtra("timeStamp",noteTimeStamp)
+            intent.putExtra("labelColor",labelColor)
+            intent.putExtra("pinned",viewModal.pinned.value)
+            intent.putExtra("archieved",viewModal.archived.value)
+            intent.putExtra("protected",true)
+            intent.putExtra("reminder",viewModal.reminderTime)
+            val tags = ArrayList<String>()
+            tags.addAll(viewModal.oldTagList)
+            tags.addAll(viewModal.newTags)
+            tags.removeAll(viewModal.deletedTags.toSet())
+            intent.putExtra("tags",tags)
+            val toDoItemString: String = Gson().toJson(viewModal.todoItems)
+            intent.putExtra("todoItems", toDoItemString)
+            startActivity(intent)
+        }
+        super.onResume()
+    }
 
+    override fun onPause() {
+        viewModal.appPaused = true
+        super.onPause()
+    }
 
 
     private fun saveOtherEntities(){
@@ -1302,13 +1505,15 @@ class AddEditNoteActivity : AppCompatActivity() ,
             viewModal.addOrDeleteTags(newTagsAdded,deletedTags,it)
         }
 
-        val labelColor = viewModal.labelColor
+        val labelColor = viewModal.labelColor.value
         if (viewModal.labelChanged){
-            if (labelColor > 0){
-                noteUid?.let { viewModal.addOrDeleteLabel(labelColor,oldLabel, it,true) }
-            }else{
-                noteUid?.let { viewModal.addOrDeleteLabel(labelColor, oldLabel, it, false) }
+            if (labelColor != null) {
+                if (labelColor > 0){
+                    noteUid?.let { viewModal.addOrDeleteLabel(labelColor,oldLabel, it,true) }
+                }else{
+                    noteUid?.let { viewModal.addOrDeleteLabel(labelColor, oldLabel, it, false) }
 
+                }
             }
         }
 
@@ -1316,7 +1521,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
 
         if (viewModal.reminderTime > 0){
-            if (reminderNoteSet){
+            if (viewModal.reminderSet.value == true){
                 if (viewModal.deletedNote.value != true){
                     startAlarm(viewModal.reminderTime.toInt())
                 }
@@ -1331,7 +1536,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
 
     private fun goToMain() {
-        
         saveNote()
         val intent = Intent(this@AddEditNoteActivity, MainActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
@@ -1350,7 +1554,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        // do your stuff
         goToMain()
 
         return super.onSupportNavigateUp()
@@ -1382,23 +1585,24 @@ class AddEditNoteActivity : AppCompatActivity() ,
         this.calendar[Calendar.MONTH] = calendar[Calendar.MONTH]
         this.calendar[Calendar.YEAR] = calendar[Calendar.YEAR]
         dateTitleTV.text="Date set:" + DateFormat.getDateFormat(this).format(calendar.time)
-
-
     }
 
     override fun getTag(tag: String) {
+
+        val tags = HashSet<String>()
+        tags.addAll(viewModal.oldTagList)
         viewModal.newTags.add(tag)
-        tagListAdapter.updateList(viewModal.oldTagList)
+        tags.addAll(viewModal.newTags)
+        tagListAdapter.updateList(ArrayList(tags))
         viewModal.noteChanged.value = true
 
     }
 
     override fun onLabelItemClick(labelColor: Int) {
-        viewModal.labelColor = labelColor
+        viewModal.labelColor.value = labelColor
         viewModal.labelChanged = true
         viewModal.noteChanged.value = true
         textChanged = true
-        coordinatorlayout.setBackgroundColor(labelColor)
 
     }
 
@@ -1406,9 +1610,9 @@ class AddEditNoteActivity : AppCompatActivity() ,
     override fun onItemDelete(position: Int, todoItem: TodoItem) {
         viewModal.noteChanged.value = true
         viewModal.todoItems.remove(todoItem)
+        todoRVAdapter.updateTodoItems(viewModal.todoItems)
         todoRVAdapter.notifyItemRemoved(position)
         deletedTodos.add(todoItem)
-        todoRVAdapter.updateTodoItems(viewModal.todoItems)
     }
 
     override fun onItemCheckChanged(position: Int, todoItem: TodoItem) {
@@ -1439,7 +1643,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
         viewModal.todoItems = todoItems
         todoRVAdapter.notifyItemChanged(position)
         viewModal.updatedTodos.add(todoItem)
-
 
     }
 

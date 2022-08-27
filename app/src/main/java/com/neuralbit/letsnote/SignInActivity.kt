@@ -39,10 +39,12 @@ class SignInActivity : AppCompatActivity() {
 
         createRequest()
         findViewById<View>(R.id.signInWithGoogleBtn).setOnClickListener { signIn() }
-        findViewById<View>(R.id.skipBtn).setOnClickListener {
-            val intent = Intent(this@SignInActivity,MainActivity::class.java)
-            startActivity(intent)
+        val termsAndConditions = findViewById<View>(R.id.termsAndConditionTV)
+        termsAndConditions.setOnClickListener {
+            val i = Intent(applicationContext,TermsAndConditions::class.java)
+            startActivity(i)
         }
+
     }
 
     private fun createRequest() {

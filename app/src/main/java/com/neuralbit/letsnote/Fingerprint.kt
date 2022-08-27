@@ -27,11 +27,12 @@ class Fingerprint : AppCompatActivity() {
         val noteUid = intent.getStringExtra("noteUid")
         val timeStamp = intent.getLongExtra("timeStamp",0)
         val labelColor = intent.getIntExtra("labelColor",0)
-        val pinned = intent.getStringExtra("pinned")
+        val pinned = intent.getBooleanExtra("pinned",false)
         val archived = intent.getBooleanExtra("archieved",false)
         val protected = intent.getBooleanExtra("protected",false)
         val tagList = intent.getStringArrayListExtra("tagList")
         val todoList = intent.getStringExtra("todoItems")
+        val noteChanged = intent.getBooleanExtra("noteChanged",false)
         val reminder = intent.getStringExtra("reminder")
 
         val noteTitleTV = findViewById<TextView>(R.id.textView)
@@ -50,6 +51,7 @@ class Fingerprint : AppCompatActivity() {
                 archived,
                 protected,
                 reminder,
+                noteChanged,
                 todoList,
                 tagList
             )
@@ -65,6 +67,7 @@ class Fingerprint : AppCompatActivity() {
             archived,
             protected,
             reminder,
+            noteChanged,
             todoList,
             tagList
         )
@@ -79,10 +82,11 @@ class Fingerprint : AppCompatActivity() {
         noteUid: String?,
         timeStamp: Long,
         labelColor: Int,
-        pinned: String?,
+        pinned: Boolean?,
         archived: Boolean,
         protected: Boolean,
         reminder: String?,
+        noteChanged : Boolean,
         todoList: String?,
         tagList: ArrayList<String>?
     ) {
@@ -122,6 +126,7 @@ class Fingerprint : AppCompatActivity() {
                         addEditIntent.putExtra("protected", protected)
                         addEditIntent.putExtra("reminder", reminder)
                         addEditIntent.putExtra("todoItems", todoList)
+                        addEditIntent.putExtra("noteChanged",noteChanged)
                         addEditIntent.putStringArrayListExtra("tagList", tagList)
                         startActivity(addEditIntent)
                         finish()

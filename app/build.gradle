@@ -50,6 +50,11 @@ android {
     buildFeatures {
         viewBinding true
     }
+    apply plugin: 'com.android.application'
+    apply plugin: 'com.google.gms.google-services' // Google services Gradle plugin
+
+// Apply the Crashlytics Gradle plugin
+    apply plugin: 'com.google.firebase.crashlytics'
 }
 
 
@@ -68,7 +73,8 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.9'
 
     // Import the BoM for the Firebase platform
-    implementation platform('com.google.firebase:firebase-bom:29.0.3')
+    implementation platform('com.google.firebase:firebase-bom:30.3.1')
+
 
     // Declare the dependency for the Firebase Authentication library
     // When using the BoM, you don't specify versions in Firebase library dependencies
@@ -91,6 +97,11 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
     implementation 'com.firebaseui:firebase-ui-auth:8.0.1'
     implementation 'com.facebook.android:facebook-login:8.1.0'
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+    implementation 'org.apache.commons:commons-lang3:3.0'
+    implementation 'com.google.firebase:firebase-crashlytics'
+    implementation 'com.google.firebase:firebase-analytics'
+
 
     // Lifecycle components
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$rootProject.lifecycleVersion"
@@ -114,4 +125,9 @@ dependencies {
     })
     androidTestImplementation "androidx.test.ext:junit:$rootProject.androidxJunitVersion"
     implementation 'androidx.recyclerview:recyclerview-selection:1.0.0'
+
+    implementation "androidx.activity:activity-ktx:1.6.0-rc01"
+    implementation "com.github.CanHub:Android-Image-Cropper:3.3.6"
+    implementation 'androidx.core:core-splashscreen:1.0.0-beta02'
+
 }

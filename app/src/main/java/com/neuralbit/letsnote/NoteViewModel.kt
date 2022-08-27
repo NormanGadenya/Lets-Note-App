@@ -22,11 +22,12 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     var newTags = HashSet<String>()
     var deletedTags = HashSet<String>()
     var noteChanged = MutableLiveData<Boolean>()
+    var appPaused = false
     var archived : MutableLiveData<Boolean> = MutableLiveData()
     var noteLocked = MutableLiveData<Boolean>()
     var deletedNote : MutableLiveData<Boolean> = MutableLiveData()
     var labelChanged : Boolean = false
-    var labelColor : Int = 0
+    var labelColor : MutableLiveData<Int> = MutableLiveData()
     var pinned : MutableLiveData<Boolean> = MutableLiveData()
     var reminderSet : MutableLiveData<Boolean> = MutableLiveData()
     var reminderTime : Long = 0
@@ -60,6 +61,12 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
 
     fun addOrDeleteTags(newTagsAdded: HashSet<String>, deletedTags: HashSet<String>, noteUid: String) {
         tagFireRepo.addOrDeleteTags(newTagsAdded,deletedTags,noteUid)
+    }
+
+    fun deleteNote (noteUid : String, labelColor : Int, tagList : List<String> ){
+        noteFireRepo.deleteNote(noteUid)
+        tagFireRepo.deleteNoteFromTags(tagList,noteUid)
+        labelFireRepo.deleteNoteFromLabel(labelColor,noteUid)
     }
 
 }
