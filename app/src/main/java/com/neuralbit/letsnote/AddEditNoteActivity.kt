@@ -395,7 +395,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
                         Collections.swap(viewModal.todoItems, i, i - 1)
                     }
                 }
-                Log.d(TAG, "onMove: $fromPosition  $toPosition")
                 todoRVAdapter.notifyItemMoved(viewHolder.adapterPosition,target.adapterPosition)
                 return false
             }
@@ -512,7 +511,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
         viewModal.noteLocked.observe(lifecycleOwner){
 
-            Log.d(TAG, "onCreate: protected $it")
             protected = it
             if (it){
                 lockNoteItem?.setIcon(R.drawable.baseline_lock_24)
@@ -1399,6 +1397,9 @@ class AddEditNoteActivity : AppCompatActivity() ,
         val noteTitle = noteTitleEdit.text.toString()
         val noteDescription = noteDescriptionEdit.text.toString()
         val currentDate= cm.currentTimeToLong()
+        viewModal.labelColor.observe(this){
+            labelColor = it
+        }
 
         if(viewModal.noteChanged.value == true){
 
@@ -1416,7 +1417,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                         noteUpdate["title"] = noteTitle
                         noteUpdate["description"] = noteDescription
                         noteUpdate["timeStamp"] = currentDate
-                        noteUpdate["label"] = viewModal.labelColor
+                        noteUpdate["label"] = labelColor
                         noteUpdate["pinned"] = viewModal.pinned.value == true
                         noteUpdate["archived"] = viewModal.archived.value == true
                         noteUpdate["reminderDate"] = viewModal.reminderTime

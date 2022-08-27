@@ -4,6 +4,7 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="../../../../layout/custom_preview.xml" value="0.25" />
+        <entry key="../../Android/Sdk/platforms/android-33/data/res/layout/simple_dropdown_item_1line.xml" value="0.35885416666666664" />
         <entry key="app/src/main/res/drawable/apricot_tag.xml" value="0.22291666666666668" />
         <entry key="app/src/main/res/drawable/apricot_toolbar.xml" value="0.1225" />
         <entry key="app/src/main/res/drawable/baseline_delete_forever_24.xml" value="0.307" />
@@ -100,6 +101,7 @@
         <entry key="app/src/main/res/layout/tag_item.xml" value="0.5" />
         <entry key="app/src/main/res/layout/tag_notes_fragment.xml" value="0.22864583333333333" />
         <entry key="app/src/main/res/layout/tag_spinner_row.xml" value="0.3328125" />
+        <entry key="app/src/main/res/layout/tag_title_layout.xml" value="0.3578125" />
         <entry key="app/src/main/res/menu/action_menu.xml" value="0.35885416666666664" />
         <entry key="app/src/main/res/menu/activity_main_drawer.xml" value="0.33" />
         <entry key="app/src/main/res/menu/add_edit_menu.xml" value="0.1828125" />
