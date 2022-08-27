@@ -154,7 +154,7 @@
             android:id="@+id/reminderIcon"
             android:layout_width="25dp"
             android:layout_height="25dp"
-            android:visibility="visible"
+            android:visibility="gone"
             android:layout_margin="@dimen/margin"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_baseline_access_alarm_24"
@@ -167,7 +167,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/margin"
-            android:visibility="visible"
+            android:visibility="gone"
             tools:text="Edite on sjjsndjncjdjcnjndjcjd"
             app:layout_constraintStart_toEndOf="@id/reminderIcon"
             app:layout_constraintBottom_toTopOf="@id/infoContainer" />

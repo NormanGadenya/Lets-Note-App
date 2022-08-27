@@ -83,7 +83,7 @@ class NoteRVAdapter (
         }
         val settingsPref = context.getSharedPreferences("Settings", AppCompatActivity.MODE_PRIVATE)
         val fontMultiplier = settingsPref.getInt("fontMultiplier",2)
-        holder.noteTextTV.setTextSize(TypedValue.COMPLEX_UNIT_SP,18f+ ((fontMultiplier-2)*4).toFloat())
+        holder.noteTextTV.setTextSize(TypedValue.COMPLEX_UNIT_SP,16f+ ((fontMultiplier-2)*4).toFloat())
         holder.noteTitleTV.setTextSize(TypedValue.COMPLEX_UNIT_SP,24f+ ((fontMultiplier-2)*4).toFloat())
         holder.reminderTV.setTextSize(TypedValue.COMPLEX_UNIT_SP,12f+ ((fontMultiplier-2)).toFloat())
         holder.tagsTV.setTextSize(TypedValue.COMPLEX_UNIT_SP,12f+ ((fontMultiplier-2)).toFloat())
@@ -165,8 +165,9 @@ class NoteRVAdapter (
             if (daysLeft >1 || daysLeft== (0).toDouble()){
                 holder.daysLeft.text = "${daysLeft.toInt()} days left "
             }else if (daysLeft == (1).toDouble()){
-                holder.daysLeft.text = "${daysLeft.toInt()} day left"
+                holder.daysLeft.text = "${deletedTime} day left"
             }
+
 
         }else{
             holder.daysLeft.visibility = GONE

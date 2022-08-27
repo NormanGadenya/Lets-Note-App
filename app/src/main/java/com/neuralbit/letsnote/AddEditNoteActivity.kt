@@ -98,7 +98,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private lateinit var delLabelBtn : ImageButton
     private lateinit var reminderIcon : ImageView
     private lateinit var reminderTV : TextView
-    private var noteID : Long= -1
     private var noteUid : String? = null
     private val viewModal : NoteViewModel by viewModels()
     private lateinit var labelViewModel : LabelViewModel
@@ -232,24 +231,13 @@ class AddEditNoteActivity : AppCompatActivity() ,
         when (noteType) {
             "Edit" -> {
                 noteTitleEdit.setText(noteTitle)
-                viewModal.pinned.value = notePinned
 
                 noteDescriptionEdit.setText(noteDesc)
                 tvTimeStamp.visibility =VISIBLE
                 redoUndoGroup.visibility = GONE
 
                 tvTimeStamp.text= getString(R.string.timeStamp,cm.convertLongToTime(noteTimeStamp)[0],cm.convertLongToTime(noteTimeStamp)[1])
-//                val labelColor = viewModal.labelColor.value
-//                if (labelColor != null) {
-//                    if(labelColor > 0){
-//                        coordinatorlayout.setBackgroundColor(labelColor)
-//                        delLabelBtn.visibility = VISIBLE
-//                    }else{
-//                        coordinatorlayout.setBackgroundColor(Color.TRANSPARENT)
-//
-//                        delLabelBtn.visibility = GONE
-//                    }
-//                }
+
                 tagListAdapter.updateList(viewModal.oldTagList)
             }
             else -> {
@@ -523,6 +511,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
         }
 
         viewModal.noteLocked.observe(lifecycleOwner){
+
+            Log.d(TAG, "onCreate: protected $it")
             protected = it
             if (it){
                 lockNoteItem?.setIcon(R.drawable.baseline_lock_24)
@@ -533,7 +523,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
         viewModal.pinned.observe(lifecycleOwner) {
             notePinned = it
-
+            Log.d(TAG, "onCreate: $pinItem")
             if (it) {
                 pinItem?.setIcon(R.drawable.ic_baseline_push_pin_24)
 
@@ -848,19 +838,25 @@ class AddEditNoteActivity : AppCompatActivity() ,
         addTagBtn = findViewById(R.id.addTagBtn)
         reminderTV = findViewById(R.id.reminderTV)
         reminderIcon = findViewById(R.id.reminderIcon)
-        noteTitleEdit.setTextSize(TypedValue.COMPLEX_UNIT_SP,32f+ ((fontMultiplier-2)*4).toFloat())
-        noteDescriptionEdit.setTextSize(TypedValue.COMPLEX_UNIT_SP,24f+ ((fontMultiplier-2)*4).toFloat())
-        tvTimeStamp.setTextSize(TypedValue.COMPLEX_UNIT_SP,10f+ ((fontMultiplier-2)*4).toFloat())
-        noteID = intent.getLongExtra("noteID",-1)
+        noteTitleEdit.setTextSize(TypedValue.COMPLEX_UNIT_SP,32f+ ((fontMultiplier-2)*2).toFloat())
+        noteDescriptionEdit.setTextSize(TypedValue.COMPLEX_UNIT_SP,18f+ ((fontMultiplier-2)*2).toFloat())
+        tvTimeStamp.setTextSize(TypedValue.COMPLEX_UNIT_SP,15f+ ((fontMultiplier-2)*2).toFloat())
         noteType = intent.getStringExtra("noteType").toString()
         intent.putExtra("noteType","Edit")
         noteTitle = intent.getStringExtra("noteTitle")
         noteUid = intent.getStringExtra("noteUid")
         noteDesc = intent.getStringExtra("noteDescription")
+
         notePinned = intent.getBooleanExtra("pinned",false)
         archived = intent.getBooleanExtra("archieved",false)
         deleted = intent.getBooleanExtra("deleted",false)
-        viewModal.noteLocked.value = intent.getBooleanExtra("protected", false)
+        if (viewModal.noteChanged.value != true){
+            viewModal.archived.value = archived
+            viewModal.deletedNote.value = deleted
+            viewModal.noteChanged.value = noteChanged
+            viewModal.pinned.value = notePinned
+            viewModal.noteLocked.value = intent.getBooleanExtra("protected", false)
+        }
 
 
         val tagIntentList = intent.getStringArrayListExtra("tagList")
@@ -872,6 +868,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
             todoDoItemList = Gson().fromJson(todoItemStr, object : TypeToken<List<TodoItem?>?>() {}.type)
         }
         noteChanged = intent.getBooleanExtra("noteChanged",false)
+        viewModal.noteChanged.value = noteChanged
 
         supportActionBar?.title = ""
         cropActivityResultLauncher = registerForActivityResult(cropActivityResultContract){
@@ -927,10 +924,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         if (oldLabel > 0){
             viewModal.labelColor.value = oldLabel
         }
-        viewModal.archived.value = archived
-        viewModal.deletedNote.value = deleted
-        viewModal.noteChanged.value = noteChanged
-        viewModal.pinned.value = notePinned
+
         val fontStyle = settingsPref.getString("font",null)
         val typeface: Typeface? = when (fontStyle) {
             "Architects daughter" -> {
@@ -946,7 +940,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 ResourcesCompat.getFont(applicationContext, R.font.roboto)
             }
         }
-        todoItemDescTV.setTextSize(TypedValue.COMPLEX_UNIT_SP,24f+ ((fontMultiplier-2)*4).toFloat())
+        todoItemDescTV.setTextSize(TypedValue.COMPLEX_UNIT_SP,18+ ((fontMultiplier-2)*2).toFloat())
         todoItemDescTV.typeface = typeface
         todoRVAdapter.fontStyle = fontStyle
         todoRVAdapter.fontMultiplier = fontMultiplier
@@ -993,6 +987,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         }
 
         pinItem?.setOnMenuItemClickListener {
+
             pinOrUnPinNote()
             return@setOnMenuItemClickListener true
         }
@@ -1405,7 +1400,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         val noteDescription = noteDescriptionEdit.text.toString()
         val currentDate= cm.currentTimeToLong()
 
-        if(textChanged){
+        if(viewModal.noteChanged.value == true){
 
             if (noteTitle.isNotEmpty() || noteDescription.isNotEmpty() || viewModal.todoItems.isNotEmpty()){
 
@@ -1421,12 +1416,12 @@ class AddEditNoteActivity : AppCompatActivity() ,
                         noteUpdate["title"] = noteTitle
                         noteUpdate["description"] = noteDescription
                         noteUpdate["timeStamp"] = currentDate
-                        noteUpdate["label"] = labelColor
-                        noteUpdate["pinned"] = notePinned
-                        noteUpdate["archived"] = archived
+                        noteUpdate["label"] = viewModal.labelColor
+                        noteUpdate["pinned"] = viewModal.pinned.value == true
+                        noteUpdate["archived"] = viewModal.archived.value == true
                         noteUpdate["reminderDate"] = viewModal.reminderTime
                         noteUpdate["todoItems"] = viewModal.todoItems
-                        noteUpdate["protected"] = protected
+                        noteUpdate["protected"] = viewModal.noteLocked.value == true
                         noteUpdate["tags"] = tags
                         noteUid?.let { viewModal.updateFireNote(noteUpdate, it) }
 
@@ -1442,9 +1437,9 @@ class AddEditNoteActivity : AppCompatActivity() ,
                             val noteFire = NoteFireIns(noteTitle, noteDescription, currentDate)
                             noteFire.tags = ArrayList(tags)
                             noteFire.reminderDate = viewModal.reminderTime
-                            noteFire.pinned = notePinned
+                            noteFire.pinned = viewModal.pinned.value == true
                             noteFire.label = labelColor
-                            noteFire.protected = protected
+                            noteFire.protected = viewModal.noteLocked.value == true
                             noteFire.todoItems = ArrayList(viewModal.todoItems)
                             noteUid =  viewModal.addFireNote(noteFire)
                             saveOtherEntities()
@@ -1526,7 +1521,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
 
         if (viewModal.reminderTime > 0){
-            if (reminderNoteSet){
+            if (viewModal.reminderSet.value == true){
                 if (viewModal.deletedNote.value != true){
                     startAlarm(viewModal.reminderTime.toInt())
                 }

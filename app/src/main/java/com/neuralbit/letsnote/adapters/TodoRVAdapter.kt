@@ -66,7 +66,8 @@ class TodoRVAdapter(
                 ResourcesCompat.getFont(context, R.font.roboto)
             }
         }
-        holder.todoItemDescET.setTextSize(TypedValue.COMPLEX_UNIT_SP,24f+ ((fontMultiplier-2)*4).toFloat())
+        holder.todoItemDescET.setTextSize(TypedValue.COMPLEX_UNIT_SP,18f+ ((fontMultiplier-2)*2).toFloat())
+
         holder.todoItemDescET.typeface = typeface
         if (todoItem.item.isNotEmpty() && todoItem.checked){
             val spannableString = SpannableString(todoItem.item)

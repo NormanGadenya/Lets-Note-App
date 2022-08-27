@@ -34,4 +34,8 @@ class MainActivityViewModel(application : Application) : AndroidViewModel(applic
         labelFireRepo.deleteNoteFromLabel(labelColor,noteUid)
     }
 
+    fun updateFireNote(noteUpdate : Map<String, Any>, noteUid : String) {
+        noteFireRepo.updateNote(noteUpdate,noteUid)
+    }
+
 }

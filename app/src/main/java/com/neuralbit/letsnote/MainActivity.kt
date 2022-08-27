@@ -92,7 +92,20 @@ class MainActivity : AppCompatActivity() {
         viewModal.getAllFireNotes().observe(this){
             allNotesViewModal.allFireNotes.value = it
         }
+        val emptyTrashImmediately = settingsPref.getBoolean("EmptyTrashImmediately",false)
+        if (emptyTrashImmediately){
+            allNotesViewModal.notesToDelete.observe(lifecycleOwner){
+                it.noteUid?.let { uid -> viewModal.deleteNote(uid,it.label,it.tags) }
 
+            }
+            allNotesViewModal.selectedNotes.clear()
+        }
+        archivedViewModel.notesToRestore.observe(lifecycleOwner){
+            val update = HashMap<String,Any>()
+            update["archived"] = false
+            update["timeStamp"] = System.currentTimeMillis()
+            it.noteUid?.let { it1 -> viewModal.updateFireNote(update, it1) }
+        }
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
@@ -215,14 +228,6 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-        val emptyTrashImmediately = settingsPref.getBoolean("EmptyTrashImmediately",false)
-        if (emptyTrashImmediately){
-            allNotesViewModal.notesToDelete.observe(lifecycleOwner){
-                it.noteUid?.let { uid -> viewModal.deleteNote(uid,it.label,it.tags) }
-
-            }
-            allNotesViewModal.selectedNotes.clear()
-        }
 
         return true
     }
@@ -237,12 +242,34 @@ class MainActivity : AppCompatActivity() {
         override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
             mode?.menuInflater?.inflate(R.menu.action_menu,menu)
             mode?.title = "Delete or Archive notes"
+            if(allNotesViewModal.deleteFrag.value == true){
+                mode?.title = "Delete or Restore notes"
+            }
+            else if(allNotesViewModal.archiveFrag){
+                mode?.title = "Delete or Restore notes"
+            }
             return true
         }
 
         override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
             val restoreItem = menu?.findItem(R.id.restore)
-            restoreItem?.isVisible = allNotesViewModal.deleteFrag.value == true
+            val archiveItem = menu?.findItem(R.id.archive)
+
+            if (allNotesViewModal.deleteFrag.value == true){
+                archiveItem?.isVisible = false
+                restoreItem?.isVisible = true
+
+            }
+            else if (allNotesViewModal.archiveFrag){
+                archiveItem?.isVisible = false
+                restoreItem?.isVisible = true
+
+            }else{
+                archiveItem?.isVisible = true
+                restoreItem?.isVisible = false
+            }
+
+
             return false
         }
 
@@ -252,24 +279,25 @@ class MainActivity : AppCompatActivity() {
                 mode?.finish()
                 return true
             }else if (item?.itemId == R.id.restore){
-                deleteVieModel.itemRestoreClicked.value = true
+                if (allNotesViewModal.deleteFrag.value == true){
+                    deleteVieModel.itemRestoreClicked.value = true
+                }else{
+                    archivedViewModel.itemRestoreClicked.value = true
+
+                }
                 mode?.finish()
                 return true
             }else if (item?.itemId == R.id.delete){
-                deleteVieModel.itemDeleteClicked.value = true
+                if(allNotesViewModal.deleteFrag.value == true){
+                    deleteVieModel.itemDeleteClicked.value = true
+                }else if (allNotesViewModal.archiveFrag){
+                    archivedViewModel.itemDeleteClicked.value = true
+                }
+                else{
+                    allNotesViewModal.itemDeleteClicked.value = true
+                }
 
-//                val alertDialog: AlertDialog.Builder = AlertDialog.Builder(applicationContext)
-//                alertDialog.setTitle("Are you sure about this ?")
-//                alertDialog.setPositiveButton("Yes"
-//                ) { _, _ ->
-//                }
-//                alertDialog.setNegativeButton("Cancel"
-//                ) { dialog, _ ->
-//
-//                    dialog.cancel() }
-//                alertDialog.show()
-//
-//
+
                 mode?.finish()
                 return true
             }

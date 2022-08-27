@@ -73,6 +73,7 @@ class AllNotesFragment : Fragment() , NoteFireClick {
         pinnedNotesRV.layoutManager =staggeredLayoutManagerPinned
         allNotesViewModel.deleteFrag.value = false
         settingsViewModel.settingsFrag.value = false
+        allNotesViewModel.archiveFrag = false
         allNotesViewModel.staggeredView.value = settingsSharedPref?.getBoolean("staggered",true)
         allNotesViewModel.staggeredView.observe(viewLifecycleOwner){
             val editor: SharedPreferences.Editor ?= settingsSharedPref?.edit()
@@ -234,6 +235,7 @@ class AllNotesFragment : Fragment() , NoteFireClick {
                     if (noteUids != null){ deletedNoteUids.addAll(noteUids)}
 
                     if (emptyTrashImmediately != true){
+                        editor?.putLong(note.noteUid,System.currentTimeMillis())
 
                         note.noteUid?.let { it1 -> deletedNoteUids.add(it1) }
 
@@ -271,6 +273,7 @@ class AllNotesFragment : Fragment() , NoteFireClick {
 
 
                 allNotesViewModel.itemSelectEnabled.value = false
+                allNotesViewModel.itemDeleteClicked.value = false
 
                 Toast.makeText(context,"Notes deleted successfully",Toast.LENGTH_SHORT).show()
             }

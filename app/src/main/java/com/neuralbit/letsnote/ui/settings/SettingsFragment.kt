@@ -58,13 +58,13 @@ class SettingsFragment : Fragment() {
             }
         }
         fontSeekBar.progress = fontPosition
-        dummyText.textSize = 32f+((fontPosition-2)*4)
+        dummyText.textSize = 18f+((fontPosition-2)*2)
 
         fontSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
             override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
                 editor.putInt("fontMultiplier",p1)
                 editor.apply()
-                dummyText.textSize = 32f+((p1-2)*4)
+                dummyText.textSize = 18f+((p1-2)*2)
             }
 
             override fun onStartTrackingTouch(p0: SeekBar?) {
@@ -98,9 +98,7 @@ class SettingsFragment : Fragment() {
             }
         }
 
-
         return root
-
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
