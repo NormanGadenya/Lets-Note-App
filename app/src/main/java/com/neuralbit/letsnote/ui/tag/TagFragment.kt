@@ -103,6 +103,15 @@ class TagFragment : Fragment(), TagRVAdapter.TagItemClick {
                 }
                 val sortedTagList = tagList.sortedBy { i -> i.noteCount }.reversed()
                 val sortedTagFireList = tagFireList.sortedBy { i -> i.noteUids.size }.reversed()
+                val welcomeIcon = binding.welcomeIcon
+                val welcomeText = binding.allNotesText
+                if (sortedTagList.isEmpty()){
+                    welcomeIcon.visibility = View.VISIBLE
+                    welcomeText.visibility = View.VISIBLE
+                }else{
+                    welcomeIcon.visibility = View.GONE
+                    welcomeText.visibility = View.GONE
+                }
                 tagViewModel.allTagFire = ArrayList(sortedTagFireList)
                 tagViewModel.allTags = ArrayList(sortedTagList)
                 tagRVAdapter?.updateTagList(ArrayList(sortedTagList))
@@ -111,36 +120,6 @@ class TagFragment : Fragment(), TagRVAdapter.TagItemClick {
         }
 
 
-//        noteViewModel.allFireTags().observe(viewLifecycleOwner){ it ->
-//            val tagFireList = HashSet<TagFire>()
-//            val pref = context?.getSharedPreferences("DeletedNotes", AppCompatActivity.MODE_PRIVATE)
-//            val deletedNotes = pref?.getStringSet("noteUids", HashSet())
-//            val tagList = HashSet<Tag>()
-//            for (t in it){
-//                val tag = Tag(t.tagName,t.noteUids.size)
-//                if (deletedNotes != null){
-//                    for (n in t.noteUids){
-//                        if (!deletedNotes.contains(n)){
-//                            tagList.add(tag)
-//                            tagFireList.add(t)
-//                        }
-//                    }
-//
-//                }else{
-//                    tagList.add(tag)
-//                    tagFireList.add(t)
-//                }
-//
-//            }
-//
-//
-//
-//            val sortedTagList = tagList.sortedBy { i -> i.noteCount }.reversed()
-//            val sortedTagFireList = tagFireList.sortedBy { i -> i.noteUids.size }.reversed()
-//            tagViewModel.allTagFire = ArrayList(sortedTagFireList)
-//            tagViewModel.allTags = ArrayList(sortedTagList)
-//            tagRVAdapter?.updateTagList(ArrayList(sortedTagList))
-//        }
 
         tagViewModel.searchQuery.observe(viewLifecycleOwner){
             if(it!=null){
@@ -152,88 +131,6 @@ class TagFragment : Fragment(), TagRVAdapter.TagItemClick {
             }
         }
 
-
-//        val touchHelperTag = ItemTouchHelper(object  : ItemTouchHelper.SimpleCallback(0,
-//            ItemTouchHelper.RIGHT){
-//            override fun onMove(
-//                recyclerView: RecyclerView,
-//                viewHolder: RecyclerView.ViewHolder,
-//                target: RecyclerView.ViewHolder
-//            ): Boolean {
-//
-//                return true
-//            }
-//
-//            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-//                val tag = tagList[viewHolder.adapterPosition]
-//                lifecycleScope.launch {
-//                    val notes =  tagViewModel.getNotesWithTag(tag.tagTitle)
-//
-//                    val deleteDialog: AlertDialog? = this.let {
-//                        val builder = AlertDialog.Builder(context)
-//                        builder.apply {
-//                            setPositiveButton("ok"
-//                            ) { _, _ ->
-//                                for (note in notes.first().notes){
-//
-//                                    tagViewModel.deleteNoteTagCrossRef(NoteTagCrossRef(note.noteID,tag.tagTitle))
-//                                }
-//                                tagViewModel.deleteTag(tag)
-//                                tagRVAdapter?.notifyItemRemoved(viewHolder.adapterPosition)
-//                                Toast.makeText(context, "#${tag.tagTitle} Deleted", Toast.LENGTH_SHORT).show()
-//
-//
-//                            }
-//                            setNegativeButton("cancel"
-//                            ) { _, _ ->
-////                                tagRVAdapter?.updateTagList(tagList)
-//
-//                            }
-//
-//                            setTitle("Delete ${tag.tagTitle}")
-//
-//                        }
-//                        builder.create()
-//                    }
-//                    deleteDialog?.show()
-//
-//
-//                }
-//
-//
-//
-//            }
-//
-//            override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
-//                super.onSelectedChanged(viewHolder, actionState)
-//                if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE){
-//                    val iView = viewHolder?.itemView as CardView
-//                    iView.setCardBackgroundColor(resources.getColor(R.color.Red))
-//
-//                }
-//            }
-//
-//            override fun clearView(
-//                recyclerView: RecyclerView,
-//                viewHolder: RecyclerView.ViewHolder
-//            ) {
-//                super.clearView(recyclerView, viewHolder)
-//                val iView = viewHolder.itemView as CardView
-//
-//                try{
-//                    iView.setCardBackgroundColor(resources.getColor(R.color.Apricot))
-//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-//                        iView.outlineSpotShadowColor = resources.getColor(R.color.Apricot)
-//                    }
-//                }catch (e : Exception){
-//                    e.printStackTrace()
-//                }
-//
-//
-//            }
-//        })
-//
-//        touchHelperTag.attachToRecyclerView(tagRV)
 
         return root
     }

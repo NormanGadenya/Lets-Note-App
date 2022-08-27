@@ -34,7 +34,6 @@
             android:name=".AddEditNoteActivity"
             android:exported="true"
             android:theme="@style/Theme.App.Activity"
-            android:windowSoftInputMode="adjustPan"
             android:parentActivityName=".MainActivity" />
 
         <activity
