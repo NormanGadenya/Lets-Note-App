@@ -116,10 +116,12 @@ class TagNotesActivity : AppCompatActivity() , NoteFireClick {
         val newList = ArrayList<NoteFire>()
 
         return run {
-            val textLower= text.toLowerCase(Locale.ROOT)
+            val textLower= text.lowercase(Locale.ROOT)
             for ( note in viewModel.allTagNotes){
 
-                if(note.title.lowercase(Locale.ROOT).contains(textLower) || note.description.toLowerCase(Locale.ROOT)
+                if(note.title.lowercase(Locale.ROOT).contains(textLower) || note.description.lowercase(
+                        Locale.ROOT
+                    )
                         .contains(textLower)
                 ){
                     newList.add(note)
@@ -214,7 +216,7 @@ class TagNotesActivity : AppCompatActivity() , NoteFireClick {
                 }
                 viewModel.allTagNotes.remove(note)
                 noteRVAdapter.updateListFire(viewModel.allTagNotes)
-                noteRVAdapter?.notifyDataSetChanged()
+                noteRVAdapter.notifyDataSetChanged()
 
 
             }

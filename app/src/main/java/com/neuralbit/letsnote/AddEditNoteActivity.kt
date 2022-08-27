@@ -634,7 +634,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 .setMessage("This permission is needed because we need to access your storage")
                 .setPositiveButton(
                     "ok"
-                ) { dialog: DialogInterface?, which: Int ->
+                ) { _: DialogInterface?, _: Int ->
                     ActivityCompat.requestPermissions(
                         this,
                         arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
@@ -752,8 +752,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
             Toast.makeText(applicationContext,"Sorry recognizer is unavailable",Toast.LENGTH_SHORT).show()
         }else{
             if (bitmap!=null){
-                val frame = Frame.Builder().setBitmap(bitmap).build()
-                val sparseArray = recognizer.detect(frame) as SparseArray<TextBlock>
+                val frame = bitmap?.let { Frame.Builder().setBitmap(it).build() }
+                val sparseArray = frame?.let { recognizer.detect(it) } as SparseArray<TextBlock>
                 val stringBuilder = StringBuilder()
                 for (i in 0 until sparseArray.size()){
                     val textBlock = sparseArray.valueAt(i)

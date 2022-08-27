@@ -2,6 +2,7 @@ package com.neuralbit.letsnote.utilities
 
 import android.R
 import android.util.Log
+import java.util.*
 
 
 /**
@@ -39,17 +40,17 @@ object ColorTransparentUtils {
         // convert color code into hexa string and remove starting 2 digit
         var color = defaultColor
         try {
-            color = Integer.toHexString(colorCode).toUpperCase().substring(2)
+            color = Integer.toHexString(colorCode).uppercase(Locale.ROOT).substring(2)
         } catch (ignored: Exception) {
         }
-        return if (!color.isEmpty() && transCode < 100) {
+        return if (color.isNotEmpty() && transCode < 100) {
             if (color.trim { it <= ' ' }.length == 6) {
                 "#" + convert(transCode) + color
             } else {
                 Log.d(TAG, "Color is already with transparency")
                 convert(transCode) + color
             }
-        } else "#" + Integer.toHexString(defaultColorID).toUpperCase().substring(2)
+        } else "#" + Integer.toHexString(defaultColorID).uppercase(Locale.ROOT).substring(2)
         // if color is empty or any other problem occur then we return deafult color;
     }
 }

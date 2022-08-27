@@ -196,7 +196,7 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
                 }
                 labelViewModel.labelNotes.remove(note)
                 noteRVAdapter.updateListFire(labelViewModel.labelNotes)
-                noteRVAdapter?.notifyDataSetChanged()
+                noteRVAdapter.notifyDataSetChanged()
 
 
             }
@@ -272,7 +272,7 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
         val newList = ArrayList<NoteFire>()
 
         return run {
-            val textLower= text.toLowerCase(Locale.ROOT)
+            val textLower= text.lowercase(Locale.ROOT)
             for ( note in labelViewModel.labelNotes){
 
                 if(note.title.lowercase(Locale.ROOT).contains(textLower) || note.description.lowercase(

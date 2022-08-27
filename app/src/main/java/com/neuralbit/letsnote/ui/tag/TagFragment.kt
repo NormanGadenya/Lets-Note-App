@@ -136,9 +136,9 @@ class TagFragment : Fragment(), TagRVAdapter.TagItemClick {
     }
     private fun filterTags(text : String) : ArrayList<Tag>{
         val newList = ArrayList<Tag>()
-        val textLower= text.toLowerCase(Locale.ROOT)
+        val textLower= text.lowercase(Locale.ROOT)
         for ( tag in tagViewModel.allTags){
-            if(tag.title.toLowerCase(Locale.ROOT).contains(textLower)){
+            if(tag.title.lowercase(Locale.ROOT).contains(textLower)){
                 newList.add(tag)
             }
         }
