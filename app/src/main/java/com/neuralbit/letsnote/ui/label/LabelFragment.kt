@@ -103,6 +103,15 @@ class LabelFragment : Fragment(), LabelRVAdapter.LabelClick {
                 }
                 val sortedLabelList = labelList.sortedBy { i -> i.labelCount }.reversed()
                 val sortedLabelFireList = labelFireList.sortedBy { i -> i.noteUids.size }.reversed()
+                val welcomeIcon = binding.welcomeIcon
+                val welcomeText = binding.allNotesText
+                if (sortedLabelList.isEmpty()){
+                    welcomeIcon.visibility = View.VISIBLE
+                    welcomeText.visibility = View.VISIBLE
+                }else{
+                    welcomeIcon.visibility = View.GONE
+                    welcomeText.visibility = View.GONE
+                }
                 labelViewModel.labelFire = sortedLabelFireList
                 labelRVAdapter?.updateLabelList(ArrayList(sortedLabelList))
             }
