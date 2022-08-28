@@ -6,9 +6,9 @@ This is a simple note application that helps organize and store them locally on 
   
   <tr>
     <td><img src="https://user-images.githubusercontent.com/28120359/187099308-b1a3d572-97b6-4be3-a001-81e126326fb4.jpg" width=100% height=50%></td>
-    <td><img src="https://user-images.githubusercontent.com/28120359/148758851-c8bbfecf-b4b5-4dc0-839e-5afe7666ad69.png" width=100% height=50%></td>
-    <td><img src="https://user-images.githubusercontent.com/28120359/148758916-61401ab8-c0e6-486f-88cf-8b55ee83aa35.png" width=100% height=50%></td>
-    <td><img src="https://user-images.githubusercontent.com/28120359/148759014-b4e6f00f-f633-493f-8621-4fb3cdcc2e0e.png" width=100% height=50%></td>
+    <td><img src="https://user-images.githubusercontent.com/28120359/187099361-dfeb9ae1-931d-43c3-9c1a-22a787ae33ac.jpg" width=100% height=50%></td>
+    <td><img src="https://user-images.githubusercontent.com/28120359/187099400-39738dde-68bc-4b9d-8ce5-0109f04b9823.jpg" width=100% height=50%></td>
+    <td><img src="https://user-images.githubusercontent.com/28120359/187099416-a99bb64b-0c57-4101-adc7-733ba6bad864.jpg" width=100% height=50%></td>
     
 
 
