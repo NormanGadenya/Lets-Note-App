@@ -617,7 +617,9 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 viewModal.todoItems.add(todoItem)
                 viewModal.noteChanged.value = true
                 todoItemDescTV.text.clear()
+                todoCheckBox.isChecked = false
                 todoRVAdapter.updateTodoItems(ArrayList(viewModal.todoItems))
+                todoRVAdapter.notifyDataSetChanged()
 
             }
 

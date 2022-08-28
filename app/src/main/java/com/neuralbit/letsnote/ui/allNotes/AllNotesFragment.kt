@@ -275,7 +275,10 @@ class AllNotesFragment : Fragment() , NoteFireClick {
                 if (emptyTrashImmediately != true){
                     allNotesViewModel.selectedNotes.clear()
                 }
-
+                if (allNotesViewModel.otherFireNotesList.value?.isEmpty() == true && allNotesViewModel.pinnedFireNotesList.value?.isEmpty() == true){
+                    welcomeIcon.visibility = VISIBLE
+                    welcomeText.visibility = VISIBLE
+                }
 
                 allNotesViewModel.itemSelectEnabled.value = false
                 allNotesViewModel.itemDeleteClicked.value = false

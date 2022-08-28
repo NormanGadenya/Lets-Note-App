@@ -80,27 +80,29 @@ class TagFireRepo {
         for ( tag in deletedTags){
 
             val tagStr = tag.split("#")[1]
-            tagRef?.child(tagStr)?.addListenerForSingleValueEvent( object :ValueEventListener{
-                override fun onDataChange(snapshot: DataSnapshot) {
+            if (!tagStr.contains("#")){
+                tagRef?.child(tagStr)?.addListenerForSingleValueEvent( object :ValueEventListener{
+                    override fun onDataChange(snapshot: DataSnapshot) {
 
-                    val tagFire = snapshot.getValue(TagFire::class.java)
-                    if (tagFire != null) {
-                        val noteUids = tagFire.noteUids
-                        noteUids.remove(noteUid)
-                        val updateMap = HashMap<String, Any>()
-                        updateMap["noteUids"] = noteUids
-                        if (noteUids.isNotEmpty()){
-                            tagRef.child(tagStr).updateChildren(updateMap)
-                        }else{
-                            tagRef.child(tagStr).removeValue()
+                        val tagFire = snapshot.getValue(TagFire::class.java)
+                        if (tagFire != null) {
+                            val noteUids = tagFire.noteUids
+                            noteUids.remove(noteUid)
+                            val updateMap = HashMap<String, Any>()
+                            updateMap["noteUids"] = noteUids
+                            if (noteUids.isNotEmpty()){
+                                tagRef.child(tagStr).updateChildren(updateMap)
+                            }else{
+                                tagRef.child(tagStr).removeValue()
+                            }
                         }
                     }
-                }
 
-                override fun onCancelled(error: DatabaseError) {
-                    Log.e(TAG, "onCancelled: $error", )
-                }
-            })
+                    override fun onCancelled(error: DatabaseError) {
+                        Log.e(TAG, "onCancelled: $error", )
+                    }
+                })
+            }
 
         }
 
