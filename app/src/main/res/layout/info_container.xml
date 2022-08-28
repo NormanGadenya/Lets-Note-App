@@ -11,13 +11,13 @@
 
     <ImageButton
         android:id="@+id/ocrButton"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:layout_margin="@dimen/margin"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:foreground="@drawable/ic_baseline_document_scanner_24"
         android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
     <TextView
         android:layout_width="wrap_content"
@@ -25,8 +25,9 @@
         android:id="@+id/tvTimeStamp"
         android:visibility="gone"
         android:textSize="12sp"
+        android:layout_margin="@dimen/margin"
+
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/addTagBtn"
         app:layout_constraintStart_toEndOf="@+id/ocrButton"
         tools:text="Edited on 15th"/>
@@ -36,9 +37,9 @@
         android:layout_height="30dp"
         android:orientation="horizontal"
         android:id= "@+id/redoUndoGroup"
+        android:layout_margin="@dimen/margin"
         android:weightSum="2"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/addTagBtn"
         app:layout_constraintStart_toEndOf="@+id/ocrButton">
 
@@ -46,8 +47,8 @@
 
         <ImageButton
             android:id="@+id/undoButton"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:layout_marginEnd="16dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:foreground="@drawable/ic_baseline_undo_24"
@@ -56,8 +57,8 @@
 
         <ImageButton
             android:id="@+id/redoButton"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:foreground="@drawable/ic_baseline_redo_24"
             android:visibility="visible"
@@ -67,24 +68,24 @@
 
     <ImageButton
         android:id="@+id/addTagBtn"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:layout_margin="@dimen/margin"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:foreground="@drawable/ic_baseline_local_offer_24"
         android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toStartOf="@id/labelBtn" />
 
     <ImageButton
         android:id="@+id/labelBtn"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:layout_margin="@dimen/margin"
         android:layout_marginTop="@dimen/margin"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:foreground="@drawable/ic_baseline_bookmark_add_24"
         android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -10,7 +10,7 @@
         android:id="@+id/welcomeIcon"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:src="@drawable/ic_baseline_label_24"
+        android:src="@drawable/ic_baseline_bookmark_24"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

@@ -4,7 +4,6 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
@@ -15,12 +14,12 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.neuralbit.letsnote.LabelNotesActivity
 import com.neuralbit.letsnote.NoteViewModel
-import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.adapters.LabelRVAdapter
 import com.neuralbit.letsnote.databinding.LabelFragmentBinding
 import com.neuralbit.letsnote.entities.LabelFire
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import com.neuralbit.letsnote.ui.settings.SettingsViewModel
+import java.util.*
 
 class LabelFragment : Fragment(), LabelRVAdapter.LabelClick {
     private val noteViewModel: NoteViewModel by activityViewModels()
@@ -62,6 +61,14 @@ class LabelFragment : Fragment(), LabelRVAdapter.LabelClick {
             }
         }
 
+        labelViewModel.searchQuery.observe(viewLifecycleOwner){
+            if(it!=null){
+                labelRVAdapter?.updateLabelList(filterLabels(it))
+
+            }else{
+                labelRVAdapter?.updateLabelList(labelViewModel.labelList)
+            }
+        }
 
         noteViewModel.allFireLabels().observe(viewLifecycleOwner){
             val pref = context?.getSharedPreferences("DeletedNotes", AppCompatActivity.MODE_PRIVATE)
@@ -77,7 +84,7 @@ class LabelFragment : Fragment(), LabelRVAdapter.LabelClick {
                     }
                 }
                 for ( l in it){
-                    val label = Label(l.labelColor,l.noteUids.size)
+                    val label = Label(l.labelColor,l.noteUids.size,l.labelTitle)
 
                     for ( n in l.noteUids){
                         if(archivedNotes.contains(n) || deletedNotes?.contains(n) == true){
@@ -113,6 +120,7 @@ class LabelFragment : Fragment(), LabelRVAdapter.LabelClick {
                     welcomeText.visibility = View.GONE
                 }
                 labelViewModel.labelFire = sortedLabelFireList
+                labelViewModel.labelList = ArrayList(sortedLabelList)
                 labelRVAdapter?.updateLabelList(ArrayList(sortedLabelList))
             }
 
@@ -121,10 +129,18 @@ class LabelFragment : Fragment(), LabelRVAdapter.LabelClick {
         return root
     }
 
-    override fun onPrepareOptionsMenu(menu: Menu) {
-        super.onPrepareOptionsMenu(menu)
-        val searchViewMenuItem = menu.findItem(R.id.search)
-        searchViewMenuItem.isVisible = false
+    private fun filterLabels(text: String): ArrayList<Label> {
+        val newList = ArrayList<Label>()
+        val textLower= text.lowercase(Locale.ROOT)
+        for ( l in labelViewModel.labelList){
+            if (l.labelTitle != null){
+                if(l.labelTitle!!.lowercase(Locale.ROOT).contains(textLower)){
+                    newList.add(l)
+                }
+            }
+        }
+
+        return newList
     }
 
     override fun onLabelClick(labelColor: Int) {
@@ -133,6 +149,8 @@ class LabelFragment : Fragment(), LabelRVAdapter.LabelClick {
                 val intent = Intent(context, LabelNotesActivity::class.java)
                 intent.putExtra("labelColor",labelColor)
                 intent.putStringArrayListExtra("noteUids", label.noteUids)
+                intent.putExtra("labelTitle",label.labelTitle)
+
                 startActivity(intent)
             }
         }

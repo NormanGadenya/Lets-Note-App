@@ -200,7 +200,7 @@ class NoteRVAdapter (
         }else{
             holder.tagsTV.visibility = GONE
         }
-        if (note.label > 0){
+        if (note.label > 0) {
             holder.noteCard.setBackgroundColor(note.label)
         }else{
             holder.noteCard.setBackgroundColor(context.resources.getColor(R.color.def_Card_Color,null))

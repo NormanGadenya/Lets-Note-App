@@ -3,10 +3,14 @@ package com.neuralbit.letsnote.adapters
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.neuralbit.letsnote.R
+import com.neuralbit.letsnote.entities.LabelFire
 
 
 class AddEditLabelAdapter(
@@ -15,12 +19,13 @@ class AddEditLabelAdapter(
     private val labelClickInterface: LabelClickInterface
 
 ): RecyclerView.Adapter<AddEditLabelAdapter.ViewHolder>() {
-    private var labelColors = ArrayList<Int>()
+    private var labels : List<LabelFire> = ArrayList()
 
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
 
         val labelView : ImageView = itemView.findViewById(R.id.labelRVItem)
+        val labelTitleTv : TextView = itemView.findViewById(R.id.labelTitle)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -29,20 +34,27 @@ class AddEditLabelAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val labelColor = labelColors[position]
+        val label = labels[position]
+        val labelColor = label.labelColor
+        val labelTitle = label.labelTitle
+        if (labelTitle.isEmpty()){
+            holder.labelTitleTv.visibility =GONE
+        }else{
+            holder.labelTitleTv.visibility = VISIBLE
+        }
         holder.labelView.setColorFilter(labelColor)
+        holder.labelTitleTv.text = labelTitle
         holder.labelView.setOnClickListener{
             labelClickInterface.onLabelItemClick(labelColor)
         }
     }
 
     override fun getItemCount(): Int {
-        return labelColors.size
+        return labels.size
     }
 
-    fun updateLabelIDList(labelColors : HashSet<Int>){
-        val list = ArrayList<Int>(labelColors)
-        this.labelColors = list
+    fun updateLabelIDList(labels : List<LabelFire>){
+        this.labels = labels
         notifyDataSetChanged()
     }
 }

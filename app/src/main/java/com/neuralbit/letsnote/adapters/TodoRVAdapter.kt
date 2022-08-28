@@ -106,7 +106,7 @@ class TodoRVAdapter(
 
 
 
-        holder.todoItemDescET.setOnKeyListener { _, key, v ->
+        holder.todoItemDescET.setOnKeyListener { _, key, _ ->
             if (key == KeyEvent.KEYCODE_ENTER){
                 holder.todoItemDescET.clearFocus()
                 todoItemInterface.onEnterKeyPressed(holder.adapterPosition,todoItem)

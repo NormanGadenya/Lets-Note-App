@@ -28,6 +28,7 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     var deletedNote : MutableLiveData<Boolean> = MutableLiveData()
     var labelChanged : Boolean = false
     var labelColor : MutableLiveData<Int> = MutableLiveData()
+    var labelTitle : MutableLiveData<String> = MutableLiveData()
     var pinned : MutableLiveData<Boolean> = MutableLiveData()
     var reminderSet : MutableLiveData<Boolean> = MutableLiveData()
     var reminderTime : Long = 0
@@ -38,6 +39,7 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     var allTodoItems = MutableLiveData<ArrayList<TodoItem>>()
     val updatedTodos = ArrayList<TodoItem>()
     var undoMode : MutableLiveData<Boolean> = MutableLiveData()
+    var labelFireList = ArrayList<LabelFire>()
 
     fun updateFireNote(noteUpdate : Map<String, Any>, noteUid : String) {
         noteFireRepo.updateNote(noteUpdate,noteUid)
@@ -55,8 +57,8 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         return labelFireRepo.getAllLabels()
     }
 
-    fun addOrDeleteLabel(labelColor: Int,oldLabel : Int, noteUid: String, add: Boolean){
-        labelFireRepo.addOrDeleteLabels(labelColor,oldLabel,noteUid,add)
+    fun addOrDeleteLabel(labelColor: Int,labelTitle : String? ,oldLabel : Int, noteUid: String, add: Boolean){
+        labelFireRepo.addOrDeleteLabels(labelColor,oldLabel,noteUid,labelTitle,add)
     }
 
     fun addOrDeleteTags(newTagsAdded: HashSet<String>, deletedTags: HashSet<String>, noteUid: String) {

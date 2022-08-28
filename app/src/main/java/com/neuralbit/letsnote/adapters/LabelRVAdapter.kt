@@ -20,8 +20,8 @@ class LabelRVAdapter(
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         val noteCountTV: TextView = itemView.findViewById(R.id.noteCount)
+        val labelTitleTV: TextView = itemView.findViewById(R.id.labelName)
         val labelCard : View = itemView.findViewById(R.id.labelCard)
-        val noteTV : TextView = itemView.findViewById(R.id.textView2)
         val arrow : ImageView = itemView.findViewById(R.id.imgView)
 
     }
@@ -36,19 +36,25 @@ class LabelRVAdapter(
         withContext(Dispatchers.Main){
             for (i in 0..value){
                 delay(100L)
-
-                textView.text= i.toString()
+                if(value==1){
+                    textView.text = context.getString(R.string.noteTagCountSingle,value.toString())
+                }else {
+                    textView.text = context.getString(R.string.noteCountMultiple, value.toString())
+                }
             }
         }
     }
 
 
+    @OptIn(DelicateCoroutinesApi::class)
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
         val labelColor = labels[position].labelColor
         val labelCount = labels[position].labelCount
+        val labelTitle = labels[position].labelTitle
 
         holder.labelCard.setBackgroundColor(labelColor)
+        holder.labelTitleTV.text = labelTitle
 
 
         GlobalScope.launch {
@@ -56,9 +62,7 @@ class LabelRVAdapter(
             updateNoteCountTV(labelCount,holder.noteCountTV)
         }
 
-        if (labelCount==1){
-            holder.noteTV.text = "Note"
-        }
+
         holder.labelCard.setOnClickListener {
             labelClick.onLabelClick(labelColor)
         }
@@ -71,7 +75,7 @@ class LabelRVAdapter(
     fun updateLabelList(labels : ArrayList<Label>){
         this.labels.clear()
         this.labels = labels
-        notifyItemRangeChanged(0,labels.size)
+        notifyDataSetChanged()
     }
 
     interface LabelClick{

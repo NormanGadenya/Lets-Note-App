@@ -7,8 +7,11 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
@@ -54,6 +57,10 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
         setContentView(R.layout.activity_label_notes)
         recyclerView = findViewById(R.id.notesRV)
         val noteUids = intent.getStringArrayListExtra("noteUids")
+        val labelTitle = intent.getStringExtra("labelTitle")
+        viewModel.labelColor = intent.getIntExtra("labelColor",0)
+        supportActionBar?.title = labelTitle
+
         val layoutManager = StaggeredGridLayoutManager( 2, LinearLayoutManager.VERTICAL)
         recyclerView.layoutManager = layoutManager
         noteRVAdapter = NoteRVAdapter(applicationContext,this)
@@ -196,7 +203,7 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
                 }
                 labelViewModel.labelNotes.remove(note)
                 noteRVAdapter.updateListFire(labelViewModel.labelNotes)
-                noteRVAdapter?.notifyDataSetChanged()
+                noteRVAdapter.notifyDataSetChanged()
 
 
             }
@@ -272,7 +279,7 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
         val newList = ArrayList<NoteFire>()
 
         return run {
-            val textLower= text.toLowerCase(Locale.ROOT)
+            val textLower= text.lowercase(Locale.ROOT)
             for ( note in labelViewModel.labelNotes){
 
                 if(note.title.lowercase(Locale.ROOT).contains(textLower) || note.description.lowercase(
@@ -290,7 +297,7 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
 
-        menuInflater.inflate(R.menu.label_tag_activity_menu, menu)
+        menuInflater.inflate(R.menu.label_activity_menu, menu)
         val searchViewMenuItem = menu.findItem(R.id.search)
         val searchView = searchViewMenuItem.actionView as SearchView
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
@@ -309,7 +316,57 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
             }
         })
 
+        val editButton = menu.findItem(R.id.edit)
+        editButton.setOnMenuItemClickListener {
+            val labelDialog: AlertDialog = this.let {
+                val builder = AlertDialog.Builder(it)
+                builder.apply {
+                    setPositiveButton("ok"
+                    ) { _, _ ->
+                        if (viewModel.labelTitle!=null){
+                            supportActionBar?.title = viewModel.labelTitle
+                        }
+
+                    }
+                    setNegativeButton("cancel"
+                    ) { _, _ ->
+
+                    }
+                    setView(R.layout.label_title_dialog)
+                    setTitle("Choose a label title")
+                }
+                builder.create()
+
+            }
+
+            labelDialog.show()
+            val labelTitleET = labelDialog.findViewById<EditText>(R.id.labelTitleET)
+            labelTitleET.addTextChangedListener(object : TextWatcher {
+                override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                }
+
+                override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+                }
+
+                override fun afterTextChanged(p0: Editable?) {
+                    viewModel.labelTitle = p0.toString()
+                }
+            })
+            return@setOnMenuItemClickListener true
+        }
+
         return true
+    }
+
+    override fun onDestroy() {
+        if (viewModel.labelTitle != null && viewModel.labelColor > 0){
+            val update = HashMap<String,Any>()
+            update["labelTitle"] = viewModel.labelTitle!!
+            viewModel.updateLabel(update,viewModel.labelColor)
+        }
+        super.onDestroy()
+
     }
 
     override fun onNoteFireClick(note: NoteFire, activated : Boolean) {

@@ -10,6 +10,8 @@ import com.neuralbit.letsnote.repos.TagFireRepo
 
 class LabelNotesViewModel(
     application: Application) :AndroidViewModel(application){
+    var labelTitle: String? = null
+    var labelColor: Int = 0
     val searchQuery: MutableLiveData<String> = MutableLiveData()
     var selectedNotes = HashSet<NoteFire>()
     var labelNotes = ArrayList<NoteFire>()
@@ -22,5 +24,9 @@ class LabelNotesViewModel(
         noteFireRepo.deleteNote(noteUid)
         tagFireRepo.deleteNoteFromTags(tagList,noteUid)
         labelFireRepo.deleteNoteFromLabel(labelColor,noteUid)
+    }
+
+    fun updateLabel (labelUpdate : Map<String,Any>, labelColor : Int){
+        labelFireRepo.updateNote(labelUpdate, labelColor)
     }
 }
