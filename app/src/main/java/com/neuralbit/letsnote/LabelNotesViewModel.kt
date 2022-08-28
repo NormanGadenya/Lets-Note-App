@@ -1,30 +1,26 @@
 package com.neuralbit.letsnote
 
 import android.app.Application
-import android.content.Context
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.neuralbit.letsnote.entities.Label
-import com.neuralbit.letsnote.relationships.LabelWIthNotes
-import com.neuralbit.letsnote.repos.LabelRepo
+import com.neuralbit.letsnote.entities.NoteFire
+import com.neuralbit.letsnote.repos.LabelFireRepo
+import com.neuralbit.letsnote.repos.NoteFireRepo
+import com.neuralbit.letsnote.repos.TagFireRepo
 
 class LabelNotesViewModel(
     application: Application) :AndroidViewModel(application){
-    val searchQuery: MutableLiveData<String>
-    private val labelRepo  : LabelRepo
+    val searchQuery: MutableLiveData<String> = MutableLiveData()
+    var selectedNotes = HashSet<NoteFire>()
+    var labelNotes = ArrayList<NoteFire>()
+    var noteUids = ArrayList<String>()
+    private val noteFireRepo : NoteFireRepo = NoteFireRepo()
+    private val labelFireRepo : LabelFireRepo = LabelFireRepo()
+    private val tagFireRepo : TagFireRepo = TagFireRepo()
 
-    init {
-        val labelDao = NoteDatabase.getDatabase(application).getLabelDao()
-        labelRepo = LabelRepo(labelDao)
-        searchQuery = MutableLiveData()
-    }
-
-    fun getNotesWithLabel ( labelID : Int) : LiveData<List<LabelWIthNotes>> {
-        return labelRepo.getNotesWithLabel(labelID)
-    }
-
-    fun getNoteLabel( noteID : Long) : LiveData<Label>{
-        return labelRepo.getNoteLabel(noteID)
+    fun deleteNote (noteUid : String, labelColor : Int, tagList : List<String> ){
+        noteFireRepo.deleteNote(noteUid)
+        tagFireRepo.deleteNoteFromTags(tagList,noteUid)
+        labelFireRepo.deleteNoteFromLabel(labelColor,noteUid)
     }
 }

@@ -3,26 +3,49 @@
     package="com.neuralbit.letsnote">
 
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
+    <uses-permission android:name="android.permission.USE_FINGERPRINT" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
+        android:name=".utilities.OfflineMode"
         android:allowBackup="true"
         android:appCategory="productivity"
         android:icon="@mipmap/ic_launcher1"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher1_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.LetsNote">
+        android:theme="@style/Theme.App.Starting">
+        <activity
+            android:name=".TermsAndConditions"
+            android:theme="@style/Theme.App.Activity"
+            android:parentActivityName=".MainActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Fingerprint"
+            android:theme="@style/Theme.App.Activity"
+            android:exported="false" />
+
+        <activity
+            android:name=".AddEditNoteActivity"
+            android:exported="true"
+            android:theme="@style/Theme.App.Activity"
+            android:parentActivityName=".MainActivity" />
+
         <activity
             android:name=".SplashActivity"
-            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"
-            android:exported="true" >
+            android:exported="true"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
         <activity
             android:name=".SaveSharedNoteActivity"
@@ -36,40 +59,38 @@
                 <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
-        <activity
-            android:name="com.yalantis.ucrop.UCropActivity"
-            android:screenOrientation="fullSensor"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity android:name="com.canhub.cropper.CropImageActivity"
+            android:theme="@style/Base.Theme.AppCompat"/>
         <activity
             android:name=".SignInActivity"
             android:exported="true"
-            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
-
-        </activity>
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
         <activity
             android:name=".LabelNotesActivity"
             android:exported="true"
+            android:theme="@style/Theme.App.Activity"
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".TagNotesActivity"
             android:exported="true"
+            android:theme="@style/Theme.App.Activity"
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:launchMode="singleTop"
             android:theme="@style/Theme.LetsNote.NoActionBar" />
-        <activity
-            android:name=".AddEditNoteActivity"
-            android:exported="true"
-            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
 
         <receiver android:name=".utilities.AlertReceiver" />
-        <receiver android:name=".utilities.DatabaseBackUp" />
+        <receiver
+            android:name=".Services.DeleteReceiver"
+            android:enabled="true"
+            android:exported="true" />
 
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
+
+
     </application>
 
 </manifest>

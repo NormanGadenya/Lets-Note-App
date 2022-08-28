@@ -2,65 +2,54 @@ package com.neuralbit.letsnote.ui.archived
 
 import android.app.Application
 import android.util.Log
-import androidx.lifecycle.*
-import com.neuralbit.letsnote.entities.Note
-import com.neuralbit.letsnote.NoteDatabase
-import com.neuralbit.letsnote.repos.NoteRepo
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import java.util.ArrayList
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
+import com.neuralbit.letsnote.entities.NoteFire
+import java.util.*
 
 class ArchivedViewModel (application : Application): AndroidViewModel(application) {
 
-    var archivedNotes: LiveData<List<Note>>
-    val repo : NoteRepo
+    var archivedFireNotes = MutableLiveData<ArrayList<NoteFire>>()
+
     var searchQuery : MutableLiveData<String> = MutableLiveData()
+    var itemRestoreClicked : MutableLiveData<Boolean> = MutableLiveData()
+    var itemDeleteClicked : MutableLiveData<Boolean> = MutableLiveData()
+    var notesToRestore : MutableLiveData<NoteFire> = MutableLiveData()
 
 
-    init{
-
-        val dao = NoteDatabase.getDatabase(application).getNotesDao()
-        repo= NoteRepo(dao)
-        archivedNotes = repo.archivedNotes
-
-    }
-
-    fun deleteNote(note: Note)= viewModelScope.launch(Dispatchers.IO){
-        repo.delete(note)
-    }
-
-    fun filterList( ) : LiveData<List<Note>>{
+    fun filterArchivedFireList () : LiveData<ArrayList<NoteFire>>{
         val textLower = searchQuery.value
         Log.d("LOG", "filterList:${searchQuery.value} ")
         return if (searchQuery.value!=null){
-            Transformations.map(archivedNotes,){
-                filterLiveList(it,textLower)
+            Transformations.map(archivedFireNotes,){
+                filterList(it,textLower)
             }
         }else{
-            archivedNotes
+            archivedFireNotes
         }
-
     }
-    private fun filterLiveList(list: List<Note>, text : String? ): List<Note>{
-        var newList = ArrayList<Note>()
 
-        return if(text!=null){
-            var textLower= text.toLowerCase()
+    private fun filterList(list : ArrayList<NoteFire>, text: String?) : ArrayList<NoteFire>{
+        val newList = ArrayList<NoteFire>()
+
+        return if (text != null) {
+            val textLower= text.toLowerCase(Locale.ROOT)
             for ( note in list){
 
-                if(note.title?.toLowerCase()?.contains(textLower) == true || note.description?.toLowerCase()
-                        ?.contains(textLower) == true
-                ){
+                if(note.title.toLowerCase(Locale.ROOT).contains(textLower) || note.description.toLowerCase(
+                        Locale.ROOT).contains(textLower)){
                     newList.add(note)
                 }
             }
-
             newList
         }else{
             list
         }
 
-
     }
+
+
 
 }

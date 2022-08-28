@@ -12,7 +12,6 @@
         android:layout_width="match_parent"
 
         android:layout_height="match_parent">
-        <include layout="@layout/note_action_bar" android:id="@+id/actionBar"/>
         <EditText
             android:id="@+id/noteEditTitle"
             android:layout_width="match_parent"
@@ -22,20 +21,20 @@
             android:hint="@string/title"
             android:inputType="textAutoComplete"
             android:autofillHints="name"
-            android:minHeight="48dp"
+            android:minHeight="60dp"
             android:paddingTop="8dp"
             android:paddingBottom="8dp"
             android:textSize="32sp"
             android:textStyle="bold"
             app:layout_constraintTop_toBottomOf="@+id/actionBar" />
 
-        <ScrollView
+        <androidx.core.widget.NestedScrollView
             android:id="@+id/scrollView2"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginTop="@dimen/margin"
-            android:layout_marginBottom="32dp"
-            app:layout_constraintBottom_toTopOf="@id/infoContainer"
+            android:layout_marginBottom="4dp"
+            app:layout_constraintBottom_toTopOf="@id/reminderIcon"
             app:layout_constraintTop_toBottomOf="@id/noteEditTitle"
             tools:ignore="NotSibling"
             tools:layout_editor_absoluteX="16dp">
@@ -46,65 +45,132 @@
                 android:layout_marginEnd="16dp"
                 android:layout_height="wrap_content">
 
+
                 <MultiAutoCompleteTextView
                     android:id="@+id/noteEditDesc"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@android:color/transparent"
-                    android:completionHint="Create new Tag"
                     android:completionThreshold="1"
+                    android:autoLink="web"
                     android:gravity="top"
+                    android:visibility="visible"
                     android:hint="@string/note_content"
                     android:importantForAutofill="no"
                     android:inputType="textMultiLine"
                     android:lineSpacingMultiplier="1.1"
-                    android:minHeight="48dp"
+                    android:popupBackground="?attr/colorOnSecondary"
+                    android:textSize="24sp"
+                    android:minHeight="60dp"
                     app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:id="@+id/todoRV"
+                    android:visibility="gone"
+                    tools:itemCount="1"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginTop="@dimen/margin"
+                    app:layout_constraintTop_toBottomOf="@id/noteEditDesc"
+                    />
+                    <ImageButton
+                        android:contentDescription="@string/add_todo_item"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/addTodo"
+                        android:minWidth="48dp"
+                        android:visibility="visible"
+                        android:minHeight="48dp"
+                        android:layout_marginTop="@dimen/margin"
+                        android:src="@drawable/ic_baseline_add_24"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        app:layout_constraintTop_toBottomOf="@id/todoRV"
+                        app:layout_constraintStart_toStartOf="parent"
+                    />
+
+                <EditText
+                    android:id="@+id/todoItemDescTV"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/margin"
+                    android:visibility="gone"
+                    android:hint="@string/_hint"
+                    android:background="@android:color/transparent"
+                    android:minHeight="48dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/todoCheckBox"
+                    app:layout_constraintEnd_toStartOf="@+id/dismissTodoBtn"
+                    app:layout_constraintStart_toEndOf="@+id/todoCheckBox"
+                    app:layout_constraintTop_toTopOf="@+id/todoCheckBox"
+                    tools:text="See family" />
+
+                <CheckBox
+                    android:id="@+id/todoCheckBox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin"
+                    android:layout_marginTop="@dimen/margin"
+                    android:minWidth="48dp"
+                    android:visibility="gone"
+                    android:minHeight="48dp"
+                    app:layout_constraintStart_toEndOf="@+id/addTodo"
+                    app:layout_constraintTop_toBottomOf="@id/todoRV" />
+
+                <ImageButton
+                    android:id="@+id/dismissTodoBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/margin"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:minWidth="48dp"
+                    android:minHeight="48dp"
+                    android:visibility="gone"
+
+                    android:src="@drawable/ic_baseline_close_24"
+                    app:layout_constraintBottom_toBottomOf="@+id/todoItemDescTV"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/todoItemDescTV" />
+
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/tagListRV"
                     android:layout_width="0dp"
+                    android:layout_marginTop="@dimen/margin"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
                     android:background="@android:color/transparent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/noteEditDesc"
+                    app:layout_constraintTop_toBottomOf="@+id/addTodo"
                     tools:itemCount="1" />
 
-                <ImageView
-                    android:id="@+id/reminderIcon"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_marginTop="@dimen/margin"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@drawable/ic_baseline_access_alarm_24"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/tagListRV" />
 
-                <TextView
-                    android:id="@+id/reminderTV"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:padding="8dp"
-                    app:layout_constraintStart_toEndOf="@id/reminderIcon"
-                    app:layout_constraintTop_toTopOf="@id/reminderIcon" />
 
-                <TextView
-                    android:id="@+id/tvTimeStamp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="3dp"
-                    android:layout_marginTop="8dp"
-                    android:text="Edite on sjjsndjncjdjcnjndjcjd"
-                    android:visibility="visible"
-                    app:layout_constraintTop_toBottomOf="@id/reminderTV"
-                    app:layout_constraintStart_toStartOf="parent"
-                     />
+
             </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-        </ScrollView>
+        </androidx.core.widget.NestedScrollView>
+        <ImageView
+            android:id="@+id/reminderIcon"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:visibility="gone"
+            android:layout_margin="@dimen/margin"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_baseline_access_alarm_24"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/infoContainer"
+            />
+
+        <TextView
+            android:id="@+id/reminderTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin"
+            android:visibility="gone"
+            tools:text="Edite on sjjsndjncjdjcnjndjcjd"
+            app:layout_constraintStart_toEndOf="@id/reminderIcon"
+            app:layout_constraintBottom_toTopOf="@id/infoContainer" />
 
         <include
             layout="@layout/info_container"

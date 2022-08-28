@@ -4,48 +4,46 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
-import android.util.Log
+import android.graphics.Typeface
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
-import androidx.cardview.widget.CardView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
-import com.neuralbit.letsnote.LabelNotesViewModel
 import com.neuralbit.letsnote.R
-import com.neuralbit.letsnote.entities.Note
-import com.neuralbit.letsnote.entities.Reminder
-import com.neuralbit.letsnote.entities.Tag
-import com.neuralbit.letsnote.relationships.TagsWithNote
+import com.neuralbit.letsnote.entities.NoteFire
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import com.neuralbit.letsnote.utilities.AlertReceiver
 import com.neuralbit.letsnote.utilities.Common
-import kotlinx.coroutines.launch
 import java.util.*
-import kotlin.collections.ArrayList
+import kotlin.math.floor
+
 
 class NoteRVAdapter (
     val context: Context,
-    val noteClickInterface :NoteClickInterface,
+    private val noteFireClick :NoteFireClick,
 
 
     ): RecyclerView.Adapter<NoteRVAdapter.ViewHolder>(){
     var viewModel : AllNotesViewModel ? = null
-    var labelViewModel : LabelNotesViewModel? = null
     var lifecycleScope : LifecycleCoroutineScope? = null
     var lifecycleOwner: LifecycleOwner ? = null
     lateinit var itemView: View
-    private val allNotes = ArrayList<Note>()
-    private val tags : String? = null
-    private var reminder : Reminder? = null
+    private var allNotesFire : List<NoteFire> = ArrayList<NoteFire>()
+    var deleteFrag = false
     var searchString: String? =null
-
+    var multipleActivated = false
     val TAG = "NoteRVAdapter"
+    var fontStyle : String? = null
+    private val deletedNotePrefs = context.getSharedPreferences("DeletedNotes", AppCompatActivity.MODE_PRIVATE)
 
 
     inner class ViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView){
@@ -55,26 +53,131 @@ class NoteRVAdapter (
         val tagsTV : TextView = itemView.findViewById(R.id.noteTagsTV)
         val reminderTV : TextView = itemView.findViewById(R.id.reminderTV)
         val reminderIcon: View = itemView.findViewById(R.id.reminderIcon)
+        val daysLeft : TextView = itemView.findViewById(R.id.timeLeftDeleteTV)
+        val lockIcon : ImageView = itemView.findViewById(R.id.noteLockedIcon)
+        val todoIcon : ImageView = itemView.findViewById(R.id.todoIcon)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+
         itemView = LayoutInflater.from(parent.context).inflate(R.layout.note_rv_item,parent,false)
         return ViewHolder(itemView)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        var title = allNotes[position].title
-        var desc = allNotes[position].description
+        val note = allNotesFire[position]
+        var title = note.title
+        val typeface: Typeface? = when (fontStyle) {
+            "Architects daughter" -> {
+                ResourcesCompat.getFont(context, R.font.architects_daughter)
+            }
+            "Abreeze" -> {
+                ResourcesCompat.getFont(context, R.font.abeezee)
+            }
+            "Adamina" -> {
+                ResourcesCompat.getFont(context, R.font.adamina)
+            }
+            else -> {
+                ResourcesCompat.getFont(context, R.font.roboto)
+            }
+        }
+        val settingsPref = context.getSharedPreferences("Settings", AppCompatActivity.MODE_PRIVATE)
+        val fontMultiplier = settingsPref.getInt("fontMultiplier",2)
+        holder.noteTextTV.setTextSize(TypedValue.COMPLEX_UNIT_SP,16f+ ((fontMultiplier-2)*4).toFloat())
+        holder.noteTitleTV.setTextSize(TypedValue.COMPLEX_UNIT_SP,24f+ ((fontMultiplier-2)*4).toFloat())
+        holder.reminderTV.setTextSize(TypedValue.COMPLEX_UNIT_SP,12f+ ((fontMultiplier-2)).toFloat())
+        holder.tagsTV.setTextSize(TypedValue.COMPLEX_UNIT_SP,12f+ ((fontMultiplier-2)).toFloat())
+        holder.noteTextTV.typeface = typeface
+        holder.noteTitleTV.typeface = typeface
+        holder.daysLeft.typeface = typeface
+        holder.reminderTV.typeface = typeface
+        holder.tagsTV.typeface = typeface
+        if (!note.protected){
+            var desc = note.description
+            if (desc.length > 250) {
+                desc = desc.substring(0, 250) + "..."
+            }
+            val todoItems = note.todoItems
+
+            for (todoItem in todoItems) {
+                desc += if (todoItem.checked){
+                    "\n + ${todoItem.item} "
+                }else{
+
+                    "\n - ${todoItem.item} "
+                }
+            }
+
+
+            if (todoItems.isEmpty()){
+                holder.todoIcon.visibility = GONE
+            }else{
+                holder.todoIcon.visibility = VISIBLE
+
+            }
+            if (desc.isEmpty()) {
+                holder.noteTextTV.visibility = GONE
+            } else {
+                holder.noteTextTV.text = desc
+                holder.noteTextTV.visibility = VISIBLE
+            }
+        }else{
+            holder.noteTextTV.text = "**protected**"
+            val todoItems = note.todoItems
+            if (todoItems.isEmpty()){
+                holder.todoIcon.visibility = GONE
+            }else{
+                holder.todoIcon.visibility = VISIBLE
+
+            }
+
+        }
         val cm = Common()
-        val noteID = allNotes[position].noteID
-        if (title?.length!! > 20) {
+        if (title.length > 20) {
             title = title.substring(0, 15) + "..."
         }
-        if (desc?.length!! > 250) {
-            desc = desc.substring(0, 250) + "..."
-        }
+
+
+
         val c = Calendar.getInstance()
 
+        lifecycleOwner?.let {
+            viewModel?.itemSelectEnabled?.observe(it){ i ->
+
+                if (!i){
+                    note.selected = false
+
+                    viewModel?.selectedNotes?.clear()
+                    if (note.label > 0){
+                        holder.noteCard.setBackgroundColor(note.label)
+                    }else{
+                        holder.noteCard.setBackgroundColor(context.resources.getColor(R.color.def_Card_Color,null))
+                    }
+                }
+            }
+        }
+
+        if (deleteFrag){
+            holder.daysLeft.visibility = VISIBLE
+            val deletedTime = deletedNotePrefs.getLong(note.noteUid,0)
+            val timeLeftMS = deletedTime +  6.048e+8 - System.currentTimeMillis()
+            val daysLeft = floor(timeLeftMS * 1.1574E-8)
+            if (daysLeft >1 || daysLeft== (0).toDouble()){
+                holder.daysLeft.text = "${daysLeft.toInt()} days left "
+            }else if (daysLeft == (1).toDouble()){
+                holder.daysLeft.text = "${deletedTime} day left"
+            }
+
+
+        }else{
+            holder.daysLeft.visibility = GONE
+        }
+
+        if (note.protected){
+            holder.lockIcon.visibility = VISIBLE
+        }else{
+            holder.lockIcon.visibility = GONE
+        }
 
         if (title.isEmpty()) {
             holder.noteTitleTV.visibility = GONE
@@ -83,137 +186,129 @@ class NoteRVAdapter (
             holder.noteTitleTV.visibility = VISIBLE
 
         }
-        
 
-        lifecycleScope?.launch {
-            if (viewModel!=null){
-                val tagList = viewModel?.getTagsWithNote(noteID)?.last()
+        var tagStr = ""
+        for (tag in note.tags) {
+            tagStr = "$tagStr $tag "
+            if (tagStr.length > 20){
+                break
+            }
+        }
+        if (tagStr.isNotEmpty()){
+            holder.tagsTV.text = tagStr
+            holder.tagsTV.visibility = VISIBLE
+        }else{
+            holder.tagsTV.visibility = GONE
+        }
+        if (note.label > 0){
+            holder.noteCard.setBackgroundColor(note.label)
+        }else{
+            holder.noteCard.setBackgroundColor(context.resources.getColor(R.color.def_Card_Color,null))
+        }
 
-                if (tagList?.tags?.isNotEmpty()!!) {
-                    holder.tagsTV.visibility = VISIBLE
+        val reminderDate = note.reminderDate
 
-                }
-                var tagStr : String? = null
+        if (reminderDate > 0) {
 
-                for (t in tagList.tags) {
-                    tagStr = t.tagTitle + " "
-                }
-                if (tagStr!=null){
-                    holder.tagsTV.text = tagStr
-                    holder.tagsTV.visibility = VISIBLE
+            if(c.timeInMillis > reminderDate){
+                holder.reminderIcon.visibility = GONE
+                holder.reminderTV.visibility = GONE
+                cancelAlarm(reminderDate.toInt())
+            }else{
+                holder.reminderIcon.visibility = VISIBLE
+                holder.reminderTV.visibility = VISIBLE
+                holder.reminderTV.text = context.resources.getString(
+                    R.string.reminder,
+                    cm.convertLongToTime(reminderDate)[0],
+                    cm.convertLongToTime(reminderDate)[1]
+                )
+
+            }
+
+
+        } else {
+            holder.reminderIcon.visibility = GONE
+            holder.reminderTV.visibility = GONE
+        }
+
+
+        searchString?.let {
+            cm.setHighLightedText(holder.noteTextTV, it)
+            cm.setHighLightedText(holder.noteTitleTV, it)
+
+        }
+        lifecycleOwner?.let { owner ->
+            viewModel?.itemSelectEnabled?.observe(owner){
+            multipleActivated = it
+        }}
+
+        holder.itemView.setOnClickListener {
+            if (multipleActivated){
+                if (!note.selected){
+                    holder.noteCard.setBackgroundColor(context.resources.getColor(R.color.sel_card_color,null))
+
+                    note.selected = true
+                    note.itemPosition = holder.adapterPosition
+                    viewModel?.selectedNotes?.add(note)
 
                 }else{
-                    holder.tagsTV.visibility = GONE
+                    note.selected = false
+                    if (note.label > 0){
+                        holder.noteCard.setBackgroundColor(note.label)
 
-                }
-
-            }
-
-        }
-
-        lifecycleOwner?.let {
-            viewModel?.getReminder(noteID)?.observe(it) { r ->
-                if (r != null) {
-
-                    if(c.timeInMillis > r.dateTime){
-                        cancelAlarm(noteID.toInt())
-                        viewModel?.deleteReminder(noteID)
                     }else{
-                        holder.reminderIcon.visibility = VISIBLE
-                        holder.reminderTV.visibility = VISIBLE
-                        holder.reminderTV.text = context.resources.getString(
-                            R.string.reminder,
-                            cm.convertLongToTime(r.dateTime)[0],
-                            cm.convertLongToTime(r.dateTime)[1]
-                        )
-
+                        holder.noteCard.setBackgroundColor(context.resources.getColor(R.color.def_Card_Color,null))
                     }
 
+                    viewModel?.selectedNotes?.remove(note)
 
-                } else {
-                    holder.reminderIcon.visibility = GONE
-                    holder.reminderTV.visibility = GONE
                 }
+            }
+
+            noteFireClick.onNoteFireClick(note,multipleActivated)
+            if (multipleActivated && viewModel?.selectedNotes?.isEmpty() == true){
+                multipleActivated = false
+                viewModel?.itemSelectEnabled?.value = false
             }
         }
 
-        lifecycleOwner?.let { owner ->
-            if (viewModel != null) {
-                viewModel?.getNoteLabel(noteID)?.observe(owner) {
-                    if(it!=null){
+        holder.itemView.setOnLongClickListener {
 
-                        val noteCardColor = it.labelID
-                        holder.noteCard.setBackgroundColor(noteCardColor)
+            if (!note.selected && !multipleActivated){
+                multipleActivated = true
+                note.selected = true
+                note.itemPosition = holder.adapterPosition
+                holder.noteCard.setBackgroundColor(context.resources.getColor(R.color.sel_card_color,null))
 
-                    }
-
-                }
-            } else if(labelViewModel!=null) {
-                labelViewModel?.getNoteLabel(noteID)?.observe(owner) {
-                    val noteCardColor = context.getColor(it.labelID)
-                    holder.noteCard.setBackgroundColor(noteCardColor)
-                }
-
+                viewModel?.selectedNotes?.add(note)
+                noteFireClick.onNoteFireLongClick(note)
+                return@setOnLongClickListener true
             }
-
-            if (desc.isEmpty()) {
-                holder.noteTextTV.visibility = GONE
-            } else {
-                holder.noteTextTV.text = desc
-                holder.noteTextTV.visibility = VISIBLE
-            }
-
-
-            searchString?.let {
-                cm.setHighLightedText(holder.noteTextTV, it)
-                cm.setHighLightedText(holder.noteTitleTV, it)
-
-            }
-
-
-
-
-
-            holder.itemView.setOnClickListener {
-                noteClickInterface.onNoteClick(allNotes.get(position))
-            }
+            return@setOnLongClickListener false
         }
     }
     override fun getItemCount(): Int {
-        return allNotes.size
+        return allNotesFire.size
     }
 
-    fun updateList( newList: List<Note>){
-        allNotes.clear()
-        allNotes.addAll(newList)
+
+    fun updateListFire( newList: List<NoteFire>){
+        allNotesFire = newList
 
         notifyDataSetChanged()
     }
-    fun undoDelete( swipedNote: Note,oldPosition : Int){
-//        allNotes.clear()
-        allNotes.add(oldPosition,swipedNote)
-        notifyItemInserted(oldPosition)
-    }
 
-    fun restoreItemColor (){
-        val c = ViewHolder(itemView)
-        c.noteCard.setBackgroundColor(0)
-    }
-    fun updateReminder(r: Reminder){
-        reminder = r
-    }
-
-    private fun cancelAlarm(noteID : Int){
+    private fun cancelAlarm(reminder : Int){
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(context, AlertReceiver::class.java)
-        val pendingIntent = PendingIntent.getBroadcast(context, noteID, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+        val pendingIntent = PendingIntent.getBroadcast(context, reminder, intent, PendingIntent.FLAG_IMMUTABLE)
         alarmManager.cancel(pendingIntent)
     }
+
 }
 
 
-
-
-interface  NoteClickInterface{
-    fun onNoteClick(note: Note)
+interface NoteFireClick{
+    fun onNoteFireClick(note : NoteFire , activated : Boolean)
+    fun onNoteFireLongClick(note: NoteFire)
 }
