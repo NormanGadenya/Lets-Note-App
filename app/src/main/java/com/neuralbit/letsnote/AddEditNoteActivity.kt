@@ -39,6 +39,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.graphics.drawable.IconCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.LifecycleOwner
@@ -59,6 +60,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.neuralbit.letsnote.Services.DeleteReceiver
 import com.neuralbit.letsnote.adapters.*
+import com.neuralbit.letsnote.entities.LabelFire
 import com.neuralbit.letsnote.entities.NoteFireIns
 import com.neuralbit.letsnote.entities.TodoItem
 import com.neuralbit.letsnote.ui.label.LabelViewModel
@@ -139,11 +141,13 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private lateinit var infoContainer : View
     private var bitmap : Bitmap? = null
     private lateinit var colorPickerView: ColorPickerView
+    private lateinit var labelTitleET: EditText
     private val deletedTodos = ArrayList<TodoItem>()
     private lateinit var deletedNotePrefs : SharedPreferences
     private lateinit var settingsPref : SharedPreferences
     private var protected = false
     private var labelColor = 0
+    private var labelTitle :String?=null
     private var noteChanged = false
     private var tagList : ArrayList<String> = ArrayList()
 
@@ -181,11 +185,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
 
         viewModal.allFireLabels().observe(lifecycleOwner){
-            val labelColors = HashSet<Int>()
-            for (l in it){
-                labelColors.add(l.labelColor)
-            }
-            labelListAdapter.updateLabelIDList(labelColors)
+            viewModal.labelFireList = ArrayList(it)
+            labelListAdapter.updateLabelIDList(it)
         }
 
         viewModal.allTodoItems.observe(this){
@@ -554,6 +555,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
         }
 
 
+
+
         noteTitleEdit.setOnKeyListener { _, _, _ ->
             viewModal.noteChanged.value = true
             tvTimeStamp.visibility = GONE
@@ -848,7 +851,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         reminderIcon = findViewById(R.id.reminderIcon)
         noteTitleEdit.setTextSize(TypedValue.COMPLEX_UNIT_SP,32f+ ((fontMultiplier-2)*2).toFloat())
         noteDescriptionEdit.setTextSize(TypedValue.COMPLEX_UNIT_SP,18f+ ((fontMultiplier-2)*2).toFloat())
-        tvTimeStamp.setTextSize(TypedValue.COMPLEX_UNIT_SP,15f+ ((fontMultiplier-2)*2).toFloat())
+        tvTimeStamp.setTextSize(TypedValue.COMPLEX_UNIT_SP,12f+ ((fontMultiplier-2)*2).toFloat())
         noteType = intent.getStringExtra("noteType").toString()
         intent.putExtra("noteType","Edit")
         noteTitle = intent.getStringExtra("noteTitle")
@@ -1109,6 +1112,9 @@ class AddEditNoteActivity : AppCompatActivity() ,
         val shortcutInfo = ShortcutInfoCompat.Builder(applicationContext, "newNote")
             .setShortLabel(getString(R.string.shortcut_short_label))
             .setLongLabel(getString(R.string.shortcut_long_label))
+            .setIcon(IconCompat.createWithResource(applicationContext,
+                R.drawable.ic_baseline_mode_edit_24
+            ))
             .setIntent(intent) // Push the shortcut
             .build()
 
@@ -1156,6 +1162,17 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 builder.apply {
                     setPositiveButton("ok"
                     ) { _, _ ->
+                        viewModal.noteChanged.value = true
+                        viewModal.labelChanged = true
+                        if (viewModal.labelColor.value != null){
+
+                            val label = viewModal.labelTitle.value?.let { it1 -> LabelFire(labelColor= viewModal.labelColor.value!!,labelTitle= it1) }
+                            if (label != null) {
+                                viewModal.labelFireList.add(label)
+                                labelListAdapter.updateLabelIDList(viewModal.labelFireList)
+                            }
+                        }
+
 
                     }
                     setNegativeButton("cancel"
@@ -1171,12 +1188,27 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
             labelDialog.show()
             colorPickerView = labelDialog.findViewById(R.id.colorPicker)
+            labelTitleET = labelDialog.findViewById(R.id.labelTitle)
+            labelTitle = labelTitleET.text.toString()
+            viewModal.labelTitle.value = labelTitle
+            labelTitleET.addTextChangedListener(object : TextWatcher{
+                override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                }
+
+                override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+                }
+
+                override fun afterTextChanged(p0: Editable?) {
+                    viewModal.labelTitle.value = p0.toString()
+                }
+            })
+
             colorPickerView.addOnColorSelectedListener{
                 val hex = ColorTransparentUtils.transparentColor(it,30)
                 viewModal.labelColor.value = Color.parseColor(hex)
-                viewModal.labelChanged = true
-                viewModal.noteChanged.value = true
                 delLabelBtn.visibility = VISIBLE
+
 
             }
 
@@ -1518,12 +1550,13 @@ class AddEditNoteActivity : AppCompatActivity() ,
         }
 
         val labelColor = viewModal.labelColor.value
+        val labelTitle = viewModal.labelTitle.value
         if (viewModal.labelChanged){
             if (labelColor != null) {
                 if (labelColor > 0){
-                    noteUid?.let { viewModal.addOrDeleteLabel(labelColor,oldLabel, it,true) }
+                    noteUid?.let { viewModal.addOrDeleteLabel(labelColor,labelTitle,oldLabel, it,true) }
                 }else{
-                    noteUid?.let { viewModal.addOrDeleteLabel(labelColor, oldLabel, it, false) }
+                    noteUid?.let { viewModal.addOrDeleteLabel(labelColor,labelTitle, oldLabel, it, false) }
 
                 }
             }

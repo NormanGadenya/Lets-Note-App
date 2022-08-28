@@ -32,6 +32,7 @@ import com.neuralbit.letsnote.databinding.ActivityMainBinding
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import com.neuralbit.letsnote.ui.archived.ArchivedViewModel
 import com.neuralbit.letsnote.ui.deletedNotes.DeletedNotesViewModel
+import com.neuralbit.letsnote.ui.label.LabelViewModel
 import com.neuralbit.letsnote.ui.settings.SettingsViewModel
 import com.neuralbit.letsnote.ui.tag.TagViewModel
 import com.neuralbit.letsnote.utilities.AlertReceiver
@@ -48,6 +49,7 @@ class MainActivity : AppCompatActivity() {
     private val deleteVieModel : DeletedNotesViewModel by viewModels()
     private lateinit var viewModal : MainActivityViewModel
     private val tagViewModel : TagViewModel by viewModels()
+    private val labelViewModel : LabelViewModel by viewModels()
     private lateinit var mAuth: FirebaseAuth
     private var actionMode : ActionMode? = null
     private var fUser : FirebaseUser? = null
@@ -157,6 +159,7 @@ class MainActivity : AppCompatActivity() {
                     allNotesViewModal.searchQuery.value = p0
                     archivedViewModel.searchQuery.value = p0
                     tagViewModel.searchQuery.value = p0
+                    labelViewModel.searchQuery.value = p0
                 }
                 return false
             }
@@ -166,6 +169,7 @@ class MainActivity : AppCompatActivity() {
                     allNotesViewModal.searchQuery.value = p0
                     archivedViewModel.searchQuery.value = p0
                     tagViewModel.searchQuery.value = p0
+                    labelViewModel.searchQuery.value = p0
 
                 }
                 return false

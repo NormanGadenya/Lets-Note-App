@@ -42,66 +42,72 @@ class LabelFireRepo {
     }
 
 
-    fun addOrDeleteLabels(newLabel : Int, oldLabel : Int, noteUid: String, add : Boolean) {
+    fun addOrDeleteLabels(newLabel : Int, oldLabel : Int, noteUid: String, labelTitle : String?, add : Boolean) {
         val labelRef = fUser?.let { database.getReference(it.uid).child("labels")}
-        labelRef?.addListenerForSingleValueEvent( object  : ValueEventListener {
-            override fun onDataChange(s: DataSnapshot) {
-                var exists = false
-                for (snapshot in s.children){
-                    val labelFire = snapshot.getValue(LabelFire::class.java)
-                    if (snapshot.key == newLabel.toString()){
-                        if (labelFire != null) {
-                            val noteUids = labelFire.noteUids
-                            if (add) {
-                                if (!noteUids.contains(noteUid)){
-                                    noteUids.add(noteUid)
-                                    val updateMap = HashMap<String, Any>()
-                                    updateMap["noteUids"] = noteUids
-                                    labelRef.child(newLabel.toString()).updateChildren(updateMap)
-                                }
-                            }else {
-                                noteUids.remove(noteUid)
-                                val updateMap = HashMap<String, Any>()
-                                updateMap["noteUids"] = noteUids
-                                if (noteUids.isNotEmpty()){
-                                    labelRef.child(newLabel.toString()).updateChildren(updateMap)
-                                }else{
-                                    labelRef.child(newLabel.toString()).removeValue()
-                                }
-                            }
-                        }
-                        exists = true
-                    }
-                    if (oldLabel > 0 && oldLabel != newLabel){
-                        if (snapshot.key == oldLabel.toString()){
-
+        if (newLabel>0){
+            labelRef?.addListenerForSingleValueEvent( object  : ValueEventListener {
+                override fun onDataChange(s: DataSnapshot) {
+                    var exists = false
+                    for (snapshot in s.children){
+                        val labelFire = snapshot.getValue(LabelFire::class.java)
+                        if (snapshot.key == newLabel.toString()){
                             if (labelFire != null) {
                                 val noteUids = labelFire.noteUids
-                                noteUids.remove(noteUid)
-                                val updateMap = HashMap<String, Any>()
-                                updateMap["noteUids"] = noteUids
-                                if (noteUids.isNotEmpty()) {
-                                    labelRef.child(oldLabel.toString()).updateChildren(updateMap)
-                                } else {
-                                    labelRef.child(oldLabel.toString()).removeValue()
+                                if (add) {
+                                    if (!noteUids.contains(noteUid)){
+                                        noteUids.add(noteUid)
+                                        val updateMap = HashMap<String, Any>()
+                                        updateMap["noteUids"] = noteUids
+                                        labelRef.child(newLabel.toString()).updateChildren(updateMap)
+                                    }
+                                }else {
+                                    noteUids.remove(noteUid)
+                                    val updateMap = HashMap<String, Any>()
+                                    updateMap["noteUids"] = noteUids
+                                    if (noteUids.isNotEmpty()){
+                                        labelRef.child(newLabel.toString()).updateChildren(updateMap)
+                                    }else{
+                                        labelRef.child(newLabel.toString()).removeValue()
+                                    }
+                                }
+                            }
+                            exists = true
+                        }
+                        if (oldLabel > 0 && oldLabel != newLabel){
+                            if (snapshot.key == oldLabel.toString()){
+
+                                if (labelFire != null ) {
+                                    val noteUids = labelFire.noteUids
+                                    noteUids.remove(noteUid)
+                                    val updateMap = HashMap<String, Any>()
+                                    updateMap["noteUids"] = noteUids
+                                    if (noteUids.isNotEmpty()) {
+                                        labelRef.child(oldLabel.toString()).updateChildren(updateMap)
+                                    } else {
+                                        labelRef.child(oldLabel.toString()).removeValue()
+                                    }
                                 }
                             }
                         }
                     }
-                }
-                if (!exists){
-                    val newTagMap = HashMap<String, Any>()
-                    val noteUids = ArrayList<String>()
-                    noteUids.add(noteUid)
-                    newTagMap["noteUids"] = noteUids
-                    labelRef.child(newLabel.toString()).setValue(newTagMap)
-                }
-            }
+                    if (!exists){
+                        val newLabelMap = HashMap<String, Any>()
+                        val noteUids = ArrayList<String>()
+                        noteUids.add(noteUid)
+                        newLabelMap["noteUids"] = noteUids
+                        if (labelTitle!= null){
+                            newLabelMap["labelTitle"] = labelTitle
+                        }
 
-            override fun onCancelled(error: DatabaseError) {
-                Log.d(TAG, "onCancelled: $error")
-            }
-        })
+                        labelRef.child(newLabel.toString()).setValue(newLabelMap)
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.d(TAG, "onCancelled: $error")
+                }
+            })
+        }
 
     }
 
@@ -131,4 +137,10 @@ class LabelFireRepo {
         })
     }
 
+    fun updateNote(labelUpdate : Map<String,Any>, labelColor : Int) {
+        fUser?.let {
+            val labelRef = database.reference.child(it.uid).child("labels").child(labelColor.toString())
+            labelRef.updateChildren(labelUpdate)
+        }
+    }
 }

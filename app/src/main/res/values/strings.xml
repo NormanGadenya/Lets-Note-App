@@ -4,7 +4,7 @@
     <string name="deletedTime"> Deleted on %1$s at %2$s</string>
     <string name="archivedTime"> Archived on %1$s at %2$s</string>
     <string name="noteTagCountSingle"> %1$s Note</string>
-    <string name="noteTagCountMultiple"> %1$s Notes</string>
+    <string name="noteCountMultiple"> %1$s Notes</string>
     <string name="reminder">Reminder set on %1$s at %2$s</string>
     <string name="opt1Desc">Later today at %1$s</string>
     <string name="opt2n3Desc">Tomorrow in the %1$s at %2$s</string>

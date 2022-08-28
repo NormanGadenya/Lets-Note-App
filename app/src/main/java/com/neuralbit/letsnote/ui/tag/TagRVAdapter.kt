@@ -55,7 +55,7 @@ class TagRVAdapter (
                 if(value==1){
                     textView.text = context.getString(R.string.noteTagCountSingle,value.toString())
                 }else {
-                    textView.text = context.getString(R.string.noteTagCountMultiple, value.toString())
+                    textView.text = context.getString(R.string.noteCountMultiple, value.toString())
                 }
             }
         }
