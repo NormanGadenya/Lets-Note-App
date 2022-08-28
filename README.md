@@ -23,7 +23,7 @@ This is a simple note application that helps organize and store them locally on 
 ## Features
 
 
-- Saves notes in an sqlite database
+- Saves notes in the cloud
 
 - Makes note taking faster and easier by automatically detecting when a user is making a list of items
 
@@ -35,7 +35,7 @@ This is a simple note application that helps organize and store them locally on 
 
 - Set reminders for notes
 
-- Speech recognition using Google Speech Recognizer api
+- Protect notes using Fingerprint authentication
 
 
 ## Installation
