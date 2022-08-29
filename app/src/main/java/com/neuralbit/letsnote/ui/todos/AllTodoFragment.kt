@@ -1,4 +1,4 @@
-package com.neuralbit.letsnote.ui.allNotes
+package com.neuralbit.letsnote.ui.todos
 
 import android.app.AlarmManager
 import android.app.PendingIntent
@@ -31,23 +31,25 @@ import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.Services.DeleteReceiver
 import com.neuralbit.letsnote.adapters.NoteFireClick
 import com.neuralbit.letsnote.adapters.NoteRVAdapter
-import com.neuralbit.letsnote.databinding.FragmentAllNotesBinding
+import com.neuralbit.letsnote.databinding.FragmentAllTodosBinding
 import com.neuralbit.letsnote.entities.NoteFire
+import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import com.neuralbit.letsnote.ui.settings.SettingsViewModel
 import com.neuralbit.letsnote.utilities.AlertReceiver
 import java.util.*
 
-class AllNotesFragment : Fragment() , NoteFireClick {
+class AllTodoFragment : Fragment() , NoteFireClick {
 
     private val allNotesViewModel: AllNotesViewModel by activityViewModels()
+    private val allTodoViewModel: AllTodoViewModel by activityViewModels()
     private val settingsViewModel: SettingsViewModel by activityViewModels()
-    private var _binding: FragmentAllNotesBinding? = null
+    private var _binding: FragmentAllTodosBinding? = null
     val TAG = "HOMEFRAGMENT"
     private lateinit var  notesRV: RecyclerView
     private lateinit var  pinnedNotesRV: RecyclerView
-    private lateinit var addNoteFAB : FloatingActionButton
     private lateinit var welcomeIcon : ImageView
     private lateinit var welcomeText : TextView
+    private lateinit var addNoteFAB : FloatingActionButton
     private val binding get() = _binding!!
     private lateinit var pinnedNotesTV: TextView
     private lateinit var otherNotesTV: TextView
@@ -56,13 +58,11 @@ class AllNotesFragment : Fragment() , NoteFireClick {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentAllNotesBinding.inflate(inflater, container, false)
+        _binding = FragmentAllTodosBinding.inflate(inflater, container, false)
 
         val root: View = binding.root
-        addNoteFAB = binding.FABAddNote
-        addNoteFAB.visibility = VISIBLE
-
         notesRV = binding.notesRV
+
         pinnedNotesRV = binding.pinnedNotesRV
         pinnedNotesTV = binding.pinnedNotesTV
         otherNotesTV = binding.otherNotesTV
@@ -114,7 +114,7 @@ class AllNotesFragment : Fragment() , NoteFireClick {
                 val deletedNotes = pref?.getStringSet("noteUids", HashSet())
                 if (deletedNotes != null){
                     if (!deletedNotes.contains(note.noteUid)){
-                        if (!note.archived){
+                        if (!note.archived && note.todoItems.isNotEmpty()){
                             if (note.pinned){
                                 pinnedNotes.add(note)
                             }else{
@@ -123,7 +123,7 @@ class AllNotesFragment : Fragment() , NoteFireClick {
                         }
                     }
                 }else{
-                    if (!note.archived){
+                    if (!note.archived && note.todoItems.isNotEmpty()){
                         if (note.pinned){
                             pinnedNotes.add(note)
                         }else{
@@ -141,8 +141,8 @@ class AllNotesFragment : Fragment() , NoteFireClick {
             }
 
 
-            allNotesViewModel.otherFireNotesList.value = otherNotes
-            allNotesViewModel.pinnedFireNotesList.value = pinnedNotes
+            allTodoViewModel.otherFireNotesList.value = otherNotes
+            allTodoViewModel.pinnedFireNotesList.value = pinnedNotes
             if (pinnedNotes.isNotEmpty()){
                 otherNotesTV.visibility = VISIBLE
                 pinnedNotesTV.visibility = VISIBLE
@@ -161,7 +161,7 @@ class AllNotesFragment : Fragment() , NoteFireClick {
 
         allNotesViewModel.searchQuery.observe(viewLifecycleOwner) { str->
 
-            allNotesViewModel.filterOtherFireList().observe(viewLifecycleOwner) {
+            allTodoViewModel.filterOtherFireList().observe(viewLifecycleOwner) {
                 if (it.isEmpty()){
                     notesRV.isVisible = false
                     otherNotesTV.isVisible = false
@@ -172,7 +172,7 @@ class AllNotesFragment : Fragment() , NoteFireClick {
                 noteRVAdapter?.updateListFire(it)
                 noteRVAdapter?.searchString = str
             }
-            allNotesViewModel.filterPinnedFireList().observe(viewLifecycleOwner) {
+            allTodoViewModel.filterPinnedFireList().observe(viewLifecycleOwner) {
                 if (it.isEmpty()){
                     pinnedNotesTV.isVisible = false
                     pinnedNotesRV.isVisible = false
@@ -193,12 +193,15 @@ class AllNotesFragment : Fragment() , NoteFireClick {
                 val selectedNotesCount = allNotesViewModel.selectedNotes.size
                 for ( note in allNotesViewModel.selectedNotes){
                     if (note.pinned){
+                        allTodoViewModel.pinnedFireNotesList.value?.remove(note)
                         allNotesViewModel.pinnedFireNotesList.value?.remove(note)
                         cancelAlarm(note.reminderDate.toInt())
                         pinnedNoteRVAdapter?.notifyDataSetChanged()
 
                     }else{
+                        allTodoViewModel.otherFireNotesList.value?.remove(note)
                         allNotesViewModel.otherFireNotesList.value?.remove(note)
+
                         cancelAlarm(note.reminderDate.toInt())
                         noteRVAdapter?.notifyDataSetChanged()
                     }
@@ -208,10 +211,10 @@ class AllNotesFragment : Fragment() , NoteFireClick {
                     note.noteUid?.let { it1 -> allNotesViewModel.updateFireNote(noteUpdate, it1) }
                 }
 
-                allNotesViewModel.otherFireNotesList.value?.let { list ->
+                allTodoViewModel.otherFireNotesList.value?.let { list ->
                     noteRVAdapter?.updateListFire(list)
                 }
-                allNotesViewModel.pinnedFireNotesList.value?.let { list ->
+                allTodoViewModel.pinnedFireNotesList.value?.let { list ->
                     pinnedNoteRVAdapter?.updateListFire(list)
                 }
 
@@ -255,12 +258,14 @@ class AllNotesFragment : Fragment() , NoteFireClick {
                     }
 
                     if (note.pinned){
+                        allTodoViewModel.pinnedFireNotesList.value?.remove(note)
                         allNotesViewModel.pinnedFireNotesList.value?.remove(note)
                         cancelAlarm(note.reminderDate.toInt())
                         pinnedNoteRVAdapter?.notifyDataSetChanged()
 
                     }else{
                         allNotesViewModel.otherFireNotesList.value?.remove(note)
+                        allTodoViewModel.otherFireNotesList.value?.remove(note)
                         cancelAlarm(note.reminderDate.toInt())
                         noteRVAdapter?.notifyDataSetChanged()
                     }
@@ -268,16 +273,16 @@ class AllNotesFragment : Fragment() , NoteFireClick {
                 }
 
 
-                allNotesViewModel.otherFireNotesList.value?.let { list ->
+                allTodoViewModel.otherFireNotesList.value?.let { list ->
                     noteRVAdapter?.updateListFire(list)
                 }
-                allNotesViewModel.pinnedFireNotesList.value?.let { list ->
+                allTodoViewModel.pinnedFireNotesList.value?.let { list ->
                     pinnedNoteRVAdapter?.updateListFire(list)
                 }
                 if (emptyTrashImmediately != true){
                     allNotesViewModel.selectedNotes.clear()
                 }
-                if (allNotesViewModel.otherFireNotesList.value?.isEmpty() == true && allNotesViewModel.pinnedFireNotesList.value?.isEmpty() == true){
+                if (allTodoViewModel.otherFireNotesList.value?.isEmpty() == true && allNotesViewModel.pinnedFireNotesList.value?.isEmpty() == true){
                     welcomeIcon.visibility = VISIBLE
                     welcomeText.visibility = VISIBLE
                 }
@@ -291,14 +296,6 @@ class AllNotesFragment : Fragment() , NoteFireClick {
                     Toast.makeText(context,"Notes deleted successfully",Toast.LENGTH_SHORT).show()
                 }
             }
-        }
-
-
-
-        addNoteFAB.setOnClickListener{
-            val intent = Intent( context,AddEditNoteActivity::class.java)
-            intent.putExtra("noteType","NewNote")
-            startActivity(intent)
         }
 
        

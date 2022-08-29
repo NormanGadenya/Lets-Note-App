@@ -3,7 +3,10 @@ package com.neuralbit.letsnote
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.WindowManager
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -38,7 +41,8 @@ class SignInActivity : AppCompatActivity() {
         setContentView(R.layout.activity_sign_in)
 
         createRequest()
-        findViewById<View>(R.id.signInWithGoogleBtn).setOnClickListener { signIn() }
+        findViewById<View>(R.id.signInWithGoogleBtn).setOnClickListener { signInGoogle() }
+        findViewById<View>(R.id.signInWithAnnoneBtn).setOnClickListener { signInAnnon() }
         val termsAndConditions = findViewById<View>(R.id.termsAndConditionTV)
         termsAndConditions.setOnClickListener {
             val i = Intent(applicationContext,TermsAndConditions::class.java)
@@ -55,12 +59,35 @@ class SignInActivity : AppCompatActivity() {
             .build()
 
 
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
+        mGoogleSignInClient = GoogleSignIn.getClient(applicationContext, gso)
     }
 
-    private fun signIn() {
+    private fun signInGoogle() {
         val signInIntent = mGoogleSignInClient!!.signInIntent
         startActivityForResult(signInIntent, RC_SIGN_IN)
+    }
+
+    private fun signInAnnon(){
+
+        val progressBar = findViewById<ProgressBar>(R.id.progress_bar)
+        progressBar.visibility = VISIBLE
+
+        mAuth.signInAnonymously()
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    progressBar.visibility = GONE
+
+
+                    // Sign in success, update UI with the signed-in user's information
+                    val intent = Intent(this@SignInActivity,MainActivity::class.java)
+                    startActivity(intent)
+                } else {
+                    progressBar.visibility = GONE
+
+                    // If sign in fails, display a message to the user.
+                    Toast.makeText(applicationContext, "Authentication failed.", Toast.LENGTH_SHORT).show()
+                }
+            }
     }
 
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

@@ -8,6 +8,11 @@
             android:id="@+id/nav_home"
             android:icon="@drawable/ic_baseline_note_24"
             android:title="@string/menu_allNotes" />
+
+        <item
+            android:id="@+id/nav_todo"
+            android:icon="@drawable/ic_baseline_todo_24"
+            android:title="@string/menu_todo" />
         <item
             android:id="@+id/nav_arch"
             android:icon="@drawable/ic_baseline_archive_24"

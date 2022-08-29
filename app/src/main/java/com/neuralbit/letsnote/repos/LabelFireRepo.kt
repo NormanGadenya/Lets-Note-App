@@ -37,7 +37,6 @@ class LabelFireRepo {
                 Log.e(TAG, "onCancelled: ${error.message}" )
             }
         })
-        fUser?.let { database.getReference(it.uid).keepSynced(true) }
         return live
     }
 

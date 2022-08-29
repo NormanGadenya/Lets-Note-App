@@ -7,8 +7,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.viewModels
@@ -76,7 +80,7 @@ class MainActivity : AppCompatActivity() {
         settingsPref =  getSharedPreferences("Settings", MODE_PRIVATE)
         appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.nav_home, R.id.nav_arch , R.id.nav_tags ,R.id.nav_labels , R.id.nav_deleted , R.id.nav_settings
+                R.id.nav_home,R.id.nav_todo ,R.id.nav_arch , R.id.nav_tags ,R.id.nav_labels , R.id.nav_deleted , R.id.nav_settings
             ), drawerLayout
         )
         viewModal = ViewModelProvider(
@@ -116,6 +120,7 @@ class MainActivity : AppCompatActivity() {
         val profileIV = headerLayout.findViewById<ImageView>(R.id.profilePic)
         val nameTV = headerLayout.findViewById<TextView>(R.id.accountName)
         val emailTV = headerLayout.findViewById<TextView>(R.id.emailAddress)
+        val detailsGroup = headerLayout.findViewById<View>(R.id.detailsGroup)
         if(profileUrl != null){
             Glide.with(applicationContext).load(profileUrl).into(profileIV)
         }
@@ -128,6 +133,11 @@ class MainActivity : AppCompatActivity() {
         val emailAdd = fUser?.email
         if (emailAdd != null){
             emailTV.text = emailAdd
+        }
+        if (fUser?.isAnonymous == true){
+            detailsGroup.visibility = GONE
+        }else{
+            detailsGroup.visibility = VISIBLE
         }
 
     }
@@ -147,6 +157,15 @@ class MainActivity : AppCompatActivity() {
         settingsViewModel.settingsFrag.observe(this){
             searchViewMenuItem.isVisible = !it
             layoutViewBtn.isVisible = !it
+        }
+
+        settingsViewModel.migrateData.observe(this){
+            if (it){
+                Log.d(TAG, "onCreateOptionsMenu: ${settingsViewModel.oldUser} ${settingsViewModel.newUser}")
+                settingsViewModel.oldUser?.let { it1 -> settingsViewModel.newUser?.let { it2 ->
+                    viewModal.migrateData(it1, it2)
+                } }
+            }
         }
 
 
@@ -232,6 +251,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+
 
         return true
     }

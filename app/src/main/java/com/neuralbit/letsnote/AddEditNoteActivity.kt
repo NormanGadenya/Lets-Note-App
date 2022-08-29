@@ -1136,9 +1136,10 @@ class AddEditNoteActivity : AppCompatActivity() ,
         val strL = p0?.toString()?.split(" ")
         if (!backPressed) {
             if (strL != null && strL.size > 1) {
-                val word = strL[strL.lastIndex - 1]
+                var word = strL[strL.lastIndex - 1]
                 if (word.contains("#")) {
                     if (!viewModal.oldTagList.contains(word)){
+                        word = word.replace("\n", "");
                         viewModal.newTags.add(word)
                         viewModal.newTagTyped.value = true
                     }

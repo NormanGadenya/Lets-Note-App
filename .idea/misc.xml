@@ -66,6 +66,7 @@
         <entry key="app/src/main/res/layout/activity_label_notes.xml" value="0.17" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_main2.xml" value="0.3697916666666667" />
+        <entry key="app/src/main/res/layout/activity_sign_in.xml" value="0.35885416666666664" />
         <entry key="app/src/main/res/layout/activity_splash.xml" value="0.2484375" />
         <entry key="app/src/main/res/layout/activity_terms_and_conditions.xml" value="0.35885416666666664" />
         <entry key="app/src/main/res/layout/add_label_dialog.xml" value="0.25" />
@@ -78,6 +79,7 @@
         <entry key="app/src/main/res/layout/deleted_notes_fragment.xml" value="0.35885416666666664" />
         <entry key="app/src/main/res/layout/fragment_add_edit.xml" value="0.2625" />
         <entry key="app/src/main/res/layout/fragment_all_notes.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/fragment_all_todos.xml" value="0.3578125" />
         <entry key="app/src/main/res/layout/fragment_archived_notes.xml" value="0.3328125" />
         <entry key="app/src/main/res/layout/fragment_gallery.xml" value="0.33" />
         <entry key="app/src/main/res/layout/fragment_home.xml" value="0.25" />
