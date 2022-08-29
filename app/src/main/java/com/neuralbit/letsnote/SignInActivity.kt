@@ -1,6 +1,7 @@
 package com.neuralbit.letsnote
 
 import android.content.Intent
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.view.View
 import android.view.View.GONE
@@ -63,29 +64,43 @@ class SignInActivity : AppCompatActivity() {
     }
 
     private fun signInGoogle() {
-        val signInIntent = mGoogleSignInClient!!.signInIntent
-        startActivityForResult(signInIntent, RC_SIGN_IN)
+        if (!isNetworkConnected()){
+            Toast.makeText(applicationContext,"Requires an internet connection for initial setup",Toast.LENGTH_SHORT).show()
+        }else{
+
+            val signInIntent = mGoogleSignInClient!!.signInIntent
+            startActivityForResult(signInIntent, RC_SIGN_IN)
+        }
     }
 
     private fun signInAnnon(){
+        if (!isNetworkConnected()){
+            Toast.makeText(applicationContext,"Requires an internet connection for initial setup",Toast.LENGTH_SHORT).show()
+        }else{
 
-        val progressBar = findViewById<ProgressBar>(R.id.progress_bar)
-        progressBar.visibility = VISIBLE
+            val progressBar = findViewById<ProgressBar>(R.id.progress_bar)
+            progressBar.visibility = VISIBLE
 
-        mAuth.signInAnonymously()
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
-                    progressBar.visibility = GONE
-                    // Sign in success, update UI with the signed-in user's information
-                    val intent = Intent(this@SignInActivity,MainActivity::class.java)
-                    startActivity(intent)
-                } else {
-                    progressBar.visibility = GONE
+            mAuth.signInAnonymously()
+                .addOnCompleteListener(this) { task ->
+                    if (task.isSuccessful) {
+                        progressBar.visibility = GONE
+                        // Sign in success, update UI with the signed-in user's information
+                        val intent = Intent(this@SignInActivity,MainActivity::class.java)
+                        startActivity(intent)
+                    } else {
+                        progressBar.visibility = GONE
 
-                    // If sign in fails, display a message to the user.
-                    Toast.makeText(applicationContext, "Authentication failed.", Toast.LENGTH_SHORT).show()
+                        // If sign in fails, display a message to the user.
+                        Toast.makeText(applicationContext, "Authentication failed.", Toast.LENGTH_SHORT).show()
+                    }
                 }
-            }
+        }
+    }
+
+    private fun isNetworkConnected(): Boolean {
+        val cm = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
+        return cm.activeNetworkInfo != null && cm.activeNetworkInfo!!.isConnected
     }
 
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
