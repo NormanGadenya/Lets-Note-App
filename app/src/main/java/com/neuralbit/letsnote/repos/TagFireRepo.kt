@@ -40,7 +40,6 @@ class TagFireRepo {
 
             }
         })
-        fUser?.let { database.getReference(it.uid).keepSynced(true) }
         return live
     }
 
@@ -48,7 +47,11 @@ class TagFireRepo {
     fun addOrDeleteTags(newTagsAdded: HashSet<String>, deletedTags: HashSet<String>, noteUid: String) {
         val tagRef = fUser?.let { database.getReference(it.uid).child("tags")}
         for (tag in newTagsAdded) {
-            val tagStr = tag.split("#")[1]
+            var tagStr = tag
+            val split = tagStr.split("#")
+            if (split.size > 1){
+                tagStr = split[1]
+            }
             tagRef?.child(tagStr)?.addListenerForSingleValueEvent( object :ValueEventListener{
                 override fun onDataChange(snapshot: DataSnapshot) {
                     if (snapshot.exists()){
@@ -80,27 +83,29 @@ class TagFireRepo {
         for ( tag in deletedTags){
 
             val tagStr = tag.split("#")[1]
-            tagRef?.child(tagStr)?.addListenerForSingleValueEvent( object :ValueEventListener{
-                override fun onDataChange(snapshot: DataSnapshot) {
+            if (!tagStr.contains("#")){
+                tagRef?.child(tagStr)?.addListenerForSingleValueEvent( object :ValueEventListener{
+                    override fun onDataChange(snapshot: DataSnapshot) {
 
-                    val tagFire = snapshot.getValue(TagFire::class.java)
-                    if (tagFire != null) {
-                        val noteUids = tagFire.noteUids
-                        noteUids.remove(noteUid)
-                        val updateMap = HashMap<String, Any>()
-                        updateMap["noteUids"] = noteUids
-                        if (noteUids.isNotEmpty()){
-                            tagRef.child(tagStr).updateChildren(updateMap)
-                        }else{
-                            tagRef.child(tagStr).removeValue()
+                        val tagFire = snapshot.getValue(TagFire::class.java)
+                        if (tagFire != null) {
+                            val noteUids = tagFire.noteUids
+                            noteUids.remove(noteUid)
+                            val updateMap = HashMap<String, Any>()
+                            updateMap["noteUids"] = noteUids
+                            if (noteUids.isNotEmpty()){
+                                tagRef.child(tagStr).updateChildren(updateMap)
+                            }else{
+                                tagRef.child(tagStr).removeValue()
+                            }
                         }
                     }
-                }
 
-                override fun onCancelled(error: DatabaseError) {
-                    Log.e(TAG, "onCancelled: $error", )
-                }
-            })
+                    override fun onCancelled(error: DatabaseError) {
+                        Log.e(TAG, "onCancelled: $error", )
+                    }
+                })
+            }
 
         }
 

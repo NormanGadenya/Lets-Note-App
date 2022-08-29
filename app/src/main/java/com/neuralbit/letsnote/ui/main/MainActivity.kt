@@ -1,4 +1,4 @@
-package com.neuralbit.letsnote
+package com.neuralbit.letsnote.ui.main
 
 import android.app.AlarmManager
 import android.app.AlertDialog
@@ -9,6 +9,9 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.viewModels
@@ -28,6 +31,8 @@ import com.firebase.ui.auth.AuthUI
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.neuralbit.letsnote.R
+import com.neuralbit.letsnote.ui.signIn.SignInActivity
 import com.neuralbit.letsnote.databinding.ActivityMainBinding
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import com.neuralbit.letsnote.ui.archived.ArchivedViewModel
@@ -76,7 +81,13 @@ class MainActivity : AppCompatActivity() {
         settingsPref =  getSharedPreferences("Settings", MODE_PRIVATE)
         appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.nav_home, R.id.nav_arch , R.id.nav_tags ,R.id.nav_labels , R.id.nav_deleted , R.id.nav_settings
+                R.id.nav_home,
+                R.id.nav_todo,
+                R.id.nav_arch,
+                R.id.nav_tags,
+                R.id.nav_labels,
+                R.id.nav_deleted,
+                R.id.nav_settings
             ), drawerLayout
         )
         viewModal = ViewModelProvider(
@@ -108,6 +119,7 @@ class MainActivity : AppCompatActivity() {
             update["timeStamp"] = System.currentTimeMillis()
             it.noteUid?.let { it1 -> viewModal.updateFireNote(update, it1) }
         }
+
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
@@ -116,6 +128,7 @@ class MainActivity : AppCompatActivity() {
         val profileIV = headerLayout.findViewById<ImageView>(R.id.profilePic)
         val nameTV = headerLayout.findViewById<TextView>(R.id.accountName)
         val emailTV = headerLayout.findViewById<TextView>(R.id.emailAddress)
+        val detailsGroup = headerLayout.findViewById<View>(R.id.detailsGroup)
         if(profileUrl != null){
             Glide.with(applicationContext).load(profileUrl).into(profileIV)
         }
@@ -129,6 +142,23 @@ class MainActivity : AppCompatActivity() {
         if (emailAdd != null){
             emailTV.text = emailAdd
         }
+        if (fUser?.isAnonymous == true){
+            detailsGroup.visibility = GONE
+        }else{
+            detailsGroup.visibility = VISIBLE
+        }
+
+        mAuth.addAuthStateListener {
+            val currentUser = it.currentUser
+            if (currentUser != null){
+                detailsGroup.visibility = VISIBLE
+                emailTV.text = currentUser.email
+                nameTV.text = currentUser.displayName
+                if (currentUser.photoUrl !=null){
+                    Glide.with(applicationContext).load(currentUser.photoUrl).into(profileIV)
+                }
+            }
+        }
 
     }
 
@@ -141,6 +171,8 @@ class MainActivity : AppCompatActivity() {
         val layoutViewBtn = menu.findItem(R.id.layoutStyle)
         val signOutButton = menu.findItem(R.id.signOut)
         val deleteButton = menu.findItem(R.id.trash)
+
+        signOutButton.isVisible = false
         allNotesViewModal.deleteFrag.observe(this){
             deleteButton.isVisible = it
         }
@@ -152,7 +184,9 @@ class MainActivity : AppCompatActivity() {
 
         val searchView = searchViewMenuItem.actionView as SearchView
         val searchIcon = searchView.findViewById<ImageView>(androidx.appcompat.R.id.search_button)
-        searchIcon.setImageDrawable(ContextCompat.getDrawable(applicationContext,R.drawable.ic_baseline_search_24))
+        searchIcon.setImageDrawable(ContextCompat.getDrawable(applicationContext,
+            R.drawable.ic_baseline_search_24
+        ))
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(p0: String?): Boolean {
                 if (p0 != null) {
@@ -197,6 +231,14 @@ class MainActivity : AppCompatActivity() {
             return@setOnMenuItemClickListener true
         }
 
+        mAuth.addAuthStateListener {
+            if (it.currentUser != null){
+                if (!it.currentUser!!.isAnonymous){
+                    signOutButton.isVisible = true
+                }
+            }
+        }
+
         signOutButton.setOnMenuItemClickListener {
             val alertDialog: AlertDialog.Builder = AlertDialog.Builder(this@MainActivity)
             alertDialog.setTitle("Are you sure about this ?")
@@ -212,7 +254,7 @@ class MainActivity : AppCompatActivity() {
                 AuthUI.getInstance()
                     .signOut(this)
                     .addOnCompleteListener{
-                        val intent = Intent(this@MainActivity,SignInActivity::class.java)
+                        val intent = Intent(this@MainActivity, SignInActivity::class.java)
                         startActivity(intent)
                     }
             }
@@ -232,6 +274,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+
 
         return true
     }

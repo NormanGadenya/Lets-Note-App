@@ -1,4 +1,4 @@
-package com.neuralbit.letsnote.adapters
+package com.neuralbit.letsnote.ui.addEditNote
 
 import android.content.Context
 import android.view.LayoutInflater

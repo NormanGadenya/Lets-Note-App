@@ -1,4 +1,4 @@
-package com.neuralbit.letsnote
+package com.neuralbit.letsnote.ui.main
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -17,7 +17,7 @@ class MainActivityViewModel(application : Application) : AndroidViewModel(applic
 
 
     fun getAllFireNotes () : LiveData<ArrayList<NoteFire>>{
-        return noteFireRepo.getAllNotes();
+        return noteFireRepo.getAllNotes()
     }
 
     fun allFireTags() : LiveData<List<TagFire>> {
@@ -37,5 +37,6 @@ class MainActivityViewModel(application : Application) : AndroidViewModel(applic
     fun updateFireNote(noteUpdate : Map<String, Any>, noteUid : String) {
         noteFireRepo.updateNote(noteUpdate,noteUid)
     }
+
 
 }

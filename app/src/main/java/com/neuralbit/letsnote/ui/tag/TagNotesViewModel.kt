@@ -1,4 +1,4 @@
-package com.neuralbit.letsnote
+package com.neuralbit.letsnote.ui.tag
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel

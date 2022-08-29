@@ -1,4 +1,4 @@
-package com.neuralbit.letsnote
+package com.neuralbit.letsnote.ui.addEditNote
 
 import android.Manifest
 import android.annotation.TargetApi
@@ -58,8 +58,9 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.neuralbit.letsnote.ui.main.MainActivity
+import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.Services.DeleteReceiver
-import com.neuralbit.letsnote.adapters.*
 import com.neuralbit.letsnote.entities.LabelFire
 import com.neuralbit.letsnote.entities.NoteFireIns
 import com.neuralbit.letsnote.entities.TodoItem
@@ -617,7 +618,9 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 viewModal.todoItems.add(todoItem)
                 viewModal.noteChanged.value = true
                 todoItemDescTV.text.clear()
+                todoCheckBox.isChecked = false
                 todoRVAdapter.updateTodoItems(ArrayList(viewModal.todoItems))
+                todoRVAdapter.notifyDataSetChanged()
 
             }
 
@@ -1134,9 +1137,10 @@ class AddEditNoteActivity : AppCompatActivity() ,
         val strL = p0?.toString()?.split(" ")
         if (!backPressed) {
             if (strL != null && strL.size > 1) {
-                val word = strL[strL.lastIndex - 1]
+                var word = strL[strL.lastIndex - 1]
                 if (word.contains("#")) {
                     if (!viewModal.oldTagList.contains(word)){
+                        word = word.replace("\n", "");
                         viewModal.newTags.add(word)
                         viewModal.newTagTyped.value = true
                     }

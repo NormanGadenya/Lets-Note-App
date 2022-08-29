@@ -24,10 +24,11 @@
     <androidx.constraintlayout.widget.ConstraintLayout
 
         android:layout_width="wrap_content"
-        android:layout_height="60dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/detailsGroup"
         android:background="@drawable/nav_acc_detail_background"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp">
+        android:padding="16dp"
+        >
 
         <TextView
             android:id="@+id/accountName"

@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
 
     android:background="#2A3439"
-    tools:context=".SignInActivity">
+    tools:context=".ui.signIn.SignInActivity">
 
     <TextView
         android:id="@+id/appName"
@@ -43,18 +43,42 @@
 
     <Button
         android:id="@+id/signInWithGoogleBtn"
-        android:layout_width="200dp"
+        android:layout_width="150dp"
         android:layout_height="50dp"
         android:layout_marginTop="50dp"
         android:background="@drawable/sign_in_bgnd"
         android:drawableLeft="@drawable/icons_google"
         android:text="Sign in"
         android:textColor="#2A3439"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/signInWithAnnoneBtn"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/signInTV" />
 
+    <Button
+        android:id="@+id/signInWithAnnoneBtn"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="50dp"
+        android:background="@drawable/skip_bgrnd"
+        android:text="Skip"
+        android:textColor="@color/timberwolf"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/progress_bar"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/signInWithGoogleBtn"
+        app:layout_constraintTop_toBottomOf="@+id/signInTV" />
 
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/signInWithAnnoneBtn"
+        app:layout_constraintTop_toBottomOf="@+id/signInTV" />
 
     <TextView
         android:id="@+id/textViewTV"

@@ -1,9 +1,13 @@
-package com.neuralbit.letsnote
+package com.neuralbit.letsnote.ui.signIn
 
 import android.content.Intent
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.WindowManager
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -14,6 +18,8 @@ import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
+import com.neuralbit.letsnote.R
+import com.neuralbit.letsnote.ui.main.MainActivity
 
 class SignInActivity : AppCompatActivity() {
     private var mGoogleSignInClient: GoogleSignInClient? = null
@@ -25,7 +31,7 @@ class SignInActivity : AppCompatActivity() {
         mAuth = FirebaseAuth.getInstance()
         firebaseUser = mAuth.currentUser
         if (firebaseUser!=null){
-            val intent = Intent(this@SignInActivity,MainActivity::class.java)
+            val intent = Intent(this@SignInActivity, MainActivity::class.java)
             startActivity(intent)
         }
 
@@ -38,10 +44,11 @@ class SignInActivity : AppCompatActivity() {
         setContentView(R.layout.activity_sign_in)
 
         createRequest()
-        findViewById<View>(R.id.signInWithGoogleBtn).setOnClickListener { signIn() }
+        findViewById<View>(R.id.signInWithGoogleBtn).setOnClickListener { signInGoogle() }
+        findViewById<View>(R.id.signInWithAnnoneBtn).setOnClickListener { signInAnnon() }
         val termsAndConditions = findViewById<View>(R.id.termsAndConditionTV)
         termsAndConditions.setOnClickListener {
-            val i = Intent(applicationContext,TermsAndConditions::class.java)
+            val i = Intent(applicationContext, TermsAndConditions::class.java)
             startActivity(i)
         }
 
@@ -55,12 +62,47 @@ class SignInActivity : AppCompatActivity() {
             .build()
 
 
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
+        mGoogleSignInClient = GoogleSignIn.getClient(applicationContext, gso)
     }
 
-    private fun signIn() {
-        val signInIntent = mGoogleSignInClient!!.signInIntent
-        startActivityForResult(signInIntent, RC_SIGN_IN)
+    private fun signInGoogle() {
+        if (!isNetworkConnected()){
+            Toast.makeText(applicationContext,"Requires an internet connection for initial setup",Toast.LENGTH_SHORT).show()
+        }else{
+
+            val signInIntent = mGoogleSignInClient!!.signInIntent
+            startActivityForResult(signInIntent, RC_SIGN_IN)
+        }
+    }
+
+    private fun signInAnnon(){
+        if (!isNetworkConnected()){
+            Toast.makeText(applicationContext,"Requires an internet connection for initial setup",Toast.LENGTH_SHORT).show()
+        }else{
+
+            val progressBar = findViewById<ProgressBar>(R.id.progress_bar)
+            progressBar.visibility = VISIBLE
+
+            mAuth.signInAnonymously()
+                .addOnCompleteListener(this) { task ->
+                    if (task.isSuccessful) {
+                        progressBar.visibility = GONE
+                        // Sign in success, update UI with the signed-in user's information
+                        val intent = Intent(this@SignInActivity, MainActivity::class.java)
+                        startActivity(intent)
+                    } else {
+                        progressBar.visibility = GONE
+
+                        // If sign in fails, display a message to the user.
+                        Toast.makeText(applicationContext, "Authentication failed.", Toast.LENGTH_SHORT).show()
+                    }
+                }
+        }
+    }
+
+    private fun isNetworkConnected(): Boolean {
+        val cm = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
+        return cm.activeNetworkInfo != null && cm.activeNetworkInfo!!.isConnected
     }
 
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -88,7 +130,7 @@ class SignInActivity : AppCompatActivity() {
             ) { task ->
                 if (task.isSuccessful) {
 
-                    val intent = Intent(this@SignInActivity,MainActivity::class.java)
+                    val intent = Intent(this@SignInActivity, MainActivity::class.java)
                     startActivity(intent)
                 } else {
                     Toast.makeText(this@SignInActivity, "Sorry auth failed.", Toast.LENGTH_SHORT).show()

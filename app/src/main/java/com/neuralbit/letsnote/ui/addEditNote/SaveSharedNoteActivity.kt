@@ -1,4 +1,4 @@
-package com.neuralbit.letsnote
+package com.neuralbit.letsnote.ui.addEditNote
 
 import android.app.AlertDialog
 import android.content.Intent
@@ -10,6 +10,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.entities.NoteFireIns
 import com.neuralbit.letsnote.utilities.Common
 import kotlin.system.exitProcess
