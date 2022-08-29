@@ -56,6 +56,8 @@
         <entry key="app/src/main/res/drawable/note_wrapper.xml" value="0.3205" />
         <entry key="app/src/main/res/drawable/save_shared_background.xml" value="0.2015" />
         <entry key="app/src/main/res/drawable/side_nav_bar.xml" value="0.1415" />
+        <entry key="app/src/main/res/drawable/sign_in_bgnd.xml" value="0.299" />
+        <entry key="app/src/main/res/drawable/skip_bgrnd.xml" value="0.299" />
         <entry key="app/src/main/res/drawable/tag_background.xml" value="0.1975" />
         <entry key="app/src/main/res/drawable/tag_background_sel.xml" value="0.3205" />
         <entry key="app/src/main/res/drawable/white.xml" value="0.1225" />

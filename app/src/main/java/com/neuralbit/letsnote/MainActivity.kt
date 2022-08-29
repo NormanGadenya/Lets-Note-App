@@ -7,7 +7,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -112,6 +111,7 @@ class MainActivity : AppCompatActivity() {
             update["timeStamp"] = System.currentTimeMillis()
             it.noteUid?.let { it1 -> viewModal.updateFireNote(update, it1) }
         }
+
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
@@ -140,6 +140,18 @@ class MainActivity : AppCompatActivity() {
             detailsGroup.visibility = VISIBLE
         }
 
+        mAuth.addAuthStateListener {
+            val currentUser = it.currentUser
+            if (currentUser != null){
+                detailsGroup.visibility = VISIBLE
+                emailTV.text = currentUser.email
+                nameTV.text = currentUser.displayName
+                if (currentUser.photoUrl !=null){
+                    Glide.with(applicationContext).load(currentUser.photoUrl).into(profileIV)
+                }
+            }
+        }
+
     }
 
 
@@ -157,15 +169,6 @@ class MainActivity : AppCompatActivity() {
         settingsViewModel.settingsFrag.observe(this){
             searchViewMenuItem.isVisible = !it
             layoutViewBtn.isVisible = !it
-        }
-
-        settingsViewModel.migrateData.observe(this){
-            if (it){
-                Log.d(TAG, "onCreateOptionsMenu: ${settingsViewModel.oldUser} ${settingsViewModel.newUser}")
-                settingsViewModel.oldUser?.let { it1 -> settingsViewModel.newUser?.let { it2 ->
-                    viewModal.migrateData(it1, it2)
-                } }
-            }
         }
 
 

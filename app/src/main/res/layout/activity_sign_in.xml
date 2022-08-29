@@ -43,7 +43,7 @@
 
     <Button
         android:id="@+id/signInWithGoogleBtn"
-        android:layout_width="200dp"
+        android:layout_width="150dp"
         android:layout_height="50dp"
         android:layout_marginTop="50dp"
         android:background="@drawable/sign_in_bgnd"
@@ -60,9 +60,9 @@
         android:layout_width="100dp"
         android:layout_height="50dp"
         android:layout_marginTop="50dp"
-        android:background="@drawable/sign_in_bgnd"
+        android:background="@drawable/skip_bgrnd"
         android:text="Skip"
-        android:textColor="#2A3439"
+        android:textColor="@color/timberwolf"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/progress_bar"
         app:layout_constraintHorizontal_bias="0.5"

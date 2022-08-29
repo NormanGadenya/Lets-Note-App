@@ -38,8 +38,5 @@ class MainActivityViewModel(application : Application) : AndroidViewModel(applic
         noteFireRepo.updateNote(noteUpdate,noteUid)
     }
 
-    fun migrateData(oldUser:String, newUser:String){
-        noteFireRepo.migrateData(oldUser, newUser)
-    }
 
 }

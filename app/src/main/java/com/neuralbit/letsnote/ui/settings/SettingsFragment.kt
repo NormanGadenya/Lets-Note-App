@@ -3,11 +3,13 @@ package com.neuralbit.letsnote.ui.settings
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import android.widget.RadioButton
 import android.widget.SeekBar
 import android.widget.Toast
@@ -37,6 +39,7 @@ class SettingsFragment : Fragment() {
     private lateinit var mAuth : FirebaseAuth
     private var mGoogleSignInClient: GoogleSignInClient? = null
     private var oldUser : FirebaseUser? = null
+    private lateinit var migrateProgressBar : ProgressBar
 
 
 
@@ -55,6 +58,7 @@ class SettingsFragment : Fragment() {
         val lightModeGroup = binding.dayNightRadioGroup
         val migrateCard = binding.cardView4
         val migrateTV = binding.backUpTV
+        migrateProgressBar = binding.migrateProgress
         oldUser
         val siginBtn = binding.signInWithGoogleBtn
         mAuth = FirebaseAuth.getInstance()
@@ -63,11 +67,11 @@ class SettingsFragment : Fragment() {
 
         if (oldUser?.isAnonymous == true){
 
-            migrateCard.visibility = View.VISIBLE
-            migrateTV.visibility = View.VISIBLE
+            migrateCard.visibility = VISIBLE
+            migrateTV.visibility = VISIBLE
         }else{
-            migrateCard.visibility = View.GONE
-            migrateTV.visibility = View.GONE
+            migrateCard.visibility = GONE
+            migrateTV.visibility = GONE
         }
         createRequest()
 
@@ -89,6 +93,13 @@ class SettingsFragment : Fragment() {
                 editor.putString("font",font)
                 editor.apply()
 
+            }
+        }
+        mAuth.addAuthStateListener {
+            val currentUser = it.currentUser
+            if (currentUser != null){
+                migrateCard.visibility = GONE
+                migrateTV.visibility = GONE
             }
         }
         fontSeekBar.progress = fontPosition
@@ -135,23 +146,6 @@ class SettingsFragment : Fragment() {
         return root
     }
 
-    private fun signIn() {
-        val credential = GoogleAuthProvider.getCredential("", null)
-        val prevUser = mAuth.currentUser
-        mAuth.signInWithCredential(credential)
-            .addOnSuccessListener { result ->
-                val currentUser = result.user
-                settingsViewModel.migrateData.value = true
-                settingsViewModel.newUser = currentUser?.uid
-                settingsViewModel.oldUser = prevUser?.uid
-
-            }
-            .addOnFailureListener {
-                Log.e(TAG, "signIn: ${it.message}", )
-                Toast.makeText(context,it.toString(),Toast.LENGTH_LONG).show()
-            }
-    }
-
     private fun createRequest() {
 
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -164,6 +158,7 @@ class SettingsFragment : Fragment() {
     }
 
     private fun signInGoogle() {
+        migrateProgressBar.visibility = VISIBLE
         val signInIntent = mGoogleSignInClient!!.signInIntent
         startActivityForResult(signInIntent, RC_SIGN_IN)
     }
@@ -187,7 +182,6 @@ class SettingsFragment : Fragment() {
 
     private fun firebaseAuthWithGoogle(acct: GoogleSignInAccount) {
         val prevUser = mAuth.currentUser?.uid
-        Log.d(TAG, "firebaseAuthWithGoogle: ${prevUser}")
         val credential = GoogleAuthProvider.getCredential(acct.idToken, null)
         mAuth.signInWithCredential(credential)
             .addOnSuccessListener {
@@ -196,6 +190,8 @@ class SettingsFragment : Fragment() {
                 oldUser?.let { it1 ->
                     if (currentUser != null) {
                         settingsViewModel.migrateData(it1.uid , currentUser.uid )
+                        migrateProgressBar.visibility = GONE
+
                     }
                 }
 
