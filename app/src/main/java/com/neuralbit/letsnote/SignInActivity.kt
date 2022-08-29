@@ -76,8 +76,6 @@ class SignInActivity : AppCompatActivity() {
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     progressBar.visibility = GONE
-
-
                     // Sign in success, update UI with the signed-in user's information
                     val intent = Intent(this@SignInActivity,MainActivity::class.java)
                     startActivity(intent)

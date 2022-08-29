@@ -163,6 +163,8 @@ class MainActivity : AppCompatActivity() {
         val layoutViewBtn = menu.findItem(R.id.layoutStyle)
         val signOutButton = menu.findItem(R.id.signOut)
         val deleteButton = menu.findItem(R.id.trash)
+
+        signOutButton.isVisible = false
         allNotesViewModal.deleteFrag.observe(this){
             deleteButton.isVisible = it
         }
@@ -217,6 +219,14 @@ class MainActivity : AppCompatActivity() {
         layoutViewBtn.setOnMenuItemClickListener {
             allNotesViewModal.staggeredView.value = !allNotesViewModal.staggeredView.value!!
             return@setOnMenuItemClickListener true
+        }
+
+        mAuth.addAuthStateListener {
+            if (it.currentUser != null){
+                if (!it.currentUser!!.isAnonymous){
+                    signOutButton.isVisible = true
+                }
+            }
         }
 
         signOutButton.setOnMenuItemClickListener {

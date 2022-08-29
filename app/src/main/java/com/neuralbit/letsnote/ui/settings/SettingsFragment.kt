@@ -97,7 +97,7 @@ class SettingsFragment : Fragment() {
         }
         mAuth.addAuthStateListener {
             val currentUser = it.currentUser
-            if (currentUser != null){
+            if (currentUser != null && !currentUser.isAnonymous){
                 migrateCard.visibility = GONE
                 migrateTV.visibility = GONE
             }
