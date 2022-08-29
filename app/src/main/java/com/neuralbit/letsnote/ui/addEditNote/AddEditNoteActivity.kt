@@ -1,4 +1,4 @@
-package com.neuralbit.letsnote
+package com.neuralbit.letsnote.ui.addEditNote
 
 import android.Manifest
 import android.annotation.TargetApi
@@ -58,8 +58,9 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.neuralbit.letsnote.ui.main.MainActivity
+import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.Services.DeleteReceiver
-import com.neuralbit.letsnote.adapters.*
 import com.neuralbit.letsnote.entities.LabelFire
 import com.neuralbit.letsnote.entities.NoteFireIns
 import com.neuralbit.letsnote.entities.TodoItem

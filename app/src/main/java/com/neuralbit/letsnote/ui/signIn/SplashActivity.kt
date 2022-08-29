@@ -1,4 +1,4 @@
-package com.neuralbit.letsnote
+package com.neuralbit.letsnote.ui.signIn
 
 import android.content.Intent
 import android.content.SharedPreferences
@@ -8,6 +8,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.google.firebase.auth.FirebaseAuth
+import com.neuralbit.letsnote.R
+import com.neuralbit.letsnote.ui.main.MainActivity
 
 class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,16 +35,16 @@ class SplashActivity : AppCompatActivity() {
         }
 
         if (firebaseUser!=null){
-            val intent = Intent(this@SplashActivity,MainActivity::class.java)
+            val intent = Intent(this@SplashActivity, MainActivity::class.java)
             startActivity(intent)
             finish()
         }else{
-            val intent = Intent(this@SplashActivity,SignInActivity::class.java)
+            val intent = Intent(this@SplashActivity, SignInActivity::class.java)
             startActivity(intent)
             finish()
 
         }
-        val intent = Intent(this@SplashActivity,SignInActivity::class.java)
+        val intent = Intent(this@SplashActivity, SignInActivity::class.java)
         startActivity(intent)
         finish()
 

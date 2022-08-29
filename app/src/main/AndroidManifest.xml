@@ -23,23 +23,23 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.App.Starting">
         <activity
-            android:name=".TermsAndConditions"
+            android:name=".ui.signIn.TermsAndConditions"
             android:theme="@style/Theme.App.Activity"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName=".ui.main.MainActivity"
             android:exported="false" />
         <activity
-            android:name=".Fingerprint"
+            android:name=".ui.addEditNote.Fingerprint"
             android:theme="@style/Theme.App.Activity"
             android:exported="false" />
 
         <activity
-            android:name=".AddEditNoteActivity"
+            android:name=".ui.addEditNote.AddEditNoteActivity"
             android:exported="true"
             android:theme="@style/Theme.App.Activity"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".ui.main.MainActivity" />
 
         <activity
-            android:name=".SplashActivity"
+            android:name=".ui.signIn.SplashActivity"
             android:exported="true"
             >
             <intent-filter>
@@ -50,7 +50,7 @@
 
         </activity>
         <activity
-            android:name=".SaveSharedNoteActivity"
+            android:name=".ui.addEditNote.SaveSharedNoteActivity"
             android:exported="true"
             android:theme="@style/Theme.AppCompat.Transparent.NoActionBar">
             <intent-filter>
@@ -64,21 +64,21 @@
         <activity android:name="com.canhub.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat"/>
         <activity
-            android:name=".SignInActivity"
+            android:name=".ui.signIn.SignInActivity"
             android:exported="true"
             android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
         <activity
-            android:name=".LabelNotesActivity"
+            android:name=".ui.label.LabelNotesActivity"
             android:exported="true"
             android:theme="@style/Theme.App.Activity"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".ui.main.MainActivity" />
         <activity
-            android:name=".TagNotesActivity"
+            android:name=".ui.tag.TagNotesActivity"
             android:exported="true"
             android:theme="@style/Theme.App.Activity"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".ui.main.MainActivity" />
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.main.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.LetsNote.NoActionBar" />
 

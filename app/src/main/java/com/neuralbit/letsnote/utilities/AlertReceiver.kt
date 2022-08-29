@@ -4,8 +4,8 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.neuralbit.letsnote.AddEditNoteActivity
-import com.neuralbit.letsnote.Fingerprint
+import com.neuralbit.letsnote.ui.addEditNote.AddEditNoteActivity
+import com.neuralbit.letsnote.ui.addEditNote.Fingerprint
 
 class AlertReceiver : BroadcastReceiver() {
     val TAG = "tag"
@@ -26,9 +26,9 @@ class AlertReceiver : BroadcastReceiver() {
         val nb = notificationHelper.channelNotification
 
         val i : Intent = if (protected){
-            Intent(context,Fingerprint::class.java)
+            Intent(context, Fingerprint::class.java)
         }else{
-            Intent(context,AddEditNoteActivity::class.java)
+            Intent(context, AddEditNoteActivity::class.java)
         }
         i.putExtra("noteType",noteType)
         i.putExtra("noteType","Edit")

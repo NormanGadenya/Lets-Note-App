@@ -1,4 +1,4 @@
-package com.neuralbit.letsnote.adapters
+package com.neuralbit.letsnote.ui.adapters
 
 import android.app.AlarmManager
 import android.app.PendingIntent

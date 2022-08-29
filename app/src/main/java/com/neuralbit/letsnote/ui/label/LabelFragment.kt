@@ -12,9 +12,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.neuralbit.letsnote.LabelNotesActivity
-import com.neuralbit.letsnote.NoteViewModel
-import com.neuralbit.letsnote.adapters.LabelRVAdapter
+import com.neuralbit.letsnote.ui.addEditNote.NoteViewModel
+import com.neuralbit.letsnote.ui.adapters.LabelRVAdapter
 import com.neuralbit.letsnote.databinding.LabelFragmentBinding
 import com.neuralbit.letsnote.entities.LabelFire
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel

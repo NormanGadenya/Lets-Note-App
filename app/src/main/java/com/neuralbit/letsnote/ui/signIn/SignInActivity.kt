@@ -1,4 +1,4 @@
-package com.neuralbit.letsnote
+package com.neuralbit.letsnote.ui.signIn
 
 import android.content.Intent
 import android.net.ConnectivityManager
@@ -18,6 +18,8 @@ import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
+import com.neuralbit.letsnote.R
+import com.neuralbit.letsnote.ui.main.MainActivity
 
 class SignInActivity : AppCompatActivity() {
     private var mGoogleSignInClient: GoogleSignInClient? = null
@@ -29,7 +31,7 @@ class SignInActivity : AppCompatActivity() {
         mAuth = FirebaseAuth.getInstance()
         firebaseUser = mAuth.currentUser
         if (firebaseUser!=null){
-            val intent = Intent(this@SignInActivity,MainActivity::class.java)
+            val intent = Intent(this@SignInActivity, MainActivity::class.java)
             startActivity(intent)
         }
 
@@ -46,7 +48,7 @@ class SignInActivity : AppCompatActivity() {
         findViewById<View>(R.id.signInWithAnnoneBtn).setOnClickListener { signInAnnon() }
         val termsAndConditions = findViewById<View>(R.id.termsAndConditionTV)
         termsAndConditions.setOnClickListener {
-            val i = Intent(applicationContext,TermsAndConditions::class.java)
+            val i = Intent(applicationContext, TermsAndConditions::class.java)
             startActivity(i)
         }
 
@@ -86,7 +88,7 @@ class SignInActivity : AppCompatActivity() {
                     if (task.isSuccessful) {
                         progressBar.visibility = GONE
                         // Sign in success, update UI with the signed-in user's information
-                        val intent = Intent(this@SignInActivity,MainActivity::class.java)
+                        val intent = Intent(this@SignInActivity, MainActivity::class.java)
                         startActivity(intent)
                     } else {
                         progressBar.visibility = GONE
@@ -128,7 +130,7 @@ class SignInActivity : AppCompatActivity() {
             ) { task ->
                 if (task.isSuccessful) {
 
-                    val intent = Intent(this@SignInActivity,MainActivity::class.java)
+                    val intent = Intent(this@SignInActivity, MainActivity::class.java)
                     startActivity(intent)
                 } else {
                     Toast.makeText(this@SignInActivity, "Sorry auth failed.", Toast.LENGTH_SHORT).show()

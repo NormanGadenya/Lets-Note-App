@@ -1,4 +1,4 @@
-package com.neuralbit.letsnote
+package com.neuralbit.letsnote.ui.main
 
 import android.app.AlarmManager
 import android.app.AlertDialog
@@ -31,6 +31,8 @@ import com.firebase.ui.auth.AuthUI
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.neuralbit.letsnote.R
+import com.neuralbit.letsnote.ui.signIn.SignInActivity
 import com.neuralbit.letsnote.databinding.ActivityMainBinding
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import com.neuralbit.letsnote.ui.archived.ArchivedViewModel
@@ -79,7 +81,13 @@ class MainActivity : AppCompatActivity() {
         settingsPref =  getSharedPreferences("Settings", MODE_PRIVATE)
         appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.nav_home,R.id.nav_todo ,R.id.nav_arch , R.id.nav_tags ,R.id.nav_labels , R.id.nav_deleted , R.id.nav_settings
+                R.id.nav_home,
+                R.id.nav_todo,
+                R.id.nav_arch,
+                R.id.nav_tags,
+                R.id.nav_labels,
+                R.id.nav_deleted,
+                R.id.nav_settings
             ), drawerLayout
         )
         viewModal = ViewModelProvider(
@@ -176,7 +184,9 @@ class MainActivity : AppCompatActivity() {
 
         val searchView = searchViewMenuItem.actionView as SearchView
         val searchIcon = searchView.findViewById<ImageView>(androidx.appcompat.R.id.search_button)
-        searchIcon.setImageDrawable(ContextCompat.getDrawable(applicationContext,R.drawable.ic_baseline_search_24))
+        searchIcon.setImageDrawable(ContextCompat.getDrawable(applicationContext,
+            R.drawable.ic_baseline_search_24
+        ))
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(p0: String?): Boolean {
                 if (p0 != null) {
@@ -244,7 +254,7 @@ class MainActivity : AppCompatActivity() {
                 AuthUI.getInstance()
                     .signOut(this)
                     .addOnCompleteListener{
-                        val intent = Intent(this@MainActivity,SignInActivity::class.java)
+                        val intent = Intent(this@MainActivity, SignInActivity::class.java)
                         startActivity(intent)
                     }
             }

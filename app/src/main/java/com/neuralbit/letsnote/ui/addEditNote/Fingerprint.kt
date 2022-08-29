@@ -1,4 +1,4 @@
-package com.neuralbit.letsnote
+package com.neuralbit.letsnote.ui.addEditNote
 
 import android.content.Intent
 import android.graphics.PorterDuff
@@ -12,6 +12,8 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.google.firebase.auth.FirebaseAuth
+import com.neuralbit.letsnote.ui.main.MainActivity
+import com.neuralbit.letsnote.R
 
 class Fingerprint : AppCompatActivity() {
 

@@ -1,4 +1,4 @@
-package com.neuralbit.letsnote.adapters
+package com.neuralbit.letsnote.ui.addEditNote
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -13,7 +13,7 @@ import com.neuralbit.letsnote.R
 
 class AddEditTagRVAdapter (
     val context: Context,
-    private val tagRVInterface :TagRVInterface
+    private val tagRVInterface : TagRVInterface
 
     ) : RecyclerView.Adapter<AddEditTagRVAdapter.ViewHolder>(){
     var deleteIgnored = false
