@@ -21,14 +21,15 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.google.android.gms.ads.AdRequest
 import com.google.gson.Gson
-import com.neuralbit.letsnote.ui.addEditNote.AddEditNoteActivity
-import com.neuralbit.letsnote.ui.addEditNote.Fingerprint
 import com.neuralbit.letsnote.Services.DeleteReceiver
-import com.neuralbit.letsnote.ui.adapters.NoteFireClick
-import com.neuralbit.letsnote.ui.adapters.NoteRVAdapter
 import com.neuralbit.letsnote.databinding.DeletedNotesFragmentBinding
 import com.neuralbit.letsnote.entities.NoteFire
+import com.neuralbit.letsnote.ui.adapters.NoteFireClick
+import com.neuralbit.letsnote.ui.adapters.NoteRVAdapter
+import com.neuralbit.letsnote.ui.addEditNote.AddEditNoteActivity
+import com.neuralbit.letsnote.ui.addEditNote.Fingerprint
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import com.neuralbit.letsnote.ui.settings.SettingsViewModel
 
@@ -56,6 +57,9 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
         val root: View = binding.root
         trashIcon = binding.trashIcon
         trashText = binding.trashText
+        val adView = binding.adView
+        val adRequest = AdRequest.Builder().build()
+        adView.loadAd(adRequest)
         settingsViewModel.settingsFrag.value = false
 
         val noteRVAdapter = context?.let { NoteRVAdapter(it,this) }

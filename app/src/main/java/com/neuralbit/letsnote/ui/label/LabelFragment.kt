@@ -12,10 +12,11 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.neuralbit.letsnote.ui.addEditNote.NoteViewModel
-import com.neuralbit.letsnote.ui.adapters.LabelRVAdapter
+import com.google.android.gms.ads.AdRequest
 import com.neuralbit.letsnote.databinding.LabelFragmentBinding
 import com.neuralbit.letsnote.entities.LabelFire
+import com.neuralbit.letsnote.ui.adapters.LabelRVAdapter
+import com.neuralbit.letsnote.ui.addEditNote.NoteViewModel
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import com.neuralbit.letsnote.ui.settings.SettingsViewModel
 import java.util.*
@@ -44,6 +45,9 @@ class LabelFragment : Fragment(), LabelRVAdapter.LabelClick {
         labelRV.adapter= labelRVAdapter
         val settingsSharedPref = context?.getSharedPreferences("Settings", AppCompatActivity.MODE_PRIVATE)
         val staggeredLayoutManagerAll = StaggeredGridLayoutManager( 2,LinearLayoutManager.VERTICAL)
+        val adView = binding.adView
+        val adRequest = AdRequest.Builder().build()
+        adView.loadAd(adRequest)
         labelRV.layoutManager = staggeredLayoutManagerAll
         allNotesViewModel.deleteFrag.value = false
         settingsViewModel.settingsFrag.value = false

@@ -19,14 +19,15 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.google.android.gms.ads.AdRequest
 import com.google.gson.Gson
-import com.neuralbit.letsnote.ui.addEditNote.AddEditNoteActivity
-import com.neuralbit.letsnote.ui.addEditNote.Fingerprint
 import com.neuralbit.letsnote.Services.DeleteReceiver
-import com.neuralbit.letsnote.ui.adapters.NoteFireClick
-import com.neuralbit.letsnote.ui.adapters.NoteRVAdapter
 import com.neuralbit.letsnote.databinding.FragmentArchivedNotesBinding
 import com.neuralbit.letsnote.entities.NoteFire
+import com.neuralbit.letsnote.ui.adapters.NoteFireClick
+import com.neuralbit.letsnote.ui.adapters.NoteRVAdapter
+import com.neuralbit.letsnote.ui.addEditNote.AddEditNoteActivity
+import com.neuralbit.letsnote.ui.addEditNote.Fingerprint
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import com.neuralbit.letsnote.ui.settings.SettingsViewModel
 import java.util.*
@@ -63,6 +64,9 @@ class ArchivedFragment : Fragment() , NoteFireClick {
         archiveText = binding.archivedText
         allNotesViewModel.archiveFrag = true
         allNotesViewModel.deleteFrag.value = false
+        val adView = binding.adView
+        val adRequest = AdRequest.Builder().build()
+        adView.loadAd(adRequest)
         val settingsSharedPref = context?.getSharedPreferences("Settings", AppCompatActivity.MODE_PRIVATE)
         val fontStyle = settingsSharedPref?.getString("font",null)
         noteRVAdapter?.fontStyle = fontStyle

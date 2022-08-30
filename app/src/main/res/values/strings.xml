@@ -48,4 +48,8 @@
     <string name="add_todo_item">Add todo item</string>
     <string name="shortcut_short_label">New note</string>
     <string name="shortcut_long_label">Take a note</string>
+    <string name="app_id">ca-app-pub-6883474616906010~6031666398</string>
+    <string name="banner">ca-app-pub-6883474616906010/7788720752</string>
+    <string name="interstitial">ca-app-pub-6883474616906010/3767684880</string>
+
 </resources>

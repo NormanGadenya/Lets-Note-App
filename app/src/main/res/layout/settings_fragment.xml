@@ -11,10 +11,16 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="0dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/adView"
+        >
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
             <TextView
                 android:id="@+id/textView"
                 android:layout_width="wrap_content"
@@ -34,8 +40,7 @@
                 android:focusable="true"
                 android:padding="8dp"
                 app:cardCornerRadius="10dp"
-                app:layout_constraintTop_toBottomOf="@id/textView"
-                >
+                app:layout_constraintTop_toBottomOf="@id/textView">
 
                 <RadioGroup
                     android:id="@+id/dayNightRadioGroup"
@@ -73,13 +78,12 @@
                 android:id="@+id/cardView2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_margin="16dp"
                 android:clickable="true"
                 android:focusable="true"
                 android:padding="8dp"
-                android:layout_margin="16dp"
                 app:cardCornerRadius="10dp"
-                app:layout_constraintTop_toBottomOf="@id/textView3"
-                >
+                app:layout_constraintTop_toBottomOf="@id/textView3">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
@@ -92,8 +96,8 @@
                         android:layout_height="wrap_content"
                         android:layout_margin="16dp"
                         android:max="4"
-                        app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <TextView
@@ -209,22 +213,21 @@
                         android:id="@+id/migrateProgress"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:layout_constraintBottom_toBottomOf="parent"
                         android:layout_margin="16dp"
                         android:visibility="gone"
+                        app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="You stand at risk of losing your notes because the app is not linked to your Google account"
-                        app:layout_constraintStart_toStartOf="parent"
                         android:layout_margin="16dp"
+                        android:text="You stand at risk of losing your notes because the app is not linked to your Google account"
                         android:textColor="@color/Red"
-                        app:layout_constraintTop_toBottomOf="@id/signInWithGoogleBtn"
                         app:layout_constraintBottom_toBottomOf="parent"
-                         />
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/signInWithGoogleBtn" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.cardview.widget.CardView>
 
@@ -252,8 +255,12 @@
 
     </ScrollView>
 
-
-
-
-
+    <com.google.android.gms.ads.AdView
+        xmlns:ads="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/adView"
+        ads:adSize="BANNER"
+        ads:layout_constraintBottom_toBottomOf="parent"
+        ads:adUnitId="@string/banner"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

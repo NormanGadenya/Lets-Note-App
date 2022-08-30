@@ -51,6 +51,10 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.HORIZONTAL
 import com.canhub.cropper.CropImage
 import com.flask.colorpicker.ColorPickerView
+import com.google.android.gms.ads.AdListener
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.InterstitialAd
+import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.vision.Frame
 import com.google.android.gms.vision.text.TextBlock
 import com.google.android.gms.vision.text.TextRecognizer
@@ -58,13 +62,13 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.neuralbit.letsnote.ui.main.MainActivity
 import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.Services.DeleteReceiver
 import com.neuralbit.letsnote.entities.LabelFire
 import com.neuralbit.letsnote.entities.NoteFireIns
 import com.neuralbit.letsnote.entities.TodoItem
 import com.neuralbit.letsnote.ui.label.LabelViewModel
+import com.neuralbit.letsnote.ui.main.MainActivity
 import com.neuralbit.letsnote.utilities.*
 import kotlinx.coroutines.launch
 import java.io.IOException
@@ -77,9 +81,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
     GetDateFromPicker,
     GetTagFromDialog,
     LabelClickInterface,
-    TodoItemInterface
-
-{
+    TodoItemInterface{
     private var fontMultiplier: Int = 2
     private var deleted: Boolean = false
     private var reminderItem : MenuItem? = null
@@ -151,6 +153,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private var labelTitle :String?=null
     private var noteChanged = false
     private var tagList : ArrayList<String> = ArrayList()
+    private lateinit var mInterstitialAd: InterstitialAd
 
     private val cropActivityResultContract = object : ActivityResultContract<Any?,Uri?>(){
         override fun createIntent(context: Context, input: Any?): Intent {
@@ -579,18 +582,39 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
 
         ocrButton.setOnClickListener {
-
             if(isNetworkConnected()){
-                if (ContextCompat.checkSelfPermission(
-                        this@AddEditNoteActivity,
-                        Manifest.permission.CAMERA
-                    ) != PackageManager.PERMISSION_GRANTED
-                ) {
-                    requestCameraPermission()
-                    requestStoragePermission()
+                if (mInterstitialAd.isLoaded){
+                    mInterstitialAd.show()
+                }
+                mInterstitialAd.adListener = object : AdListener(){
+                    override fun onAdClosed() {
+                        if (ContextCompat.checkSelfPermission(
+                                this@AddEditNoteActivity,
+                                Manifest.permission.CAMERA
+                            ) != PackageManager.PERMISSION_GRANTED
+                        ) {
+                            requestCameraPermission()
+                            requestStoragePermission()
 
-                } else {
-                    cropActivityResultLauncher.launch(null)
+                        } else {
+                            cropActivityResultLauncher.launch(null)
+                        }
+                    }
+
+                    override fun onAdFailedToLoad(p0: LoadAdError?) {
+                        if (ContextCompat.checkSelfPermission(
+                                this@AddEditNoteActivity,
+                                Manifest.permission.CAMERA
+                            ) != PackageManager.PERMISSION_GRANTED
+                        ) {
+                            requestCameraPermission()
+                            requestStoragePermission()
+
+                        } else {
+                            cropActivityResultLauncher.launch(null)
+                        }
+                    }
+
                 }
             }else{
                 Snackbar.make(coordinatorlayout, "No internet connection", Snackbar.LENGTH_SHORT).show()
@@ -836,6 +860,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
             removeShortcuts();
         }
 
+
+
         deletedNotePrefs = applicationContext.getSharedPreferences("DeletedNotes", MODE_PRIVATE)
         settingsPref = applicationContext.getSharedPreferences("Settings", MODE_PRIVATE)
         fontMultiplier = settingsPref.getInt("fontMultiplier",2)
@@ -881,6 +907,10 @@ class AddEditNoteActivity : AppCompatActivity() ,
         if (todoItemStr != null){
             todoDoItemList = Gson().fromJson(todoItemStr, object : TypeToken<List<TodoItem?>?>() {}.type)
         }
+        mInterstitialAd = InterstitialAd(this)
+        mInterstitialAd.adUnitId = resources.getString(R.string.interstitial)
+        mInterstitialAd.loadAd(AdRequest.Builder().build())
+
         noteChanged = intent.getBooleanExtra("noteChanged",false)
         viewModal.noteChanged.value = noteChanged
 
@@ -1694,8 +1724,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
         viewModal.updatedTodos.add(todoItem)
 
     }
-
-
 
 
 }

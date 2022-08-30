@@ -12,9 +12,10 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.neuralbit.letsnote.ui.addEditNote.NoteViewModel
+import com.google.android.gms.ads.AdRequest
 import com.neuralbit.letsnote.databinding.FragmentTagBinding
 import com.neuralbit.letsnote.entities.TagFire
+import com.neuralbit.letsnote.ui.addEditNote.NoteViewModel
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import java.util.*
 
@@ -23,7 +24,6 @@ class TagFragment : Fragment(), TagRVAdapter.TagItemClick {
     private val tagViewModel: TagViewModel by activityViewModels()
     private val noteViewModel: NoteViewModel by activityViewModels()
     private val allNotesViewModel : AllNotesViewModel by activityViewModels()
-    private var tagCount = HashMap<String,Int>()
     private var _binding: FragmentTagBinding? = null
     lateinit var tagRV: RecyclerView
     private val binding get() = _binding!!
@@ -39,7 +39,9 @@ class TagFragment : Fragment(), TagRVAdapter.TagItemClick {
         _binding = FragmentTagBinding.inflate(inflater, container, false)
         val root: View = binding.root
         tagRV = binding.noteTagRV
-
+        val adView = binding.adView
+        val adRequest = AdRequest.Builder().build()
+        adView.loadAd(adRequest)
         val settingsSharedPref = context?.getSharedPreferences("Settings", AppCompatActivity.MODE_PRIVATE)
         val staggeredLayoutManagerAll = StaggeredGridLayoutManager( 2,LinearLayoutManager.VERTICAL)
         tagRV.layoutManager = staggeredLayoutManagerAll
