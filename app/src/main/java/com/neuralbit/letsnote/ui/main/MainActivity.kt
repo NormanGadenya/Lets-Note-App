@@ -153,7 +153,7 @@ class MainActivity : AppCompatActivity() {
 
         mAuth.addAuthStateListener {
             val currentUser = it.currentUser
-            if (currentUser != null){
+            if (currentUser?.isAnonymous == false){
                 detailsGroup.visibility = VISIBLE
                 emailTV.text = currentUser.email
                 nameTV.text = currentUser.displayName

@@ -2,20 +2,22 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_marginStart="8dp"
-    android:layout_height="30dp"
+    android:layout_height="wrap_content"
     android:clickable="true"
-    android:padding="4dp"
+    android:padding="8dp"
 
     android:background="@drawable/tag_background"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:focusable="true">
+
     <TextView
+        android:id="@+id/tagTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="#tag"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:id="@+id/tagTitle"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
         android:layout_width="20dp"
