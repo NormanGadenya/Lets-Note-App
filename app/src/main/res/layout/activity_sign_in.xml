@@ -62,6 +62,7 @@
         android:layout_marginTop="50dp"
         android:background="@drawable/skip_bgrnd"
         android:text="Skip"
+        android:visibility="gone"
         android:textColor="@color/timberwolf"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/progress_bar"
