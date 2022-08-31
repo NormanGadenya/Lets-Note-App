@@ -28,17 +28,17 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.bumptech.glide.Glide
 import com.firebase.ui.auth.AuthUI
+import com.google.android.gms.ads.MobileAds
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.neuralbit.letsnote.R
-import com.neuralbit.letsnote.ui.signIn.SignInActivity
 import com.neuralbit.letsnote.databinding.ActivityMainBinding
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import com.neuralbit.letsnote.ui.archived.ArchivedViewModel
 import com.neuralbit.letsnote.ui.deletedNotes.DeletedNotesViewModel
 import com.neuralbit.letsnote.ui.label.LabelViewModel
-import com.neuralbit.letsnote.ui.settings.SettingsViewModel
+import com.neuralbit.letsnote.ui.signIn.SignInActivity
 import com.neuralbit.letsnote.ui.tag.TagViewModel
 import com.neuralbit.letsnote.utilities.AlertReceiver
 
@@ -50,7 +50,6 @@ class MainActivity : AppCompatActivity() {
     private val TAG = "MainActivity"
     private val allNotesViewModal : AllNotesViewModel by viewModels()
     private val archivedViewModel : ArchivedViewModel by viewModels()
-    private val settingsViewModel : SettingsViewModel by viewModels()
     private val deleteVieModel : DeletedNotesViewModel by viewModels()
     private lateinit var viewModal : MainActivityViewModel
     private val tagViewModel : TagViewModel by viewModels()
@@ -71,6 +70,8 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(applicationContext, SignInActivity::class.java)
             startActivity(intent)
         }
+        MobileAds.initialize(this@MainActivity)
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.appBarMain.toolbar)
@@ -150,7 +151,7 @@ class MainActivity : AppCompatActivity() {
 
         mAuth.addAuthStateListener {
             val currentUser = it.currentUser
-            if (currentUser != null){
+            if (currentUser?.isAnonymous == false){
                 detailsGroup.visibility = VISIBLE
                 emailTV.text = currentUser.email
                 nameTV.text = currentUser.displayName
@@ -171,17 +172,6 @@ class MainActivity : AppCompatActivity() {
         val layoutViewBtn = menu.findItem(R.id.layoutStyle)
         val signOutButton = menu.findItem(R.id.signOut)
         val deleteButton = menu.findItem(R.id.trash)
-
-        signOutButton.isVisible = false
-        allNotesViewModal.deleteFrag.observe(this){
-            deleteButton.isVisible = it
-        }
-        settingsViewModel.settingsFrag.observe(this){
-            searchViewMenuItem.isVisible = !it
-            layoutViewBtn.isVisible = !it
-        }
-
-
         val searchView = searchViewMenuItem.actionView as SearchView
         val searchIcon = searchView.findViewById<ImageView>(androidx.appcompat.R.id.search_button)
         searchIcon.setImageDrawable(ContextCompat.getDrawable(applicationContext,
@@ -231,17 +221,14 @@ class MainActivity : AppCompatActivity() {
             return@setOnMenuItemClickListener true
         }
 
-        mAuth.addAuthStateListener {
-            if (it.currentUser != null){
-                if (!it.currentUser!!.isAnonymous){
-                    signOutButton.isVisible = true
-                }
-            }
-        }
 
         signOutButton.setOnMenuItemClickListener {
             val alertDialog: AlertDialog.Builder = AlertDialog.Builder(this@MainActivity)
-            alertDialog.setTitle("Are you sure about this ?")
+            if(fUser?.isAnonymous == true){
+                alertDialog.setTitle("If you proceed, you will lose your notes. Please link your google account first")
+            }else{
+                alertDialog.setTitle("Are you sure about this ?")
+            }
             alertDialog.setPositiveButton("Yes"
             ) { _, _ ->
                 allNotesViewModal.getAllFireNotes().observe(this){

@@ -11,6 +11,7 @@ class LabelViewModel (application: Application): AndroidViewModel(application)  
     private val labelFireRepo : LabelFireRepo = LabelFireRepo()
     var labelFire : List<LabelFire> = ArrayList()
     var searchQuery : MutableLiveData<String> = MutableLiveData()
+    var bannerKey : String?= null
 
 
 }

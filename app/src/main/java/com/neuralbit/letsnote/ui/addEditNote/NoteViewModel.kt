@@ -23,6 +23,7 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     var deletedTags = HashSet<String>()
     var noteChanged = MutableLiveData<Boolean>()
     var appPaused = false
+    var adViewed = false
     var archived : MutableLiveData<Boolean> = MutableLiveData()
     var noteLocked = MutableLiveData<Boolean>()
     var deletedNote : MutableLiveData<Boolean> = MutableLiveData()

@@ -39,14 +39,26 @@
             android:id="@+id/noteCount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/notes"
-            android:textSize="20sp"
+            android:text="3"
             android:textColor="@color/gunmetal"
+            android:textSize="20sp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/imgView"
+            app:layout_constraintEnd_toStartOf="@+id/noteText"
+            app:layout_constraintTop_toBottomOf="@+id/labelName" />
+
+        <TextView
+            android:id="@+id/noteText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/notes"
+            android:textColor="@color/gunmetal"
+            android:textSize="20sp"
             app:layout_constraintBottom_toTopOf="@+id/imgView"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/labelName" />
+            app:layout_constraintTop_toBottomOf="@+id/labelName"
+            app:layout_constraintVertical_bias="0.517" />
 
         <ImageView
             android:id="@+id/imgView"

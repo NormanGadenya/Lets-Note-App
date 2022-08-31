@@ -17,7 +17,7 @@ class NoteFireRepo {
     private val database = Firebase.database
     val TAG = "NoteFireRepo"
 
-    private val fUser = FirebaseAuth.getInstance().currentUser
+    private var fUser = FirebaseAuth.getInstance().currentUser
 
     fun addNote( note : NoteFireIns) : String ?{
         val notesRef = fUser?.let { database.getReference(it.uid).child("notes")}
@@ -31,9 +31,9 @@ class NoteFireRepo {
 
     fun getAllNotes () : LiveData<ArrayList<NoteFire>> {
         val live = MutableLiveData<ArrayList<NoteFire>>()
-        val notesRef = fUser?.let { database.getReference(it.uid).child("notes") }
 
-        notesRef?.addListenerForSingleValueEvent(object : ValueEventListener{
+        var notesRef = fUser?.let { database.getReference(it.uid).child("notes") }
+        val eventListener = object : ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
                 val notes = ArrayList<NoteFire>()
                 for ( s : DataSnapshot in snapshot.children ){
@@ -51,8 +51,18 @@ class NoteFireRepo {
 
             override fun onCancelled(error: DatabaseError) {
                 throw error.toException()
+
             }
-        })
+        }
+        notesRef?.addValueEventListener(eventListener)
+        FirebaseAuth.getInstance().addAuthStateListener {
+            notesRef?.removeEventListener(eventListener)
+            fUser= it.currentUser
+            notesRef = it.currentUser?.uid?.let { it1 -> database.getReference(it1).child("notes") }
+
+            notesRef?.addValueEventListener(eventListener)
+
+        }
 
         return live
     }

@@ -32,15 +32,18 @@
         <entry key="app/src/main/res/drawable/ic_baseline_add_24.xml" value="0.3125" />
         <entry key="app/src/main/res/drawable/ic_baseline_add_alert_24.xml" value="0.254" />
         <entry key="app/src/main/res/drawable/ic_baseline_add_location_24.xml" value="0.3125" />
+        <entry key="app/src/main/res/drawable/ic_baseline_archive_24.xml" value="0.2965" />
         <entry key="app/src/main/res/drawable/ic_baseline_bookmark_24.xml" value="0.353125" />
         <entry key="app/src/main/res/drawable/ic_baseline_bookmark_add_24.xml" value="0.31" />
         <entry key="app/src/main/res/drawable/ic_baseline_bookmark_remove_24.xml" value="0.1125" />
+        <entry key="app/src/main/res/drawable/ic_baseline_edit_24.xml" value="0.2965" />
         <entry key="app/src/main/res/drawable/ic_baseline_mode_edit_24.xml" value="0.2875" />
         <entry key="app/src/main/res/drawable/ic_baseline_more_vert_24.xml" value="0.307" />
         <entry key="app/src/main/res/drawable/ic_baseline_push_pin_24.xml" value="0.179" />
         <entry key="app/src/main/res/drawable/ic_baseline_search_24.xml" value="0.191" />
         <entry key="app/src/main/res/drawable/ic_baseline_settings_24.xml" value="0.307" />
         <entry key="app/src/main/res/drawable/ic_baseline_table_rows_24.xml" value="0.31" />
+        <entry key="app/src/main/res/drawable/ic_baseline_todo_24.xml" value="0.246" />
         <entry key="app/src/main/res/drawable/ic_baseline_unarchive_24.xml" value="0.254" />
         <entry key="app/src/main/res/drawable/ic_ev_24.xml" value="0.353125" />
         <entry key="app/src/main/res/drawable/ic_launcher1_foreground.xml" value="0.1" />
@@ -91,7 +94,7 @@
         <entry key="app/src/main/res/layout/fragment_tag.xml" value="0.2631578947368421" />
         <entry key="app/src/main/res/layout/fragment_time.xml" value="0.3333333333333333" />
         <entry key="app/src/main/res/layout/info_container.xml" value="0.33" />
-        <entry key="app/src/main/res/layout/label_fragment.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/label_fragment.xml" value="0.35104166666666664" />
         <entry key="app/src/main/res/layout/label_item.xml" value="0.25" />
         <entry key="app/src/main/res/layout/label_rv_item.xml" value="0.33" />
         <entry key="app/src/main/res/layout/label_title_dialog.xml" value="0.28229166666666666" />
@@ -105,7 +108,7 @@
         <entry key="app/src/main/res/layout/note_label_bottom_sheet.xml" value="0.25" />
         <entry key="app/src/main/res/layout/note_rv_item.xml" value="0.5539906103286385" />
         <entry key="app/src/main/res/layout/save_shared_note_fragment.xml" value="0.15" />
-        <entry key="app/src/main/res/layout/settings_fragment.xml" value="0.35885416666666664" />
+        <entry key="app/src/main/res/layout/settings_fragment.xml" value="0.33" />
         <entry key="app/src/main/res/layout/spinner_tag_row.xml" value="0.3328125" />
         <entry key="app/src/main/res/layout/tag_adapter_item.xml" value="0.75" />
         <entry key="app/src/main/res/layout/tag_frag_item.xml" value="0.33" />
@@ -113,6 +116,7 @@
         <entry key="app/src/main/res/layout/tag_notes_fragment.xml" value="0.22864583333333333" />
         <entry key="app/src/main/res/layout/tag_spinner_row.xml" value="0.3328125" />
         <entry key="app/src/main/res/layout/tag_title_layout.xml" value="0.3578125" />
+        <entry key="app/src/main/res/layout/todo_rv_item.xml" value="0.35885416666666664" />
         <entry key="app/src/main/res/menu/action_menu.xml" value="0.35885416666666664" />
         <entry key="app/src/main/res/menu/activity_main_drawer.xml" value="0.33" />
         <entry key="app/src/main/res/menu/add_edit_menu.xml" value="0.1828125" />
@@ -121,6 +125,7 @@
         <entry key="app/src/main/res/menu/labelnotes_activity.xml" value="0.19375" />
         <entry key="app/src/main/res/menu/main_activity2.xml" value="0.18" />
         <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.1155" />
+        <entry key="app/src/main/res/xml/ad_details.xml" value="0.30512820512820515" />
         <entry key="app/src/main/res/xml/shortcuts.xml" value="0.3729166666666667" />
       </map>
     </option>

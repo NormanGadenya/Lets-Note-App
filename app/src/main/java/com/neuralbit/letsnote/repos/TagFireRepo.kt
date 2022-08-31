@@ -16,12 +16,12 @@ class TagFireRepo {
     val database = Firebase.database
     val TAG = "TagFireRepo"
 
-    private val fUser = FirebaseAuth.getInstance().currentUser
+    private var fUser = FirebaseAuth.getInstance().currentUser
 
     fun getAllTags () : LiveData<List<TagFire>> {
         val live = MutableLiveData<List<TagFire>>()
-        val tagRef = fUser?.let { database.getReference(it.uid).child("tags") }
-        tagRef?.addListenerForSingleValueEvent(object : ValueEventListener{
+        var tagRef = fUser?.let { database.getReference(it.uid).child("tags") }
+        val eventListener = object : ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
                 val tags = ArrayList<TagFire>()
                 for ( s : DataSnapshot in snapshot.children ){
@@ -39,7 +39,17 @@ class TagFireRepo {
                 throw error.toException()
 
             }
-        })
+
+        }
+        tagRef?.addValueEventListener(eventListener)
+        FirebaseAuth.getInstance().addAuthStateListener {
+            tagRef?.removeEventListener(eventListener)
+            fUser= it.currentUser
+            tagRef = it.currentUser?.uid?.let { it1 -> database.getReference(it1).child("tags") }
+
+            tagRef?.addValueEventListener(eventListener)
+
+        }
         return live
     }
 
@@ -82,7 +92,11 @@ class TagFireRepo {
 
         for ( tag in deletedTags){
 
-            val tagStr = tag.split("#")[1]
+            var tagStr = tag
+            val split = tagStr.split("#")
+            if (split.size > 1){
+                tagStr = split[1]
+            }
             if (!tagStr.contains("#")){
                 tagRef?.child(tagStr)?.addListenerForSingleValueEvent( object :ValueEventListener{
                     override fun onDataChange(snapshot: DataSnapshot) {
@@ -115,7 +129,11 @@ class TagFireRepo {
         val tagRef = fUser?.let { database.getReference(it.uid).child("tags") }
         for ( tag in tags){
 
-            val tagStr = tag.split("#")[1]
+            var tagStr = tag
+            val split = tagStr.split("#")
+            if (split.size > 1){
+                tagStr = split[1]
+            }
             tagRef?.child(tagStr)?.addListenerForSingleValueEvent( object :ValueEventListener{
                 override fun onDataChange(snapshot: DataSnapshot) {
 

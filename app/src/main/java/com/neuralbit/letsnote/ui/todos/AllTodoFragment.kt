@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.View
@@ -25,14 +26,14 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.gson.Gson
-import com.neuralbit.letsnote.ui.addEditNote.AddEditNoteActivity
-import com.neuralbit.letsnote.ui.addEditNote.Fingerprint
 import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.Services.DeleteReceiver
-import com.neuralbit.letsnote.ui.adapters.NoteFireClick
-import com.neuralbit.letsnote.ui.adapters.NoteRVAdapter
 import com.neuralbit.letsnote.databinding.FragmentAllTodosBinding
 import com.neuralbit.letsnote.entities.NoteFire
+import com.neuralbit.letsnote.ui.adapters.NoteFireClick
+import com.neuralbit.letsnote.ui.adapters.NoteRVAdapter
+import com.neuralbit.letsnote.ui.addEditNote.AddEditNoteActivity
+import com.neuralbit.letsnote.ui.addEditNote.Fingerprint
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import com.neuralbit.letsnote.ui.settings.SettingsViewModel
 import com.neuralbit.letsnote.utilities.AlertReceiver
@@ -187,10 +188,13 @@ class AllTodoFragment : Fragment() , NoteFireClick {
             }
 
         }
+        setHasOptionsMenu(true)
+
 
         allNotesViewModel.itemArchiveClicked.observe(viewLifecycleOwner){
             if (it && allNotesViewModel.selectedNotes.isNotEmpty()){
                 val selectedNotesCount = allNotesViewModel.selectedNotes.size
+                Log.d(TAG, "onCreateView: ${allNotesViewModel.selectedNotes}")
                 for ( note in allNotesViewModel.selectedNotes){
                     if (note.pinned){
                         allTodoViewModel.pinnedFireNotesList.value?.remove(note)
@@ -218,6 +222,11 @@ class AllTodoFragment : Fragment() , NoteFireClick {
                     pinnedNoteRVAdapter?.updateListFire(list)
                 }
 
+                if (allTodoViewModel.otherFireNotesList.value?.isEmpty() == true && allNotesViewModel.pinnedFireNotesList.value?.isEmpty() == true){
+                    welcomeIcon.visibility = VISIBLE
+                    welcomeText.visibility = VISIBLE
+                }
+
                 allNotesViewModel.selectedNotes.clear()
 
 
@@ -237,7 +246,6 @@ class AllTodoFragment : Fragment() , NoteFireClick {
                 val pref = context?.getSharedPreferences("DeletedNotes", AppCompatActivity.MODE_PRIVATE)
                 val settings = context?.getSharedPreferences("Settings", AppCompatActivity.MODE_PRIVATE)
                 val emptyTrashImmediately = settings?.getBoolean("EmptyTrashImmediately",false)
-
                 for ( note in allNotesViewModel.selectedNotes){
                     val editor: SharedPreferences.Editor ?= pref?.edit()
                     val noteUids = pref?.getStringSet("noteUids",HashSet())
@@ -264,8 +272,8 @@ class AllTodoFragment : Fragment() , NoteFireClick {
                         pinnedNoteRVAdapter?.notifyDataSetChanged()
 
                     }else{
-                        allNotesViewModel.otherFireNotesList.value?.remove(note)
                         allTodoViewModel.otherFireNotesList.value?.remove(note)
+                        allNotesViewModel.otherFireNotesList.value?.remove(note)
                         cancelAlarm(note.reminderDate.toInt())
                         noteRVAdapter?.notifyDataSetChanged()
                     }
@@ -286,6 +294,7 @@ class AllTodoFragment : Fragment() , NoteFireClick {
                     welcomeIcon.visibility = VISIBLE
                     welcomeText.visibility = VISIBLE
                 }
+
 
                 allNotesViewModel.itemSelectEnabled.value = false
                 allNotesViewModel.itemDeleteClicked.value = false

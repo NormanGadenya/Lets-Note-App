@@ -10,7 +10,7 @@
 
     <item
         android:id="@+id/edit"
-        android:icon="@drawable/ic_baseline_mode_edit_24"
+        android:icon="@drawable/ic_baseline_edit_24"
         android:title="Edit label"
         app:showAsAction="always" />
 </menu>

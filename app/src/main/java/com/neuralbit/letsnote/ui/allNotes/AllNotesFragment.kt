@@ -6,12 +6,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.View
+import android.util.Log
+import android.view.*
 import android.view.View.GONE
 import android.view.View.VISIBLE
-import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -24,15 +22,16 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.Gson
-import com.neuralbit.letsnote.ui.addEditNote.AddEditNoteActivity
-import com.neuralbit.letsnote.ui.addEditNote.Fingerprint
 import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.Services.DeleteReceiver
-import com.neuralbit.letsnote.ui.adapters.NoteFireClick
-import com.neuralbit.letsnote.ui.adapters.NoteRVAdapter
 import com.neuralbit.letsnote.databinding.FragmentAllNotesBinding
 import com.neuralbit.letsnote.entities.NoteFire
+import com.neuralbit.letsnote.ui.adapters.NoteFireClick
+import com.neuralbit.letsnote.ui.adapters.NoteRVAdapter
+import com.neuralbit.letsnote.ui.addEditNote.AddEditNoteActivity
+import com.neuralbit.letsnote.ui.addEditNote.Fingerprint
 import com.neuralbit.letsnote.ui.settings.SettingsViewModel
 import com.neuralbit.letsnote.utilities.AlertReceiver
 import java.util.*
@@ -103,9 +102,32 @@ class AllNotesFragment : Fragment() , NoteFireClick {
         pinnedNoteRVAdapter?.lifecycleScope = lifecycleScope
         pinnedNoteRVAdapter?.lifecycleOwner = this
         pinnedNoteRVAdapter?.fontStyle = fontStyle
+        setHasOptionsMenu(true)
+        val mAuth: FirebaseAuth = FirebaseAuth.getInstance()
+        mAuth.addAuthStateListener {
+            val otherNotes = allNotesViewModel.otherFireNotesList.value
+            val pinnedNotes = allNotesViewModel.pinnedFireNotesList.value
+            if (pinnedNotes?.isNotEmpty() == true){
+                otherNotesTV.visibility = VISIBLE
+                pinnedNotesTV.visibility = VISIBLE
+                pinnedNotesRV.visibility = VISIBLE
+                pinnedNoteRVAdapter?.updateListFire(pinnedNotes)
+
+            }else{
+                otherNotesTV.visibility = GONE
+                pinnedNotesTV.visibility = GONE
+                pinnedNotesRV.visibility = GONE
+            }
+            if (otherNotes != null) {
+                noteRVAdapter?.updateListFire(otherNotes)
+            }
+
+        }
 
         allNotesViewModel.selectedNotes.clear()
+
         allNotesViewModel.allFireNotes.observe(viewLifecycleOwner){ notes ->
+            Log.d(TAG, "onCreateView: AllNotesFrag $notes")
 
             val pinnedNotes = LinkedList<NoteFire>()
             val otherNotes = LinkedList<NoteFire>()
@@ -305,10 +327,12 @@ class AllNotesFragment : Fragment() , NoteFireClick {
         return root
     }
 
-    override fun onPrepareOptionsMenu(menu: Menu) {
-        super.onPrepareOptionsMenu(menu)
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+
         val trashButton = menu.findItem(R.id.trash)
         trashButton.isVisible = false
+        super.onCreateOptionsMenu(menu, inflater)
     }
 
     override fun onDestroyView() {

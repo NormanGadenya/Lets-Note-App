@@ -15,12 +15,14 @@ class LabelFireRepo {
     private val database = Firebase.database
     private val TAG = "LabelFireRepo"
 
-    private val fUser = FirebaseAuth.getInstance().currentUser
+    private var fUser = FirebaseAuth.getInstance().currentUser
 
     fun getAllLabels () : LiveData<List<LabelFire>> {
         val live = MutableLiveData<List<LabelFire>>()
-        val labelRef = fUser?.let { database.getReference(it.uid).child("labels") }
-        labelRef?.addListenerForSingleValueEvent(object : ValueEventListener {
+
+        var labelRef = fUser?.let { database.getReference(it.uid).child("labels") }
+
+        val eventListener = object :ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
                 val labels = ArrayList<LabelFire>()
                 for ( s : DataSnapshot in snapshot.children ){
@@ -34,9 +36,18 @@ class LabelFireRepo {
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Log.e(TAG, "onCancelled: ${error.message}" )
+                throw error.toException()
             }
-        })
+        }
+        labelRef?.addValueEventListener(eventListener)
+        FirebaseAuth.getInstance().addAuthStateListener {
+            labelRef?.removeEventListener(eventListener)
+            fUser= it.currentUser
+            labelRef = it.currentUser?.uid?.let { it1 -> database.getReference(it1).child("labels") }
+
+            labelRef?.addValueEventListener(eventListener)
+
+        }
         return live
     }
 
@@ -116,6 +127,7 @@ class LabelFireRepo {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val labelFire = snapshot.getValue(LabelFire::class.java)
                 if (labelFire != null) {
+                    Log.d(TAG, "onDataChange: $snapshot")
                     val noteUids = labelFire.noteUids
                     noteUids.remove(noteUid)
                     val updateMap = HashMap<String, Any>()
