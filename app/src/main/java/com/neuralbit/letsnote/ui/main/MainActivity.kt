@@ -224,7 +224,11 @@ class MainActivity : AppCompatActivity() {
 
         signOutButton.setOnMenuItemClickListener {
             val alertDialog: AlertDialog.Builder = AlertDialog.Builder(this@MainActivity)
-            alertDialog.setTitle("Are you sure about this ?")
+            if(fUser?.isAnonymous == true){
+                alertDialog.setTitle("If you proceed, you will lose your notes. Please link your google account first")
+            }else{
+                alertDialog.setTitle("Are you sure about this ?")
+            }
             alertDialog.setPositiveButton("Yes"
             ) { _, _ ->
                 allNotesViewModal.getAllFireNotes().observe(this){

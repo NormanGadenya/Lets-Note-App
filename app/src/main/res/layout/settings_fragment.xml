@@ -216,7 +216,7 @@
                         android:layout_height="wrap_content"
                         android:layout_margin="16dp"
                         android:visibility="gone"
-                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintBottom_toBottomOf="@+id/signInWithGoogleBtn"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
