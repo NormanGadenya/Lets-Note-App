@@ -1,7 +1,6 @@
 package com.neuralbit.letsnote.ui.deletedNotes
 
 import android.app.AlarmManager
-import android.app.AlertDialog
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -15,6 +14,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.gms.ads.AdRequest
+import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.neuralbit.letsnote.Services.DeleteReceiver
 import com.neuralbit.letsnote.databinding.DeletedNotesFragmentBinding
@@ -32,8 +33,10 @@ import com.neuralbit.letsnote.ui.addEditNote.AddEditNoteActivity
 import com.neuralbit.letsnote.ui.addEditNote.Fingerprint
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import com.neuralbit.letsnote.ui.settings.SettingsViewModel
+import kotlinx.coroutines.*
 
 class DeletedNotesFragment : Fragment() , NoteFireClick {
+    private var noteRVAdapter: NoteRVAdapter? = null
     private val allNotesViewModel: AllNotesViewModel by activityViewModels()
     private val deletedNotesViewModel: DeletedNotesViewModel by activityViewModels()
     private val settingsViewModel: SettingsViewModel by activityViewModels()
@@ -44,6 +47,8 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
     val TAG = "DELETEDNOTESFRAG"
     private lateinit var trashIcon : ImageView
     private lateinit var trashText : TextView
+    private lateinit var parentLayout : CoordinatorLayout
+    private val tempNotesToDelete = ArrayList<NoteFire>()
 
 
 
@@ -57,12 +62,13 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
         val root: View = binding.root
         trashIcon = binding.trashIcon
         trashText = binding.trashText
+        parentLayout = binding.coordinatorlayout
         val adView = binding.adView
         val adRequest = AdRequest.Builder().build()
         adView.loadAd(adRequest)
         settingsViewModel.settingsFrag.value = false
 
-        val noteRVAdapter = context?.let { NoteRVAdapter(it,this) }
+        noteRVAdapter = context?.let { NoteRVAdapter(it,this) }
         deletedRV.layoutManager = LinearLayoutManager(context)
 
         noteRVAdapter?.viewModel = allNotesViewModel
@@ -129,65 +135,35 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
         }
 
         deletedNotesViewModel.itemDeleteClicked.observe(viewLifecycleOwner){
+
+
             if (it && allNotesViewModel.selectedNotes.isNotEmpty()){
+                val snackbar = Snackbar.make(parentLayout,"Notes deleted successfully", Snackbar.LENGTH_LONG)
+                snackbar.setAction("UNDO"
+                ) { restoreTempNotes()}
+                snackbar.show()
+                GlobalScope.launch {
+                    permanentlyDeleteNotes(pref)
+                }
                 val selectedNotesCount = allNotesViewModel.selectedNotes.size
-                val alertDialog: AlertDialog.Builder = AlertDialog.Builder(context)
-                alertDialog.setTitle("Are you sure about this ?")
-                alertDialog.setPositiveButton("Yes"
-                ) { _, _ ->
-                    run {
-                        val noteUids = pref?.getStringSet("noteUids", HashSet())
-                        val deletedNoteUids = HashSet<String>()
-                        if (noteUids != null) {
-                            deletedNoteUids.addAll(noteUids)
-                        }
-                        Log.d(TAG, "onCreateView: ${allNotesViewModel.selectedNotes}")
-                        val notes = ArrayList(deletedNotesViewModel.deletedNotes)
-                        for (deletedNote in allNotesViewModel.selectedNotes) {
-                            if (deletedNote.selected) {
-                                val editor: SharedPreferences.Editor? = pref?.edit()
-                                deletedNote.noteUid?.let { it1 -> deletedNoteUids.remove(it1) }
-                                editor?.putStringSet("noteUids", deletedNoteUids)
-                                editor?.remove(deletedNote.noteUid)
-                                editor?.apply()
-                                deletedNotesViewModel.deletedNotes.remove(deletedNote)
-                                notes.remove(deletedNote)
-                                deletedNote.noteUid?.let { uid ->
-                                    deletedNotesViewModel.deleteNote(
-                                        uid,
-                                        deletedNote.label,
-                                        deletedNote.tags
-                                    )
-                                    cancelDelete(deletedNote.timeStamp.toInt())
-                                }
-                            }
-                        }
-                        allNotesViewModel.selectedNotes.clear()
-                        allNotesViewModel.itemSelectEnabled.value = false
-                        deletedNotesViewModel.itemDeleteClicked.value = false
-                        if (selectedNotesCount == 1){
-                            Toast.makeText(context,"Note deleted successfully",Toast.LENGTH_SHORT).show()
-                        }else{
-                            Toast.makeText(context,"Notes deleted successfully",Toast.LENGTH_SHORT).show()
-                        }
+                val notes = ArrayList(deletedNotesViewModel.deletedNotes)
 
-                        noteRVAdapter?.updateListFire(notes)
+                for (deletedNote in allNotesViewModel.selectedNotes) {
+                    if (deletedNote.selected){
 
-                    }
-
-                }
-                alertDialog.setNegativeButton("Cancel"
-                ) { dialog, _ ->
-                    run {
-                        dialog.cancel()
-                        allNotesViewModel.selectedNotes.clear()
-                        allNotesViewModel.itemSelectEnabled.value = false
-                        deletedNotesViewModel.itemDeleteClicked.value = false
+                        tempNotesToDelete.add(deletedNote)
+                        notes.remove(deletedNote)
                     }
                 }
-                alertDialog.show()
+                noteRVAdapter?.updateListFire(notes)
 
-
+                allNotesViewModel.itemSelectEnabled.value = false
+                deletedNotesViewModel.itemDeleteClicked.value = false
+                if (selectedNotesCount == 1){
+                    Toast.makeText(context,"Note deleted successfully",Toast.LENGTH_SHORT).show()
+                }else{
+                    Toast.makeText(context,"Notes deleted successfully",Toast.LENGTH_SHORT).show()
+                }
             }
         }
 
@@ -228,6 +204,44 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
         return root
 
     }
+
+    private fun restoreTempNotes() {
+        deletedNotesViewModel.undoDelete = true
+        noteRVAdapter?.updateListFire(ArrayList(deletedNotesViewModel.deletedNotes))
+    }
+
+    private suspend fun permanentlyDeleteNotes(pref: SharedPreferences?) {
+        withContext(Dispatchers.Main){
+            delay(2000L)
+            Log.d(TAG, "permanentlyDeleteNotes: ${deletedNotesViewModel.undoDelete}")
+            if (deletedNotesViewModel.undoDelete){
+                for (deletedNote in tempNotesToDelete) {
+                    val noteUids = pref?.getStringSet("noteUids", HashSet())
+                    val deletedNoteUids = HashSet<String>()
+                    if (noteUids != null) {
+                        deletedNoteUids.addAll(noteUids)
+                    }
+                    val editor: SharedPreferences.Editor? = pref?.edit()
+                    deletedNote.noteUid?.let { it1 -> deletedNoteUids.remove(it1) }
+                    editor?.putStringSet("noteUids", deletedNoteUids)
+                    editor?.remove(deletedNote.noteUid)
+                    editor?.apply()
+                    deletedNotesViewModel.deletedNotes.remove(deletedNote)
+                    deletedNote.noteUid?.let { uid ->
+                        deletedNotesViewModel.deleteNote(
+                            uid,
+                            deletedNote.label,
+                            deletedNote.tags
+                        )
+                        cancelDelete(deletedNote.timeStamp.toInt())
+                    }
+                }
+
+            }
+
+        }
+    }
+
     private fun cancelDelete(timestamp : Int){
         val alarmManager = context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(context, DeleteReceiver::class.java)
@@ -266,12 +280,15 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
 
     }
 
+
     override fun onNoteFireLongClick(note: NoteFire) {
+
         if (note.selected){
             allNotesViewModel.selectedNotes.add(note)
         }else{
             allNotesViewModel.selectedNotes.remove(note)
         }
+
         allNotesViewModel.itemSelectEnabled.value = true
     }
 

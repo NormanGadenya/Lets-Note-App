@@ -5,11 +5,10 @@ import androidx.lifecycle.ViewModel
 import com.neuralbit.letsnote.repos.MigrationRepo
 
 class SettingsViewModel : ViewModel() {
+    val dataMigrated: MutableLiveData<Boolean> = MutableLiveData()
     var settingsFrag = MutableLiveData<Boolean>()
-    var migrateData = MutableLiveData<Boolean>()
-    var migrationRepo = MigrationRepo()
-    var oldUser: String? = null
-    var newUser: String? = null
+    private var migrationRepo = MigrationRepo()
+
 
     fun migrateData(oldUser:String, newUser:String){
         migrationRepo.migrateData(oldUser, newUser)

@@ -17,10 +17,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.InterstitialAd
-import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -44,7 +41,6 @@ class SettingsFragment : Fragment() {
     private var mGoogleSignInClient: GoogleSignInClient? = null
     private var oldUser : FirebaseUser? = null
     private lateinit var migrateProgressBar : ProgressBar
-    private lateinit var mInterstitialAd: InterstitialAd
 
 
 
@@ -66,10 +62,6 @@ class SettingsFragment : Fragment() {
         val adView = binding.adView
         val adRequest = AdRequest.Builder().build()
         adView.loadAd(adRequest)
-
-        mInterstitialAd = InterstitialAd(context)
-        mInterstitialAd.adUnitId = resources.getString(R.string.interstitial)
-        mInterstitialAd.loadAd(AdRequest.Builder().build())
         migrateProgressBar = binding.migrateProgress
         oldUser
         val siginBtn = binding.signInWithGoogleBtn
@@ -86,7 +78,6 @@ class SettingsFragment : Fragment() {
             migrateTV.visibility = GONE
         }
         createRequest()
-
         siginBtn.setOnClickListener { signInGoogle() }
         val fontRadioGroup = binding.radioGroup
         val fontSeekBar = binding.seekBar
@@ -170,24 +161,9 @@ class SettingsFragment : Fragment() {
     }
 
     private fun signInGoogle() {
-        if (mInterstitialAd.isLoaded){
-            mInterstitialAd.show()
-        }
-        mInterstitialAd.adListener = object : AdListener(){
-            override fun onAdClosed() {
-                migrateProgressBar.visibility = VISIBLE
-                val signInIntent = mGoogleSignInClient!!.signInIntent
-                startActivityForResult(signInIntent, RC_SIGN_IN)
-            }
-
-            override fun onAdFailedToLoad(p0: LoadAdError?) {
-                migrateProgressBar.visibility = VISIBLE
-                val signInIntent = mGoogleSignInClient!!.signInIntent
-                startActivityForResult(signInIntent, RC_SIGN_IN)
-            }
-
-        }
-
+        migrateProgressBar.visibility = VISIBLE
+        val signInIntent = mGoogleSignInClient!!.signInIntent
+        startActivityForResult(signInIntent, RC_SIGN_IN)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -218,7 +194,7 @@ class SettingsFragment : Fragment() {
                     if (currentUser != null) {
                         settingsViewModel.migrateData(it1.uid , currentUser.uid )
                         migrateProgressBar.visibility = GONE
-
+                        settingsViewModel.dataMigrated.value = true
                     }
                 }
 

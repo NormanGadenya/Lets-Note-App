@@ -433,6 +433,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         })
         touchHelper.attachToRecyclerView(todoRV)
 
+        mInterstitialAd.show()
 
 
         viewModal.backPressed.observe(this) { 
@@ -559,8 +560,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
         }
 
 
-
-
         noteTitleEdit.setOnKeyListener { _, _, _ ->
             viewModal.noteChanged.value = true
             tvTimeStamp.visibility = GONE
@@ -583,39 +582,57 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
         ocrButton.setOnClickListener {
             if(isNetworkConnected()){
-                if (mInterstitialAd.isLoaded){
-                    mInterstitialAd.show()
-                }
-                mInterstitialAd.adListener = object : AdListener(){
-                    override fun onAdClosed() {
-                        if (ContextCompat.checkSelfPermission(
-                                this@AddEditNoteActivity,
-                                Manifest.permission.CAMERA
-                            ) != PackageManager.PERMISSION_GRANTED
-                        ) {
-                            requestCameraPermission()
-                            requestStoragePermission()
 
-                        } else {
-                            cropActivityResultLauncher.launch(null)
-                        }
+                if (viewModal.adViewed){
+                    if (ContextCompat.checkSelfPermission(
+                            this@AddEditNoteActivity,
+                            Manifest.permission.CAMERA
+                        ) != PackageManager.PERMISSION_GRANTED
+                    ) {
+                        requestCameraPermission()
+                        requestStoragePermission()
+
+                    } else {
+                        cropActivityResultLauncher.launch(null)
                     }
-
-                    override fun onAdFailedToLoad(p0: LoadAdError?) {
-                        if (ContextCompat.checkSelfPermission(
-                                this@AddEditNoteActivity,
-                                Manifest.permission.CAMERA
-                            ) != PackageManager.PERMISSION_GRANTED
-                        ) {
-                            requestCameraPermission()
-                            requestStoragePermission()
-
-                        } else {
-                            cropActivityResultLauncher.launch(null)
-                        }
+                }else{
+                    if (mInterstitialAd.isLoaded){
+                        mInterstitialAd.show()
                     }
+                    mInterstitialAd.adListener = object : AdListener(){
+                        override fun onAdClosed() {
+                            viewModal.adViewed = true
+                            if (ContextCompat.checkSelfPermission(
+                                    this@AddEditNoteActivity,
+                                    Manifest.permission.CAMERA
+                                ) != PackageManager.PERMISSION_GRANTED
+                            ) {
+                                requestCameraPermission()
+                                requestStoragePermission()
 
+                            } else {
+                                cropActivityResultLauncher.launch(null)
+                            }
+                        }
+
+
+                        override fun onAdFailedToLoad(p0: LoadAdError?) {
+                            if (ContextCompat.checkSelfPermission(
+                                    this@AddEditNoteActivity,
+                                    Manifest.permission.CAMERA
+                                ) != PackageManager.PERMISSION_GRANTED
+                            ) {
+                                requestCameraPermission()
+                                requestStoragePermission()
+
+                            } else {
+                                cropActivityResultLauncher.launch(null)
+                            }
+                        }
+
+                    }
                 }
+
             }else{
                 Snackbar.make(coordinatorlayout, "No internet connection", Snackbar.LENGTH_SHORT).show()
             }

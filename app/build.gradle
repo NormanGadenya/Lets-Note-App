@@ -26,6 +26,10 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         signingConfig signingConfigs.release
+//
+//        Properties properties = new Properties()
+//        properties.load(project.rootProject.file("local.properties").newDataInputStream())
+//        buildConfigField "String", "BANNER_KEY", "\"${properties.getProperty("BANNER")}\""
     }
 
     buildTypes {
