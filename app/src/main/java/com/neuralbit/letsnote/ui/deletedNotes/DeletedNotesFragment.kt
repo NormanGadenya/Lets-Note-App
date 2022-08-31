@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -49,6 +48,9 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
     private lateinit var trashText : TextView
     private lateinit var parentLayout : CoordinatorLayout
     private val tempNotesToDelete = ArrayList<NoteFire>()
+
+    @Volatile
+    var restoreDeleted = false
 
 
 
@@ -93,6 +95,8 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
                 deletedRV.layoutManager = LinearLayoutManager(context)
             }
         }
+        setHasOptionsMenu(true)
+
         allNotesViewModel.allFireNotes.observe(viewLifecycleOwner){
             val deletedNotes = pref?.getStringSet("noteUids", HashSet())
 
@@ -206,15 +210,15 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
     }
 
     private fun restoreTempNotes() {
-        deletedNotesViewModel.undoDelete = true
+        restoreDeleted = true
+        tempNotesToDelete.clear()
         noteRVAdapter?.updateListFire(ArrayList(deletedNotesViewModel.deletedNotes))
     }
 
     private suspend fun permanentlyDeleteNotes(pref: SharedPreferences?) {
         withContext(Dispatchers.Main){
             delay(2000L)
-            Log.d(TAG, "permanentlyDeleteNotes: ${deletedNotesViewModel.undoDelete}")
-            if (deletedNotesViewModel.undoDelete){
+            if (!restoreDeleted){
                 for (deletedNote in tempNotesToDelete) {
                     val noteUids = pref?.getStringSet("noteUids", HashSet())
                     val deletedNoteUids = HashSet<String>()

@@ -4,6 +4,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
@@ -13,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.gms.ads.AdRequest
+import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.databinding.LabelFragmentBinding
 import com.neuralbit.letsnote.entities.LabelFire
 import com.neuralbit.letsnote.ui.adapters.LabelRVAdapter
@@ -63,6 +65,7 @@ class LabelFragment : Fragment(), LabelRVAdapter.LabelClick {
                 labelRV.layoutManager = LinearLayoutManager(context)
             }
         }
+        setHasOptionsMenu(true)
 
         labelViewModel.searchQuery.observe(viewLifecycleOwner){
             if(it!=null){
@@ -144,6 +147,12 @@ class LabelFragment : Fragment(), LabelRVAdapter.LabelClick {
         }
 
         return newList
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        super.onPrepareOptionsMenu(menu)
+        val trashButton = menu.findItem(R.id.trash)
+        trashButton.isVisible = false
     }
 
     override fun onLabelClick(labelColor: Int) {

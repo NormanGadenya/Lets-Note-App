@@ -4,7 +4,6 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.neuralbit.letsnote.R
@@ -22,7 +21,7 @@ class LabelRVAdapter(
         val noteCountTV: TextView = itemView.findViewById(R.id.noteCount)
         val labelTitleTV: TextView = itemView.findViewById(R.id.labelName)
         val labelCard : View = itemView.findViewById(R.id.labelCard)
-        val arrow : ImageView = itemView.findViewById(R.id.imgView)
+        val noteText : TextView = itemView.findViewById(R.id.noteText)
 
     }
 
@@ -32,15 +31,12 @@ class LabelRVAdapter(
         return ViewHolder(itemView)
 
     }
+
     private suspend fun updateNoteCountTV(value : Int, textView: TextView){
         withContext(Dispatchers.Main){
             for (i in 0..value){
                 delay(100L)
-                if(value==1){
-                    textView.text = context.getString(R.string.noteTagCountSingle,value.toString())
-                }else {
-                    textView.text = context.getString(R.string.noteCountMultiple, value.toString())
-                }
+                textView.text = i.toString()
             }
         }
     }
@@ -55,6 +51,12 @@ class LabelRVAdapter(
 
         holder.labelCard.setBackgroundColor(labelColor)
         holder.labelTitleTV.text = labelTitle
+
+        if (labelCount == 1){
+            holder.noteText.text = "note"
+        }else{
+            holder.noteText.text = "notes"
+        }
 
 
         GlobalScope.launch {

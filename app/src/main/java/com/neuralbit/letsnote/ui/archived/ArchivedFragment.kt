@@ -6,9 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -21,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.gms.ads.AdRequest
 import com.google.gson.Gson
+import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.Services.DeleteReceiver
 import com.neuralbit.letsnote.databinding.FragmentArchivedNotesBinding
 import com.neuralbit.letsnote.entities.NoteFire
@@ -79,6 +78,8 @@ class ArchivedFragment : Fragment() , NoteFireClick {
                 notesRV.layoutManager = LinearLayoutManager(context)
             }
         }
+        setHasOptionsMenu(true)
+
         allNotesViewModel.allFireNotes.observe(viewLifecycleOwner) {
             val pref = context?.getSharedPreferences("DeletedNotes", AppCompatActivity.MODE_PRIVATE)
             val deletedNotes = pref?.getStringSet("noteUids", HashSet())
@@ -211,6 +212,11 @@ class ArchivedFragment : Fragment() , NoteFireClick {
         _binding = null
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        val trashButton = menu.findItem(R.id.trash)
+        trashButton.isVisible = false
+        super.onCreateOptionsMenu(menu, inflater)
+    }
 
     override fun onNoteFireClick(note: NoteFire, activated : Boolean) {
         if (!note.selected && !activated){

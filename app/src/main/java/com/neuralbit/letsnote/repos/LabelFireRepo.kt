@@ -127,6 +127,7 @@ class LabelFireRepo {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val labelFire = snapshot.getValue(LabelFire::class.java)
                 if (labelFire != null) {
+                    Log.d(TAG, "onDataChange: $snapshot")
                     val noteUids = labelFire.noteUids
                     noteUids.remove(noteUid)
                     val updateMap = HashMap<String, Any>()

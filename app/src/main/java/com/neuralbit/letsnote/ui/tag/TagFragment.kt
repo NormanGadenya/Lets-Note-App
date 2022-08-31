@@ -3,9 +3,7 @@ package com.neuralbit.letsnote.ui.tag
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -13,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.gms.ads.AdRequest
+import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.databinding.FragmentTagBinding
 import com.neuralbit.letsnote.entities.TagFire
 import com.neuralbit.letsnote.ui.addEditNote.NoteViewModel
@@ -120,6 +119,7 @@ class TagFragment : Fragment(), TagRVAdapter.TagItemClick {
 
         }
 
+        setHasOptionsMenu(true)
 
 
         tagViewModel.searchQuery.observe(viewLifecycleOwner){
@@ -146,6 +146,13 @@ class TagFragment : Fragment(), TagRVAdapter.TagItemClick {
 
         return newList
 
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+
+        val trashButton = menu.findItem(R.id.trash)
+        trashButton.isVisible = false
+        super.onCreateOptionsMenu(menu, inflater)
     }
 
 

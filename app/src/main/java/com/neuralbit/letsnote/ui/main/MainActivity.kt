@@ -174,17 +174,6 @@ class MainActivity : AppCompatActivity() {
         val layoutViewBtn = menu.findItem(R.id.layoutStyle)
         val signOutButton = menu.findItem(R.id.signOut)
         val deleteButton = menu.findItem(R.id.trash)
-
-        signOutButton.isVisible = false
-        allNotesViewModal.deleteFrag.observe(this){
-            deleteButton.isVisible = it
-        }
-        settingsViewModel.settingsFrag.observe(this){
-            searchViewMenuItem.isVisible = !it
-            layoutViewBtn.isVisible = !it
-        }
-
-
         val searchView = searchViewMenuItem.actionView as SearchView
         val searchIcon = searchView.findViewById<ImageView>(androidx.appcompat.R.id.search_button)
         searchIcon.setImageDrawable(ContextCompat.getDrawable(applicationContext,
@@ -234,13 +223,6 @@ class MainActivity : AppCompatActivity() {
             return@setOnMenuItemClickListener true
         }
 
-        mAuth.addAuthStateListener {
-            if (it.currentUser != null){
-                if (!it.currentUser!!.isAnonymous){
-                    signOutButton.isVisible = true
-                }
-            }
-        }
 
         signOutButton.setOnMenuItemClickListener {
             val alertDialog: AlertDialog.Builder = AlertDialog.Builder(this@MainActivity)

@@ -42,11 +42,7 @@ class SplashActivity : AppCompatActivity() {
             val intent = Intent(this@SplashActivity, SignInActivity::class.java)
             startActivity(intent)
             finish()
-
         }
-        val intent = Intent(this@SplashActivity, SignInActivity::class.java)
-        startActivity(intent)
-        finish()
 
     }
 

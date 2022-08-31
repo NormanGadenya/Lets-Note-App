@@ -188,6 +188,8 @@ class AllTodoFragment : Fragment() , NoteFireClick {
             }
 
         }
+        setHasOptionsMenu(true)
+
 
         allNotesViewModel.itemArchiveClicked.observe(viewLifecycleOwner){
             if (it && allNotesViewModel.selectedNotes.isNotEmpty()){

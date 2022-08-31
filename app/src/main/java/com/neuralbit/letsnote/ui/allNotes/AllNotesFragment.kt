@@ -7,12 +7,9 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.View
+import android.view.*
 import android.view.View.GONE
 import android.view.View.VISIBLE
-import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -105,6 +102,7 @@ class AllNotesFragment : Fragment() , NoteFireClick {
         pinnedNoteRVAdapter?.lifecycleScope = lifecycleScope
         pinnedNoteRVAdapter?.lifecycleOwner = this
         pinnedNoteRVAdapter?.fontStyle = fontStyle
+        setHasOptionsMenu(true)
         val mAuth: FirebaseAuth = FirebaseAuth.getInstance()
         mAuth.addAuthStateListener {
             val otherNotes = allNotesViewModel.otherFireNotesList.value
@@ -329,10 +327,12 @@ class AllNotesFragment : Fragment() , NoteFireClick {
         return root
     }
 
-    override fun onPrepareOptionsMenu(menu: Menu) {
-        super.onPrepareOptionsMenu(menu)
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+
         val trashButton = menu.findItem(R.id.trash)
         trashButton.isVisible = false
+        super.onCreateOptionsMenu(menu, inflater)
     }
 
     override fun onDestroyView() {

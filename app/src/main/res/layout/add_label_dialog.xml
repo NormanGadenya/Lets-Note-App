@@ -23,6 +23,8 @@
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:minLines="1"
+            android:inputType="text"
             android:id="@+id/labelTitle"
             android:hint="label title" />
     </com.google.android.material.textfield.TextInputLayout>
