@@ -1,5 +1,5 @@
 # Let's Note App
-This is a simple note application that helps organize and store them locally on your device.
+This is a simple note application that helps organize and store them both locally and on the cloud
 
 ## Screenshots
 <table>
