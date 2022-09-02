@@ -9,9 +9,9 @@ plugins {
 android {
     signingConfigs {
         release {
-            storeFile file('/home/another-one/Documents/letsNoteKS.jks')
+            storeFile file('/home/annonymous/StudioProjects/letsNote.jks')
             storePassword 'normaneg'
-            keyAlias 'letsNote'
+            keyAlias 'annonymous'
             keyPassword 'normaneg'
         }
     }

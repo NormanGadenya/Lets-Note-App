@@ -3,9 +3,8 @@ package com.neuralbit.letsnote.ui.main
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import com.neuralbit.letsnote.entities.LabelFire
 import com.neuralbit.letsnote.entities.NoteFire
-import com.neuralbit.letsnote.entities.TagFire
+import com.neuralbit.letsnote.repos.DeleteDataRepo
 import com.neuralbit.letsnote.repos.LabelFireRepo
 import com.neuralbit.letsnote.repos.NoteFireRepo
 import com.neuralbit.letsnote.repos.TagFireRepo
@@ -14,19 +13,13 @@ class MainActivityViewModel(application : Application) : AndroidViewModel(applic
     private val noteFireRepo : NoteFireRepo = NoteFireRepo()
     private val labelFireRepo : LabelFireRepo = LabelFireRepo()
     private val tagFireRepo : TagFireRepo = TagFireRepo()
+    private val deleteDataRepo = DeleteDataRepo(application.applicationContext)
 
 
     fun getAllFireNotes () : LiveData<ArrayList<NoteFire>>{
         return noteFireRepo.getAllNotes()
     }
 
-    fun allFireTags() : LiveData<List<TagFire>> {
-        return tagFireRepo.getAllTags()
-    }
-
-    fun allFireLabels() : LiveData<List<LabelFire>> {
-        return labelFireRepo.getAllLabels()
-    }
 
     fun deleteNote (noteUid : String, labelColor : Int, tagList : List<String> ){
         noteFireRepo.deleteNote(noteUid)
@@ -38,5 +31,8 @@ class MainActivityViewModel(application : Application) : AndroidViewModel(applic
         noteFireRepo.updateNote(noteUpdate,noteUid)
     }
 
+    fun deleteUserDataContent(){
+        deleteDataRepo.deleteUserData()
+    }
 
 }
