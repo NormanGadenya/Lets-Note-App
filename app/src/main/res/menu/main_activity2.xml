@@ -25,5 +25,11 @@
         android:icon="@drawable/baseline_logout_24"
         app:showAsAction="never"/>
 
+    <item
+        android:id="@+id/deleteAndSignOut"
+        android:title="Delete data and sign out"
+        android:icon="@drawable/baseline_logout_24"
+        app:showAsAction="never"/>
+
 
 </menu>

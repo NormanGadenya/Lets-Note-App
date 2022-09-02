@@ -14,6 +14,7 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
@@ -173,6 +174,7 @@ class MainActivity : AppCompatActivity() {
         val signOutButton = menu.findItem(R.id.signOut)
         val deleteButton = menu.findItem(R.id.trash)
         val searchView = searchViewMenuItem.actionView as SearchView
+        val deleteAndSignOut = menu.findItem(R.id.deleteAndSignOut)
         val searchIcon = searchView.findViewById<ImageView>(androidx.appcompat.R.id.search_button)
         searchIcon.setImageDrawable(ContextCompat.getDrawable(applicationContext,
             R.drawable.ic_baseline_search_24
@@ -244,6 +246,20 @@ class MainActivity : AppCompatActivity() {
                         val intent = Intent(this@MainActivity, SignInActivity::class.java)
                         startActivity(intent)
                     }
+            }
+
+            alertDialog.setNegativeButton("Cancel"
+            ) { dialog, _ -> dialog.cancel() }
+            alertDialog.show()
+            return@setOnMenuItemClickListener true
+        }
+        deleteAndSignOut.setOnMenuItemClickListener {
+            val alertDialog: AlertDialog.Builder = AlertDialog.Builder(this@MainActivity)
+            alertDialog.setTitle("You will lose all your stored notes if you proceed")
+            alertDialog.setPositiveButton("Yes"
+            ) { _, _ ->
+                Toast.makeText(applicationContext,"All your information has been wiped out", Toast.LENGTH_SHORT).show()
+                viewModal.deleteUserDataContent()
             }
 
             alertDialog.setNegativeButton("Cancel"
