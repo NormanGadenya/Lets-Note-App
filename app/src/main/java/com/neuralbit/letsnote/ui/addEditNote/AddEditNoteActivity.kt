@@ -51,10 +51,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.HORIZONTAL
 import com.canhub.cropper.CropImage
 import com.flask.colorpicker.ColorPickerView
-import com.google.android.gms.ads.AdListener
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.InterstitialAd
-import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.vision.Frame
 import com.google.android.gms.vision.text.TextBlock
 import com.google.android.gms.vision.text.TextRecognizer
@@ -153,7 +149,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private var labelTitle :String?=null
     private var noteChanged = false
     private var tagList : ArrayList<String> = ArrayList()
-    private lateinit var mInterstitialAd: InterstitialAd
 
     private val cropActivityResultContract = object : ActivityResultContract<Any?,Uri?>(){
         override fun createIntent(context: Context, input: Any?): Intent {
@@ -433,7 +428,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
         })
         touchHelper.attachToRecyclerView(todoRV)
 
-        mInterstitialAd.show()
 
 
         viewModal.backPressed.observe(this) { 
@@ -582,55 +576,16 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
         ocrButton.setOnClickListener {
             if(isNetworkConnected()){
+                if (ContextCompat.checkSelfPermission(
+                        this@AddEditNoteActivity,
+                        Manifest.permission.CAMERA
+                    ) != PackageManager.PERMISSION_GRANTED
+                ) {
+                    requestCameraPermission()
+                    requestStoragePermission()
 
-                if (viewModal.adViewed){
-                    if (ContextCompat.checkSelfPermission(
-                            this@AddEditNoteActivity,
-                            Manifest.permission.CAMERA
-                        ) != PackageManager.PERMISSION_GRANTED
-                    ) {
-                        requestCameraPermission()
-                        requestStoragePermission()
-
-                    } else {
-                        cropActivityResultLauncher.launch(null)
-                    }
-                }else{
-                    if (mInterstitialAd.isLoaded){
-                        mInterstitialAd.show()
-                    }
-                    mInterstitialAd.adListener = object : AdListener(){
-                        override fun onAdClosed() {
-                            viewModal.adViewed = true
-                            if (ContextCompat.checkSelfPermission(
-                                    this@AddEditNoteActivity,
-                                    Manifest.permission.CAMERA
-                                ) != PackageManager.PERMISSION_GRANTED
-                            ) {
-                                requestCameraPermission()
-                                requestStoragePermission()
-
-                            } else {
-                                cropActivityResultLauncher.launch(null)
-                            }
-                        }
-
-
-                        override fun onAdFailedToLoad(p0: LoadAdError?) {
-                            if (ContextCompat.checkSelfPermission(
-                                    this@AddEditNoteActivity,
-                                    Manifest.permission.CAMERA
-                                ) != PackageManager.PERMISSION_GRANTED
-                            ) {
-                                requestCameraPermission()
-                                requestStoragePermission()
-
-                            } else {
-                                cropActivityResultLauncher.launch(null)
-                            }
-                        }
-
-                    }
+                } else {
+                    cropActivityResultLauncher.launch(null)
                 }
 
             }else{
@@ -924,10 +879,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
         if (todoItemStr != null){
             todoDoItemList = Gson().fromJson(todoItemStr, object : TypeToken<List<TodoItem?>?>() {}.type)
         }
-        mInterstitialAd = InterstitialAd(this)
-        mInterstitialAd.adUnitId = resources.getString(R.string.interstitial)
-        mInterstitialAd.loadAd(AdRequest.Builder().build())
-
         noteChanged = intent.getBooleanExtra("noteChanged",false)
         viewModal.noteChanged.value = noteChanged
 
