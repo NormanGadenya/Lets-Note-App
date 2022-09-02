@@ -62,8 +62,8 @@
         android:layout_marginTop="50dp"
         android:background="@drawable/skip_bgrnd"
         android:text="Skip"
-        android:visibility="gone"
         android:textColor="@color/timberwolf"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/progress_bar"
         app:layout_constraintHorizontal_bias="0.5"
@@ -106,11 +106,27 @@
         android:text="@string/termsAndConditions"
 
         android:textColor="#A9BA9D"
-        android:textSize="20sp"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/privacyPolicyTv"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewTV" />
+
+    <TextView
+        android:id="@+id/privacyPolicyTv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:paddingStart="16dp"
+        android:paddingLeft="16dp"
+        android:text="@string/privacyPolicy"
+        android:textColor="#A9BA9D"
+        android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/termsAndConditionTV"
         app:layout_constraintTop_toBottomOf="@+id/textViewTV" />
 
 

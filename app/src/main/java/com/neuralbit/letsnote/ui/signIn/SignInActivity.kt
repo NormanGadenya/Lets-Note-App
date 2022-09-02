@@ -18,6 +18,7 @@ import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
+import com.neuralbit.letsnote.PrivacyPolicy
 import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.ui.main.MainActivity
 
@@ -49,6 +50,11 @@ class SignInActivity : AppCompatActivity() {
         val termsAndConditions = findViewById<View>(R.id.termsAndConditionTV)
         termsAndConditions.setOnClickListener {
             val i = Intent(applicationContext, TermsAndConditions::class.java)
+            startActivity(i)
+        }
+        val privacyPolicyTV = findViewById<View>(R.id.privacyPolicyTv)
+        privacyPolicyTV.setOnClickListener {
+            val i = Intent(applicationContext, PrivacyPolicy::class.java)
             startActivity(i)
         }
 
