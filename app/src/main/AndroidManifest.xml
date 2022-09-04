@@ -87,7 +87,7 @@
 
         <receiver android:name=".utilities.AlertReceiver" />
         <receiver
-            android:name=".Services.DeleteReceiver"
+            android:name=".services.DeleteReceiver"
             android:enabled="true"
             android:exported="true" />
 

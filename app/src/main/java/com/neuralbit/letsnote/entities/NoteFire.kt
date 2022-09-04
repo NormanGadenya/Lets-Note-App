@@ -8,6 +8,7 @@ data class NoteFire (
     var pinned: Boolean = false,
     var archived: Boolean = false,
     var protected: Boolean = false,
+    var deletedDate: Long = 0,
     var tags : List<String> = ArrayList(),
     var todoItems : List<TodoItem> = ArrayList(),
     var selected :Boolean = false,

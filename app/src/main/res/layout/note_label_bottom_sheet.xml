@@ -21,7 +21,7 @@
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:id="@+id/addNewLabel"
-        android:background="@drawable/ic_baseline_bookmark_add_24"
+        android:background="@drawable/ic_outline_bookmark_add_24"
         app:layout_constraintTop_toBottomOf="@id/labelTitle"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="8dp"/>

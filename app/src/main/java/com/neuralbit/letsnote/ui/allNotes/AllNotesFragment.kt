@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -25,9 +24,9 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.Gson
 import com.neuralbit.letsnote.R
-import com.neuralbit.letsnote.Services.DeleteReceiver
 import com.neuralbit.letsnote.databinding.FragmentAllNotesBinding
 import com.neuralbit.letsnote.entities.NoteFire
+import com.neuralbit.letsnote.services.DeleteReceiver
 import com.neuralbit.letsnote.ui.adapters.NoteFireClick
 import com.neuralbit.letsnote.ui.adapters.NoteRVAdapter
 import com.neuralbit.letsnote.ui.addEditNote.AddEditNoteActivity
@@ -127,24 +126,11 @@ class AllNotesFragment : Fragment() , NoteFireClick {
         allNotesViewModel.selectedNotes.clear()
 
         allNotesViewModel.allFireNotes.observe(viewLifecycleOwner){ notes ->
-            Log.d(TAG, "onCreateView: AllNotesFrag $notes")
 
             val pinnedNotes = LinkedList<NoteFire>()
             val otherNotes = LinkedList<NoteFire>()
             for (note in notes) {
-                val pref = context?.getSharedPreferences("DeletedNotes", AppCompatActivity.MODE_PRIVATE)
-                val deletedNotes = pref?.getStringSet("noteUids", HashSet())
-                if (deletedNotes != null){
-                    if (!deletedNotes.contains(note.noteUid)){
-                        if (!note.archived){
-                            if (note.pinned){
-                                pinnedNotes.add(note)
-                            }else{
-                                otherNotes.add(note)
-                            }
-                        }
-                    }
-                }else{
+                if (note.deletedDate == (0).toLong()){
                     if (!note.archived){
                         if (note.pinned){
                             pinnedNotes.add(note)
@@ -251,31 +237,11 @@ class AllNotesFragment : Fragment() , NoteFireClick {
         }
 
         allNotesViewModel.itemDeleteClicked.observe(viewLifecycleOwner){
+            val settings = context?.getSharedPreferences("Settings", AppCompatActivity.MODE_PRIVATE)
+            val emptyTrashImmediately = settings?.getBoolean("EmptyTrashImmediately",false)
             if (it && allNotesViewModel.selectedNotes.isNotEmpty()){
                 val selectedNotesCount = allNotesViewModel.selectedNotes.size
-                val pref = context?.getSharedPreferences("DeletedNotes", AppCompatActivity.MODE_PRIVATE)
-                val settings = context?.getSharedPreferences("Settings", AppCompatActivity.MODE_PRIVATE)
-                val emptyTrashImmediately = settings?.getBoolean("EmptyTrashImmediately",false)
-
                 for ( note in allNotesViewModel.selectedNotes){
-                    val editor: SharedPreferences.Editor ?= pref?.edit()
-                    val noteUids = pref?.getStringSet("noteUids",HashSet())
-                    val deletedNoteUids = HashSet<String>()
-                    if (noteUids != null){ deletedNoteUids.addAll(noteUids)}
-
-                    if (emptyTrashImmediately != true){
-                        editor?.putLong(note.noteUid,System.currentTimeMillis())
-
-                        note.noteUid?.let { it1 -> deletedNoteUids.add(it1) }
-
-                        note.noteUid?.let { it1 -> scheduleDelete(it1,note.tags,note.label,note.timeStamp) }
-
-                        editor?.putStringSet("noteUids",deletedNoteUids)
-                        editor?.apply()
-                    }else{
-                        allNotesViewModel.notesToDelete.value =  note
-                    }
-
                     if (note.pinned){
                         allNotesViewModel.pinnedFireNotesList.value?.remove(note)
                         cancelAlarm(note.reminderDate.toInt())
@@ -286,9 +252,19 @@ class AllNotesFragment : Fragment() , NoteFireClick {
                         cancelAlarm(note.reminderDate.toInt())
                         noteRVAdapter?.notifyDataSetChanged()
                     }
+                    if (emptyTrashImmediately != true){
+                        val noteUpdate = HashMap<String,Any>()
+                        noteUpdate["deleted"] = true
+                        note.noteUid?.let { it1 -> allNotesViewModel.updateFireNote(noteUpdate, it1) }
+
+                        note.noteUid?.let { it1 -> scheduleDelete(it1,note.tags,note.label,note.timeStamp) }
+
+                    }else{
+                        allNotesViewModel.notesToDelete.value =  note
+                    }
+
 
                 }
-
 
                 allNotesViewModel.otherFireNotesList.value?.let { list ->
                     noteRVAdapter?.updateListFire(list)
@@ -296,9 +272,8 @@ class AllNotesFragment : Fragment() , NoteFireClick {
                 allNotesViewModel.pinnedFireNotesList.value?.let { list ->
                     pinnedNoteRVAdapter?.updateListFire(list)
                 }
-                if (emptyTrashImmediately != true){
-                    allNotesViewModel.selectedNotes.clear()
-                }
+
+                allNotesViewModel.selectedNotes.clear()
                 if (allNotesViewModel.otherFireNotesList.value?.isEmpty() == true && allNotesViewModel.pinnedFireNotesList.value?.isEmpty() == true){
                     welcomeIcon.visibility = VISIBLE
                     welcomeText.visibility = VISIBLE
@@ -307,6 +282,7 @@ class AllNotesFragment : Fragment() , NoteFireClick {
                 allNotesViewModel.itemSelectEnabled.value = false
                 allNotesViewModel.itemDeleteClicked.value = false
 
+                allNotesViewModel.itemSelectEnabled.value = false
                 if (selectedNotesCount ==1){
                     Toast.makeText(context,"Note deleted successfully",Toast.LENGTH_SHORT).show()
                 }else{
@@ -314,7 +290,6 @@ class AllNotesFragment : Fragment() , NoteFireClick {
                 }
             }
         }
-
 
 
         addNoteFAB.setOnClickListener{

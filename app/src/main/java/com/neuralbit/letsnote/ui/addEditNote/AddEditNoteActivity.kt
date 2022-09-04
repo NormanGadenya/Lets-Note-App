@@ -23,7 +23,6 @@ import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
 import android.text.format.DateFormat
-import android.util.Log
 import android.util.SparseArray
 import android.util.TypedValue
 import android.view.*
@@ -59,10 +58,10 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.neuralbit.letsnote.R
-import com.neuralbit.letsnote.Services.DeleteReceiver
 import com.neuralbit.letsnote.entities.LabelFire
 import com.neuralbit.letsnote.entities.NoteFireIns
 import com.neuralbit.letsnote.entities.TodoItem
+import com.neuralbit.letsnote.services.DeleteReceiver
 import com.neuralbit.letsnote.ui.label.LabelViewModel
 import com.neuralbit.letsnote.ui.main.MainActivity
 import com.neuralbit.letsnote.utilities.*
@@ -285,11 +284,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
         lockNoteItem?.isVisible = !(!fingerprintManager.isHardwareDetected || !fingerprintManager.hasEnrolledFingerprints())
 
         viewModal.deletedNote.observe(lifecycleOwner){
-            val emptyTrashImmediately = settingsPref.getBoolean("EmptyTrashImmediately",false)
-
-            val editor: SharedPreferences.Editor = deletedNotePrefs.edit()
-            val noteUids = deletedNotePrefs.getStringSet("noteUids",HashSet())
-            val deletedNoteUids = HashSet<String>()
             if (it) {
 
                 pinItem?.isVisible = false
@@ -303,15 +297,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 reminderIcon.visibility = GONE
                 addTodoButton.visibility = GONE
                 todoRV.isEnabled = false
-                if (!emptyTrashImmediately){
-                    if (noteUids != null){
-                        deletedNoteUids.addAll(noteUids)
-                        noteUid?.let { deletedNoteUids.add(it) }
-                    }
-                    editor.putStringSet("noteUids",deletedNoteUids)
-                    editor.putLong(noteUid,calendar.timeInMillis)
-                    editor.apply()
-                }
                 cancelAlarm(viewModal.reminderTime.toInt())
 
 
@@ -330,12 +315,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 }
                 addTodoButton.visibility = VISIBLE
                 todoRV.isEnabled = true
-                if (noteUids != null){
-                    deletedNoteUids.addAll(noteUids)
-                    noteUid?.let { uid -> deletedNoteUids.remove(uid) }
-                }
-                editor.putStringSet("noteUids",deletedNoteUids)
-                editor.apply()
 
             }
         }
@@ -450,6 +429,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
             showLabelBottomSheetDialog()
         }
         val helper = TextViewUndoRedo(noteDescriptionEdit)
+        helper.setUndoButton(undoButton)
+        helper.setRedoButton(redoButton)
         undoButton.setOnClickListener {
             helper.undo()
         }
@@ -531,7 +512,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
         viewModal.pinned.observe(lifecycleOwner) {
             notePinned = it
-            Log.d(TAG, "onCreate: $pinItem")
             if (it) {
                 pinItem?.setIcon(R.drawable.ic_baseline_push_pin_24)
 
@@ -1464,6 +1444,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                         noteUpdate["timeStamp"] = currentDate
                         noteUpdate["label"] = labelColor
                         noteUpdate["pinned"] = viewModal.pinned.value == true
+                        noteUpdate["deletedDate"] = 0
                         noteUpdate["archived"] = viewModal.archived.value == true
                         noteUpdate["reminderDate"] = viewModal.reminderTime
                         noteUpdate["todoItems"] = viewModal.todoItems
@@ -1497,6 +1478,19 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 }else{
                     val emptyTrashImmediately = settingsPref.getBoolean("EmptyTrashImmediately",false)
                     if (!emptyTrashImmediately){
+                        cancelDelete(viewModal.reminderTime.toInt())
+                        val noteUpdate = HashMap<String,Any>()
+                        noteUpdate["title"] = noteTitle
+                        noteUpdate["description"] = noteDescription
+                        noteUpdate["timeStamp"] = currentDate
+                        noteUpdate["label"] = labelColor
+                        noteUpdate["pinned"] = viewModal.pinned.value == true
+                        noteUpdate["deletedDate"] = calendar.timeInMillis
+                        noteUpdate["reminderDate"] = viewModal.reminderTime
+                        noteUpdate["todoItems"] = viewModal.todoItems
+                        noteUpdate["protected"] = viewModal.noteLocked.value == true
+                        noteUpdate["tags"] = tags
+                        noteUid?.let { viewModal.updateFireNote(noteUpdate, it) }
                         noteUid?.let { scheduleDelete(it, tags,labelColor,noteTimeStamp) }
                     }else{
                         noteUid?.let { viewModal.deleteNote(it, labelColor,tags) }
