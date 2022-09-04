@@ -14,6 +14,9 @@ import android.text.Editable;
 import android.text.Selection;
 import android.text.TextWatcher;
 import android.text.style.UnderlineSpan;
+import android.util.Log;
+import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 /**
@@ -21,6 +24,7 @@ import android.widget.TextView;
  */
 public class TextViewUndoRedo {
 
+    public static final String TAG = "TextViewUndoRedo";
     /**
      * Is undo/redo being performed? This member signals if an undo/redo
      * operation is currently being performed. Changes in the text during
@@ -42,6 +46,10 @@ public class TextViewUndoRedo {
      * The edit text.
      */
     private TextView mTextView;
+
+    private ImageButton undoButton;
+
+    private ImageButton redoButton;
 
     // =================================================================== //
 
@@ -114,6 +122,15 @@ public class TextViewUndoRedo {
 
         Selection.setSelection(text, edit.mmBefore == null ? start
                 : (start + edit.mmBefore.length()));
+
+        Log.d(TAG, "undo: " + redoButton);
+        if (redoButton != null){
+            redoButton.setEnabled(getCanRedo());
+        }
+
+        if (undoButton != null){
+            undoButton.setEnabled(getCanUndo());
+        }
     }
 
     /**
@@ -148,6 +165,14 @@ public class TextViewUndoRedo {
 
         Selection.setSelection(text, edit.mmAfter == null ? start
                 : (start + edit.mmAfter.length()));
+        if (redoButton != null){
+            redoButton.setEnabled(getCanRedo());
+        }
+
+        if (undoButton != null){
+            undoButton.setEnabled(getCanUndo());
+        }
+
     }
 
     /**
@@ -227,11 +252,23 @@ public class TextViewUndoRedo {
         }
 
         mEditHistory.mmPosition = sp.getInt(prefix + ".position", -1);
-        if (mEditHistory.mmPosition == -1) {
-            return false;
-        }
+        return mEditHistory.mmPosition != -1;
+    }
 
-        return true;
+    public View getUndoButton() {
+        return undoButton;
+    }
+
+    public void setUndoButton(ImageButton undoButton) {
+        this.undoButton = undoButton;
+    }
+
+    public View getRedoButton() {
+        return redoButton;
+    }
+
+    public void setRedoButton(ImageButton redoButton) {
+        this.redoButton = redoButton;
     }
 
     // =================================================================== //

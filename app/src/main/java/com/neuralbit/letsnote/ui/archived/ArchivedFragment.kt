@@ -4,7 +4,6 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.*
 import android.widget.ImageView
@@ -20,7 +19,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.gms.ads.AdRequest
 import com.google.gson.Gson
 import com.neuralbit.letsnote.R
-import com.neuralbit.letsnote.Services.DeleteReceiver
+import com.neuralbit.letsnote.services.DeleteReceiver
 import com.neuralbit.letsnote.databinding.FragmentArchivedNotesBinding
 import com.neuralbit.letsnote.entities.NoteFire
 import com.neuralbit.letsnote.ui.adapters.NoteFireClick
@@ -81,21 +80,11 @@ class ArchivedFragment : Fragment() , NoteFireClick {
         setHasOptionsMenu(true)
 
         allNotesViewModel.allFireNotes.observe(viewLifecycleOwner) {
-            val pref = context?.getSharedPreferences("DeletedNotes", AppCompatActivity.MODE_PRIVATE)
-            val deletedNotes = pref?.getStringSet("noteUids", HashSet())
             val archivedNotes = ArrayList<NoteFire>()
 
             for ( note in it){
-                if (deletedNotes != null){
-                    if (!deletedNotes.contains(note.noteUid)){
-                        if (note.archived){
-                            archivedNotes.add(note)
-                        }
-                    }
-                }else{
-                    if (note.archived){
-                        archivedNotes.add(note)
-                    }
+                if (note.deletedDate == (0).toLong() && note.archived) {
+                    archivedNotes.add(note)
                 }
             }
             if (archivedNotes.isEmpty()){
@@ -112,25 +101,18 @@ class ArchivedFragment : Fragment() , NoteFireClick {
         archivedViewModel.itemDeleteClicked.observe(viewLifecycleOwner){
             if (it && allNotesViewModel.selectedNotes.isNotEmpty()){
                 val selectedNotesCount = allNotesViewModel.selectedNotes.size
-                val pref = context?.getSharedPreferences("DeletedNotes", AppCompatActivity.MODE_PRIVATE)
                 val settings = context?.getSharedPreferences("Settings", AppCompatActivity.MODE_PRIVATE)
                 val emptyTrashImmediately = settings?.getBoolean("EmptyTrashImmediately",false)
 
                 for ( note in allNotesViewModel.selectedNotes){
-                    val editor: SharedPreferences.Editor ?= pref?.edit()
-                    val noteUids = pref?.getStringSet("noteUids",HashSet())
-                    val deletedNoteUids = HashSet<String>()
-                    if (noteUids != null){ deletedNoteUids.addAll(noteUids)}
 
                     if (emptyTrashImmediately != true){
-                        editor?.putLong(note.noteUid,System.currentTimeMillis())
-
-                        note.noteUid?.let { it1 -> deletedNoteUids.add(it1) }
+                        val noteUpdate = HashMap<String,Any>()
+                        noteUpdate["deleted"] = true
+                        note.noteUid?.let { it1 -> allNotesViewModel.updateFireNote(noteUpdate, it1) }
 
                         note.noteUid?.let { it1 -> scheduleDelete(it1,note.tags,note.label,note.timeStamp) }
 
-                        editor?.putStringSet("noteUids",deletedNoteUids)
-                        editor?.apply()
                     }else{
                         allNotesViewModel.notesToDelete.value =  note
                     }

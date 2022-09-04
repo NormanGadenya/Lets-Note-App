@@ -33,8 +33,11 @@ class AddEditTagRVAdapter (
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val tag = allTags[position]
-
-        holder.tagTitle.text = tag
+        var tagTitle = tag
+        if (tagTitle[0] != '#'){
+            tagTitle = "#$tagTitle"
+        }
+        holder.tagTitle.text = tagTitle
         holder.itemView.setOnLongClickListener {
             holder.deleteBtn.visibility = VISIBLE
             return@setOnLongClickListener true

@@ -23,7 +23,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.gms.ads.AdRequest
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
-import com.neuralbit.letsnote.Services.DeleteReceiver
+import com.neuralbit.letsnote.services.DeleteReceiver
 import com.neuralbit.letsnote.databinding.DeletedNotesFragmentBinding
 import com.neuralbit.letsnote.entities.NoteFire
 import com.neuralbit.letsnote.ui.adapters.NoteFireClick
@@ -98,16 +98,10 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
         setHasOptionsMenu(true)
 
         allNotesViewModel.allFireNotes.observe(viewLifecycleOwner){
-            val deletedNotes = pref?.getStringSet("noteUids", HashSet())
-
             val filteredNotes = HashSet<NoteFire>()
             for (n in it){
-                if (deletedNotes != null){
-                    for ( dNoteUid in deletedNotes){
-                        if (dNoteUid == n.noteUid){
-                            filteredNotes.add(n)
-                        }
-                    }
+                if (n.deletedDate > 0){
+                    filteredNotes.add(n)
                 }
             }
 
@@ -130,10 +124,6 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
                         cancelDelete(deletedNote.timeStamp.toInt())
                     }
                 }
-                val editor: SharedPreferences.Editor ?= pref?.edit()
-                editor?.clear()
-                editor?.apply()
-
                 Toast.makeText(context,"Trash cleared successfully",Toast.LENGTH_SHORT).show()
             }
         }
@@ -175,20 +165,13 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
         deletedNotesViewModel.itemRestoreClicked.observe(viewLifecycleOwner){
             if (it && allNotesViewModel.selectedNotes.isNotEmpty()){
                 val selectedNotesCount = allNotesViewModel.selectedNotes.size
-                val noteUids = pref?.getStringSet("noteUids", HashSet())
-                val deletedNoteUids = HashSet<String>()
-                if (noteUids != null){
-                    deletedNoteUids.addAll(noteUids)
-                }
                 val notes = ArrayList(deletedNotesViewModel.deletedNotes)
                 for ( note in allNotesViewModel.selectedNotes){
                     if (note.selected){
-                        val editor: SharedPreferences.Editor ?= pref?.edit()
-                        note.noteUid?.let { it1 -> deletedNoteUids.remove(it1) }
+                        val noteUpdate = HashMap<String,Any>()
+                        noteUpdate["deletedDate"] = 0
+                        note.noteUid?.let { it1 -> allNotesViewModel.updateFireNote(noteUpdate, it1) }
                         cancelDelete(note.timeStamp.toInt())
-                        editor?.putStringSet("noteUids",deletedNoteUids)
-                        editor?.remove(note.noteUid)
-                        editor?.apply()
                         deletedNotesViewModel.deletedNotes.remove(note)
                         notes.remove(note)
                     }
@@ -220,16 +203,6 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
             delay(2000L)
             if (!restoreDeleted){
                 for (deletedNote in tempNotesToDelete) {
-                    val noteUids = pref?.getStringSet("noteUids", HashSet())
-                    val deletedNoteUids = HashSet<String>()
-                    if (noteUids != null) {
-                        deletedNoteUids.addAll(noteUids)
-                    }
-                    val editor: SharedPreferences.Editor? = pref?.edit()
-                    deletedNote.noteUid?.let { it1 -> deletedNoteUids.remove(it1) }
-                    editor?.putStringSet("noteUids", deletedNoteUids)
-                    editor?.remove(deletedNote.noteUid)
-                    editor?.apply()
                     deletedNotesViewModel.deletedNotes.remove(deletedNote)
                     deletedNote.noteUid?.let { uid ->
                         deletedNotesViewModel.deleteNote(

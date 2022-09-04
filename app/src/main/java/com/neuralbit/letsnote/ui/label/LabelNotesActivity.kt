@@ -5,7 +5,6 @@ import android.app.AlertDialog
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -22,13 +21,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.gson.Gson
-import com.neuralbit.letsnote.ui.addEditNote.Fingerprint
 import com.neuralbit.letsnote.R
-import com.neuralbit.letsnote.Services.DeleteReceiver
+import com.neuralbit.letsnote.services.DeleteReceiver
+import com.neuralbit.letsnote.entities.NoteFire
 import com.neuralbit.letsnote.ui.adapters.NoteFireClick
 import com.neuralbit.letsnote.ui.adapters.NoteRVAdapter
-import com.neuralbit.letsnote.entities.NoteFire
 import com.neuralbit.letsnote.ui.addEditNote.AddEditNoteActivity
+import com.neuralbit.letsnote.ui.addEditNote.Fingerprint
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import com.neuralbit.letsnote.utilities.AlertReceiver
 import java.util.*
@@ -92,12 +91,10 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
         }
 
         allNotesViewModel.getAllFireNotes().observe(this){
-            val pref = applicationContext?.getSharedPreferences("DeletedNotes", MODE_PRIVATE)
-            val deletedNotes = pref?.getStringSet("noteUids", HashSet())
             val notes = ArrayList<NoteFire>()
             for(note in it){
                 for (uid in viewModel.noteUids){
-                    if (note.noteUid == uid && !note.archived  && deletedNotes?.contains(uid) == false){
+                    if (note.noteUid == uid && !note.archived  && note.deletedDate == (0).toLong() ){
                         notes.add(note)
                     }
                 }
@@ -177,26 +174,19 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
 
     private fun deleteNotes() {
         if (allNotesViewModel.selectedNotes.isNotEmpty()){
-            val pref = applicationContext?.getSharedPreferences("DeletedNotes", MODE_PRIVATE)
             val settings = applicationContext?.getSharedPreferences("Settings", MODE_PRIVATE)
             val emptyTrashImmediately = settings?.getBoolean("EmptyTrashImmediately",false)
 
             val selectedNotesCount = allNotesViewModel.selectedNotes.size
             for ( note in allNotesViewModel.selectedNotes){
-                val editor: SharedPreferences.Editor ?= pref?.edit()
-                val noteUids = pref?.getStringSet("noteUids",HashSet())
-                val deletedNoteUids = HashSet<String>()
-                if (noteUids != null){ deletedNoteUids.addAll(noteUids)}
-
                 if (emptyTrashImmediately != true){
-                    editor?.putLong(note.noteUid,System.currentTimeMillis())
-
-                    note.noteUid?.let { it1 -> deletedNoteUids.add(it1) }
-
+                    labelViewModel.labelNotes.remove(note)
+                    cancelAlarm(note.reminderDate.toInt())
                     note.noteUid?.let { it1 -> scheduleDelete(it1,note.tags,note.label,note.timeStamp) }
 
-                    editor?.putStringSet("noteUids",deletedNoteUids)
-                    editor?.apply()
+                    val noteUpdate = HashMap<String,Any>()
+                    noteUpdate["deletedDate"] = System.currentTimeMillis()
+                    note.noteUid?.let { it1 -> allNotesViewModel.updateFireNote(noteUpdate, it1) }
                 }else{
                     labelViewModel.labelNotes.remove(note)
                     if (emptyTrashImmediately){
@@ -207,7 +197,6 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
                 labelViewModel.labelNotes.remove(note)
                 noteRVAdapter.updateListFire(labelViewModel.labelNotes)
                 noteRVAdapter.notifyDataSetChanged()
-
 
             }
 

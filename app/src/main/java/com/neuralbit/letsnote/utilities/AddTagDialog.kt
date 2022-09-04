@@ -31,11 +31,16 @@ class AddTagDialog(private val getTagFromDialog: GetTagFromDialog, val ctx: Cont
                 run {
 
                     var tagTitle = addTagET?.text.toString()
-                    if (tagTitle[0] == '#'){
-                        tagTitle = tagTitle.substring(1,tagTitle.length)
-                    }
+                    if (tagTitle.isNotEmpty()){
 
-                    getTagFromDialog.getTag(tagTitle)
+                        if (tagTitle[0] == '#'){
+                            tagTitle = tagTitle.substring(1,tagTitle.length)
+                        }
+                        tagTitle = CamelCaseConverter.convertString(tagTitle)
+
+
+                        getTagFromDialog.getTag(tagTitle)
+                    }
                 }
             }
         return builder.create()

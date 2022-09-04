@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.View
@@ -27,9 +26,9 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.gson.Gson
 import com.neuralbit.letsnote.R
-import com.neuralbit.letsnote.Services.DeleteReceiver
 import com.neuralbit.letsnote.databinding.FragmentAllTodosBinding
 import com.neuralbit.letsnote.entities.NoteFire
+import com.neuralbit.letsnote.services.DeleteReceiver
 import com.neuralbit.letsnote.ui.adapters.NoteFireClick
 import com.neuralbit.letsnote.ui.adapters.NoteRVAdapter
 import com.neuralbit.letsnote.ui.addEditNote.AddEditNoteActivity
@@ -111,25 +110,11 @@ class AllTodoFragment : Fragment() , NoteFireClick {
             val pinnedNotes = LinkedList<NoteFire>()
             val otherNotes = LinkedList<NoteFire>()
             for (note in notes) {
-                val pref = context?.getSharedPreferences("DeletedNotes", AppCompatActivity.MODE_PRIVATE)
-                val deletedNotes = pref?.getStringSet("noteUids", HashSet())
-                if (deletedNotes != null){
-                    if (!deletedNotes.contains(note.noteUid)){
-                        if (!note.archived && note.todoItems.isNotEmpty()){
-                            if (note.pinned){
-                                pinnedNotes.add(note)
-                            }else{
-                                otherNotes.add(note)
-                            }
-                        }
-                    }
-                }else{
-                    if (!note.archived && note.todoItems.isNotEmpty()){
-                        if (note.pinned){
-                            pinnedNotes.add(note)
-                        }else{
-                            otherNotes.add(note)
-                        }
+                if (!note.archived && note.todoItems.isNotEmpty() && note.deletedDate == (0).toLong()){
+                    if (note.pinned){
+                        pinnedNotes.add(note)
+                    }else{
+                        otherNotes.add(note)
                     }
                 }
             }
@@ -194,7 +179,6 @@ class AllTodoFragment : Fragment() , NoteFireClick {
         allNotesViewModel.itemArchiveClicked.observe(viewLifecycleOwner){
             if (it && allNotesViewModel.selectedNotes.isNotEmpty()){
                 val selectedNotesCount = allNotesViewModel.selectedNotes.size
-                Log.d(TAG, "onCreateView: ${allNotesViewModel.selectedNotes}")
                 for ( note in allNotesViewModel.selectedNotes){
                     if (note.pinned){
                         allTodoViewModel.pinnedFireNotesList.value?.remove(note)
@@ -241,64 +225,52 @@ class AllTodoFragment : Fragment() , NoteFireClick {
         }
 
         allNotesViewModel.itemDeleteClicked.observe(viewLifecycleOwner){
+            val settings = context?.getSharedPreferences("Settings", AppCompatActivity.MODE_PRIVATE)
+            val emptyTrashImmediately = settings?.getBoolean("EmptyTrashImmediately",false)
             if (it && allNotesViewModel.selectedNotes.isNotEmpty()){
                 val selectedNotesCount = allNotesViewModel.selectedNotes.size
-                val pref = context?.getSharedPreferences("DeletedNotes", AppCompatActivity.MODE_PRIVATE)
-                val settings = context?.getSharedPreferences("Settings", AppCompatActivity.MODE_PRIVATE)
-                val emptyTrashImmediately = settings?.getBoolean("EmptyTrashImmediately",false)
                 for ( note in allNotesViewModel.selectedNotes){
-                    val editor: SharedPreferences.Editor ?= pref?.edit()
-                    val noteUids = pref?.getStringSet("noteUids",HashSet())
-                    val deletedNoteUids = HashSet<String>()
-                    if (noteUids != null){ deletedNoteUids.addAll(noteUids)}
-
-                    if (emptyTrashImmediately != true){
-                        editor?.putLong(note.noteUid,System.currentTimeMillis())
-
-                        note.noteUid?.let { it1 -> deletedNoteUids.add(it1) }
-
-                        note.noteUid?.let { it1 -> scheduleDelete(it1,note.tags,note.label,note.timeStamp) }
-
-                        editor?.putStringSet("noteUids",deletedNoteUids)
-                        editor?.apply()
-                    }else{
-                        allNotesViewModel.notesToDelete.value =  note
-                    }
-
                     if (note.pinned){
-                        allTodoViewModel.pinnedFireNotesList.value?.remove(note)
                         allNotesViewModel.pinnedFireNotesList.value?.remove(note)
                         cancelAlarm(note.reminderDate.toInt())
                         pinnedNoteRVAdapter?.notifyDataSetChanged()
 
                     }else{
-                        allTodoViewModel.otherFireNotesList.value?.remove(note)
                         allNotesViewModel.otherFireNotesList.value?.remove(note)
                         cancelAlarm(note.reminderDate.toInt())
                         noteRVAdapter?.notifyDataSetChanged()
                     }
+                    if (emptyTrashImmediately != true){
+                        val noteUpdate = HashMap<String,Any>()
+                        noteUpdate["deleted"] = true
+                        note.noteUid?.let { it1 -> allNotesViewModel.updateFireNote(noteUpdate, it1) }
+
+                        note.noteUid?.let { it1 -> scheduleDelete(it1,note.tags,note.label,note.timeStamp) }
+
+                    }else{
+                        allNotesViewModel.notesToDelete.value =  note
+                    }
+
 
                 }
 
-
-                allTodoViewModel.otherFireNotesList.value?.let { list ->
+                allNotesViewModel.otherFireNotesList.value?.let { list ->
                     noteRVAdapter?.updateListFire(list)
                 }
-                allTodoViewModel.pinnedFireNotesList.value?.let { list ->
+                allNotesViewModel.pinnedFireNotesList.value?.let { list ->
                     pinnedNoteRVAdapter?.updateListFire(list)
                 }
-                if (emptyTrashImmediately != true){
-                    allNotesViewModel.selectedNotes.clear()
-                }
-                if (allTodoViewModel.otherFireNotesList.value?.isEmpty() == true && allNotesViewModel.pinnedFireNotesList.value?.isEmpty() == true){
+
+                allNotesViewModel.selectedNotes.clear()
+                if (allNotesViewModel.otherFireNotesList.value?.isEmpty() == true && allNotesViewModel.pinnedFireNotesList.value?.isEmpty() == true){
                     welcomeIcon.visibility = VISIBLE
                     welcomeText.visibility = VISIBLE
                 }
 
-
                 allNotesViewModel.itemSelectEnabled.value = false
                 allNotesViewModel.itemDeleteClicked.value = false
 
+                allNotesViewModel.itemSelectEnabled.value = false
                 if (selectedNotesCount ==1){
                     Toast.makeText(context,"Note deleted successfully",Toast.LENGTH_SHORT).show()
                 }else{
@@ -307,7 +279,6 @@ class AllTodoFragment : Fragment() , NoteFireClick {
             }
         }
 
-       
         return root
     }
 

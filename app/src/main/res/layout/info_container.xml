@@ -15,7 +15,7 @@
         android:layout_height="30dp"
         android:layout_margin="@dimen/margin"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:foreground="@drawable/ic_baseline_document_scanner_24"
+        android:foreground="@drawable/ic_outline_document_scanner_24"
         android:visibility="visible"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -23,13 +23,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/tvTimeStamp"
+        android:paddingTop="4dp"
         android:visibility="gone"
         android:textSize="12sp"
         android:layout_margin="@dimen/margin"
-
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/addTagBtn"
         app:layout_constraintStart_toEndOf="@+id/ocrButton"
+        app:layout_constraintBottom_toBottomOf="@id/ocrButton"
         tools:text="Edited on 15th"/>
 
     <LinearLayout
@@ -59,6 +60,7 @@
             android:id="@+id/redoButton"
             android:layout_width="30dp"
             android:layout_height="30dp"
+            android:enabled="false"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:foreground="@drawable/ic_baseline_redo_24"
             android:visibility="visible"
@@ -72,7 +74,7 @@
         android:layout_height="30dp"
         android:layout_margin="@dimen/margin"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:foreground="@drawable/ic_baseline_local_offer_24"
+        android:foreground="@drawable/ic_baseline_tag_24"
         android:visibility="visible"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toStartOf="@id/labelBtn" />
@@ -84,7 +86,7 @@
         android:layout_margin="@dimen/margin"
         android:layout_marginTop="@dimen/margin"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:foreground="@drawable/ic_baseline_bookmark_add_24"
+        android:foreground="@drawable/ic_outline_bookmark_add_24"
         android:visibility="visible"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />

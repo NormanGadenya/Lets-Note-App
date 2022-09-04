@@ -19,7 +19,7 @@
             android:title="@string/menu_archived" />
         <item
             android:id="@+id/nav_tags"
-            android:icon="@drawable/ic_baseline_local_offer_24"
+            android:icon="@drawable/tag_frag_icon_24"
             android:title="@string/tags"/>
         <item
             android:id="@+id/nav_labels"

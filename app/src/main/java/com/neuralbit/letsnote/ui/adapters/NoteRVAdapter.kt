@@ -159,7 +159,7 @@ class NoteRVAdapter (
 
         if (deleteFrag){
             holder.daysLeft.visibility = VISIBLE
-            val deletedTime = deletedNotePrefs.getLong(note.noteUid,0)
+            val deletedTime = note.deletedDate
             val timeLeftMS = deletedTime +  6.048e+8 - System.currentTimeMillis()
             val daysLeft = floor(timeLeftMS * 1.1574E-8)
             if (daysLeft >1 || daysLeft== (0).toDouble()){
