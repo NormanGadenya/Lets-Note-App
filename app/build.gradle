@@ -102,7 +102,7 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.11.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
     implementation 'com.firebaseui:firebase-ui-auth:8.0.1'
-    implementation 'com.facebook.android:facebook-login:8.1.0'
+//    implementation 'com.facebook.android:facebook-login:8.1.0'
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
     implementation 'org.apache.commons:commons-lang3:3.0'
     implementation 'com.google.firebase:firebase-crashlytics'

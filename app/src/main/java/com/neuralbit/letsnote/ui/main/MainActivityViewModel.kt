@@ -16,7 +16,7 @@ class MainActivityViewModel(application : Application) : AndroidViewModel(applic
     private val deleteDataRepo = DeleteDataRepo(application.applicationContext)
 
 
-    fun getAllFireNotes () : LiveData<ArrayList<NoteFire>>{
+    suspend fun getAllFireNotes () : LiveData<ArrayList<NoteFire>>{
         return noteFireRepo.getAllNotes()
     }
 

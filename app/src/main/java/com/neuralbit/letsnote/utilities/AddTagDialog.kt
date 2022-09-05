@@ -15,7 +15,7 @@ class AddTagDialog(private val getTagFromDialog: GetTagFromDialog, val ctx: Cont
     val TAG = "AddTagDialog"
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
-        val builder = AlertDialog.Builder(activity)
+        val builder = AlertDialog.Builder(ctx)
         val layoutInflater = activity?.layoutInflater
         val view = layoutInflater?.inflate(R.layout.add_tag_dialog,null)
         val addTagET = view?.findViewById<AutoCompleteTextView>(R.id.newTagET)

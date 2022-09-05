@@ -16,13 +16,14 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:contentDescription="@string/label_icon" />
 
         <TextView
             android:id="@+id/allNotesText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="All your labels appear here"
+            android:text="@string/all_labels_text"
             android:visibility="visible"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

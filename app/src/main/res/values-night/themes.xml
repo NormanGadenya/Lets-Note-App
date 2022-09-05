@@ -5,6 +5,7 @@
         <item name="colorPrimary">@color/timberwolf</item>
         <item name="colorPrimaryVariant">@color/timberwolf</item>
         <item name="colorOnPrimary">@color/timberwolf</item>
+        <item name="colorAccent">@color/Apricot</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/teal_200</item>
         <item name="colorSecondaryVariant">@color/teal_200</item>

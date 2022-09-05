@@ -97,7 +97,8 @@
         android:src="@drawable/ic_baseline_note_add_24"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        android:contentDescription="@string/new_note_button" />
 
 
 

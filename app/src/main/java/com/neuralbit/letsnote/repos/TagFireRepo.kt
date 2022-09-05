@@ -13,7 +13,7 @@ import com.neuralbit.letsnote.entities.TagFire
 
 class TagFireRepo {
 
-    val database = Firebase.database
+    private val database = Firebase.database
     val TAG = "TagFireRepo"
 
     private var fUser = FirebaseAuth.getInstance().currentUser
@@ -21,6 +21,7 @@ class TagFireRepo {
     fun getAllTags () : LiveData<List<TagFire>> {
         val live = MutableLiveData<List<TagFire>>()
         var tagRef = fUser?.let { database.getReference(it.uid).child("tags") }
+
         val eventListener = object : ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
                 val tags = ArrayList<TagFire>()

@@ -66,7 +66,8 @@
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/reminderTV" />
+            app:layout_constraintTop_toBottomOf="@+id/reminderTV"
+            android:contentDescription="@string/lock_icon" />
 
         <ImageView
             android:layout_width="20dp"
@@ -76,7 +77,8 @@
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/noteLockedIcon"
-            app:layout_constraintTop_toBottomOf="@+id/reminderTV" />
+            app:layout_constraintTop_toBottomOf="@+id/reminderTV"
+            android:contentDescription="@string/todo_icon" />
 
         <ImageView
             android:id="@+id/reminderIcon"
@@ -87,7 +89,8 @@
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="@+id/reminderTV"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/noteTagsTV" />
+            app:layout_constraintTop_toBottomOf="@id/noteTagsTV"
+            android:contentDescription="@string/reminder_icon" />
 
         <TextView
             android:id="@+id/reminderTV"

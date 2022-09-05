@@ -8,7 +8,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Choose the date"
+        android:text="@string/choose_date"
         android:textSize="20sp"
         android:layout_marginStart="16dp"
         app:layout_constraintStart_toStartOf="parent"
@@ -27,7 +27,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Choose the time"
+        android:text="@string/choose_time"
         android:textSize="20sp"
         android:layout_marginTop="20dp"
         android:layout_marginStart="16dp"
@@ -44,7 +44,8 @@
         android:layout_marginEnd="@dimen/margin"
 
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/timeTitle" />
+        app:layout_constraintTop_toTopOf="@id/timeTitle"
+        android:contentDescription="@string/clock_icon" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

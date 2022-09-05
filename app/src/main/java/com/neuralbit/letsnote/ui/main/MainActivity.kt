@@ -22,6 +22,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -42,6 +43,7 @@ import com.neuralbit.letsnote.ui.label.LabelViewModel
 import com.neuralbit.letsnote.ui.signIn.SignInActivity
 import com.neuralbit.letsnote.ui.tag.TagViewModel
 import com.neuralbit.letsnote.utilities.AlertReceiver
+import kotlinx.coroutines.launch
 
 
 class MainActivity : AppCompatActivity() {
@@ -59,7 +61,7 @@ class MainActivity : AppCompatActivity() {
     private var actionMode : ActionMode? = null
     private var fUser : FirebaseUser? = null
     private lateinit var settingsPref: SharedPreferences
-    val lifecycleOwner = this
+    private val lifecycleOwner = this
 
 
 
@@ -104,8 +106,11 @@ class MainActivity : AppCompatActivity() {
 
             }
         }
-        viewModal.getAllFireNotes().observe(this){
-            allNotesViewModal.allFireNotes.value = it
+
+        lifecycleScope.launch {
+            viewModal.getAllFireNotes().observe(lifecycleOwner){
+                allNotesViewModal.allFireNotes.value = it
+            }
         }
         val emptyTrashImmediately = settingsPref.getBoolean("EmptyTrashImmediately",false)
         if (emptyTrashImmediately){
@@ -233,9 +238,9 @@ class MainActivity : AppCompatActivity() {
             }
             alertDialog.setPositiveButton("Yes"
             ) { _, _ ->
-                allNotesViewModal.getAllFireNotes().observe(this){
-                    for ( note in it){
-                        cancelAlarm(note.reminderDate.toInt())
+                lifecycleScope.launch {
+                    viewModal.getAllFireNotes().observe(lifecycleOwner){
+                        allNotesViewModal.allFireNotes.value = it
                     }
                 }
 
