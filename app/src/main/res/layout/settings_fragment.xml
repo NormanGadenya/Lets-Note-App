@@ -27,7 +27,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                android:text="Day or Night mode"
+                android:text="@string/day_night_mode"
                 android:textSize="20sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -53,15 +53,15 @@
 
                     <RadioButton
                         android:id="@+id/darkMode"
-                        android:text="Dark mode" />
+                        android:text="@string/dark_mode" />
 
                     <RadioButton
                         android:id="@+id/lightMode"
-                        android:text="Light mode" />
+                        android:text="@string/light_mode" />
 
                     <RadioButton
                         android:id="@+id/defaultMode"
-                        android:text="Default" />
+                        android:text="@string/default_mode" />
                 </RadioGroup>
             </androidx.cardview.widget.CardView>
 
@@ -70,7 +70,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                android:text="Font size"
+                android:text="@string/font_size"
                 android:textSize="20sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/cardView" />
@@ -106,7 +106,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="8dp"
-                        android:text="Note"
+                        android:text="@string/note"
                         android:textSize="32sp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toEndOf="@id/seekBar"
@@ -121,7 +121,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                android:text="Font style"
+                android:text="@string/font_style"
                 android:textSize="20sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/cardView2" />
@@ -164,7 +164,7 @@
                     <RadioButton
                         android:id="@+id/fontDef"
                         android:fontFamily="@font/roboto"
-                        android:text="Default" />
+                        android:text="@string/default_mode" />
 
                 </RadioGroup>
             </androidx.cardview.widget.CardView>
@@ -174,7 +174,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                android:text="Link with your Google account"
+                android:text="@string/link_to_google"
                 android:textSize="20sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/cardView3" />
@@ -205,7 +205,7 @@
                         android:layout_margin="16dp"
                         android:background="@drawable/sign_in_bgnd"
                         android:drawableLeft="@drawable/icons_google"
-                        android:text="Sign in"
+                        android:text="@string/sign_in"
                         android:textColor="@color/timberwolf"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
@@ -224,7 +224,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="16dp"
-                        android:text="You stand at risk of losing your notes because the app is not linked to your Google account"
+                        android:text="@string/risk_text"
                         android:textColor="@color/Red"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -238,7 +238,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                android:text="Empty trash automatically"
+                android:text="@string/empty_trash"
                 android:textSize="16sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/cardView4" />
@@ -248,7 +248,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                android:text="App version 1.0"
+                android:text="@string/app_version"
                 android:textSize="20sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/emptyTrashSwitch" />

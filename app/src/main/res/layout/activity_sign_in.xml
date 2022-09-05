@@ -47,7 +47,7 @@
         android:layout_height="50dp"
         android:layout_marginTop="50dp"
         android:background="@drawable/sign_in_bgnd"
-        android:drawableLeft="@drawable/icons_google"
+        android:drawableStart="@drawable/icons_google"
         android:text="Sign in"
         android:textColor="#2A3439"
         app:layout_constraintEnd_toStartOf="@+id/signInWithAnnoneBtn"

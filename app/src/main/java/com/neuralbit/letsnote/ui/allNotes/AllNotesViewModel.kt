@@ -51,7 +51,7 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
     }
 
 
-    fun getAllFireNotes () :LiveData<ArrayList<NoteFire>> {
+    suspend fun getAllFireNotes () : LiveData<ArrayList<NoteFire>>{
         return noteFireRepo.getAllNotes()
     }
 

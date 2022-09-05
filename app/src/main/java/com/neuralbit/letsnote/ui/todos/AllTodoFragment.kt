@@ -49,10 +49,10 @@ class AllTodoFragment : Fragment() , NoteFireClick {
     private lateinit var  pinnedNotesRV: RecyclerView
     private lateinit var welcomeIcon : ImageView
     private lateinit var welcomeText : TextView
-    private lateinit var addNoteFAB : FloatingActionButton
     private val binding get() = _binding!!
     private lateinit var pinnedNotesTV: TextView
     private lateinit var otherNotesTV: TextView
+    private lateinit var addTodoButton : FloatingActionButton
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -68,6 +68,7 @@ class AllTodoFragment : Fragment() , NoteFireClick {
         otherNotesTV = binding.otherNotesTV
         welcomeIcon = binding.welcomeIcon
         welcomeText = binding.allNotesText
+        addTodoButton = binding.FABAddTodo
         val settingsSharedPref = context?.getSharedPreferences("Settings", AppCompatActivity.MODE_PRIVATE)
         val staggeredLayoutManagerAll = StaggeredGridLayoutManager( 2,LinearLayoutManager.VERTICAL)
         val staggeredLayoutManagerPinned = StaggeredGridLayoutManager( 2,LinearLayoutManager.VERTICAL)
@@ -174,6 +175,13 @@ class AllTodoFragment : Fragment() , NoteFireClick {
 
         }
         setHasOptionsMenu(true)
+
+        addTodoButton.setOnClickListener{
+            val intent = Intent( context, AddEditNoteActivity::class.java)
+            intent.putExtra("noteType","NewTodo")
+            startActivity(intent)
+        }
+
 
 
         allNotesViewModel.itemArchiveClicked.observe(viewLifecycleOwner){

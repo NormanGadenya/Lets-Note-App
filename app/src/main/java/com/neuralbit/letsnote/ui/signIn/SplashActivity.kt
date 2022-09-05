@@ -7,9 +7,11 @@ import android.os.PersistableBundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.lifecycleScope
 import com.google.firebase.auth.FirebaseAuth
 import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.ui.main.MainActivity
+import kotlinx.coroutines.launch
 
 class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,15 +24,19 @@ class SplashActivity : AppCompatActivity() {
         val mAuth = FirebaseAuth.getInstance()
         val firebaseUser = mAuth.currentUser
         val settingsPref : SharedPreferences = getSharedPreferences("Settings", MODE_PRIVATE)
-        when (settingsPref.getString("mode","default")) {
-            "Dark mode" -> {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            }
-            "Light mode" -> {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-            }
-            else -> {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+
+
+        lifecycleScope.launch {
+            when (settingsPref.getString("mode","default")) {
+                "Dark mode" -> {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                }
+                "Light mode" -> {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                }
+                else -> {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+                }
             }
         }
 

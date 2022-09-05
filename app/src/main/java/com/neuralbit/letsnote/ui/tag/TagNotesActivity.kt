@@ -19,14 +19,15 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.gson.Gson
 import com.neuralbit.letsnote.R
-import com.neuralbit.letsnote.services.DeleteReceiver
 import com.neuralbit.letsnote.entities.NoteFire
+import com.neuralbit.letsnote.services.DeleteReceiver
 import com.neuralbit.letsnote.ui.adapters.NoteFireClick
 import com.neuralbit.letsnote.ui.adapters.NoteRVAdapter
 import com.neuralbit.letsnote.ui.addEditNote.AddEditNoteActivity
 import com.neuralbit.letsnote.ui.addEditNote.Fingerprint
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import com.neuralbit.letsnote.utilities.AlertReceiver
+import kotlinx.coroutines.launch
 import java.util.*
 
 class TagNotesActivity : AppCompatActivity() , NoteFireClick {
@@ -35,6 +36,8 @@ class TagNotesActivity : AppCompatActivity() , NoteFireClick {
     private lateinit var allNotesViewModel: AllNotesViewModel
     private lateinit var recyclerView : RecyclerView
     private var actionMode : ActionMode? = null
+    private val lifecycleOwner = this
+
 
     val TAG = "TagNotesActivity"
 
@@ -86,17 +89,20 @@ class TagNotesActivity : AppCompatActivity() , NoteFireClick {
 
             }
         }
-        allNotesViewModel.getAllFireNotes().observe(this){
-            val notes = ArrayList<NoteFire>()
-            for(note in it){
-                for (uid in viewModel.noteUids){
-                    if (note.noteUid == uid && !note.archived  && note.deletedDate == (0).toLong() ){
-                        notes.add(note)
+
+        lifecycleScope.launch {
+            allNotesViewModel.getAllFireNotes().observe(lifecycleOwner){
+                val notes = ArrayList<NoteFire>()
+                for(note in it){
+                    for (uid in viewModel.noteUids){
+                        if (note.noteUid == uid && !note.archived  && note.deletedDate == (0).toLong() ){
+                            notes.add(note)
+                        }
                     }
                 }
+                viewModel.allTagNotes = notes
+                noteRVAdapter.updateListFire(notes)
             }
-            viewModel.allTagNotes = notes
-            noteRVAdapter.updateListFire(notes)
         }
 
 

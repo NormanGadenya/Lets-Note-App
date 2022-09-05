@@ -21,12 +21,15 @@
         app:layout_constraintTop_toBottomOf="@+id/colorPicker">
 
         <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/labelTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minLines="1"
+            android:hint="@string/label_title"
             android:inputType="text"
-            android:id="@+id/labelTitle"
-            android:hint="label title" />
+            android:minLines="1"
+            android:textColorHint="#546E7A"
+            android:minHeight="48dp"
+            />
     </com.google.android.material.textfield.TextInputLayout>
 
 

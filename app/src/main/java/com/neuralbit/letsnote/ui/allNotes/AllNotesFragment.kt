@@ -129,6 +129,7 @@ class AllNotesFragment : Fragment() , NoteFireClick {
 
             val pinnedNotes = LinkedList<NoteFire>()
             val otherNotes = LinkedList<NoteFire>()
+
             for (note in notes) {
                 if (note.deletedDate == (0).toLong()){
                     if (!note.archived){

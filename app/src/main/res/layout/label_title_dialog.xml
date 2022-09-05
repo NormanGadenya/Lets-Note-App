@@ -11,8 +11,8 @@
         android:inputType="text"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:hint="Label title"
-        />
+        android:hint="@string/label_title"
+        android:importantForAutofill="no" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

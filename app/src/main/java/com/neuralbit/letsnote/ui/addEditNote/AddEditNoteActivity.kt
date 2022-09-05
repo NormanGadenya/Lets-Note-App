@@ -807,12 +807,10 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private fun initControllers(){
         cm= Common()
         if (Build.VERSION.SDK_INT >= 25) {
-            createShortcut();
+            createShortcut()
         }else{
-            removeShortcuts();
+            removeShortcuts()
         }
-
-
 
         deletedNotePrefs = applicationContext.getSharedPreferences("DeletedNotes", MODE_PRIVATE)
         settingsPref = applicationContext.getSharedPreferences("Settings", MODE_PRIVATE)
@@ -832,9 +830,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         reminderIcon = findViewById(R.id.reminderIcon)
         noteTitleEdit.setTextSize(TypedValue.COMPLEX_UNIT_SP,32f+ ((fontMultiplier-2)*2).toFloat())
         noteDescriptionEdit.setTextSize(TypedValue.COMPLEX_UNIT_SP,18f+ ((fontMultiplier-2)*2).toFloat())
-        tvTimeStamp.setTextSize(TypedValue.COMPLEX_UNIT_SP,12f+ ((fontMultiplier-2)*2).toFloat())
         noteType = intent.getStringExtra("noteType").toString()
-        intent.putExtra("noteType","Edit")
         noteTitle = intent.getStringExtra("noteTitle")
         noteUid = intent.getStringExtra("noteUid")
         noteDesc = intent.getStringExtra("noteDescription")
@@ -940,6 +936,12 @@ class AddEditNoteActivity : AppCompatActivity() ,
         noteTitleEdit.typeface = typeface
         reminderTV.typeface = typeface
         tvTimeStamp.typeface = typeface
+        if (noteType == "NewTodo"){
+            noteDescriptionEdit.visibility = GONE
+            todoRV.visibility = VISIBLE
+            todoItemDescTV.visibility = VISIBLE
+            todoCheckBox.visibility = VISIBLE
+        }
     }
 
 
@@ -1090,23 +1092,37 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private fun createShortcut() {
         val intent = Intent(applicationContext, AddEditNoteActivity::class.java)
         intent.action = Intent.ACTION_VIEW
-        val shortcutInfo = ShortcutInfoCompat.Builder(applicationContext, "newNote")
-            .setShortLabel(getString(R.string.shortcut_short_label))
-            .setLongLabel(getString(R.string.shortcut_long_label))
+        val newNoteShortcut = ShortcutInfoCompat.Builder(applicationContext, "newNote")
+            .setShortLabel(getString(R.string.note_shortcut_short_label))
+            .setLongLabel(getString(R.string.note_shortcut_long_label))
             .setIcon(IconCompat.createWithResource(applicationContext,
                 R.drawable.ic_baseline_mode_edit_24
             ))
             .setIntent(intent) // Push the shortcut
             .build()
 
-        ShortcutManagerCompat.pushDynamicShortcut(applicationContext, shortcutInfo)
+        ShortcutManagerCompat.pushDynamicShortcut(applicationContext, newNoteShortcut)
+        intent.putExtra("noteType","NewTodo")
+
+        val newTodoShortcut = ShortcutInfoCompat.Builder(applicationContext, "newTodo")
+            .setShortLabel(getString(R.string.todo_shortcut_short_label))
+            .setLongLabel(getString(R.string.todo_shortcut_long_label))
+            .setIcon(IconCompat.createWithResource(applicationContext,
+                R.drawable.ic_baseline_checklist_rtl_24
+            ))
+            .setIntent(intent) // Push the shortcut
+            .build()
+
+        ShortcutManagerCompat.pushDynamicShortcut(applicationContext, newTodoShortcut)
+
+
     }
 
 
     @TargetApi(25)
     private fun removeShortcuts() {
         val shortcutManager = getSystemService(ShortcutManager::class.java)
-        shortcutManager.disableShortcuts(listOf("newNote"))
+        shortcutManager.disableShortcuts(listOf("newNote","newTodo"))
         shortcutManager.removeAllDynamicShortcuts()
     }
 
