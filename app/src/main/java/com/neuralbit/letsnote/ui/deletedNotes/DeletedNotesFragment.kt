@@ -4,7 +4,6 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -23,9 +22,9 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.gms.ads.AdRequest
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
-import com.neuralbit.letsnote.services.DeleteReceiver
 import com.neuralbit.letsnote.databinding.DeletedNotesFragmentBinding
 import com.neuralbit.letsnote.entities.NoteFire
+import com.neuralbit.letsnote.services.DeleteReceiver
 import com.neuralbit.letsnote.ui.adapters.NoteFireClick
 import com.neuralbit.letsnote.ui.adapters.NoteRVAdapter
 import com.neuralbit.letsnote.ui.addEditNote.AddEditNoteActivity
@@ -33,6 +32,7 @@ import com.neuralbit.letsnote.ui.addEditNote.Fingerprint
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import com.neuralbit.letsnote.ui.settings.SettingsViewModel
 import kotlinx.coroutines.*
+import kotlin.math.floor
 
 class DeletedNotesFragment : Fragment() , NoteFireClick {
     private var noteRVAdapter: NoteRVAdapter? = null
@@ -100,8 +100,22 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
         allNotesViewModel.allFireNotes.observe(viewLifecycleOwner){
             val filteredNotes = HashSet<NoteFire>()
             for (n in it){
-                if (n.deletedDate > 0){
-                    filteredNotes.add(n)
+                val timeLeftMS = n.deletedDate +  6.048e+8 - System.currentTimeMillis()
+                val daysLeft = floor(timeLeftMS * 1.1574E-8)
+
+                if (n.deletedDate > 0 && daysLeft > 0){
+                    if (daysLeft > 0){
+                        filteredNotes.add(n)
+                    }else{
+                        n.noteUid?.let { uid ->
+                            deletedNotesViewModel.deleteNote(
+                                uid,
+                                n.label,
+                                n.tags
+                            )
+                            cancelDelete(n.timeStamp.toInt())
+                        }
+                    }
                 }
             }
 
@@ -137,14 +151,13 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
                 ) { restoreTempNotes()}
                 snackbar.show()
                 GlobalScope.launch {
-                    permanentlyDeleteNotes(pref)
+                    permanentlyDeleteNotes()
                 }
                 val selectedNotesCount = allNotesViewModel.selectedNotes.size
                 val notes = ArrayList(deletedNotesViewModel.deletedNotes)
 
                 for (deletedNote in allNotesViewModel.selectedNotes) {
                     if (deletedNote.selected){
-
                         tempNotesToDelete.add(deletedNote)
                         notes.remove(deletedNote)
                     }
@@ -198,7 +211,7 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
         noteRVAdapter?.updateListFire(ArrayList(deletedNotesViewModel.deletedNotes))
     }
 
-    private suspend fun permanentlyDeleteNotes(pref: SharedPreferences?) {
+    private suspend fun permanentlyDeleteNotes() {
         withContext(Dispatchers.Main){
             delay(2000L)
             if (!restoreDeleted){
