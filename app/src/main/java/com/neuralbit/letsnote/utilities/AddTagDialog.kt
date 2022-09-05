@@ -25,9 +25,9 @@ class AddTagDialog(private val getTagFromDialog: GetTagFromDialog, val ctx: Cont
         addTagET?.threshold = 1
         builder.setView(view)
             .setTitle("Add new tag")
-            .setNegativeButton("cancel"
+            .setNegativeButton("Cancel"
             ) { _, _ -> dismiss() }
-            .setPositiveButton("ok"){_, _ ->
+            .setPositiveButton("Ok"){_, _ ->
                 run {
 
                     var tagTitle = addTagET?.text.toString()
