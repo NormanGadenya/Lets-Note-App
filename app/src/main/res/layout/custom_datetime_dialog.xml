@@ -23,7 +23,8 @@
         android:src="@drawable/ic_baseline_date_range_24"
         android:layout_marginEnd="@dimen/margin"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/dateTitle" />
+        app:layout_constraintTop_toTopOf="@id/dateTitle"
+        android:contentDescription="@string/date_button" />
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -42,10 +43,9 @@
         android:background="?attr/selectableItemBackgroundBorderless"
         android:src="@drawable/ic_baseline_access_time_24"
         android:layout_marginEnd="@dimen/margin"
-
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/timeTitle"
-        android:contentDescription="@string/clock_icon" />
+        android:contentDescription="@string/time_button" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -53,6 +53,7 @@
                 android:id="@+id/pinnedNotesRV"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:contentDescription="@string/all_notes_list"
                 android:overScrollMode="never"
                 android:visibility="visible"
                 app:layout_constraintTop_toBottomOf="@+id/pinnedNotesTV"

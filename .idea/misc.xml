@@ -81,11 +81,12 @@
         <entry key="app/src/main/res/drawable/tag_background.xml" value="0.1975" />
         <entry key="app/src/main/res/drawable/tag_background_sel.xml" value="0.3205" />
         <entry key="app/src/main/res/drawable/tag_frag_icon_24.xml" value="0.3545" />
+        <entry key="app/src/main/res/drawable/welcome_icon.xml" value="0.317" />
         <entry key="app/src/main/res/drawable/white.xml" value="0.1225" />
         <entry key="app/src/main/res/drawable/white_tag.xml" value="0.353125" />
         <entry key="app/src/main/res/drawable/wild_orchid_tag.xml" value="0.22291666666666668" />
         <entry key="app/src/main/res/drawable/wild_orchid_toolbar.xml" value="0.1225" />
-        <entry key="app/src/main/res/layout-land/activity_sign_in.xml" value="0.3037918871252205" />
+        <entry key="app/src/main/res/layout-land/activity_sign_in.xml" value="0.35752979414951247" />
         <entry key="app/src/main/res/layout-v26/label_item.xml" value="0.15989583333333332" />
         <entry key="app/src/main/res/layout/activity_add_edit_note.xml" value="0.33" />
         <entry key="app/src/main/res/layout/activity_fingerprint.xml" value="0.35885416666666664" />
@@ -103,11 +104,11 @@
         <entry key="app/src/main/res/layout/checklist_item.xml" value="0.5" />
         <entry key="app/src/main/res/layout/content_main.xml" value="0.25" />
         <entry key="app/src/main/res/layout/custom_datetime_dialog.xml" value="0.18" />
-        <entry key="app/src/main/res/layout/deleted_notes_fragment.xml" value="0.35885416666666664" />
+        <entry key="app/src/main/res/layout/deleted_notes_fragment.xml" value="0.24289405684754523" />
         <entry key="app/src/main/res/layout/fragment_add_edit.xml" value="0.2625" />
-        <entry key="app/src/main/res/layout/fragment_all_notes.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/fragment_all_notes.xml" value="0.2640449438202247" />
         <entry key="app/src/main/res/layout/fragment_all_todos.xml" value="0.3578125" />
-        <entry key="app/src/main/res/layout/fragment_archived_notes.xml" value="0.3328125" />
+        <entry key="app/src/main/res/layout/fragment_archived_notes.xml" value="0.2618384401114206" />
         <entry key="app/src/main/res/layout/fragment_gallery.xml" value="0.33" />
         <entry key="app/src/main/res/layout/fragment_home.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_item_list.xml" value="0.19375" />

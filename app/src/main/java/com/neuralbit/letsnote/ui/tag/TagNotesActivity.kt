@@ -50,7 +50,7 @@ class TagNotesActivity : AppCompatActivity() , NoteFireClick {
         allNotesViewModel = ViewModelProvider(
             this,
             ViewModelProvider.AndroidViewModelFactory.getInstance(application)
-        ).get(AllNotesViewModel::class.java)
+        )[AllNotesViewModel::class.java]
         setContentView(R.layout.activity_label_notes)
         recyclerView = findViewById(R.id.notesRV)
         val tagTitle = intent.getStringExtra("tagTitle")
