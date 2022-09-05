@@ -14,7 +14,6 @@ import android.content.pm.ShortcutManager
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Typeface
-import android.hardware.fingerprint.FingerprintManager
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Build
@@ -39,6 +38,7 @@ import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.IconCompat
+import androidx.core.hardware.fingerprint.FingerprintManagerCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.LifecycleOwner
@@ -280,8 +280,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
             }
         }
 
-        val fingerprintManager : FingerprintManager = getSystemService(FINGERPRINT_SERVICE) as FingerprintManager
-        lockNoteItem?.isVisible = !(!fingerprintManager.isHardwareDetected || !fingerprintManager.hasEnrolledFingerprints())
 
         viewModal.deletedNote.observe(lifecycleOwner){
             if (it) {
@@ -603,7 +601,10 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
         }
     }
-
+    private fun isFingerPrintAvailable(): Boolean {
+        val fingerprintManager = FingerprintManagerCompat.from(applicationContext)
+        return fingerprintManager.isHardwareDetected && fingerprintManager.hasEnrolledFingerprints()
+    }
 
     private fun requestStoragePermission() {
         if (ActivityCompat.shouldShowRequestPermissionRationale(
@@ -611,7 +612,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 Manifest.permission.READ_EXTERNAL_STORAGE
             )
         ) {
-            androidx.appcompat.app.AlertDialog.Builder(this)
+            androidx.appcompat.app.AlertDialog.Builder(this@AddEditNoteActivity)
                 .setTitle("Permission needed")
                 .setMessage("This permission is needed because we need to access your storage")
                 .setPositiveButton(
@@ -639,7 +640,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
     private fun deleteNote(){
         val alertDialog: AlertDialog? = this.let {
-            val builder = AlertDialog.Builder(this)
+            val builder = AlertDialog.Builder(this@AddEditNoteActivity)
             builder.apply {
                 setPositiveButton("ok"
                 ) { _, _ ->
@@ -706,7 +707,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 Manifest.permission.CAMERA
             )
         ) {
-            AlertDialog.Builder(this)
+            AlertDialog.Builder(this@AddEditNoteActivity)
                 .setTitle("Permission needed")
                 .setMessage("This permission is needed because we need to access your camera")
                 .setPositiveButton(
@@ -1031,6 +1032,12 @@ class AddEditNoteActivity : AppCompatActivity() ,
             viewModal.noteLocked.value = !protected
             return@setOnMenuItemClickListener true
         }
+        try {
+            lockNoteItem?.isVisible = isFingerPrintAvailable()
+        }catch (ignored : Exception){
+
+        }
+
 
         return super.onCreateOptionsMenu(menu)
     }
@@ -1155,7 +1162,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         labelListRV.layoutManager =layoutManager
         labelListRV.adapter = labelListAdapter
         addNewLabelBtn?.setOnClickListener {
-            val labelDialog: AlertDialog = this.let {
+            val labelDialog: AlertDialog = this@AddEditNoteActivity.let {
                 val builder = AlertDialog.Builder(it)
                 builder.apply {
                     setPositiveButton("ok"
@@ -1334,7 +1341,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
 
     private fun openDateTimeDialog(){
-        val alertDialog: AlertDialog? = this.let {
+        val alertDialog: AlertDialog? = this@AddEditNoteActivity.let {
             val builder = AlertDialog.Builder(it)
             builder.apply {
                 setPositiveButton("ok"

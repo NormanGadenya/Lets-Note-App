@@ -17,8 +17,8 @@
 
     <ImageButton
         android:id="@+id/datePickButton"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:src="@drawable/ic_baseline_date_range_24"
         android:layout_marginEnd="@dimen/margin"
@@ -38,8 +38,8 @@
 
     <ImageButton
         android:id="@+id/timePickButton"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:src="@drawable/ic_baseline_access_time_24"
         android:layout_marginEnd="@dimen/margin"

@@ -16,6 +16,7 @@
         android:textSize="50sp"
         app:layout_constraintBottom_toTopOf="@+id/imageView5"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -27,6 +28,7 @@
         android:src="@drawable/ic_launcher1_foreground"
         app:layout_constraintBottom_toTopOf="@+id/signInTV"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/appName" />
 
@@ -39,6 +41,7 @@
         android:textSize="30sp"
         app:layout_constraintBottom_toTopOf="@+id/signInWithGoogleBtn"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView5" />
 
@@ -50,8 +53,9 @@
         android:drawableStart="@drawable/icons_google"
         android:text="@string/sign_in"
         android:textColor="#2A3439"
-        app:layout_constraintBottom_toTopOf="@+id/termsAndConditionTV"
+        app:layout_constraintBottom_toTopOf="@+id/textViewTV"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/signInTV" />
 
@@ -85,30 +89,31 @@
         android:id="@+id/textViewTV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingEnd="16dp"
         android:paddingStart="16dp"
+        android:paddingEnd="16dp"
         android:text="@string/sign_in_tot"
         android:textColor="#A9BA9D"
         android:textSize="16sp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/termsAndConditionTV"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/termsAndConditionTV" />
+        app:layout_constraintTop_toBottomOf="@+id/signInWithGoogleBtn" />
 
     <TextView
         android:id="@+id/termsAndConditionTV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingEnd="16dp"
         android:paddingStart="16dp"
+        android:paddingEnd="16dp"
         android:text="@string/termsAndConditions"
         android:textColor="#A9BA9D"
         android:textSize="16sp"
-        app:layout_constraintBottom_toTopOf="@+id/textViewTV"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/privacyPolicyTv"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/signInWithGoogleBtn" />
+        app:layout_constraintTop_toBottomOf="@+id/textViewTV" />
 
     <TextView
         android:id="@+id/privacyPolicyTv"
