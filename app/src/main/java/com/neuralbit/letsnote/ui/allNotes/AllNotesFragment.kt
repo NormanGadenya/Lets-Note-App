@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.os.Build
 import android.os.Bundle
 import android.view.*
 import android.view.View.GONE
@@ -96,11 +97,15 @@ class AllNotesFragment : Fragment() , NoteFireClick {
         noteRVAdapter?.viewModel = allNotesViewModel
         noteRVAdapter?.lifecycleScope = lifecycleScope
         noteRVAdapter?.lifecycleOwner = this
-        noteRVAdapter?.fontStyle = fontStyle
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+
+            noteRVAdapter?.fontStyle = fontStyle
+            pinnedNoteRVAdapter?.fontStyle = fontStyle
+
+        }
         pinnedNoteRVAdapter?.viewModel = allNotesViewModel
         pinnedNoteRVAdapter?.lifecycleScope = lifecycleScope
         pinnedNoteRVAdapter?.lifecycleOwner = this
-        pinnedNoteRVAdapter?.fontStyle = fontStyle
         setHasOptionsMenu(true)
         val mAuth: FirebaseAuth = FirebaseAuth.getInstance()
         mAuth.addAuthStateListener {
@@ -255,7 +260,7 @@ class AllNotesFragment : Fragment() , NoteFireClick {
                     }
                     if (emptyTrashImmediately != true){
                         val noteUpdate = HashMap<String,Any>()
-                        noteUpdate["deleted"] = true
+                        noteUpdate["deletedDate"] = System.currentTimeMillis()
                         note.noteUid?.let { it1 -> allNotesViewModel.updateFireNote(noteUpdate, it1) }
 
                         note.noteUid?.let { it1 -> scheduleDelete(it1,note.tags,note.label,note.timeStamp) }

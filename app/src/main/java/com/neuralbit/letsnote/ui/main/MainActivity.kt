@@ -246,7 +246,7 @@ class MainActivity : AppCompatActivity() {
 
 
                 AuthUI.getInstance()
-                    .signOut(this)
+                    .signOut(this@MainActivity)
                     .addOnCompleteListener{
                         val intent = Intent(this@MainActivity, SignInActivity::class.java)
                         startActivity(intent)
@@ -264,7 +264,7 @@ class MainActivity : AppCompatActivity() {
             alertDialog.setPositiveButton("Yes"
             ) { _, _ ->
                 Toast.makeText(applicationContext,"All your information has been wiped out", Toast.LENGTH_SHORT).show()
-                viewModal.deleteUserDataContent()
+                viewModal.deleteUserDataContent(this@MainActivity)
             }
 
             alertDialog.setNegativeButton("Cancel"

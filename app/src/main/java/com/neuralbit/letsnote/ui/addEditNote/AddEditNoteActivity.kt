@@ -1,7 +1,6 @@
 package com.neuralbit.letsnote.ui.addEditNote
 
 import android.Manifest
-import android.annotation.TargetApi
 import android.app.AlarmManager
 import android.app.AlertDialog
 import android.app.PendingIntent
@@ -10,7 +9,6 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
-import android.content.pm.ShortcutManager
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Typeface
@@ -141,7 +139,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private lateinit var colorPickerView: ColorPickerView
     private lateinit var labelTitleET: EditText
     private val deletedTodos = ArrayList<TodoItem>()
-    private lateinit var deletedNotePrefs : SharedPreferences
     private lateinit var settingsPref : SharedPreferences
     private var protected = false
     private var labelColor = 0
@@ -222,7 +219,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         }
 
         addTagBtn.setOnClickListener {
-            val addTagDialog = AddTagDialog(this,applicationContext)
+            val addTagDialog = AddTagDialog(this,this@AddEditNoteActivity)
             addTagDialog.tagList = tagList
             addTagDialog.show(supportFragmentManager,"addTagDialogs")
 
@@ -608,29 +605,29 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
     private fun requestStoragePermission() {
         if (ActivityCompat.shouldShowRequestPermissionRationale(
-                this,
+                this@AddEditNoteActivity,
                 Manifest.permission.READ_EXTERNAL_STORAGE
             )
         ) {
-            androidx.appcompat.app.AlertDialog.Builder(this@AddEditNoteActivity)
+            AlertDialog.Builder(this@AddEditNoteActivity)
                 .setTitle("Permission needed")
                 .setMessage("This permission is needed because we need to access your storage")
                 .setPositiveButton(
                     "ok"
                 ) { _: DialogInterface?, _: Int ->
                     ActivityCompat.requestPermissions(
-                        this,
+                        this@AddEditNoteActivity,
                         arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
                         GALLERY_REQUEST
                     )
                 }
                 .setNegativeButton(
                     "cancel"
-                ) { dialog: DialogInterface, which: Int -> dialog.dismiss() }
+                ) { dialog: DialogInterface, _: Int -> dialog.dismiss() }
                 .create().show()
         } else {
             ActivityCompat.requestPermissions(
-                this,
+                this@AddEditNoteActivity,
                 arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
                 GALLERY_REQUEST
             )
@@ -639,7 +636,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
 
     private fun deleteNote(){
-        val alertDialog: AlertDialog? = this.let {
+        val alertDialog: AlertDialog? = this@AddEditNoteActivity.let {
             val builder = AlertDialog.Builder(this@AddEditNoteActivity)
             builder.apply {
                 setPositiveButton("ok"
@@ -703,7 +700,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
     private fun requestCameraPermission() {
         if (ActivityCompat.shouldShowRequestPermissionRationale(
-                this,
+                this@AddEditNoteActivity,
                 Manifest.permission.CAMERA
             )
         ) {
@@ -722,7 +719,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 .create().show()
         } else {
             ActivityCompat.requestPermissions(
-                this,
+                this@AddEditNoteActivity,
                 arrayOf(Manifest.permission.CAMERA),
                 REQUEST_CAMERA_CODE
             )
@@ -807,13 +804,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
     private fun initControllers(){
         cm= Common()
-        if (Build.VERSION.SDK_INT >= 25) {
-            createShortcut()
-        }else{
-            removeShortcuts()
-        }
+        createShortcut()
 
-        deletedNotePrefs = applicationContext.getSharedPreferences("DeletedNotes", MODE_PRIVATE)
         settingsPref = applicationContext.getSharedPreferences("Settings", MODE_PRIVATE)
         fontMultiplier = settingsPref.getInt("fontMultiplier",2)
 
@@ -876,8 +868,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
         undoButton = findViewById(R.id.undoButton)
         redoButton = findViewById(R.id.redoButton)
         infoContainer = findViewById(R.id.infoContainer)
-        alertBottomSheet =  BottomSheetDialog(this)
-        labelBottomSheet = BottomSheetDialog(this)
+        alertBottomSheet =  BottomSheetDialog(this@AddEditNoteActivity)
+        labelBottomSheet = BottomSheetDialog(this@AddEditNoteActivity)
         coordinatorlayout = findViewById(R.id.coordinatorlayout)
         layoutManager.orientation = HORIZONTAL
         tagListAdapter= AddEditTagRVAdapter(applicationContext,this)
@@ -915,28 +907,35 @@ class AddEditNoteActivity : AppCompatActivity() ,
         }
 
         val fontStyle = settingsPref.getString("font",null)
-        val typeface: Typeface? = when (fontStyle) {
-            "Architects daughter" -> {
-                ResourcesCompat.getFont(applicationContext, R.font.architects_daughter)
-            }
-            "Abreeze" -> {
-                ResourcesCompat.getFont(applicationContext, R.font.abeezee)
-            }
-            "Adamina" -> {
-                ResourcesCompat.getFont(applicationContext, R.font.adamina)
-            }
-            else -> {
-                ResourcesCompat.getFont(applicationContext, R.font.roboto)
-            }
-        }
         todoItemDescTV.setTextSize(TypedValue.COMPLEX_UNIT_SP,18+ ((fontMultiplier-2)*2).toFloat())
-        todoItemDescTV.typeface = typeface
-        todoRVAdapter.fontStyle = fontStyle
-        todoRVAdapter.fontMultiplier = fontMultiplier
-        noteDescriptionEdit.typeface = typeface
-        noteTitleEdit.typeface = typeface
-        reminderTV.typeface = typeface
-        tvTimeStamp.typeface = typeface
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+
+            val typeface: Typeface? = when (fontStyle) {
+                "Architects daughter" -> {
+                    ResourcesCompat.getFont(applicationContext, R.font.architects_daughter)
+                }
+                "Abreeze" -> {
+                    ResourcesCompat.getFont(applicationContext, R.font.abeezee)
+                }
+                "Adamina" -> {
+                    ResourcesCompat.getFont(applicationContext, R.font.adamina)
+                }
+                else -> {
+                    ResourcesCompat.getFont(applicationContext, R.font.roboto)
+                }
+            }
+
+
+            todoItemDescTV.typeface = typeface
+            todoRVAdapter.fontStyle = fontStyle
+            todoRVAdapter.fontMultiplier = fontMultiplier
+            noteDescriptionEdit.typeface = typeface
+            noteTitleEdit.typeface = typeface
+            reminderTV.typeface = typeface
+            tvTimeStamp.typeface = typeface
+        }
         if (noteType == "NewTodo"){
             noteDescriptionEdit.visibility = GONE
             todoRV.visibility = VISIBLE
@@ -1095,7 +1094,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
     }
 
-    @TargetApi(25)
     private fun createShortcut() {
         val intent = Intent(applicationContext, AddEditNoteActivity::class.java)
         intent.action = Intent.ACTION_VIEW
@@ -1108,7 +1106,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
             .setIntent(intent) // Push the shortcut
             .build()
 
-        ShortcutManagerCompat.pushDynamicShortcut(applicationContext, newNoteShortcut)
         intent.putExtra("noteType","NewTodo")
 
         val newTodoShortcut = ShortcutInfoCompat.Builder(applicationContext, "newTodo")
@@ -1121,17 +1118,18 @@ class AddEditNoteActivity : AppCompatActivity() ,
             .build()
 
         ShortcutManagerCompat.pushDynamicShortcut(applicationContext, newTodoShortcut)
+        ShortcutManagerCompat.pushDynamicShortcut(applicationContext, newNoteShortcut)
+
 
 
     }
 
 
-    @TargetApi(25)
-    private fun removeShortcuts() {
-        val shortcutManager = getSystemService(ShortcutManager::class.java)
-        shortcutManager.disableShortcuts(listOf("newNote","newTodo"))
-        shortcutManager.removeAllDynamicShortcuts()
-    }
+//    private fun removeShortcuts() {
+//        val shortcutManager = getSystemService(ShortcutManager::class.java)
+//        shortcutManager.disableShortcuts(listOf("newNote","newTodo"))
+//        shortcutManager.removeAllDynamicShortcuts()
+//    }
 
 
     private fun getTagFromString(p0: CharSequence?) {
@@ -1276,26 +1274,26 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 in 0..4 -> {
                     calendar[Calendar.HOUR_OF_DAY] = 8
                     calendar[Calendar.MINUTE] = 0
-                    Toast.makeText(this, "Reminder set for today at 8:00 am", Toast.LENGTH_SHORT).show()
+
+                    Toast.makeText(this@AddEditNoteActivity, resources.getString(R.string.reminder_set_today,"8:00 am"), Toast.LENGTH_SHORT).show()
 
                 }
                 in 5..8 -> {
                     calendar[Calendar.HOUR_OF_DAY] = 14
                     calendar[Calendar.MINUTE] = 0
-                    Toast.makeText(this, "Reminder set for today at 2:00 pm", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@AddEditNoteActivity, resources.getString(R.string.reminder_set_today,"2:00 pm"), Toast.LENGTH_SHORT).show()
 
                 }
                 in 9..14 ->{
                     calendar[Calendar.HOUR_OF_DAY] = 18
                     calendar[Calendar.MINUTE] = 0
-                    Toast.makeText(this, "Reminder set for today at 6:00 pm", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@AddEditNoteActivity, resources.getString(R.string.reminder_set_today,"6:00 pm"), Toast.LENGTH_SHORT).show()
 
                 }
                 in 15..18 -> {
                     calendar[Calendar.HOUR_OF_DAY] = 20
                     calendar[Calendar.MINUTE] = 0
-                    Toast.makeText(this, "Reminder set for today at 8:00 pm", Toast.LENGTH_SHORT).show()
-
+                    Toast.makeText(this@AddEditNoteActivity, resources.getString(R.string.reminder_set_today,"8:00 pm"), Toast.LENGTH_SHORT).show()
                 }
             }
             viewModal.reminderTime = calendar.timeInMillis
@@ -1313,7 +1311,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 viewModal.noteChanged.value = true
 
             }
-            Toast.makeText(this, "Reminder set for tomorrow at 8:00am", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this@AddEditNoteActivity, resources.getString(R.string.reminder_set_tomorrow,"8:00 pm"), Toast.LENGTH_SHORT).show()
 
             viewModal.reminderTime = calendar.timeInMillis
             viewModal.reminderSet.value = true
@@ -1641,21 +1639,26 @@ class AddEditNoteActivity : AppCompatActivity() ,
         this.calendar[Calendar.HOUR]= calendar[Calendar.HOUR]
         this.calendar[Calendar.MINUTE]= calendar[Calendar.MINUTE]
         this.calendar[Calendar.SECOND]= calendar[Calendar.SECOND]
-        timeTitleTV.text= "Time set:" + DateFormat.getTimeFormat(this).format(calendar.time)
+        timeTitleTV.text= resources.getString(R.string.date_time_set,"Time set ", DateFormat.getTimeFormat(applicationContext).format(calendar.time))
     }
 
     override fun getDateInfo(calendar : Calendar) {
         this.calendar[Calendar.DAY_OF_MONTH] = calendar[Calendar.DAY_OF_MONTH]
         this.calendar[Calendar.MONTH] = calendar[Calendar.MONTH]
         this.calendar[Calendar.YEAR] = calendar[Calendar.YEAR]
-        dateTitleTV.text="Date set:" + DateFormat.getDateFormat(this).format(calendar.time)
+        dateTitleTV.text= resources.getString(R.string.date_time_set,"Date set ", DateFormat.getDateFormat(applicationContext).format(calendar.time))
     }
 
     override fun getTag(tag: String) {
-
+        var tagTitle = tag
+        if(tagTitle.isNotEmpty()){
+            if (tagTitle[0] != '#'){
+                tagTitle = "#$tag"
+            }
+        }
         val tags = HashSet<String>()
         tags.addAll(viewModal.oldTagList)
-        viewModal.newTags.add(tag)
+        viewModal.newTags.add(tagTitle)
         tags.addAll(viewModal.newTags)
         tagListAdapter.updateList(ArrayList(tags))
         viewModal.noteChanged.value = true

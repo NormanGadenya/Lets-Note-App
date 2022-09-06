@@ -5,6 +5,10 @@
     <string name="welcome_text">Lets get started</string>
     <string name="sign_in_tot">By signing in you are accepting the terms and conditions</string>
     <string name="timeStamp"> Edited on %1$s at %2$s</string>
+    <string name="font_seekbar_desc">Font seekbar</string>
+    <string name="date_time_set">"%1$s set  :"  %2$s</string>
+    <string name="reminder_set_today"> Reminder set today at %1$s</string>
+    <string name="reminder_set_tomorrow"> Reminder set tomorrow at %1$s</string>
     <string name="deletedTime"> Deleted on %1$s at %2$s</string>
     <string name="archivedTime"> Archived on %1$s at %2$s</string>
     <string name="noteTagCountSingle"> %1$s Note</string>

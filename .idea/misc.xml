@@ -86,9 +86,14 @@
         <entry key="app/src/main/res/drawable/white_tag.xml" value="0.353125" />
         <entry key="app/src/main/res/drawable/wild_orchid_tag.xml" value="0.22291666666666668" />
         <entry key="app/src/main/res/drawable/wild_orchid_toolbar.xml" value="0.1225" />
+        <entry key="app/src/main/res/font/abeezee.xml" value="0.19453125" />
+        <entry key="app/src/main/res/font/architects_daughter.xml" value="0.19453125" />
+        <entry key="app/src/main/res/font/belleza.xml" value="0.19453125" />
+        <entry key="app/src/main/res/font/fira_sans_thin.xml" value="0.19453125" />
+        <entry key="app/src/main/res/font/roboto.xml" value="0.19453125" />
         <entry key="app/src/main/res/layout-land/activity_sign_in.xml" value="0.35752979414951247" />
         <entry key="app/src/main/res/layout-v26/label_item.xml" value="0.15989583333333332" />
-        <entry key="app/src/main/res/layout/activity_add_edit_note.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/activity_add_edit_note.xml" value="0.21" />
         <entry key="app/src/main/res/layout/activity_fingerprint.xml" value="0.35885416666666664" />
         <entry key="app/src/main/res/layout/activity_label_notes.xml" value="0.17" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.25" />
@@ -103,7 +108,7 @@
         <entry key="app/src/main/res/layout/app_bar_main.xml" value="0.3089887640449438" />
         <entry key="app/src/main/res/layout/checklist_item.xml" value="0.5" />
         <entry key="app/src/main/res/layout/content_main.xml" value="0.25" />
-        <entry key="app/src/main/res/layout/custom_datetime_dialog.xml" value="0.18" />
+        <entry key="app/src/main/res/layout/custom_datetime_dialog.xml" value="0.2" />
         <entry key="app/src/main/res/layout/deleted_notes_fragment.xml" value="0.24289405684754523" />
         <entry key="app/src/main/res/layout/fragment_add_edit.xml" value="0.2625" />
         <entry key="app/src/main/res/layout/fragment_all_notes.xml" value="0.2640449438202247" />

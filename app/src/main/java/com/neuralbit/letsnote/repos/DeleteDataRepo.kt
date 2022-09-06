@@ -7,7 +7,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 
-class DeleteDataRepo(val context : Context) {
+class DeleteDataRepo() {
 
     private val database = Firebase.database
     val TAG = "NoteFireRepo"
@@ -15,7 +15,7 @@ class DeleteDataRepo(val context : Context) {
 
 
 
-    fun deleteUserData( ){
+    fun deleteUserData(context: Context ){
         val userRef = fUser?.uid?.let { database.getReference(it) }
         userRef?.removeValue()
         AuthUI.getInstance()

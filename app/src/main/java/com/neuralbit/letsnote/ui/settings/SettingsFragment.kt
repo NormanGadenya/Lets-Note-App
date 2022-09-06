@@ -2,6 +2,7 @@ package com.neuralbit.letsnote.ui.settings
 
 import android.content.Intent
 import android.content.SharedPreferences
+import android.os.Build
 import android.os.Bundle
 import android.view.*
 import android.view.View.GONE
@@ -52,6 +53,15 @@ class SettingsFragment : Fragment() {
         val darkMode = settingsPref.getInt("darkModePosition",R.id.defaultMode)
         val fontPosition = settingsPref.getInt("fontMultiplier",2)
         val radioPosition = settingsPref.getInt("radioPosition", R.id.fontDef)
+        val fontStyleTitle = binding.fontStyleDummyT
+        val fontStyleCard = binding.cardView3
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O){
+            fontStyleTitle.visibility = GONE
+            fontStyleCard.visibility = GONE
+        }else{
+            fontStyleTitle.visibility = VISIBLE
+            fontStyleCard.visibility = VISIBLE
+        }
         val emptyTrashSwitch = binding.emptyTrashSwitch
         val lightModeGroup = binding.dayNightRadioGroup
         val migrateCard = binding.cardView4

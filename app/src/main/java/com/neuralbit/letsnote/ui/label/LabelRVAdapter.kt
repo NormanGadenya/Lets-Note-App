@@ -1,4 +1,4 @@
-package com.neuralbit.letsnote.ui.adapters
+package com.neuralbit.letsnote.ui.label
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.neuralbit.letsnote.R
-import com.neuralbit.letsnote.ui.label.Label
 import kotlinx.coroutines.*
 
 class LabelRVAdapter(

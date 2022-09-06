@@ -205,6 +205,7 @@
                         android:layout_margin="16dp"
                         android:background="@drawable/sign_in_bgnd"
                         android:drawableLeft="@drawable/icons_google"
+                        android:contentDescription="@string/font_seekbar_desc"
                         android:text="@string/sign_in"
                         android:textColor="@color/timberwolf"
                         app:layout_constraintStart_toStartOf="parent"

@@ -4,6 +4,7 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.*
 import android.widget.ImageView
@@ -19,9 +20,9 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.gms.ads.AdRequest
 import com.google.gson.Gson
 import com.neuralbit.letsnote.R
-import com.neuralbit.letsnote.services.DeleteReceiver
 import com.neuralbit.letsnote.databinding.FragmentArchivedNotesBinding
 import com.neuralbit.letsnote.entities.NoteFire
+import com.neuralbit.letsnote.services.DeleteReceiver
 import com.neuralbit.letsnote.ui.adapters.NoteFireClick
 import com.neuralbit.letsnote.ui.adapters.NoteRVAdapter
 import com.neuralbit.letsnote.ui.addEditNote.AddEditNoteActivity
@@ -67,7 +68,9 @@ class ArchivedFragment : Fragment() , NoteFireClick {
         adView.loadAd(adRequest)
         val settingsSharedPref = context?.getSharedPreferences("Settings", AppCompatActivity.MODE_PRIVATE)
         val fontStyle = settingsSharedPref?.getString("font",null)
-        noteRVAdapter?.fontStyle = fontStyle
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            noteRVAdapter?.fontStyle = fontStyle
+        }
         val staggeredLayoutManagerAll = StaggeredGridLayoutManager( 2,LinearLayoutManager.VERTICAL)
         allNotesViewModel.staggeredView.observe(viewLifecycleOwner){
             if (it){
@@ -108,7 +111,7 @@ class ArchivedFragment : Fragment() , NoteFireClick {
 
                     if (emptyTrashImmediately != true){
                         val noteUpdate = HashMap<String,Any>()
-                        noteUpdate["deleted"] = true
+                        noteUpdate["deletedDate"] = System.currentTimeMillis()
                         note.noteUid?.let { it1 -> allNotesViewModel.updateFireNote(noteUpdate, it1) }
 
                         note.noteUid?.let { it1 -> scheduleDelete(it1,note.tags,note.label,note.timeStamp) }

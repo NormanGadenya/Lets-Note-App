@@ -19,9 +19,9 @@ android {
 
     defaultConfig {
         applicationId "com.neuralbit.letsnote"
-        minSdk 23
+        minSdk 25
         targetSdk 33
-        versionCode 6
+        versionCode 7
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

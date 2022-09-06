@@ -5,6 +5,7 @@ import android.app.AlertDialog
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -74,7 +75,9 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
         noteRVAdapter.lifecycleOwner = this
         val settingsSharedPref = getSharedPreferences("Settings", MODE_PRIVATE)
         val fontStyle = settingsSharedPref?.getString("font",null)
-        noteRVAdapter.fontStyle = fontStyle
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            noteRVAdapter.fontStyle = fontStyle
+        }
         val staggeredLayoutManagerAll = StaggeredGridLayoutManager( 2,LinearLayoutManager.VERTICAL)
         recyclerView.layoutManager = staggeredLayoutManagerAll
         val staggered = settingsSharedPref?.getBoolean("staggered",true)
