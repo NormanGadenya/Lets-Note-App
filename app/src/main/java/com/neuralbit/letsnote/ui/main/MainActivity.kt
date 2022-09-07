@@ -257,10 +257,13 @@ class MainActivity : AppCompatActivity() {
         }
         deleteAndSignOut.setOnMenuItemClickListener {
             val alertDialog: AlertDialog.Builder = AlertDialog.Builder(this@MainActivity)
-            alertDialog.setTitle("You will lose all your stored notes if you proceed")
+            alertDialog.setTitle(resources.getString(R.string.delete_and_sign_out_alert))
             alertDialog.setPositiveButton("Yes"
             ) { _, _ ->
-                Toast.makeText(applicationContext,"All your information has been wiped out", Toast.LENGTH_SHORT).show()
+                Toast.makeText(applicationContext,resources.getString(R.string.delete_and_sign_out_message), Toast.LENGTH_SHORT).show()
+                val editor : SharedPreferences.Editor= settingsPref.edit()
+                editor.clear()
+                editor.apply()
                 viewModal.deleteUserDataContent(this@MainActivity)
             }
 
@@ -273,8 +276,10 @@ class MainActivity : AppCompatActivity() {
             if (layoutViewBtn != null){
                 if (it){
                     layoutViewBtn.setIcon(R.drawable.ic_baseline_table_rows_24)
+                    layoutViewBtn.title = resources.getString(R.string.list_layout)
                 }else{
                     layoutViewBtn.setIcon(R.drawable.baseline_grid_view_24)
+                    layoutViewBtn.title = resources.getString(R.string.grid_layout)
 
                 }
             }

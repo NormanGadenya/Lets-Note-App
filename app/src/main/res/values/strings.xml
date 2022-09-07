@@ -6,6 +6,7 @@
     <string name="sign_in_tot">By signing in you are accepting the terms and conditions</string>
     <string name="timeStamp"> Edited on %1$s at %2$s</string>
     <string name="font_seekbar_desc">Font seekbar</string>
+    <string name="font_style_desc">Font seekbar</string>
     <string name="date_time_set">"%1$s set  :"  %2$s</string>
     <string name="reminder_set_today"> Reminder set today at %1$s</string>
     <string name="reminder_set_tomorrow"> Reminder set tomorrow at %1$s</string>
@@ -88,6 +89,23 @@
     <string name="title_activity_splash_screen">SplashScreen</string>
     <string name="new_note_button">New note</string>
     <string name="new_todo_button">New todo</string>
+    <string name="architects_daughter">Architects daughter</string>
+    <string name="abreeze">Abreeze</string>
+    <string name="adamina">Adamina</string>
+    <string name="archive">Archive</string>
+    <string name="restore">Restore</string>
+    <string name="delete">Delete</string>
+    <string name="share">Share</string>
+    <string name="protect">Lock note</string>
+    <string name="pin_note">Pin note</string>
+    <string name="edit_label">Edit label</string>
+    <string name="grid_layout">Grid layout</string>
+    <string name="list_layout">List layout</string>
+    <string name="clear_trash">Clear trash</string>
+    <string name="sign_out">Sign out</string>
+    <string name="delete_and_sign_out_alert">You will lose all your stored notes if you proceed</string>
+    <string name="delete_and_sign_out">Delete data and sign out</string>
+    <string name="delete_and_sign_out_message">All your information has been wiped out</string>
     <string name="note_type_button">Note type</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>

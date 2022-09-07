@@ -23,8 +23,8 @@ class AddEditLabelAdapter(
 
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
-
-        val labelView : ImageView = itemView.findViewById(R.id.labelRVItem)
+        val labelView : View = itemView.findViewById(R.id.label)
+        val labelViewIV : ImageView = itemView.findViewById(R.id.labelRVItem)
         val labelTitleTv : TextView = itemView.findViewById(R.id.labelTitle)
     }
 
@@ -42,9 +42,9 @@ class AddEditLabelAdapter(
         }else{
             holder.labelTitleTv.visibility = VISIBLE
         }
-        holder.labelView.setColorFilter(labelColor)
+        holder.labelViewIV.setColorFilter(labelColor)
         holder.labelTitleTv.text = labelTitle
-        holder.labelView.setOnClickListener{
+        holder.labelView.setOnClickListener {
             labelClickInterface.onLabelItemClick(labelColor)
         }
     }

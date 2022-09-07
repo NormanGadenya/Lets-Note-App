@@ -1361,7 +1361,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                     alertBottomSheet.dismiss()
 
                 }
-                setView(R.layout.custom_datetime_dialog)
+                setView(R.layout.alert_datetime_dialog)
                 setTitle("Choose date and time")
             }
             builder.create()

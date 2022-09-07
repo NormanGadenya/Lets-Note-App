@@ -11,6 +11,6 @@
     <item
         android:id="@+id/edit"
         android:icon="@drawable/ic_baseline_edit_24"
-        android:title="Edit label"
-        app:showAsAction="always" />
+        android:title="@string/edit_label"
+        app:showAsAction="ifRoom" />
 </menu>
