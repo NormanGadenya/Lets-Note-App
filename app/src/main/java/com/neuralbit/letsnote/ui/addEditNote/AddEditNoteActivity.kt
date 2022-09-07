@@ -941,6 +941,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
             todoRV.visibility = VISIBLE
             todoItemDescTV.visibility = VISIBLE
             todoCheckBox.visibility = VISIBLE
+            ocrButton.visibility = GONE
         }
     }
 
