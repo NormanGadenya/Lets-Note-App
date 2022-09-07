@@ -186,18 +186,23 @@ class AllNotesFragment : Fragment() , NoteFireClick {
                 noteRVAdapter?.updateListFire(it)
                 noteRVAdapter?.searchString = str
             }
-            allNotesViewModel.filterPinnedFireList().observe(viewLifecycleOwner) {
-                if (it.isEmpty()){
-                    pinnedNotesTV.isVisible = false
-                    pinnedNotesRV.isVisible = false
-                    otherNotesTV.isVisible = false
-                }else{
-                    pinnedNotesTV.isVisible = true
-                    pinnedNotesRV.isVisible = true
-                    otherNotesTV.isVisible = true
+            allNotesViewModel.filterPinnedFireList().observe(viewLifecycleOwner) { pinnedNotes ->
+                allNotesViewModel.filterOtherFireList().observe(viewLifecycleOwner) { otherNotes ->
+                    if (pinnedNotes.isEmpty()){
+                        pinnedNotesTV.isVisible = false
+                        pinnedNotesRV.isVisible = false
+                        otherNotesTV.isVisible = false
+                    }else{
+                        pinnedNotesTV.isVisible = true
+                        pinnedNotesRV.isVisible = true
+                        if (otherNotes.isNotEmpty()){
+                            otherNotesTV.isVisible = true
+                        }
+                    }
                 }
+
                 pinnedNoteRVAdapter?.searchString = str
-                pinnedNoteRVAdapter?.updateListFire(it)
+                pinnedNoteRVAdapter?.updateListFire(pinnedNotes)
             }
 
         }

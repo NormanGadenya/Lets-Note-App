@@ -1,9 +1,6 @@
 package com.neuralbit.letsnote.ui.main
 
-import android.app.AlarmManager
 import android.app.AlertDialog
-import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -42,7 +39,6 @@ import com.neuralbit.letsnote.ui.deletedNotes.DeletedNotesViewModel
 import com.neuralbit.letsnote.ui.label.LabelViewModel
 import com.neuralbit.letsnote.ui.signIn.SignInActivity
 import com.neuralbit.letsnote.ui.tag.TagViewModel
-import com.neuralbit.letsnote.utilities.AlertReceiver
 import kotlinx.coroutines.launch
 
 
@@ -369,13 +365,6 @@ class MainActivity : AppCompatActivity() {
             actionMode = null
         }
 
-    }
-
-    private fun cancelAlarm(reminder : Int){
-        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(this, AlertReceiver::class.java)
-        val pendingIntent = PendingIntent.getBroadcast(this, reminder, intent, PendingIntent.FLAG_IMMUTABLE)
-        alarmManager.cancel(pendingIntent)
     }
 
 

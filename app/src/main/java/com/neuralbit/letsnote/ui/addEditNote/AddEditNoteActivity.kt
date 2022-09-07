@@ -1385,7 +1385,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private fun startAlarm(requestCode: Int) {
        
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(this, AlertReceiver::class.java)
+        val intent = Intent(this@AddEditNoteActivity, AlertReceiver::class.java)
         viewModal.noteChanged.value = true
         val noteTitle = noteTitleEdit.text.toString()
         val noteDescription = noteDescriptionEdit.text.toString()
@@ -1434,7 +1434,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
     private fun cancelAlarm(requestCode: Int){
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(this, AlertReceiver::class.java)
+        val intent = Intent(this@AddEditNoteActivity, AlertReceiver::class.java)
         val pendingIntent = PendingIntent.getBroadcast(this,requestCode , intent, PendingIntent.FLAG_IMMUTABLE)
         alarmManager.cancel(pendingIntent)
     }
