@@ -2,7 +2,7 @@
     <string name="app_name">Let\'s note</string>
     <string name="app_version">App version 1.0</string>
     <string name="app_icon">App icon</string>
-    <string name="welcome_text">Lets get started</string>
+    <string name="welcome_text">Let\'s get started</string>
     <string name="sign_in_tot">By signing in you are accepting the terms and conditions</string>
     <string name="timeStamp"> Edited on %1$s at %2$s</string>
     <string name="font_seekbar_desc">Font seekbar</string>
@@ -16,6 +16,7 @@
     <string name="reminder">Reminder set on %1$s at %2$s</string>
     <string name="opt1Desc">Later today at %1$s</string>
     <string name="opt2n3Desc">Tomorrow in the %1$s at %2$s</string>
+    <string name="app_version_template">Application version %1$s</string>
     <string name="tagTitle">#%1$s</string>
     <string name="createNewTag">Create #%1$s</string>
     <string name="title_activity_main2">MainActivity2</string>
@@ -25,8 +26,8 @@
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="add_tag_hint">#neverLoseANote</string>
-    <string name="date_button">Date button</string>
-    <string name="time_button">Time button</string>
+    <string name="date_button">Date</string>
+    <string name="time_button">Time</string>
     <string name="action_settings">Settings</string>
 
     <string name="menu_allNotes">All Notes</string>
@@ -47,11 +48,11 @@
     <string name="settings">Settings</string>
     <string name="Save">Save</string>
     <string name="pick_a_label">Pick a label</string>
-    <string name="add_tag_button">Add tag button</string>
+    <string name="add_tag_button">Add tag</string>
     <string name="todo_icon">Todo icon</string>
-    <string name="ocr_button">OCR button</string>
-    <string name="undo_button">Undo button</string>
-    <string name="redo_button">Redo button</string>
+    <string name="ocr_button">OCR</string>
+    <string name="undo_button">Undo</string>
+    <string name="redo_button">Redo</string>
     <string name="lock_icon">Note locked icon</string>
     <string name="Cancel">Cancel</string>
     <string name="label_icon">Label icon</string>
@@ -62,7 +63,7 @@
     <string name="note">Note</string>
     <string name="font_style">Font style</string>
     <string name="font_size">Font size</string>
-    <string name="delete_tag_button">Delete tag button</string>
+    <string name="delete_tag_button">Delete tag</string>
     <string name="link_to_google">Link with your Google account</string>
     <string name="sign_in">Sign in</string>
     <string name="empty_trash">Empty trash automatically</string>
@@ -85,18 +86,18 @@
     <string name="termsAndConditions"><u>Terms and Conditions</u></string>
     <string name="privacyPolicy"><u>Privacy Policy</u></string>
     <string name="title_activity_splash_screen">SplashScreen</string>
-    <string name="new_note_button">New note button</string>
-    <string name="new_todo_button">New todo button</string>
+    <string name="new_note_button">New note</string>
+    <string name="new_todo_button">New todo</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
     <string name="second_fragment_label">Second Fragment</string>
     <string name="next">Next</string>
-    <string name="add_label_button">Add label button</string>
+    <string name="add_label_button">Add label</string>
     <string name="previous">Previous</string>
     <string name="arrow_icon">Arrow icon</string>
     <string name="reminder_icon">Reminder Icon</string>
     <string name="fingerprint_icon">Fingerprint Icon</string>
-    <string name="dismiss_todo_button">Dismiss todo button</string>
+    <string name="dismiss_todo_button">Dismiss todo</string>
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <string name="_hint">Todo item</string>
@@ -109,7 +110,7 @@
     <string name="banner">ca-app-pub-6883474616906010/7788720752</string>
     <string name="interstitial">ca-app-pub-6883474616906010/3767684880</string>
     <string name="delete_todo_button">Delete todo item</string>
-    <string name="drag_todo_button">Drag todo button</string>
+    <string name="drag_todo_button">Drag todo</string>
     <string name="all_notes_list">List of all notes</string>
     <string name="all_todo_list">List of all todos</string>
     <string name="all_archived_list">List of all archived notes</string>

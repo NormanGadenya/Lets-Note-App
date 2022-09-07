@@ -140,6 +140,7 @@ class MainActivity : AppCompatActivity() {
             Glide.with(applicationContext).load(profileUrl).into(profileIV)
         }
 
+
         val name = fUser?.displayName
         if (name != null){
             nameTV.text = name

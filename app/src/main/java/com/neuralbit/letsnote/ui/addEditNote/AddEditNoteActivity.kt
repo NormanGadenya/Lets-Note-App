@@ -1005,6 +1005,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
             } else {
                 cancelAlarm(reminderTime.toInt())
                 viewModal.reminderTime = 0
+                viewModal.reminderSet.value = false
             }
             return@setOnMenuItemClickListener true
         }

@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="@dimen/nav_header_height"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@drawable/splash"
+    android:background="@drawable/splash2"
     android:gravity="bottom"
     android:orientation="vertical"
     android:paddingLeft="@dimen/margin"
