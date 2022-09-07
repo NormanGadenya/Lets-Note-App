@@ -10,6 +10,8 @@ import android.os.Bundle
 import android.view.*
 import android.view.View.GONE
 import android.view.View.VISIBLE
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -50,6 +52,14 @@ class AllNotesFragment : Fragment() , NoteFireClick {
     private val binding get() = _binding!!
     private lateinit var pinnedNotesTV: TextView
     private lateinit var otherNotesTV: TextView
+    private lateinit var noteTypeFAB : FloatingActionButton
+    private lateinit var addTodoFAB : FloatingActionButton
+    private val rotateOpen: Animation by lazy { AnimationUtils.loadAnimation(context,R.anim.rotate_open_anim)}
+    private val rotateClose: Animation by lazy { AnimationUtils.loadAnimation(context,R.anim.rotate_close_anim)}
+    private val fromBottom: Animation by lazy { AnimationUtils.loadAnimation(context,R.anim.from_bottom_anim)}
+    private val toBottom: Animation by lazy { AnimationUtils.loadAnimation(context,R.anim.to_bottom)}
+    private var clicked = false
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -59,8 +69,8 @@ class AllNotesFragment : Fragment() , NoteFireClick {
 
         val root: View = binding.root
         addNoteFAB = binding.FABAddNote
-        addNoteFAB.visibility = VISIBLE
-
+        addTodoFAB = binding.FABAddTodoList
+        noteTypeFAB = binding.FABNoteType
         notesRV = binding.notesRV
         pinnedNotesRV = binding.pinnedNotesRV
         pinnedNotesTV = binding.pinnedNotesTV
@@ -89,6 +99,22 @@ class AllNotesFragment : Fragment() , NoteFireClick {
                 pinnedNotesRV.layoutManager = LinearLayoutManager(context)
             }
         }
+        addNoteFAB.setOnClickListener{
+            val intent = Intent( context,AddEditNoteActivity::class.java)
+            intent.putExtra("noteType","NewNote")
+            startActivity(intent)
+        }
+        addTodoFAB.setOnClickListener{
+            val intent = Intent( context,AddEditNoteActivity::class.java)
+            intent.putExtra("noteType","NewTodo")
+            startActivity(intent)
+        }
+        noteTypeFAB.setOnClickListener{
+            setVisibility(clicked)
+            setAnimation(clicked)
+            clicked = !clicked
+        }
+
         val fontStyle = settingsSharedPref?.getString("font",null)
         val noteRVAdapter = context?.let { NoteRVAdapter(it,this) }
         val pinnedNoteRVAdapter = context?.let { NoteRVAdapter(it,this) }
@@ -303,11 +329,11 @@ class AllNotesFragment : Fragment() , NoteFireClick {
         }
 
 
-        addNoteFAB.setOnClickListener{
-            val intent = Intent( context, AddEditNoteActivity::class.java)
-            intent.putExtra("noteType","NewNote")
-            startActivity(intent)
-        }
+//        addNoteFAB.setOnClickListener{
+//            val intent = Intent( context, AddEditNoteActivity::class.java)
+//            intent.putExtra("noteType","NewNote")
+//            startActivity(intent)
+//        }
 
        
         return root
@@ -319,6 +345,28 @@ class AllNotesFragment : Fragment() , NoteFireClick {
         val trashButton = menu.findItem(R.id.trash)
         trashButton.isVisible = false
         super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    private fun setAnimation(clicked: Boolean) {
+        if (!clicked){
+            noteTypeFAB.startAnimation(rotateOpen)
+            addTodoFAB.startAnimation(fromBottom)
+            addNoteFAB.startAnimation(fromBottom)
+        }else{
+            noteTypeFAB.startAnimation(rotateClose)
+            addTodoFAB.startAnimation(toBottom)
+            addNoteFAB.startAnimation(toBottom)
+        }
+    }
+
+    private fun setVisibility(clicked : Boolean) {
+        if (!clicked){
+            addTodoFAB.visibility = VISIBLE
+            addNoteFAB.visibility = VISIBLE
+        }else{
+            addTodoFAB.visibility = GONE
+            addNoteFAB.visibility = GONE
+        }
     }
 
     override fun onDestroyView() {
