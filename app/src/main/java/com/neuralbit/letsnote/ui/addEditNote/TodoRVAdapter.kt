@@ -2,6 +2,7 @@ package com.neuralbit.letsnote.ui.addEditNote
 
 import android.content.Context
 import android.graphics.Typeface
+import android.os.Build
 import android.text.Editable
 import android.text.SpannableString
 import android.text.TextWatcher
@@ -52,23 +53,28 @@ class TodoRVAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val todoItem = allTodoItems[position]
         holder.checkBox.isChecked = todoItem.checked
-        val typeface: Typeface? = when (fontStyle) {
-            "Architects daughter" -> {
-                ResourcesCompat.getFont(context, R.font.architects_daughter)
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val typeface: Typeface? = when (fontStyle) {
+                "Architects daughter" -> {
+                    ResourcesCompat.getFont(context, R.font.architects_daughter)
+                }
+                "Abreeze" -> {
+                    ResourcesCompat.getFont(context, R.font.abeezee)
+                }
+                "Adamina" -> {
+                    ResourcesCompat.getFont(context, R.font.adamina)
+                }
+                else -> {
+                    ResourcesCompat.getFont(context, R.font.roboto)
+                }
             }
-            "Abreeze" -> {
-                ResourcesCompat.getFont(context, R.font.abeezee)
-            }
-            "Adamina" -> {
-                ResourcesCompat.getFont(context, R.font.adamina)
-            }
-            else -> {
-                ResourcesCompat.getFont(context, R.font.roboto)
-            }
+            holder.todoItemDescET.typeface = typeface
+
         }
         holder.todoItemDescET.setTextSize(TypedValue.COMPLEX_UNIT_SP,18f+ ((fontMultiplier-2)*2).toFloat())
 
-        holder.todoItemDescET.typeface = typeface
         if (todoItem.item.isNotEmpty() && todoItem.checked){
             val spannableString = SpannableString(todoItem.item)
             val strikethroughSpan = StrikethroughSpan()

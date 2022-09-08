@@ -11,23 +11,23 @@
     <item
         android:id="@+id/layoutStyle"
         android:icon="@drawable/baseline_grid_view_24"
-        android:title="Layout style"
+        android:title="@string/grid_layout"
         app:showAsAction="ifRoom"
         />
     <item
         android:id="@+id/trash"
-        android:title="Clear trash"
+        android:title="@string/clear_trash"
         android:icon="@drawable/baseline_delete_forever_24"
         app:showAsAction="always"/>
     <item
         android:id="@+id/signOut"
-        android:title="Sign out"
+        android:title="@string/sign_out"
         android:icon="@drawable/baseline_logout_24"
         app:showAsAction="never"/>
 
     <item
         android:id="@+id/deleteAndSignOut"
-        android:title="Delete data and sign out"
+        android:title="@string/delete_and_sign_out"
         android:icon="@drawable/baseline_logout_24"
         app:showAsAction="never"/>
 

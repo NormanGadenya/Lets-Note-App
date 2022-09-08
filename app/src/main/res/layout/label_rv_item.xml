@@ -5,11 +5,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:padding="8dp"
     android:clickable="true"
+    android:id="@+id/label"
     android:focusable="true"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <ImageView
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:id="@+id/labelRVItem"
         android:src="@drawable/ic_baseline_bookmark_24"
         app:layout_constraintTop_toTopOf="parent"
@@ -17,15 +18,16 @@
         android:contentDescription="@string/label_icon" />
 
     <TextView
+        android:id="@+id/labelTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:text="#tag"
         android:layout_marginTop="4dp"
         android:background="@drawable/tag_background"
         android:padding="4dp"
+        app:layout_constraintEnd_toEndOf="@+id/labelRVItem"
+        app:layout_constraintStart_toStartOf="@+id/labelRVItem"
         app:layout_constraintTop_toBottomOf="@id/labelRVItem"
-        app:layout_constraintStart_toStartOf="parent"
-        android:id="@+id/labelTitle"/>
+        tools:text="#tag" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

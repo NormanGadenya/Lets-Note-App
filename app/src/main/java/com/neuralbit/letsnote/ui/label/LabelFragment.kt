@@ -17,7 +17,6 @@ import com.google.android.gms.ads.AdRequest
 import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.databinding.LabelFragmentBinding
 import com.neuralbit.letsnote.entities.LabelFire
-import com.neuralbit.letsnote.ui.adapters.LabelRVAdapter
 import com.neuralbit.letsnote.ui.addEditNote.NoteViewModel
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import com.neuralbit.letsnote.ui.settings.SettingsViewModel
@@ -77,38 +76,27 @@ class LabelFragment : Fragment(), LabelRVAdapter.LabelClick {
         }
 
         noteViewModel.allFireLabels().observe(viewLifecycleOwner){
-            val pref = context?.getSharedPreferences("DeletedNotes", AppCompatActivity.MODE_PRIVATE)
-            val deletedNotes = pref?.getStringSet("noteUids", HashSet())
             val labelList = HashSet<Label>()
             val labelFireList = HashSet<LabelFire>()
             allNotesViewModel.allFireNotes.observe(viewLifecycleOwner){ allNotes ->
                 
-                val archivedNotes = ArrayList<String>()
+                val invalidNotes = ArrayList<String>()
                 for ( n in allNotes){
-                    if (n.archived){
-                        n.noteUid?.let { it1 -> archivedNotes.add(it1) }
+                    if (n.archived || n.deletedDate > (0).toLong()){
+                        n.noteUid?.let { it1 -> invalidNotes.add(it1) }
                     }
                 }
                 for ( l in it){
                     val label = Label(l.labelColor,l.noteUids.size,l.labelTitle)
 
                     for ( n in l.noteUids){
-                        if(archivedNotes.contains(n) || deletedNotes?.contains(n) == true){
+                        if(invalidNotes.contains(n)){
                             label.labelCount-=1
                         }
-                        if (!archivedNotes.contains(n)){
-                            if (deletedNotes != null){
 
-                                if (!deletedNotes.contains(n)){
-                                    labelList.add(label)
-                                    labelFireList.add(l)
-                                }
-
-
-                            }else{
-                                labelList.add(label)
-                                labelFireList.add(l)
-                            }
+                        if (!invalidNotes.contains(n)){
+                            labelList.add(label)
+                            labelFireList.add(l)
                         }
 
                     }

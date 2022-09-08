@@ -64,38 +64,27 @@ class TagFragment : Fragment(), TagRVAdapter.TagItemClick {
         tagRV.adapter= tagRVAdapter
 
         noteViewModel.allFireTags().observe(viewLifecycleOwner){
-            val pref = context?.getSharedPreferences("DeletedNotes", AppCompatActivity.MODE_PRIVATE)
-            val deletedNotes = pref?.getStringSet("noteUids", HashSet())
             val tagList = HashSet<Tag>()
             val tagFireList = HashSet<TagFire>()
             allNotesViewModel.allFireNotes.observe(viewLifecycleOwner){ allNotes ->
 
-                val archivedNotes = ArrayList<String>()
+                val invalidNotes = ArrayList<String>()
                 for ( n in allNotes){
-                    if (n.archived){
-                        n.noteUid?.let { it1 -> archivedNotes.add(it1) }
+                    if (n.archived || n.deletedDate > (0).toLong()){
+                        n.noteUid?.let { it1 -> invalidNotes.add(it1) }
                     }
                 }
                 for ( t in it){
                     val tag = Tag(t.tagName,t.noteUids.size)
 
                     for ( n in t.noteUids){
-                        if(archivedNotes.contains(n) || deletedNotes?.contains(n) == true){
+                        if(invalidNotes.contains(n)){
                             tag.noteCount-=1
                         }
-                        if (!archivedNotes.contains(n)){
-                            if (deletedNotes != null){
 
-                                if (!deletedNotes.contains(n)){
-                                    tagList.add(tag)
-                                    tagFireList.add(t)
-                                }
-
-
-                            }else{
-                                tagList.add(tag)
-                                tagFireList.add(t)
-                            }
+                        if (!invalidNotes.contains(n)){
+                            tagList.add(tag)
+                            tagFireList.add(t)
                         }
 
                     }

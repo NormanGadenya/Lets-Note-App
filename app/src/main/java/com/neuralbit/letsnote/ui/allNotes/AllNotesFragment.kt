@@ -5,10 +5,13 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.os.Build
 import android.os.Bundle
 import android.view.*
 import android.view.View.GONE
 import android.view.View.VISIBLE
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -21,6 +24,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.play.core.review.ReviewManager
+import com.google.android.play.core.review.ReviewManagerFactory
 import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.Gson
 import com.neuralbit.letsnote.R
@@ -49,6 +54,15 @@ class AllNotesFragment : Fragment() , NoteFireClick {
     private val binding get() = _binding!!
     private lateinit var pinnedNotesTV: TextView
     private lateinit var otherNotesTV: TextView
+    private lateinit var noteTypeFAB : FloatingActionButton
+    private lateinit var addTodoFAB : FloatingActionButton
+    private val rotateOpen: Animation by lazy { AnimationUtils.loadAnimation(context,R.anim.rotate_open_anim)}
+    private val rotateClose: Animation by lazy { AnimationUtils.loadAnimation(context,R.anim.rotate_close_anim)}
+    private val fromBottom: Animation by lazy { AnimationUtils.loadAnimation(context,R.anim.from_bottom_anim)}
+    private val toBottom: Animation by lazy { AnimationUtils.loadAnimation(context,R.anim.to_bottom)}
+    private var clicked = false
+    private var reviewSharedPrefEditor : SharedPreferences.Editor ? = null
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -58,8 +72,8 @@ class AllNotesFragment : Fragment() , NoteFireClick {
 
         val root: View = binding.root
         addNoteFAB = binding.FABAddNote
-        addNoteFAB.visibility = VISIBLE
-
+        addTodoFAB = binding.FABAddTodoList
+        noteTypeFAB = binding.FABNoteType
         notesRV = binding.notesRV
         pinnedNotesRV = binding.pinnedNotesRV
         pinnedNotesTV = binding.pinnedNotesTV
@@ -75,6 +89,25 @@ class AllNotesFragment : Fragment() , NoteFireClick {
         settingsViewModel.settingsFrag.value = false
         allNotesViewModel.archiveFrag = false
         allNotesViewModel.staggeredView.value = settingsSharedPref?.getBoolean("staggered",true)
+        val reviewSharedPrefs : SharedPreferences? = context?.getSharedPreferences("Review_count_down", AppCompatActivity.MODE_PRIVATE)
+        reviewSharedPrefEditor = reviewSharedPrefs?.edit()
+        if (reviewSharedPrefEditor != null && reviewSharedPrefs!= null){
+            var reviewCount = reviewSharedPrefs.getInt("count", 0)
+            reviewCount +=1
+            reviewSharedPrefEditor!!.putInt("count",reviewCount)
+            val reviewManager: ReviewManager? = context?.let { ReviewManagerFactory.create(it) }
+
+            if (reviewCount == 5){
+                val requestReviewTask = reviewManager?.requestReviewFlow()
+
+                requestReviewTask?.addOnCompleteListener { request ->
+                    if (request.isSuccessful) {
+                        activity?.let { reviewManager.launchReviewFlow(it, request.result) }
+                    }
+                }
+            }
+        }
+
         allNotesViewModel.staggeredView.observe(viewLifecycleOwner){
             val editor: SharedPreferences.Editor ?= settingsSharedPref?.edit()
             editor?.putBoolean("staggered",it)
@@ -88,6 +121,22 @@ class AllNotesFragment : Fragment() , NoteFireClick {
                 pinnedNotesRV.layoutManager = LinearLayoutManager(context)
             }
         }
+        addNoteFAB.setOnClickListener{
+            val intent = Intent( context,AddEditNoteActivity::class.java)
+            intent.putExtra("noteType","NewNote")
+            startActivity(intent)
+        }
+        addTodoFAB.setOnClickListener{
+            val intent = Intent( context,AddEditNoteActivity::class.java)
+            intent.putExtra("noteType","NewTodo")
+            startActivity(intent)
+        }
+        noteTypeFAB.setOnClickListener{
+            setVisibility(clicked)
+            setAnimation(clicked)
+            clicked = !clicked
+        }
+
         val fontStyle = settingsSharedPref?.getString("font",null)
         val noteRVAdapter = context?.let { NoteRVAdapter(it,this) }
         val pinnedNoteRVAdapter = context?.let { NoteRVAdapter(it,this) }
@@ -96,11 +145,15 @@ class AllNotesFragment : Fragment() , NoteFireClick {
         noteRVAdapter?.viewModel = allNotesViewModel
         noteRVAdapter?.lifecycleScope = lifecycleScope
         noteRVAdapter?.lifecycleOwner = this
-        noteRVAdapter?.fontStyle = fontStyle
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+
+            noteRVAdapter?.fontStyle = fontStyle
+            pinnedNoteRVAdapter?.fontStyle = fontStyle
+
+        }
         pinnedNoteRVAdapter?.viewModel = allNotesViewModel
         pinnedNoteRVAdapter?.lifecycleScope = lifecycleScope
         pinnedNoteRVAdapter?.lifecycleOwner = this
-        pinnedNoteRVAdapter?.fontStyle = fontStyle
         setHasOptionsMenu(true)
         val mAuth: FirebaseAuth = FirebaseAuth.getInstance()
         mAuth.addAuthStateListener {
@@ -181,18 +234,23 @@ class AllNotesFragment : Fragment() , NoteFireClick {
                 noteRVAdapter?.updateListFire(it)
                 noteRVAdapter?.searchString = str
             }
-            allNotesViewModel.filterPinnedFireList().observe(viewLifecycleOwner) {
-                if (it.isEmpty()){
-                    pinnedNotesTV.isVisible = false
-                    pinnedNotesRV.isVisible = false
-                    otherNotesTV.isVisible = false
-                }else{
-                    pinnedNotesTV.isVisible = true
-                    pinnedNotesRV.isVisible = true
-                    otherNotesTV.isVisible = true
+            allNotesViewModel.filterPinnedFireList().observe(viewLifecycleOwner) { pinnedNotes ->
+                allNotesViewModel.filterOtherFireList().observe(viewLifecycleOwner) { otherNotes ->
+                    if (pinnedNotes.isEmpty()){
+                        pinnedNotesTV.isVisible = false
+                        pinnedNotesRV.isVisible = false
+                        otherNotesTV.isVisible = false
+                    }else{
+                        pinnedNotesTV.isVisible = true
+                        pinnedNotesRV.isVisible = true
+                        if (otherNotes.isNotEmpty()){
+                            otherNotesTV.isVisible = true
+                        }
+                    }
                 }
+
                 pinnedNoteRVAdapter?.searchString = str
-                pinnedNoteRVAdapter?.updateListFire(it)
+                pinnedNoteRVAdapter?.updateListFire(pinnedNotes)
             }
 
         }
@@ -255,7 +313,7 @@ class AllNotesFragment : Fragment() , NoteFireClick {
                     }
                     if (emptyTrashImmediately != true){
                         val noteUpdate = HashMap<String,Any>()
-                        noteUpdate["deleted"] = true
+                        noteUpdate["deletedDate"] = System.currentTimeMillis()
                         note.noteUid?.let { it1 -> allNotesViewModel.updateFireNote(noteUpdate, it1) }
 
                         note.noteUid?.let { it1 -> scheduleDelete(it1,note.tags,note.label,note.timeStamp) }
@@ -293,12 +351,6 @@ class AllNotesFragment : Fragment() , NoteFireClick {
         }
 
 
-        addNoteFAB.setOnClickListener{
-            val intent = Intent( context, AddEditNoteActivity::class.java)
-            intent.putExtra("noteType","NewNote")
-            startActivity(intent)
-        }
-
        
         return root
     }
@@ -309,6 +361,28 @@ class AllNotesFragment : Fragment() , NoteFireClick {
         val trashButton = menu.findItem(R.id.trash)
         trashButton.isVisible = false
         super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    private fun setAnimation(clicked: Boolean) {
+        if (!clicked){
+            noteTypeFAB.startAnimation(rotateOpen)
+            addTodoFAB.startAnimation(fromBottom)
+            addNoteFAB.startAnimation(fromBottom)
+        }else{
+            noteTypeFAB.startAnimation(rotateClose)
+            addTodoFAB.startAnimation(toBottom)
+            addNoteFAB.startAnimation(toBottom)
+        }
+    }
+
+    private fun setVisibility(clicked : Boolean) {
+        if (!clicked){
+            addTodoFAB.visibility = VISIBLE
+            addNoteFAB.visibility = VISIBLE
+        }else{
+            addTodoFAB.visibility = GONE
+            addNoteFAB.visibility = GONE
+        }
     }
 
     override fun onDestroyView() {
@@ -338,6 +412,7 @@ class AllNotesFragment : Fragment() , NoteFireClick {
     }
 
     override fun onNoteFireClick(note: NoteFire, activated : Boolean) {
+        reviewSharedPrefEditor?.apply()
 
         if (!note.selected && !activated){
             val intent : Intent = if(note.protected){

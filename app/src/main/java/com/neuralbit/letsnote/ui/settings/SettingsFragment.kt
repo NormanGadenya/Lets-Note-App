@@ -2,6 +2,7 @@ package com.neuralbit.letsnote.ui.settings
 
 import android.content.Intent
 import android.content.SharedPreferences
+import android.os.Build
 import android.os.Bundle
 import android.view.*
 import android.view.View.GONE
@@ -23,6 +24,7 @@ import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
+import com.neuralbit.letsnote.BuildConfig
 import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.databinding.SettingsFragmentBinding
 
@@ -52,11 +54,22 @@ class SettingsFragment : Fragment() {
         val darkMode = settingsPref.getInt("darkModePosition",R.id.defaultMode)
         val fontPosition = settingsPref.getInt("fontMultiplier",2)
         val radioPosition = settingsPref.getInt("radioPosition", R.id.fontDef)
+        val fontStyleTitle = binding.fontStyleDummyT
+        val fontStyleCard = binding.cardView3
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O){
+            fontStyleTitle.visibility = GONE
+            fontStyleCard.visibility = GONE
+        }else{
+            fontStyleTitle.visibility = VISIBLE
+            fontStyleCard.visibility = VISIBLE
+        }
         val emptyTrashSwitch = binding.emptyTrashSwitch
         val lightModeGroup = binding.dayNightRadioGroup
         val migrateCard = binding.cardView4
         val migrateTV = binding.backUpTV
         val adView = binding.adView
+        val versionNameTv = binding.versionNameTV
+        versionNameTv.text = resources.getString(R.string.app_version_template,BuildConfig.VERSION_NAME)
         val adRequest = AdRequest.Builder().build()
         adView.loadAd(adRequest)
         migrateProgressBar = binding.migrateProgress

@@ -5,44 +5,44 @@
     <item
         android:id="@+id/reminderButton"
         android:icon="@drawable/ic_baseline_access_alarm_24"
-        android:title="Reminder"
+        android:title="@string/reminder"
         app:showAsAction="always"/>
 
     <item
         android:id="@+id/pinButton"
         android:icon="@drawable/ic_outline_push_pin_24"
-        android:title="Pin Note"
+        android:title="@string/pin_note"
         app:showAsAction="always"/>
 
     <item
         android:id="@+id/lockButton"
         android:icon="@drawable/baseline_lock_open_24"
-        android:title="Lock Note"
-        app:showAsAction="always"/>
+        android:title="@string/protect"
+        app:showAsAction="ifRoom"/>
 
 
     <item
         android:id="@+id/restoreButton"
         android:icon="@drawable/ic_baseline_restore_24"
-        android:title="Restore"
-        app:showAsAction="always"/>
+        android:title="@string/restore"
+        app:showAsAction="ifRoom"/>
 
     <item
         android:id="@+id/shareButton"
         android:icon="@drawable/baseline_share_24"
-        android:title="Share"
+        android:title="@string/share"
         app:showAsAction="ifRoom"/>
 
     <item
         android:id="@+id/archiveButton"
         android:icon="@drawable/ic_outline_archive_24"
-        android:title="Archive"
+        android:title="@string/archive"
         app:showAsAction="ifRoom"/>
 
     <item
         android:id="@+id/deleteButton"
         android:icon="@drawable/ic_outline_delete_24"
-        android:title="Delete"
+        android:title="@string/delete"
         app:showAsAction="never"/>
 
 

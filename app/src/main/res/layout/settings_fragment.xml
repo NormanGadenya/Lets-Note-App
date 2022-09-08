@@ -37,7 +37,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                android:clickable="true"
+                android:contentDescription="@string/day_night_mode"
                 android:focusable="true"
                 android:padding="8dp"
                 app:cardCornerRadius="10dp"
@@ -97,6 +97,7 @@
                         android:layout_height="wrap_content"
                         android:layout_margin="16dp"
                         android:max="4"
+                        android:contentDescription="@string/font_seekbar_desc"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
@@ -142,6 +143,7 @@
                     android:id="@+id/radioGroup"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:contentDescription="@string/font_style_desc"
                     android:layout_margin="16dp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/fontStyleDummyT">
@@ -149,17 +151,17 @@
                     <RadioButton
                         android:id="@+id/fontA"
                         android:fontFamily="@font/architects_daughter"
-                        android:text="Architects daughter" />
+                        android:text="@string/architects_daughter" />
 
                     <RadioButton
                         android:id="@+id/fontB"
                         android:fontFamily="@font/abeezee"
-                        android:text="Abreeze" />
+                        android:text="@string/abreeze" />
 
                     <RadioButton
                         android:id="@+id/fontC"
                         android:fontFamily="@font/adamina"
-                        android:text="Adamina" />
+                        android:text="@string/adamina" />
 
                     <RadioButton
                         android:id="@+id/fontDef"
@@ -205,6 +207,7 @@
                         android:layout_margin="16dp"
                         android:background="@drawable/sign_in_bgnd"
                         android:drawableLeft="@drawable/icons_google"
+                        android:contentDescription="@string/sign_in"
                         android:text="@string/sign_in"
                         android:textColor="@color/timberwolf"
                         app:layout_constraintStart_toStartOf="parent"
@@ -248,7 +251,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                android:text="@string/app_version"
+                android:id="@+id/versionNameTV"
                 android:textSize="20sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/emptyTrashSwitch" />

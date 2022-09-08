@@ -1,9 +1,6 @@
 package com.neuralbit.letsnote.ui.main
 
-import android.app.AlarmManager
 import android.app.AlertDialog
-import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -42,7 +39,6 @@ import com.neuralbit.letsnote.ui.deletedNotes.DeletedNotesViewModel
 import com.neuralbit.letsnote.ui.label.LabelViewModel
 import com.neuralbit.letsnote.ui.signIn.SignInActivity
 import com.neuralbit.letsnote.ui.tag.TagViewModel
-import com.neuralbit.letsnote.utilities.AlertReceiver
 import kotlinx.coroutines.launch
 
 
@@ -139,6 +135,7 @@ class MainActivity : AppCompatActivity() {
         if(profileUrl != null){
             Glide.with(applicationContext).load(profileUrl).into(profileIV)
         }
+
 
         val name = fUser?.displayName
         if (name != null){
@@ -246,7 +243,7 @@ class MainActivity : AppCompatActivity() {
 
 
                 AuthUI.getInstance()
-                    .signOut(this)
+                    .signOut(this@MainActivity)
                     .addOnCompleteListener{
                         val intent = Intent(this@MainActivity, SignInActivity::class.java)
                         startActivity(intent)
@@ -260,11 +257,14 @@ class MainActivity : AppCompatActivity() {
         }
         deleteAndSignOut.setOnMenuItemClickListener {
             val alertDialog: AlertDialog.Builder = AlertDialog.Builder(this@MainActivity)
-            alertDialog.setTitle("You will lose all your stored notes if you proceed")
+            alertDialog.setTitle(resources.getString(R.string.delete_and_sign_out_alert))
             alertDialog.setPositiveButton("Yes"
             ) { _, _ ->
-                Toast.makeText(applicationContext,"All your information has been wiped out", Toast.LENGTH_SHORT).show()
-                viewModal.deleteUserDataContent()
+                Toast.makeText(applicationContext,resources.getString(R.string.delete_and_sign_out_message), Toast.LENGTH_SHORT).show()
+                val editor : SharedPreferences.Editor= settingsPref.edit()
+                editor.clear()
+                editor.apply()
+                viewModal.deleteUserDataContent(this@MainActivity)
             }
 
             alertDialog.setNegativeButton("Cancel"
@@ -276,8 +276,10 @@ class MainActivity : AppCompatActivity() {
             if (layoutViewBtn != null){
                 if (it){
                     layoutViewBtn.setIcon(R.drawable.ic_baseline_table_rows_24)
+                    layoutViewBtn.title = resources.getString(R.string.list_layout)
                 }else{
                     layoutViewBtn.setIcon(R.drawable.baseline_grid_view_24)
+                    layoutViewBtn.title = resources.getString(R.string.grid_layout)
 
                 }
             }
@@ -287,12 +289,14 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         val a = Intent(Intent.ACTION_MAIN)
         a.addCategory(Intent.CATEGORY_HOME)
         a.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         startActivity(a)
     }
+
     private inner class MActionModeCallBack : ActionMode.Callback {
         override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
             mode?.menuInflater?.inflate(R.menu.action_menu,menu)
@@ -368,13 +372,6 @@ class MainActivity : AppCompatActivity() {
             actionMode = null
         }
 
-    }
-
-    private fun cancelAlarm(reminder : Int){
-        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(this, AlertReceiver::class.java)
-        val pendingIntent = PendingIntent.getBroadcast(this, reminder, intent, PendingIntent.FLAG_IMMUTABLE)
-        alarmManager.cancel(pendingIntent)
     }
 
 

@@ -54,6 +54,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:overScrollMode="never"
+                android:contentDescription="@string/all_todo_list"
+
                 android:visibility="visible"
                 app:layout_constraintTop_toBottomOf="@+id/pinnedNotesTV"
                 tools:itemCount="2"

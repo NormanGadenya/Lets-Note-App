@@ -43,7 +43,6 @@ class NoteRVAdapter (
     var multipleActivated = false
     val TAG = "NoteRVAdapter"
     var fontStyle : String? = null
-    private val deletedNotePrefs = context.getSharedPreferences("DeletedNotes", AppCompatActivity.MODE_PRIVATE)
 
 
     inner class ViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView){
@@ -67,19 +66,26 @@ class NoteRVAdapter (
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val note = allNotesFire[position]
         var title = note.title
-        val typeface: Typeface? = when (fontStyle) {
-            "Architects daughter" -> {
-                ResourcesCompat.getFont(context, R.font.architects_daughter)
+        if (fontStyle != null){
+            val typeface: Typeface? = when (fontStyle) {
+                "Architects daughter" -> {
+                    ResourcesCompat.getFont(context, R.font.architects_daughter)
+                }
+                "Abreeze" -> {
+                    ResourcesCompat.getFont(context, R.font.abeezee)
+                }
+                "Adamina" -> {
+                    ResourcesCompat.getFont(context, R.font.adamina)
+                }
+                else -> {
+                    ResourcesCompat.getFont(context, R.font.roboto)
+                }
             }
-            "Abreeze" -> {
-                ResourcesCompat.getFont(context, R.font.abeezee)
-            }
-            "Adamina" -> {
-                ResourcesCompat.getFont(context, R.font.adamina)
-            }
-            else -> {
-                ResourcesCompat.getFont(context, R.font.roboto)
-            }
+            holder.noteTextTV.typeface = typeface
+            holder.noteTitleTV.typeface = typeface
+            holder.daysLeft.typeface = typeface
+            holder.reminderTV.typeface = typeface
+            holder.tagsTV.typeface = typeface
         }
         val settingsPref = context.getSharedPreferences("Settings", AppCompatActivity.MODE_PRIVATE)
         val fontMultiplier = settingsPref.getInt("fontMultiplier",2)
@@ -87,11 +93,7 @@ class NoteRVAdapter (
         holder.noteTitleTV.setTextSize(TypedValue.COMPLEX_UNIT_SP,24f+ ((fontMultiplier-2)*4).toFloat())
         holder.reminderTV.setTextSize(TypedValue.COMPLEX_UNIT_SP,12f+ ((fontMultiplier-2)).toFloat())
         holder.tagsTV.setTextSize(TypedValue.COMPLEX_UNIT_SP,12f+ ((fontMultiplier-2)).toFloat())
-        holder.noteTextTV.typeface = typeface
-        holder.noteTitleTV.typeface = typeface
-        holder.daysLeft.typeface = typeface
-        holder.reminderTV.typeface = typeface
-        holder.tagsTV.typeface = typeface
+
         if (!note.protected){
             var desc = note.description
             if (desc.length > 250) {
