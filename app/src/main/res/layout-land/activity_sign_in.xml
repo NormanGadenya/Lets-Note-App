@@ -69,13 +69,13 @@
         android:textColor="@color/timberwolf"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/progress_bar"
+        app:layout_constraintEnd_toStartOf="@+id/sign_in_progress_bar"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/signInWithGoogleBtn"
         app:layout_constraintTop_toBottomOf="@+id/signInTV" />
 
     <ProgressBar
-        android:id="@+id/progress_bar"
+        android:id="@+id/sign_in_progress_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"

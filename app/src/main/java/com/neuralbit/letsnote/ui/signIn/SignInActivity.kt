@@ -1,15 +1,17 @@
 package com.neuralbit.letsnote.ui.signIn
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.ConnectivityManager
 import android.os.Bundle
 import android.view.View
 import android.view.View.GONE
-import android.view.View.VISIBLE
 import android.view.WindowManager
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -21,11 +23,13 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.neuralbit.letsnote.PrivacyPolicy
 import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.ui.main.MainActivity
+import kotlinx.coroutines.launch
 
 class SignInActivity : AppCompatActivity() {
     private var mGoogleSignInClient: GoogleSignInClient? = null
     private lateinit var mAuth: FirebaseAuth
     private var firebaseUser : FirebaseUser? = null
+    private lateinit var progressBar : ProgressBar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,15 +40,29 @@ class SignInActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        window.setFlags(
-            WindowManager.LayoutParams.FLAG_FULLSCREEN,
-            WindowManager.LayoutParams.FLAG_FULLSCREEN
-        )
+        val settingsPref : SharedPreferences = getSharedPreferences("Settings", MODE_PRIVATE)
+
+        lifecycleScope.launch {
+            when (settingsPref.getString("mode","default")) {
+                "Dark mode" -> {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                }
+                "Light mode" -> {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                }
+                else -> {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+                }
+            }
+        }
+        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
         window.statusBarColor = getColor(R.color.gunmetal)
 
         setContentView(R.layout.activity_sign_in)
 
         createRequest()
+        progressBar = findViewById(R.id.sign_in_progress_bar)
+
         findViewById<View>(R.id.signInWithGoogleBtn).setOnClickListener { signInGoogle() }
         findViewById<View>(R.id.signInWithAnnoneBtn).setOnClickListener { signInAnnon() }
         val termsAndConditions = findViewById<View>(R.id.termsAndConditionTV)
@@ -71,10 +89,19 @@ class SignInActivity : AppCompatActivity() {
         mGoogleSignInClient = GoogleSignIn.getClient(applicationContext, gso)
     }
 
+    @Deprecated("Deprecated in Java")
+    override fun onBackPressed() {
+        val a = Intent(Intent.ACTION_MAIN)
+        a.addCategory(Intent.CATEGORY_HOME)
+        a.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(a)
+    }
+
     private fun signInGoogle() {
         if (!isNetworkConnected()){
             Toast.makeText(applicationContext,"Requires an internet connection for initial setup",Toast.LENGTH_SHORT).show()
         }else{
+            progressBar.visibility = View.VISIBLE
 
             val signInIntent = mGoogleSignInClient!!.signInIntent
             startActivityForResult(signInIntent, RC_SIGN_IN)
@@ -86,8 +113,6 @@ class SignInActivity : AppCompatActivity() {
             Toast.makeText(applicationContext,"Requires an internet connection for initial setup",Toast.LENGTH_SHORT).show()
         }else{
 
-            val progressBar = findViewById<ProgressBar>(R.id.progress_bar)
-            progressBar.visibility = VISIBLE
 
             mAuth.signInAnonymously()
                 .addOnCompleteListener(this) { task ->
@@ -123,7 +148,7 @@ class SignInActivity : AppCompatActivity() {
             } catch (e: ApiException) {
                 // Google Sign In failed, update UI appropriately
                 // ...
-                Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
+                e.fillInStackTrace()
             }
         }
     }
@@ -135,10 +160,14 @@ class SignInActivity : AppCompatActivity() {
                 this
             ) { task ->
                 if (task.isSuccessful) {
+                    progressBar.visibility = GONE
+
 
                     val intent = Intent(this@SignInActivity, MainActivity::class.java)
                     startActivity(intent)
                 } else {
+                    progressBar.visibility = GONE
+
                     Toast.makeText(this@SignInActivity, "Sorry auth failed.", Toast.LENGTH_SHORT).show()
                 }
             }

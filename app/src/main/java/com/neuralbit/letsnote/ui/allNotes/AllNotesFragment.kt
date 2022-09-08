@@ -24,6 +24,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.play.core.review.ReviewManager
+import com.google.android.play.core.review.ReviewManagerFactory
 import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.Gson
 import com.neuralbit.letsnote.R
@@ -59,6 +61,7 @@ class AllNotesFragment : Fragment() , NoteFireClick {
     private val fromBottom: Animation by lazy { AnimationUtils.loadAnimation(context,R.anim.from_bottom_anim)}
     private val toBottom: Animation by lazy { AnimationUtils.loadAnimation(context,R.anim.to_bottom)}
     private var clicked = false
+    private var reviewSharedPrefEditor : SharedPreferences.Editor ? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -86,6 +89,25 @@ class AllNotesFragment : Fragment() , NoteFireClick {
         settingsViewModel.settingsFrag.value = false
         allNotesViewModel.archiveFrag = false
         allNotesViewModel.staggeredView.value = settingsSharedPref?.getBoolean("staggered",true)
+        val reviewSharedPrefs : SharedPreferences? = context?.getSharedPreferences("Review_count_down", AppCompatActivity.MODE_PRIVATE)
+        reviewSharedPrefEditor = reviewSharedPrefs?.edit()
+        if (reviewSharedPrefEditor != null && reviewSharedPrefs!= null){
+            var reviewCount = reviewSharedPrefs.getInt("count", 0)
+            reviewCount +=1
+            reviewSharedPrefEditor!!.putInt("count",reviewCount)
+            val reviewManager: ReviewManager? = context?.let { ReviewManagerFactory.create(it) }
+
+            if (reviewCount == 5){
+                val requestReviewTask = reviewManager?.requestReviewFlow()
+
+                requestReviewTask?.addOnCompleteListener { request ->
+                    if (request.isSuccessful) {
+                        activity?.let { reviewManager.launchReviewFlow(it, request.result) }
+                    }
+                }
+            }
+        }
+
         allNotesViewModel.staggeredView.observe(viewLifecycleOwner){
             val editor: SharedPreferences.Editor ?= settingsSharedPref?.edit()
             editor?.putBoolean("staggered",it)
@@ -329,12 +351,6 @@ class AllNotesFragment : Fragment() , NoteFireClick {
         }
 
 
-//        addNoteFAB.setOnClickListener{
-//            val intent = Intent( context, AddEditNoteActivity::class.java)
-//            intent.putExtra("noteType","NewNote")
-//            startActivity(intent)
-//        }
-
        
         return root
     }
@@ -396,6 +412,7 @@ class AllNotesFragment : Fragment() , NoteFireClick {
     }
 
     override fun onNoteFireClick(note: NoteFire, activated : Boolean) {
+        reviewSharedPrefEditor?.apply()
 
         if (!note.selected && !activated){
             val intent : Intent = if(note.protected){
