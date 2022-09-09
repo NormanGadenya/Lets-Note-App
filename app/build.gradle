@@ -21,7 +21,7 @@ android {
         applicationId "com.neuralbit.letsnote"
         minSdk 25
         targetSdk 33
-        versionCode 11
+        versionCode 12
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -131,7 +131,6 @@ dependencies {
 
     implementation "androidx.activity:activity-ktx:1.6.0-rc01"
     implementation "com.github.CanHub:Android-Image-Cropper:3.3.6"
-    implementation 'androidx.core:core-splashscreen:1.0.0'
     implementation("com.google.android.play:review:2.0.0")
 
     // For Kotlin users also import the Kotlin extensions library for Play In-App Review:

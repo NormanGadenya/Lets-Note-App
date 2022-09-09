@@ -224,9 +224,9 @@ class AllTodoFragment : Fragment() , NoteFireClick {
 
                 allNotesViewModel.itemSelectEnabled.value = false
                 if (selectedNotesCount ==1){
-                    Toast.makeText(context,"Note archived successfully",Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context,resources.getString(R.string.notes_archived_successfully), Toast.LENGTH_SHORT).show()
                 }else{
-                    Toast.makeText(context,"Notes archived successfully",Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context,resources.getString(R.string.notes_archived_successfully,"s"), Toast.LENGTH_SHORT).show()
                 }
 
             }
@@ -280,9 +280,9 @@ class AllTodoFragment : Fragment() , NoteFireClick {
 
                 allNotesViewModel.itemSelectEnabled.value = false
                 if (selectedNotesCount ==1){
-                    Toast.makeText(context,"Note deleted successfully",Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context,resources.getString(R.string.notes_deleted_successfully), Toast.LENGTH_SHORT).show()
                 }else{
-                    Toast.makeText(context,"Notes deleted successfully",Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context,resources.getString(R.string.notes_deleted_successfully,"s"), Toast.LENGTH_SHORT).show()
                 }
             }
         }

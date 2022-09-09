@@ -20,7 +20,6 @@ import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
-import com.neuralbit.letsnote.PrivacyPolicy
 import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.ui.main.MainActivity
 import kotlinx.coroutines.launch
@@ -64,7 +63,7 @@ class SignInActivity : AppCompatActivity() {
         progressBar = findViewById(R.id.sign_in_progress_bar)
 
         findViewById<View>(R.id.signInWithGoogleBtn).setOnClickListener { signInGoogle() }
-        findViewById<View>(R.id.signInWithAnnoneBtn).setOnClickListener { signInAnnon() }
+        findViewById<View>(R.id.signInWithAnnoneBtn).setOnClickListener { signInAnon() }
         val termsAndConditions = findViewById<View>(R.id.termsAndConditionTV)
         termsAndConditions.setOnClickListener {
             val i = Intent(applicationContext, TermsAndConditions::class.java)
@@ -99,7 +98,7 @@ class SignInActivity : AppCompatActivity() {
 
     private fun signInGoogle() {
         if (!isNetworkConnected()){
-            Toast.makeText(applicationContext,"Requires an internet connection for initial setup",Toast.LENGTH_SHORT).show()
+            Toast.makeText(applicationContext,resources.getString(R.string.no_internet_connection_init),Toast.LENGTH_SHORT).show()
         }else{
             progressBar.visibility = View.VISIBLE
 
@@ -108,11 +107,11 @@ class SignInActivity : AppCompatActivity() {
         }
     }
 
-    private fun signInAnnon(){
+    private fun signInAnon(){
         if (!isNetworkConnected()){
-            Toast.makeText(applicationContext,"Requires an internet connection for initial setup",Toast.LENGTH_SHORT).show()
+            Toast.makeText(applicationContext,resources.getString(R.string.no_internet_connection_init),Toast.LENGTH_SHORT).show()
         }else{
-
+            progressBar.visibility = View.VISIBLE
 
             mAuth.signInAnonymously()
                 .addOnCompleteListener(this) { task ->

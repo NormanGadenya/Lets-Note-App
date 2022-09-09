@@ -81,6 +81,7 @@
         <entry key="app/src/main/res/drawable/tag_background.xml" value="0.1975" />
         <entry key="app/src/main/res/drawable/tag_background_sel.xml" value="0.3205" />
         <entry key="app/src/main/res/drawable/tag_frag_icon_24.xml" value="0.3545" />
+        <entry key="app/src/main/res/drawable/wave.xml" value="0.337" />
         <entry key="app/src/main/res/drawable/welcome_icon.xml" value="0.317" />
         <entry key="app/src/main/res/drawable/white.xml" value="0.1225" />
         <entry key="app/src/main/res/drawable/white_tag.xml" value="0.353125" />
@@ -99,7 +100,7 @@
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_main2.xml" value="0.3697916666666667" />
         <entry key="app/src/main/res/layout/activity_privacy_policy.xml" value="0.35885416666666664" />
-        <entry key="app/src/main/res/layout/activity_sign_in.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/activity_sign_in.xml" value="0.33" />
         <entry key="app/src/main/res/layout/activity_splash.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_terms_and_conditions.xml" value="0.35885416666666664" />
         <entry key="app/src/main/res/layout/add_label_dialog.xml" value="0.1" />

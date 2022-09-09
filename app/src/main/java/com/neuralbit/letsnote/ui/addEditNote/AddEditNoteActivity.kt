@@ -564,7 +564,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 }
 
             }else{
-                Snackbar.make(coordinatorlayout, "No internet connection", Snackbar.LENGTH_SHORT).show()
+                Snackbar.make(coordinatorlayout, resources.getString(R.string.no_internet_connection), Snackbar.LENGTH_SHORT).show()
             }
         }
 
@@ -639,17 +639,17 @@ class AddEditNoteActivity : AppCompatActivity() ,
         val alertDialog: AlertDialog? = this@AddEditNoteActivity.let {
             val builder = AlertDialog.Builder(this@AddEditNoteActivity)
             builder.apply {
-                setPositiveButton("ok"
+                setPositiveButton(resources.getString(R.string.yes)
                 ) { _, _ ->
                     viewModal.deletedNote.value = true
                     viewModal.noteChanged.value = true
                     goToMain()
                 }
 
-                setNegativeButton("cancel"
+                setNegativeButton(resources.getString(R.string.cancel)
                 ) { _, _ ->
                 }
-                setTitle("Delete Note")
+                setTitle(getString(R.string.delete_note))
 
             }
             builder.create()
@@ -729,7 +729,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private fun recognizeText(){
         val recognizer = TextRecognizer.Builder(applicationContext).build()
         if (!recognizer.isOperational){
-            Toast.makeText(applicationContext,"Sorry recognizer is unavailable",Toast.LENGTH_SHORT).show()
+            Toast.makeText(applicationContext,getString(R.string.recognizer_unavailable),Toast.LENGTH_SHORT).show()
         }else{
             if (bitmap!=null){
                 val frame = bitmap?.let { Frame.Builder().setBitmap(it).build() }
@@ -749,11 +749,11 @@ class AddEditNoteActivity : AppCompatActivity() ,
         viewModal.noteChanged.value = true
 
         viewModal.archived.value = true
-        var snackbar = Snackbar.make(coordinatorlayout,"Note Achieved",Snackbar.LENGTH_LONG)
+        var snackbar = Snackbar.make(coordinatorlayout,getString(R.string.note_archived),Snackbar.LENGTH_LONG)
         snackbar.setAction("UNDO"
         ) {
             viewModal.archived.value= false
-            snackbar = Snackbar.make(coordinatorlayout,"Note unarchived",Snackbar.LENGTH_SHORT)
+            snackbar = Snackbar.make(coordinatorlayout,getString(R.string.note_restored),Snackbar.LENGTH_SHORT)
         }
         snackbar.show()
 
@@ -772,12 +772,12 @@ class AddEditNoteActivity : AppCompatActivity() ,
         viewModal.noteChanged.value = true
         if(viewModal.archived.value == true) {
             viewModal.archived.value = false
-            var snackbar = Snackbar.make(coordinatorlayout, "Note unarchived", Snackbar.LENGTH_LONG)
+            var snackbar = Snackbar.make(coordinatorlayout, getString(R.string.note_restored), Snackbar.LENGTH_LONG)
             snackbar.setAction(
                 "UNDO"
             ) {
                 viewModal.archived.value = true
-                snackbar = Snackbar.make(coordinatorlayout, "Note archived", Snackbar.LENGTH_SHORT)
+                snackbar = Snackbar.make(coordinatorlayout, getString(R.string.note_archived), Snackbar.LENGTH_SHORT)
             }
             snackbar.show()
         }
@@ -786,12 +786,12 @@ class AddEditNoteActivity : AppCompatActivity() ,
         viewModal.noteChanged.value = true
         if(viewModal.deletedNote.value == true) {
             viewModal.deletedNote.value = false
-            var snackbar = Snackbar.make(coordinatorlayout, "Note recovered", Snackbar.LENGTH_LONG)
+            var snackbar = Snackbar.make(coordinatorlayout, resources.getString(R.string.note_restored), Snackbar.LENGTH_LONG)
             snackbar.setAction(
                 "UNDO"
             ) {
                 viewModal.deletedNote.value = true
-                snackbar = Snackbar.make(coordinatorlayout, "Note deleted", Snackbar.LENGTH_SHORT)
+                snackbar = Snackbar.make(coordinatorlayout, resources.getString(R.string.note_deleted), Snackbar.LENGTH_SHORT)
             }
             snackbar.show()
         }
@@ -1051,10 +1051,17 @@ class AddEditNoteActivity : AppCompatActivity() ,
             val sendIntent: Intent = Intent().apply {
                 action = Intent.ACTION_SEND
 
-                val textToShare : String ? = if (noteTitle!!.isNotBlank()){
+                var textToShare : String ? = if (noteTitle!!.isNotBlank()){
                     noteTitle + "\n" + noteDesc
                 }else{
                     noteDesc
+                }
+                for (todoItem in viewModal.todoItems) {
+                    textToShare += if (todoItem.checked){
+                        "\n + ${todoItem.item} "
+                    }else{
+                        "\n - ${todoItem.item} "
+                    }
                 }
 
                 putExtra(Intent.EXTRA_TEXT, textToShare)
@@ -1071,24 +1078,22 @@ class AddEditNoteActivity : AppCompatActivity() ,
         viewModal.noteChanged.value = true
         if(notePinned){
             viewModal.pinned.value = false
-            var snackbar = Snackbar.make(coordinatorlayout,"Note unpinned",Snackbar.LENGTH_LONG)
-            snackbar.setAction("UNDO"
-            ) {
+            var snackbar = Snackbar.make(coordinatorlayout,getString(R.string.note_unpinned),Snackbar.LENGTH_LONG)
+            snackbar.setAction(getString(R.string.undo)) {
                 viewModal.pinned.value = true
 
-                snackbar = Snackbar.make(coordinatorlayout,"Note pinned",Snackbar.LENGTH_SHORT)
+                snackbar = Snackbar.make(coordinatorlayout,getString(R.string.note_pinned),Snackbar.LENGTH_SHORT)
                 snackbar.show()
             }
             snackbar.show()
         }else{
             viewModal.pinned.value = true
 
-            var snackbar = Snackbar.make(coordinatorlayout,"Note pinned",Snackbar.LENGTH_LONG)
-            snackbar.setAction("UNDO"
-            ) {
+            var snackbar = Snackbar.make(coordinatorlayout,getString(R.string.note_pinned),Snackbar.LENGTH_LONG)
+            snackbar.setAction(getString(R.string.undo)) {
                 viewModal.pinned.value = false
 
-                snackbar = Snackbar.make(coordinatorlayout,"Note unpinned",Snackbar.LENGTH_SHORT)
+                snackbar = Snackbar.make(coordinatorlayout,getString(R.string.note_unpinned),Snackbar.LENGTH_SHORT)
                 snackbar.show()
             }
             snackbar.show()
@@ -1165,7 +1170,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
             val labelDialog: AlertDialog = this@AddEditNoteActivity.let {
                 val builder = AlertDialog.Builder(it)
                 builder.apply {
-                    setPositiveButton("ok"
+                    setPositiveButton(getString(R.string.yes)
                     ) { _, _ ->
                         viewModal.noteChanged.value = true
                         viewModal.labelChanged = true
@@ -1180,7 +1185,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
 
                     }
-                    setNegativeButton("cancel"
+                    setNegativeButton(getString(R.string.cancel)
                     ) { _, _ ->
 
                     }
@@ -1332,7 +1337,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
             viewModal.reminderTime = calendar.timeInMillis
             viewModal.reminderSet.value = true
 
-            Toast.makeText(this, "Reminder set for tomorrow at 6:00pm", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this,  resources.getString(R.string.reminder_set_tomorrow,"6:00 pm"), Toast.LENGTH_SHORT).show()
 
         }
     }
@@ -1344,25 +1349,25 @@ class AddEditNoteActivity : AppCompatActivity() ,
         val alertDialog: AlertDialog? = this@AddEditNoteActivity.let {
             val builder = AlertDialog.Builder(it)
             builder.apply {
-                setPositiveButton("ok"
+                setPositiveButton(getString(R.string.yes)
                 ) { _, _ ->
                     if(noteDescriptionEdit.length() > 0 || noteTitleEdit.length() >0 ){
                         viewModal.noteChanged.value = true
 
                     }
-                    Toast.makeText(context, "Reminder set", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, getString(R.string.reminder_set), Toast.LENGTH_SHORT).show()
                     viewModal.reminderTime = calendar.timeInMillis
                     viewModal.reminderSet.value = true
                     alertBottomSheet.dismiss()
 
                 }
-                setNegativeButton("cancel"
+                setNegativeButton(getString(R.string.cancel)
                 ) { _, _ ->
                     alertBottomSheet.dismiss()
 
                 }
                 setView(R.layout.alert_datetime_dialog)
-                setTitle("Choose date and time")
+                setTitle(getString(R.string.choose_date_time))
             }
             builder.create()
         }
@@ -1477,7 +1482,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
                         if (!archived){
                             saveOtherEntities()
-                            Toast.makeText(this,"Note updated .. " , Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this,getString(R.string.note_updated) , Toast.LENGTH_SHORT).show()
                         }else{
                             cancelAlarm(viewModal.reminderTime.toInt())
                         }
@@ -1495,7 +1500,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                             saveOtherEntities()
 
                         }
-                        Toast.makeText(this,"Note added .. " , Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this,getString(R.string.note_updated) , Toast.LENGTH_SHORT).show()
 
                     }
                 }else{
@@ -1518,7 +1523,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                     }else{
                         noteUid?.let { viewModal.deleteNote(it, labelColor,tags) }
                     }
-                    Toast.makeText(this@AddEditNoteActivity,"Note Deleted",Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@AddEditNoteActivity,getString(R.string.note_deleted),Toast.LENGTH_SHORT).show()
 
                 }
 

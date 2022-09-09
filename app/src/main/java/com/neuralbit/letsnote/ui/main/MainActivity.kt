@@ -46,7 +46,6 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
-    private val TAG = "MainActivity"
     private val allNotesViewModal : AllNotesViewModel by viewModels()
     private val archivedViewModel : ArchivedViewModel by viewModels()
     private val deleteVieModel : DeletedNotesViewModel by viewModels()
@@ -208,12 +207,12 @@ class MainActivity : AppCompatActivity() {
         deleteButton.setOnMenuItemClickListener {
             if (deleteVieModel.deletedNotes.isNotEmpty()){
                 val alertDialog: AlertDialog.Builder = AlertDialog.Builder(this@MainActivity)
-                alertDialog.setTitle("Are you sure about this ?")
-                alertDialog.setPositiveButton("Yes"
+                alertDialog.setTitle(resources.getString(R.string.general_warning_message))
+                alertDialog.setPositiveButton(resources.getString(R.string.yes)
                 ) { _, _ ->
                     deleteVieModel.clearTrash.value = true
                 }
-                alertDialog.setNegativeButton("Cancel"
+                alertDialog.setNegativeButton(resources.getString(R.string.cancel)
                 ) { dialog, _ -> dialog.cancel() }
                 alertDialog.show()
             }
@@ -229,11 +228,11 @@ class MainActivity : AppCompatActivity() {
         signOutButton.setOnMenuItemClickListener {
             val alertDialog: AlertDialog.Builder = AlertDialog.Builder(this@MainActivity)
             if(fUser?.isAnonymous == true){
-                alertDialog.setTitle("If you proceed, you will lose your notes. Please link your google account first")
+                alertDialog.setTitle(resources.getString(R.string.logout_anonymous_message))
             }else{
-                alertDialog.setTitle("Are you sure about this ?")
+                alertDialog.setTitle(resources.getString(R.string.general_warning_message))
             }
-            alertDialog.setPositiveButton("Yes"
+            alertDialog.setPositiveButton(resources.getString(R.string.yes)
             ) { _, _ ->
                 lifecycleScope.launch {
                     viewModal.getAllFireNotes().observe(lifecycleOwner){
@@ -250,7 +249,7 @@ class MainActivity : AppCompatActivity() {
                     }
             }
 
-            alertDialog.setNegativeButton("Cancel"
+            alertDialog.setNegativeButton(resources.getString(R.string.cancel)
             ) { dialog, _ -> dialog.cancel() }
             alertDialog.show()
             return@setOnMenuItemClickListener true
@@ -258,7 +257,7 @@ class MainActivity : AppCompatActivity() {
         deleteAndSignOut.setOnMenuItemClickListener {
             val alertDialog: AlertDialog.Builder = AlertDialog.Builder(this@MainActivity)
             alertDialog.setTitle(resources.getString(R.string.delete_and_sign_out_alert))
-            alertDialog.setPositiveButton("Yes"
+            alertDialog.setPositiveButton(resources.getString(R.string.yes)
             ) { _, _ ->
                 Toast.makeText(applicationContext,resources.getString(R.string.delete_and_sign_out_message), Toast.LENGTH_SHORT).show()
                 val editor : SharedPreferences.Editor= settingsPref.edit()
@@ -267,7 +266,7 @@ class MainActivity : AppCompatActivity() {
                 viewModal.deleteUserDataContent(this@MainActivity)
             }
 
-            alertDialog.setNegativeButton("Cancel"
+            alertDialog.setNegativeButton(resources.getString(R.string.cancel)
             ) { dialog, _ -> dialog.cancel() }
             alertDialog.show()
             return@setOnMenuItemClickListener true
@@ -300,12 +299,12 @@ class MainActivity : AppCompatActivity() {
     private inner class MActionModeCallBack : ActionMode.Callback {
         override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
             mode?.menuInflater?.inflate(R.menu.action_menu,menu)
-            mode?.title = "Delete or Archive notes"
+            mode?.title = resources.getString(R.string.delete_or_archive_notes)
             if(allNotesViewModal.deleteFrag.value == true){
-                mode?.title = "Delete or Restore notes"
+                mode?.title = resources.getString(R.string.delete_or_restore_notes)
             }
             else if(allNotesViewModal.archiveFrag){
-                mode?.title = "Delete or Restore notes"
+                mode?.title = resources.getString(R.string.delete_or_restore_notes)
             }
             return true
         }

@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.gms.ads.AdRequest
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
+import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.databinding.DeletedNotesFragmentBinding
 import com.neuralbit.letsnote.entities.NoteFire
 import com.neuralbit.letsnote.services.DeleteReceiver
@@ -140,7 +141,7 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
                         cancelDelete(deletedNote.timeStamp.toInt())
                     }
                 }
-                Toast.makeText(context,"Trash cleared successfully",Toast.LENGTH_SHORT).show()
+                Toast.makeText(context,resources.getString(R.string.notes_deleted_successfully,"s"),Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -148,7 +149,7 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
 
 
             if (it && allNotesViewModel.selectedNotes.isNotEmpty()){
-                val snackbar = Snackbar.make(parentLayout,"Notes deleted successfully", Snackbar.LENGTH_LONG)
+                val snackbar = Snackbar.make(parentLayout,resources.getString(R.string.notes_deleted_successfully,"s"), Snackbar.LENGTH_LONG)
                 snackbar.setAction("UNDO"
                 ) { restoreTempNotes()}
                 snackbar.show()
@@ -169,9 +170,9 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
                 allNotesViewModel.itemSelectEnabled.value = false
                 deletedNotesViewModel.itemDeleteClicked.value = false
                 if (selectedNotesCount == 1){
-                    Toast.makeText(context,"Note deleted successfully",Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context,resources.getString(R.string.notes_deleted_successfully,""),Toast.LENGTH_SHORT).show()
                 }else{
-                    Toast.makeText(context,"Notes deleted successfully",Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context,resources.getString(R.string.notes_deleted_successfully,"s"),Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -195,9 +196,9 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
                 allNotesViewModel.selectedNotes.clear()
                 allNotesViewModel.itemSelectEnabled.value = false
                 if (selectedNotesCount == 1){
-                    Toast.makeText(context,"Note restored successfully",Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context,resources.getString(R.string.notes_restored_successfully),Toast.LENGTH_SHORT).show()
                 }else{
-                    Toast.makeText(context,"Notes restored successfully",Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context,resources.getString(R.string.notes_restored_successfully, "s"),Toast.LENGTH_SHORT).show()
 
                 }
             }

@@ -47,32 +47,30 @@
 
     <Button
         android:id="@+id/signInWithGoogleBtn"
-        android:layout_width="150dp"
+        android:layout_width="200dp"
         android:layout_height="50dp"
         android:background="@drawable/sign_in_bgnd"
         android:drawableStart="@drawable/icons_google"
         android:text="@string/sign_in"
         android:textColor="#2A3439"
         app:layout_constraintBottom_toTopOf="@+id/textViewTV"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/signInWithAnnoneBtn"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/signInTV" />
 
     <Button
         android:id="@+id/signInWithAnnoneBtn"
-        android:layout_width="100dp"
+        android:layout_width="200dp"
         android:layout_height="50dp"
-        android:layout_marginTop="25dp"
         android:background="@drawable/skip_bgrnd"
-        android:text="Skip"
+        android:text="@string/skip"
         android:textColor="@color/timberwolf"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/sign_in_progress_bar"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/signInWithGoogleBtn"
-        app:layout_constraintTop_toBottomOf="@+id/signInTV" />
+        app:layout_constraintTop_toTopOf="@+id/signInWithGoogleBtn" />
 
     <ProgressBar
         android:id="@+id/sign_in_progress_bar"

@@ -133,10 +133,10 @@ class ArchivedFragment : Fragment() , NoteFireClick {
                 allNotesViewModel.itemSelectEnabled.value = false
                 allNotesViewModel.itemDeleteClicked.value = false
                 if (selectedNotesCount == 1){
-                    Toast.makeText(context,"Note deleted successfully", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context,resources.getString(R.string.notes_deleted_successfully),Toast.LENGTH_SHORT).show()
 
                 }else{
-                    Toast.makeText(context,"Notes deleted successfully", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context,resources.getString(R.string.notes_deleted_successfully,"s"),Toast.LENGTH_SHORT).show()
                 }
 
             }
@@ -159,9 +159,11 @@ class ArchivedFragment : Fragment() , NoteFireClick {
                 allNotesViewModel.itemDeleteClicked.value = false
                 allNotesViewModel.selectedNotes.clear()
                 if (selectedNotesCount == 1){
-                    Toast.makeText(context,"Note restored successfully", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context,resources.getString(R.string.notes_restored_successfully),Toast.LENGTH_SHORT).show()
+
                 }else{
-                    Toast.makeText(context,"Notes restored successfully", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context,resources.getString(R.string.notes_restored_successfully,"s"),Toast.LENGTH_SHORT).show()
+
                 }
             }
 

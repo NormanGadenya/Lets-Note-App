@@ -30,9 +30,6 @@ class LabelFragment : Fragment(), LabelRVAdapter.LabelClick {
     private var _binding:LabelFragmentBinding ? = null
     private lateinit var labelRV:RecyclerView
     private val binding get() = _binding!!
-    val TAG = "LabelFragment"
-
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

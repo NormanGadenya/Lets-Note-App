@@ -40,7 +40,7 @@ class TagNotesActivity : AppCompatActivity() , NoteFireClick {
     private val lifecycleOwner = this
 
 
-    val TAG = "TagNotesActivity"
+    private val TAG = "TagNotesActivity"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -144,7 +144,7 @@ class TagNotesActivity : AppCompatActivity() , NoteFireClick {
     private inner class MActionModeCallBack : ActionMode.Callback {
         override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
             mode?.menuInflater?.inflate(R.menu.action_menu,menu)
-            mode?.title = "Delete or Archive notes"
+            mode?.title = resources.getString(R.string.delete_or_archive_notes)
             return true
         }
 
@@ -165,13 +165,13 @@ class TagNotesActivity : AppCompatActivity() , NoteFireClick {
             }else if (item?.itemId == R.id.delete){
 
                 val alertDialog: AlertDialog.Builder = AlertDialog.Builder(applicationContext)
-                alertDialog.setTitle("Are you sure about this ?")
-                alertDialog.setPositiveButton("Yes"
+                alertDialog.setTitle(resources.getString(R.string.general_warning_message))
+                alertDialog.setPositiveButton(resources.getString(R.string.yes)
                 ) { _, _ ->
                     deleteNotes()
                     mode?.finish()
                 }
-                alertDialog.setNegativeButton("Cancel"
+                alertDialog.setNegativeButton(resources.getString(R.string.cancel)
                 ) { dialog, _ ->
                     run {
                         mode?.finish()
@@ -232,7 +232,7 @@ class TagNotesActivity : AppCompatActivity() , NoteFireClick {
 
             allNotesViewModel.itemSelectEnabled.value = false
 
-            Toast.makeText(applicationContext,"Notes deleted successfully", Toast.LENGTH_SHORT).show()
+            Toast.makeText(applicationContext,resources.getString(R.string.notes_deleted_successfully), Toast.LENGTH_SHORT).show()
         }
 
     }
@@ -276,10 +276,10 @@ class TagNotesActivity : AppCompatActivity() , NoteFireClick {
 
             allNotesViewModel.itemSelectEnabled.value = false
             if(selectedNotesCount == 1){
-                Toast.makeText(applicationContext,"Note archived successfully", Toast.LENGTH_SHORT).show()
+                Toast.makeText(applicationContext,resources.getString(R.string.notes_archived_successfully), Toast.LENGTH_SHORT).show()
 
             }else{
-                Toast.makeText(applicationContext,"Notes archived successfully", Toast.LENGTH_SHORT).show()
+                Toast.makeText(applicationContext,resources.getString(R.string.notes_archived_successfully,"s"), Toast.LENGTH_SHORT).show()
 
             }
         }
