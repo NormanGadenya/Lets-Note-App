@@ -23,7 +23,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.App.Starting">
         <activity
-            android:name=".PrivacyPolicy"
+            android:name=".ui.signIn.PrivacyPolicy"
             android:exported="false"
             android:parentActivityName=".ui.main.MainActivity"
             android:theme="@style/Theme.App.Activity"/>

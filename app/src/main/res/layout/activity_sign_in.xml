@@ -12,13 +12,13 @@
         android:id="@+id/imageView5"
         android:layout_width="200dp"
         android:layout_height="200dp"
+        android:contentDescription="@string/app_icon"
         android:src="@drawable/ic_launcher1_foreground"
         app:layout_constraintBottom_toTopOf="@+id/appName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:contentDescription="@string/app_icon" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/signInTV"
@@ -56,7 +56,8 @@
         android:text="@string/sign_in"
         android:textColor="#2A3439"
         app:layout_constraintBottom_toTopOf="@+id/textViewTV"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/signInWithAnnoneBtn"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/signInTV" />
 
@@ -64,16 +65,14 @@
         android:id="@+id/signInWithAnnoneBtn"
         android:layout_width="100dp"
         android:layout_height="50dp"
-        android:layout_marginTop="50dp"
         android:background="@drawable/skip_bgrnd"
         android:text="Skip"
         android:textColor="@color/timberwolf"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:visibility="visible"
         app:layout_constraintEnd_toStartOf="@+id/sign_in_progress_bar"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/signInWithGoogleBtn"
-        app:layout_constraintTop_toBottomOf="@+id/signInTV" />
+        app:layout_constraintTop_toTopOf="@+id/signInWithGoogleBtn" />
 
     <ProgressBar
         android:id="@+id/sign_in_progress_bar"
@@ -109,8 +108,7 @@
         android:text="@string/termsAndConditions"
         android:textColor="#A9BA9D"
         android:textSize="16sp"
-        android:layout_marginBottom="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/imageView6"
         app:layout_constraintEnd_toStartOf="@+id/privacyPolicyTv"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent" />
@@ -127,5 +125,10 @@
         app:layout_constraintStart_toEndOf="@+id/termsAndConditionTV"
         app:layout_constraintTop_toTopOf="@+id/termsAndConditionTV" />
 
-
+    <ImageView
+        android:id="@+id/imageView6"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:src="@drawable/wave"
+        app:layout_constraintBottom_toBottomOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

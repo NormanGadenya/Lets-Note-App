@@ -1,9 +1,10 @@
-package com.neuralbit.letsnote
+package com.neuralbit.letsnote.ui.signIn
 
 import android.os.Bundle
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
+import com.neuralbit.letsnote.R
 
 class PrivacyPolicy : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

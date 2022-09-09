@@ -1051,10 +1051,17 @@ class AddEditNoteActivity : AppCompatActivity() ,
             val sendIntent: Intent = Intent().apply {
                 action = Intent.ACTION_SEND
 
-                val textToShare : String ? = if (noteTitle!!.isNotBlank()){
+                var textToShare : String ? = if (noteTitle!!.isNotBlank()){
                     noteTitle + "\n" + noteDesc
                 }else{
                     noteDesc
+                }
+                for (todoItem in viewModal.todoItems) {
+                    textToShare += if (todoItem.checked){
+                        "\n + ${todoItem.item} "
+                    }else{
+                        "\n - ${todoItem.item} "
+                    }
                 }
 
                 putExtra(Intent.EXTRA_TEXT, textToShare)
