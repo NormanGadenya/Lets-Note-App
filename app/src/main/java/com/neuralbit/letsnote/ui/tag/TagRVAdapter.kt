@@ -13,7 +13,7 @@ import kotlinx.coroutines.*
 
 class TagRVAdapter (
     val context: Context,
-    val tagItemClick: TagItemClick
+    private val tagItemClick: TagItemClick
         ): RecyclerView.Adapter<TagRVAdapter.ViewHolder>(){
     var searchString : String? = null
 

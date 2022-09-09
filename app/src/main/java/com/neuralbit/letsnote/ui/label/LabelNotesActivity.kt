@@ -42,9 +42,8 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
     private var actionMode : ActionMode? = null
     private lateinit var noteRVAdapter : NoteRVAdapter
     private val lifecycleOwner = this
+    private val TAG = "LabelNotesActivity"
 
-
-    val TAG = "LabelNotesActivity"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(
@@ -130,7 +129,7 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
     private inner class MActionModeCallBack : ActionMode.Callback {
         override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
             mode?.menuInflater?.inflate(R.menu.action_menu,menu)
-            mode?.title = "Delete or Archive notes"
+            mode?.title = resources.getString(R.string.delete_or_archive_notes)
             return true
         }
 
@@ -151,13 +150,13 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
             }else if (item?.itemId == R.id.delete){
 
                 val alertDialog: AlertDialog.Builder = AlertDialog.Builder(this@LabelNotesActivity)
-                alertDialog.setTitle("Are you sure about this ?")
-                alertDialog.setPositiveButton("Yes"
+                alertDialog.setTitle(resources.getString(R.string.general_warning_message))
+                alertDialog.setPositiveButton(resources.getString(R.string.yes)
                 ) { _, _ ->
                     deleteNotes()
                     mode?.finish()
                 }
-                alertDialog.setNegativeButton("Cancel"
+                alertDialog.setNegativeButton(resources.getString(R.string.cancel)
                 ) { dialog, _ ->
                     run {
                         mode?.finish()
@@ -216,9 +215,11 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
 
             allNotesViewModel.itemSelectEnabled.value = false
             if (selectedNotesCount == 1){
-                Toast.makeText(applicationContext,"Note deleted successfully",Toast.LENGTH_SHORT).show()
+                Toast.makeText(applicationContext,resources.getString(R.string.notes_deleted_successfully),Toast.LENGTH_SHORT).show()
+
             }else{
-                Toast.makeText(applicationContext,"Notes deleted successfully",Toast.LENGTH_SHORT).show()
+                Toast.makeText(applicationContext,resources.getString(R.string.notes_deleted_successfully,"s"),Toast.LENGTH_SHORT).show()
+
             }
 
         }
@@ -244,10 +245,10 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
 
             allNotesViewModel.itemSelectEnabled.value = false
             if (selectedNotesCount == 1){
-                Toast.makeText(applicationContext,"Note archived successfully", Toast.LENGTH_SHORT).show()
+                Toast.makeText(applicationContext,resources.getString(R.string.notes_archived_successfully),Toast.LENGTH_SHORT).show()
 
             }else{
-                Toast.makeText(applicationContext,"Notes archived successfully", Toast.LENGTH_SHORT).show()
+                Toast.makeText(applicationContext,resources.getString(R.string.notes_archived_successfully,"s"),Toast.LENGTH_SHORT).show()
 
             }
 
