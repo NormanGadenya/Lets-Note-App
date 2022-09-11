@@ -8,14 +8,16 @@
     android:id="@+id/label"
     android:focusable="true"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <ImageView
+        android:id="@+id/labelRVItem"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:id="@+id/labelRVItem"
+        android:contentDescription="@string/label_icon"
         android:src="@drawable/ic_baseline_bookmark_24"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/labelTitle"
         app:layout_constraintStart_toStartOf="parent"
-        android:contentDescription="@string/label_icon" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/labelTitle"
@@ -24,10 +26,9 @@
         android:layout_marginTop="4dp"
         android:background="@drawable/tag_background"
         android:padding="4dp"
-        app:layout_constraintEnd_toEndOf="@+id/labelRVItem"
-        app:layout_constraintStart_toStartOf="@+id/labelRVItem"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/labelRVItem"
-        tools:text="#tag" />
+        tools:text="#tafffffffg" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

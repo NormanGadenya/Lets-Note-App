@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/reminderButton"
-        android:icon="@drawable/ic_baseline_access_alarm_24"
+        android:icon="@drawable/ic_baseline_access_alarm_note_rv_24"
         android:title="@string/reminder"
         app:showAsAction="always"/>
 
