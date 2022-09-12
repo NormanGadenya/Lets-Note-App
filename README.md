@@ -15,6 +15,9 @@ This is a simple note application that helps organize and store them both locall
   </tr>
  </table>
 
+This app is available at the Google Play Store!
+
+<a target="_blank" href='https://play.google.com/store/apps/details?id=com.neuralbit.letsnote'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png' width="240px"/></a>
 
 
 
