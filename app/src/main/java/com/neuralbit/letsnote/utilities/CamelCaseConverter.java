@@ -3,7 +3,7 @@ package com.neuralbit.letsnote.utilities;
 public class CamelCaseConverter {
     // function to convert the string into lower camel case
 
-    static String convertString( String s )
+    public static String convertString( String s )
     {
         // to keep track of spaces
         int ctr = 0 ;

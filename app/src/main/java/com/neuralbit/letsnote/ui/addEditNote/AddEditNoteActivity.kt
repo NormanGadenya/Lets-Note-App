@@ -678,7 +678,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
             if (noteContentSplit[lineIndex].endsWith(":")) {
                 if (noteContent.endsWith("\n")) {
                     if (!backPressed) {
-                        noteDescriptionEdit.append("-> ")
+                        noteDescriptionEdit.append("- ")
 
                     }
                 }
@@ -1030,6 +1030,11 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
         lockNoteItem?.setOnMenuItemClickListener {
             viewModal.noteChanged.value = true
+            if (!protected){
+                Toast.makeText(applicationContext,getString(R.string.note_locked),Toast.LENGTH_SHORT).show()
+            }else{
+                Toast.makeText(applicationContext,getString(R.string.note_unlocked),Toast.LENGTH_SHORT).show()
+            }
             viewModal.noteLocked.value = !protected
             return@setOnMenuItemClickListener true
         }
@@ -1646,14 +1651,14 @@ class AddEditNoteActivity : AppCompatActivity() ,
         this.calendar[Calendar.HOUR]= calendar[Calendar.HOUR]
         this.calendar[Calendar.MINUTE]= calendar[Calendar.MINUTE]
         this.calendar[Calendar.SECOND]= calendar[Calendar.SECOND]
-        timeTitleTV.text= resources.getString(R.string.date_time_set,"Time set ", DateFormat.getTimeFormat(applicationContext).format(calendar.time))
+        timeTitleTV.text= resources.getString(R.string.date_time_set,"Time ", DateFormat.getTimeFormat(applicationContext).format(calendar.time))
     }
 
     override fun getDateInfo(calendar : Calendar) {
         this.calendar[Calendar.DAY_OF_MONTH] = calendar[Calendar.DAY_OF_MONTH]
         this.calendar[Calendar.MONTH] = calendar[Calendar.MONTH]
         this.calendar[Calendar.YEAR] = calendar[Calendar.YEAR]
-        dateTitleTV.text= resources.getString(R.string.date_time_set,"Date set ", DateFormat.getDateFormat(applicationContext).format(calendar.time))
+        dateTitleTV.text= resources.getString(R.string.date_time_set,"Date ", DateFormat.getDateFormat(applicationContext).format(calendar.time))
     }
 
     override fun getTag(tag: String) {

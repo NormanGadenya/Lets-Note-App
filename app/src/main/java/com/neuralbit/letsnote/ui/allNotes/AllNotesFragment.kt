@@ -1,6 +1,7 @@
 package com.neuralbit.letsnote.ui.allNotes
 
 import android.app.AlarmManager
+import android.app.AlertDialog
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -97,14 +98,29 @@ class AllNotesFragment : Fragment() , NoteFireClick {
             reviewSharedPrefEditor!!.putInt("count",reviewCount)
             val reviewManager: ReviewManager? = context?.let { ReviewManagerFactory.create(it) }
 
-            if (reviewCount == 5){
-                val requestReviewTask = reviewManager?.requestReviewFlow()
+            if (reviewCount == 10){
 
-                requestReviewTask?.addOnCompleteListener { request ->
-                    if (request.isSuccessful) {
-                        activity?.let { reviewManager.launchReviewFlow(it, request.result) }
+                val alertDialog: AlertDialog.Builder = AlertDialog.Builder(context)
+                alertDialog.setTitle(resources.getString(R.string.rate_app))
+                alertDialog.setPositiveButton(resources.getString(R.string.yes)
+                ) { _, _ ->
+                    val requestReviewTask = reviewManager?.requestReviewFlow()
+
+                    requestReviewTask?.addOnCompleteListener { request ->
+                        if (request.isSuccessful) {
+                            activity?.let { reviewManager.launchReviewFlow(it, request.result) }
+                        }
                     }
                 }
+                alertDialog.setNegativeButton(resources.getString(R.string.cancel)
+                ) { dialog, _ ->
+                    reviewCount = 0
+                    reviewSharedPrefEditor?.apply()
+
+                    dialog.cancel()
+                }
+                alertDialog.show()
+
             }
         }
 
@@ -252,7 +268,6 @@ class AllNotesFragment : Fragment() , NoteFireClick {
                 pinnedNoteRVAdapter?.searchString = str
                 pinnedNoteRVAdapter?.updateListFire(pinnedNotes)
             }
-
         }
 
         allNotesViewModel.itemArchiveClicked.observe(viewLifecycleOwner){
@@ -349,9 +364,6 @@ class AllNotesFragment : Fragment() , NoteFireClick {
                 }
             }
         }
-
-
-       
         return root
     }
 

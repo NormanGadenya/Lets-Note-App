@@ -85,7 +85,7 @@
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_marginTop="4dp"
-            android:background="@drawable/ic_baseline_access_alarm_24"
+            android:background="@drawable/ic_baseline_access_alarm_note_rv_24"
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="@+id/reminderTV"
             app:layout_constraintStart_toStartOf="parent"

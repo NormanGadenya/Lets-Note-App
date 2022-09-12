@@ -18,6 +18,7 @@
     <string name="opt1Desc">Later today at %1$s</string>
     <string name="opt2n3Desc">Tomorrow in the %1$s at %2$s</string>
     <string name="app_version_template">Application version %1$s</string>
+    <string name="rate_app">Would you like to rate our app?</string>
     <string name="tagTitle">#%1$s</string>
     <string name="createNewTag">Create #%1$s</string>
     <string name="title_activity_main2">MainActivity2</string>
@@ -72,6 +73,7 @@
     <string name="note_unpinned">Note unpinned</string>
     <string name="note_deleted">Note deleted</string>
     <string name="note_locked">Note locked</string>
+    <string name="note_unlocked">Note unlocked</string>
     <string name="note_saved">Note saved</string>
     <string name="note_updated">Note updated</string>
     <string name="note_restored">Note restored</string>
@@ -85,6 +87,7 @@
     <string name="undo">UNDO</string>
     <string name="choose_date_and_time">Choose date and time</string>
     <string name="reminder_set">Reminder set</string>
+    <string name="reminder_menu_desc">Set a reminder</string>
     <string name="no">No</string>
     <string name="cancel">Cancel</string>
     <string name="general_warning_message">Are you sure about this ?</string>

@@ -1,4 +1,4 @@
-package com.neuralbit.letsnote.utilities
+package com.neuralbit.letsnote.ui.addEditNote
 
 import android.app.AlertDialog
 import android.app.Dialog
@@ -8,6 +8,7 @@ import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import androidx.appcompat.app.AppCompatDialogFragment
 import com.neuralbit.letsnote.R
+import com.neuralbit.letsnote.utilities.CamelCaseConverter
 
 
 class AddTagDialog(private val getTagFromDialog: GetTagFromDialog, val ctx: Context): AppCompatDialogFragment() {
