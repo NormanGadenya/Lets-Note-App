@@ -87,6 +87,7 @@
     <string name="undo">UNDO</string>
     <string name="choose_date_and_time">Choose date and time</string>
     <string name="reminder_set">Reminder set</string>
+    <string name="reminder_menu_desc">Set a reminder</string>
     <string name="no">No</string>
     <string name="cancel">Cancel</string>
     <string name="general_warning_message">Are you sure about this ?</string>
