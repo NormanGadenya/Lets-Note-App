@@ -1030,6 +1030,11 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
         lockNoteItem?.setOnMenuItemClickListener {
             viewModal.noteChanged.value = true
+            if (!protected){
+                Toast.makeText(applicationContext,getString(R.string.note_locked),Toast.LENGTH_SHORT).show()
+            }else{
+                Toast.makeText(applicationContext,getString(R.string.note_unlocked),Toast.LENGTH_SHORT).show()
+            }
             viewModal.noteLocked.value = !protected
             return@setOnMenuItemClickListener true
         }

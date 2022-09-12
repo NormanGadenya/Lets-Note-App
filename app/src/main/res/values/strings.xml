@@ -73,6 +73,7 @@
     <string name="note_unpinned">Note unpinned</string>
     <string name="note_deleted">Note deleted</string>
     <string name="note_locked">Note locked</string>
+    <string name="note_unlocked">Note unlocked</string>
     <string name="note_saved">Note saved</string>
     <string name="note_updated">Note updated</string>
     <string name="note_restored">Note restored</string>
