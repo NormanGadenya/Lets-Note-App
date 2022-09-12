@@ -7,8 +7,6 @@
     android:layout_height="?android:attr/actionBarSize"
     app:layout_constraintBottom_toBottomOf="parent">
 
-
-
     <ImageButton
         android:id="@+id/ocrButton"
         android:layout_width="35dp"
@@ -20,19 +18,23 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:contentDescription="@string/ocr_button" />
+
     <TextView
-        android:layout_width="150dp"
-        android:layout_height="wrap_content"
         android:id="@+id/tvTimeStamp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:paddingTop="4dp"
-        android:visibility="visible"
         android:textSize="15sp"
-        android:layout_margin="@dimen/margin"
-        app:layout_constraintTop_toTopOf="parent"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="@+id/addTagBtn"
         app:layout_constraintEnd_toStartOf="@+id/addTagBtn"
         app:layout_constraintStart_toEndOf="@+id/ocrButton"
-        app:layout_constraintBottom_toBottomOf="@id/ocrButton"
-        tools:text="Edited on 15th January"/>
+        app:layout_constraintTop_toTopOf="@+id/addTagBtn"
+        tools:text="Edited on 15th January" />
 
     <LinearLayout
         android:layout_width="wrap_content"

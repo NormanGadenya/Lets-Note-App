@@ -18,6 +18,7 @@
     <string name="opt1Desc">Later today at %1$s</string>
     <string name="opt2n3Desc">Tomorrow in the %1$s at %2$s</string>
     <string name="app_version_template">Application version %1$s</string>
+    <string name="rate_app">Would you like to rate our app?</string>
     <string name="tagTitle">#%1$s</string>
     <string name="createNewTag">Create #%1$s</string>
     <string name="title_activity_main2">MainActivity2</string>
