@@ -25,6 +25,7 @@
         <entry key="app/src/main/res/drawable/drawer_handler.xml" value="0.1155" />
         <entry key="app/src/main/res/drawable/eng_violet_tag.xml" value="0.22291666666666668" />
         <entry key="app/src/main/res/drawable/ev_toolbar.xml" value="0.1225" />
+        <entry key="app/src/main/res/drawable/floating_button_title_background.xml" value="0.206" />
         <entry key="app/src/main/res/drawable/honey_dew.xml" value="0.22291666666666668" />
         <entry key="app/src/main/res/drawable/honey_drew_toolbar.xml" value="0.1225" />
         <entry key="app/src/main/res/drawable/ic_apricot_24.xml" value="0.353125" />
@@ -101,7 +102,7 @@
         <entry key="app/src/main/res/layout-land/activity_sign_in.xml" value="0.35752979414951247" />
         <entry key="app/src/main/res/layout-v26/label_item.xml" value="0.15989583333333332" />
         <entry key="app/src/main/res/layout/activity_add_edit_note.xml" value="0.21" />
-        <entry key="app/src/main/res/layout/activity_fingerprint.xml" value="0.35885416666666664" />
+        <entry key="app/src/main/res/layout/activity_fingerprint.xml" value="0.5" />
         <entry key="app/src/main/res/layout/activity_label_notes.xml" value="0.17" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_main2.xml" value="0.3697916666666667" />
@@ -112,6 +113,7 @@
         <entry key="app/src/main/res/layout/add_label_dialog.xml" value="0.1" />
         <entry key="app/src/main/res/layout/add_tag_dialog.xml" value="0.22644927536231885" />
         <entry key="app/src/main/res/layout/alert_bottom_sheet.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/alert_datetime_dialog.xml" value="0.35885416666666664" />
         <entry key="app/src/main/res/layout/app_bar_main.xml" value="0.3089887640449438" />
         <entry key="app/src/main/res/layout/checklist_item.xml" value="0.5" />
         <entry key="app/src/main/res/layout/content_main.xml" value="0.25" />
@@ -165,7 +167,7 @@
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_X" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">

@@ -65,6 +65,7 @@
     <string name="note">Note</string>
     <string name="font_style">Font style</string>
     <string name="font_size">Font size</string>
+    <string name="fingerprint_retry">Click the fingerprint icon to try again</string>
     <string name="skip">Skip</string>
     <string name="yes">Yes</string>
     <string name="note_archived">Note archived</string>
@@ -168,4 +169,6 @@
     <string name="all_tag_notes">List of all notes belonging to this tag</string>
     <string name="all_deleted_notes">List of all deleted notes</string>
     <string name="delete_note">Delete Note</string>
+    <string name="new_todo_note">New todo</string>
+    <string name="new_text_note">New note</string>
 </resources>

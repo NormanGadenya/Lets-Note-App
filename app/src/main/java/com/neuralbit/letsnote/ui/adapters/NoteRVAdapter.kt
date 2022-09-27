@@ -67,25 +67,30 @@ class NoteRVAdapter (
         val note = allNotesFire[position]
         var title = note.title
         if (fontStyle != null){
-            val typeface: Typeface? = when (fontStyle) {
-                "Architects daughter" -> {
-                    ResourcesCompat.getFont(context, R.font.architects_daughter)
+            try {
+                val typeface: Typeface? = when (fontStyle) {
+                    "Architects daughter" -> {
+                        ResourcesCompat.getFont(context, R.font.architects_daughter)
+                    }
+                    "Abreeze" -> {
+                        ResourcesCompat.getFont(context, R.font.abeezee)
+                    }
+                    "Adamina" -> {
+                        ResourcesCompat.getFont(context, R.font.adamina)
+                    }
+                    else -> {
+                        ResourcesCompat.getFont(context, R.font.roboto)
+                    }
                 }
-                "Abreeze" -> {
-                    ResourcesCompat.getFont(context, R.font.abeezee)
-                }
-                "Adamina" -> {
-                    ResourcesCompat.getFont(context, R.font.adamina)
-                }
-                else -> {
-                    ResourcesCompat.getFont(context, R.font.roboto)
-                }
+                holder.noteTextTV.typeface = typeface
+                holder.noteTitleTV.typeface = typeface
+                holder.daysLeft.typeface = typeface
+                holder.reminderTV.typeface = typeface
+                holder.tagsTV.typeface = typeface
+            }catch (_: Exception){
+
             }
-            holder.noteTextTV.typeface = typeface
-            holder.noteTitleTV.typeface = typeface
-            holder.daysLeft.typeface = typeface
-            holder.reminderTV.typeface = typeface
-            holder.tagsTV.typeface = typeface
+
         }
         val settingsPref = context.getSharedPreferences("Settings", AppCompatActivity.MODE_PRIVATE)
         val fontMultiplier = settingsPref.getInt("fontMultiplier",2)

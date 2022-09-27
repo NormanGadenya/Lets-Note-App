@@ -6,17 +6,19 @@ import android.hardware.biometrics.BiometricPrompt
 import android.os.Build
 import android.os.Bundle
 import android.os.CancellationSignal
+import android.view.View.VISIBLE
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.google.firebase.auth.FirebaseAuth
-import com.neuralbit.letsnote.ui.main.MainActivity
 import com.neuralbit.letsnote.R
+import com.neuralbit.letsnote.ui.main.MainActivity
 
 class Fingerprint : AppCompatActivity() {
 
+    private lateinit var retryTV: TextView
     private var authenticationCallback: BiometricPrompt.AuthenticationCallback? = null
     private var cancellationSignal: CancellationSignal? = null
 
@@ -39,11 +41,12 @@ class Fingerprint : AppCompatActivity() {
 
         val noteTitleTV = findViewById<TextView>(R.id.textView)
         noteTitleTV.text = "Unlock to view the note \n $noteTitle"
-        val fingerprint = findViewById<ImageView>(R.id.imageView)
+        val fingerprintIV = findViewById<ImageView>(R.id.imageView)
+        retryTV = findViewById(R.id.retryTV)
 
-        fingerprint.setOnClickListener{
+        fingerprintIV.setOnClickListener{
             initializeFingerprint(
-                fingerprint,
+                fingerprintIV,
                 noteTitle,
                 noteDesc,
                 noteUid,
@@ -59,7 +62,7 @@ class Fingerprint : AppCompatActivity() {
             )
         }
         initializeFingerprint(
-            fingerprint,
+            fingerprintIV,
             noteTitle,
             noteDesc,
             noteUid,
@@ -96,6 +99,7 @@ class Fingerprint : AppCompatActivity() {
         authenticationCallback = object : BiometricPrompt.AuthenticationCallback() {
             override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
                 super.onAuthenticationError(errorCode, errString)
+                retryTV.visibility = VISIBLE
                 fingerprint.setColorFilter(
                     ContextCompat.getColor(
                         applicationContext,
@@ -115,8 +119,7 @@ class Fingerprint : AppCompatActivity() {
                         ), PorterDuff.Mode.SRC_IN
                     )
                     try {
-                        val addEditIntent =
-                            Intent(this@Fingerprint, AddEditNoteActivity::class.java)
+                        val addEditIntent = Intent(this@Fingerprint, AddEditNoteActivity::class.java)
                         addEditIntent.putExtra("noteType", "Edit")
                         addEditIntent.putExtra("noteTitle", noteTitle)
                         addEditIntent.putExtra("noteDescription", noteDesc)

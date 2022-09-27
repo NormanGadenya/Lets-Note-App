@@ -104,6 +104,21 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:contentDescription="@string/new_todo_button" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@+id/FABAddNote"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/floating_button_title_background"
+        android:padding="8dp"
+        android:visibility="gone"
+        android:text="@string/new_text_note"
+        android:textColor="@color/timberwolf"
+        android:id = "@+id/note_title_tv"
+        app:layout_constraintEnd_toStartOf="@+id/FABAddNote"
+        app:layout_constraintTop_toTopOf="@+id/FABAddNote"
+    />
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/FABAddNote"
         android:layout_width="wrap_content"
@@ -118,6 +133,20 @@
         app:layout_constraintBottom_toTopOf="@id/FABNoteType"
         app:layout_constraintEnd_toEndOf="parent"
         android:contentDescription="@string/new_note_button" />
+
+    <TextView
+        android:id="@+id/note_todo_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/floating_button_title_background"
+        android:padding="8dp"
+        android:visibility="gone"
+        android:layout_marginEnd="8dp"
+        android:text="@string/new_todo_note"
+        android:textColor="@color/timberwolf"
+        app:layout_constraintBottom_toBottomOf="@+id/FABAddTodoList"
+        app:layout_constraintEnd_toStartOf="@+id/FABAddTodoList"
+        app:layout_constraintTop_toTopOf="@+id/FABAddTodoList" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/FABNoteType"

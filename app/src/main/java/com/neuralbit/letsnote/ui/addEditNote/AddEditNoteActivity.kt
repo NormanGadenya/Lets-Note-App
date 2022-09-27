@@ -911,30 +911,34 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            try{
+                val typeface: Typeface? = when (fontStyle) {
+                    "Architects daughter" -> {
+                        ResourcesCompat.getFont(applicationContext, R.font.architects_daughter)
+                    }
+                    "Abreeze" -> {
+                        ResourcesCompat.getFont(applicationContext, R.font.abeezee)
+                    }
+                    "Adamina" -> {
+                        ResourcesCompat.getFont(applicationContext, R.font.adamina)
+                    }
+                    else -> {
+                        ResourcesCompat.getFont(applicationContext, R.font.roboto)
+                    }
+                }
 
-            val typeface: Typeface? = when (fontStyle) {
-                "Architects daughter" -> {
-                    ResourcesCompat.getFont(applicationContext, R.font.architects_daughter)
-                }
-                "Abreeze" -> {
-                    ResourcesCompat.getFont(applicationContext, R.font.abeezee)
-                }
-                "Adamina" -> {
-                    ResourcesCompat.getFont(applicationContext, R.font.adamina)
-                }
-                else -> {
-                    ResourcesCompat.getFont(applicationContext, R.font.roboto)
-                }
+
+                todoItemDescTV.typeface = typeface
+                todoRVAdapter.fontStyle = fontStyle
+                todoRVAdapter.fontMultiplier = fontMultiplier
+                noteDescriptionEdit.typeface = typeface
+                noteTitleEdit.typeface = typeface
+                reminderTV.typeface = typeface
+                tvTimeStamp.typeface = typeface
+            }catch (_ : Exception){
+
             }
 
-
-            todoItemDescTV.typeface = typeface
-            todoRVAdapter.fontStyle = fontStyle
-            todoRVAdapter.fontMultiplier = fontMultiplier
-            noteDescriptionEdit.typeface = typeface
-            noteTitleEdit.typeface = typeface
-            reminderTV.typeface = typeface
-            tvTimeStamp.typeface = typeface
         }
         if (noteType == "NewTodo"){
             noteDescriptionEdit.visibility = GONE

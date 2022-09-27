@@ -11,7 +11,7 @@ android {
         release {
             storeFile file('/home/annonymous/StudioProjects/letsNote.jks')
             storePassword 'normaneg'
-            keyAlias 'annonymous'
+            keyAlias 'testAlias'
             keyPassword 'normaneg'
         }
     }
@@ -85,7 +85,6 @@ dependencies {
 
     implementation 'com.google.android.gms:play-services-auth:20.3.0'
     implementation 'com.google.android.gms:play-services-ads:21.1.0'
-
 
 
     implementation 'androidx.navigation:navigation-fragment-ktx:2.5.1'

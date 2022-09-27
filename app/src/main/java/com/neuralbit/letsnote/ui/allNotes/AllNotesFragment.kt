@@ -50,6 +50,8 @@ class AllNotesFragment : Fragment() , NoteFireClick {
     private lateinit var  notesRV: RecyclerView
     private lateinit var  pinnedNotesRV: RecyclerView
     private lateinit var addNoteFAB : FloatingActionButton
+    private lateinit var addNoteTV : TextView
+    private lateinit var addTodoTV : TextView
     private lateinit var welcomeIcon : ImageView
     private lateinit var welcomeText : TextView
     private val binding get() = _binding!!
@@ -75,6 +77,8 @@ class AllNotesFragment : Fragment() , NoteFireClick {
         addNoteFAB = binding.FABAddNote
         addTodoFAB = binding.FABAddTodoList
         noteTypeFAB = binding.FABNoteType
+        addNoteTV = binding.noteTitleTv
+        addTodoTV = binding.noteTodoTv
         notesRV = binding.notesRV
         pinnedNotesRV = binding.pinnedNotesRV
         pinnedNotesTV = binding.pinnedNotesTV
@@ -380,10 +384,14 @@ class AllNotesFragment : Fragment() , NoteFireClick {
             noteTypeFAB.startAnimation(rotateOpen)
             addTodoFAB.startAnimation(fromBottom)
             addNoteFAB.startAnimation(fromBottom)
+            addNoteTV.startAnimation(fromBottom)
+            addTodoTV.startAnimation(fromBottom)
         }else{
             noteTypeFAB.startAnimation(rotateClose)
             addTodoFAB.startAnimation(toBottom)
             addNoteFAB.startAnimation(toBottom)
+            addNoteTV.startAnimation(toBottom)
+            addTodoTV.startAnimation(toBottom)
         }
     }
 
@@ -391,9 +399,13 @@ class AllNotesFragment : Fragment() , NoteFireClick {
         if (!clicked){
             addTodoFAB.visibility = VISIBLE
             addNoteFAB.visibility = VISIBLE
+            addNoteTV.visibility = VISIBLE
+            addTodoTV.visibility = VISIBLE
         }else{
             addTodoFAB.visibility = GONE
             addNoteFAB.visibility = GONE
+            addNoteTV.visibility = GONE
+            addTodoTV.visibility = GONE
         }
     }
 
