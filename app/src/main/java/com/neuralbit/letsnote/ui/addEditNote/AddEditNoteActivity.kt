@@ -1116,13 +1116,16 @@ class AddEditNoteActivity : AppCompatActivity() ,
         val newNoteShortcut = ShortcutInfoCompat.Builder(applicationContext, "newNote")
             .setShortLabel(getString(R.string.note_shortcut_short_label))
             .setLongLabel(getString(R.string.note_shortcut_long_label))
-            .setIcon(IconCompat.createWithResource(applicationContext,
+            .setIcon(
+                IconCompat.createWithResource(applicationContext,
                 R.drawable.ic_baseline_mode_edit_24
             ))
             .setIntent(intent) // Push the shortcut
             .build()
+        ShortcutManagerCompat.pushDynamicShortcut(applicationContext, newNoteShortcut)
 
         intent.putExtra("noteType","NewTodo")
+
 
         val newTodoShortcut = ShortcutInfoCompat.Builder(applicationContext, "newTodo")
             .setShortLabel(getString(R.string.todo_shortcut_short_label))
@@ -1134,9 +1137,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
             .build()
 
         ShortcutManagerCompat.pushDynamicShortcut(applicationContext, newTodoShortcut)
-        ShortcutManagerCompat.pushDynamicShortcut(applicationContext, newNoteShortcut)
-
-
+        
 
     }
 
