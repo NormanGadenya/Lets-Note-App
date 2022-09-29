@@ -171,4 +171,6 @@
     <string name="delete_note">Delete Note</string>
     <string name="new_todo_note">New todo</string>
     <string name="new_text_note">New note</string>
+    <string name="share_app">Share App</string>
+    <string name="let_others_know_about_us">Let others know about us</string>
 </resources>

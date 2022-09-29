@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
     android:background="#2A3439"
     tools:context=".ui.signIn.SignInActivity">
 
@@ -127,6 +126,7 @@
 
     <ImageView
         android:id="@+id/imageView6"
+        android:layout_marginBottom="-10dp"
         android:layout_width="match_parent"
         android:layout_height="100dp"
         android:src="@drawable/wave"

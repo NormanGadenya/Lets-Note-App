@@ -6,6 +6,7 @@ import android.hardware.biometrics.BiometricPrompt
 import android.os.Build
 import android.os.Bundle
 import android.os.CancellationSignal
+import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.ImageView
 import android.widget.TextView
@@ -112,6 +113,8 @@ class Fingerprint : AppCompatActivity() {
                 super.onAuthenticationSucceeded(result)
                 val user = FirebaseAuth.getInstance().currentUser
                 if (user != null) {
+                    retryTV.visibility = GONE
+
                     fingerprint.setColorFilter(
                         ContextCompat.getColor(
                             applicationContext,
@@ -119,6 +122,7 @@ class Fingerprint : AppCompatActivity() {
                         ), PorterDuff.Mode.SRC_IN
                     )
                     try {
+
                         val addEditIntent = Intent(this@Fingerprint, AddEditNoteActivity::class.java)
                         addEditIntent.putExtra("noteType", "Edit")
                         addEditIntent.putExtra("noteTitle", noteTitle)

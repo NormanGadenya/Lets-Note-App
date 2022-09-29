@@ -69,6 +69,7 @@ class SettingsFragment : Fragment() {
         val migrateTV = binding.backUpTV
         val adView = binding.adView
         val versionNameTv = binding.versionNameTV
+        val shareAppBtn = binding.shareButton
         versionNameTv.text = resources.getString(R.string.app_version_template,BuildConfig.VERSION_NAME)
         val adRequest = AdRequest.Builder().build()
         adView.loadAd(adRequest)
@@ -86,6 +87,18 @@ class SettingsFragment : Fragment() {
         }else{
             migrateCard.visibility = GONE
             migrateTV.visibility = GONE
+        }
+        shareAppBtn.setOnClickListener {
+            val sendIntent: Intent = Intent().apply {
+                action = Intent.ACTION_SEND
+
+                val appLink = "https://play.google.com/store/apps/details?id=com.neuralbit.letsnote"
+
+                putExtra(Intent.EXTRA_TEXT, appLink)
+                type = "text/plain"
+            }
+            val shareIntent = Intent.createChooser(sendIntent, null)
+            startActivity(shareIntent)
         }
         createRequest()
         setHasOptionsMenu(true)

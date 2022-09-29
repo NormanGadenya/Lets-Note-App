@@ -1137,7 +1137,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
             .build()
 
         ShortcutManagerCompat.pushDynamicShortcut(applicationContext, newTodoShortcut)
-        
+
 
     }
 
@@ -1365,10 +1365,10 @@ class AddEditNoteActivity : AppCompatActivity() ,
                         viewModal.noteChanged.value = true
 
                     }
-                    Toast.makeText(context, getString(R.string.reminder_set), Toast.LENGTH_SHORT).show()
                     viewModal.reminderTime = calendar.timeInMillis
                     viewModal.reminderSet.value = true
                     alertBottomSheet.dismiss()
+                    Toast.makeText(context,resources.getString(R.string.reminder, DateFormat.getDateFormat(applicationContext).format(calendar.time) , DateFormat.getTimeFormat(applicationContext).format(calendar.time)),Toast.LENGTH_SHORT).show()
 
                 }
                 setNegativeButton(getString(R.string.cancel)
@@ -1510,7 +1510,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                             saveOtherEntities()
 
                         }
-                        Toast.makeText(this,getString(R.string.note_updated) , Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this,getString(R.string.note_saved) , Toast.LENGTH_SHORT).show()
 
                     }
                 }else{
