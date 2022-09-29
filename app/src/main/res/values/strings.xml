@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Let\'s note</string>
+    <string name="app_name" translatable="false">Let\'s note</string>
     <string name="app_version">App version 1.0</string>
     <string name="app_icon">App icon</string>
     <string name="welcome_text">Let\'s get started</string>
