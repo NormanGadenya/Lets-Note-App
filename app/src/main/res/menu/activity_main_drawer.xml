@@ -8,13 +8,18 @@
             android:id="@+id/nav_home"
             android:icon="@drawable/ic_baseline_note_24"
             android:title="@string/menu_allNotes" />
+
+        <item
+            android:id="@+id/nav_todo"
+            android:icon="@drawable/ic_baseline_todo_24"
+            android:title="@string/menu_todo" />
         <item
             android:id="@+id/nav_arch"
             android:icon="@drawable/ic_baseline_archive_24"
             android:title="@string/menu_archived" />
         <item
             android:id="@+id/nav_tags"
-            android:icon="@drawable/ic_baseline_local_offer_24"
+            android:icon="@drawable/tag_frag_icon_24"
             android:title="@string/tags"/>
         <item
             android:id="@+id/nav_labels"

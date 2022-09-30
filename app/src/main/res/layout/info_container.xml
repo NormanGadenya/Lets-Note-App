@@ -4,41 +4,46 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/infoContainer"
     android:layout_width="match_parent"
-    android:layout_height="?attr/actionBarSize"
+    android:layout_height="?android:attr/actionBarSize"
     app:layout_constraintBottom_toBottomOf="parent">
-
-
 
     <ImageButton
         android:id="@+id/ocrButton"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
         android:layout_margin="@dimen/margin"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:foreground="@drawable/ic_baseline_document_scanner_24"
+        android:foreground="@drawable/ic_outline_document_scanner_24"
         android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:contentDescription="@string/ocr_button" />
+
     <TextView
+        android:id="@+id/tvTimeStamp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/tvTimeStamp"
-        android:visibility="gone"
-        android:textSize="12sp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:paddingTop="4dp"
+        android:textSize="15sp"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="@+id/addTagBtn"
         app:layout_constraintEnd_toStartOf="@+id/addTagBtn"
         app:layout_constraintStart_toEndOf="@+id/ocrButton"
-        tools:text="Edited on 15th"/>
+        app:layout_constraintTop_toTopOf="@+id/addTagBtn"
+        tools:text="Edited on 15th January" />
 
     <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="30dp"
+        android:layout_height="35dp"
         android:orientation="horizontal"
         android:id= "@+id/redoUndoGroup"
+        android:layout_margin="@dimen/margin"
         android:weightSum="2"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/addTagBtn"
         app:layout_constraintStart_toEndOf="@+id/ocrButton">
 
@@ -46,45 +51,48 @@
 
         <ImageButton
             android:id="@+id/undoButton"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
             android:layout_marginEnd="16dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:foreground="@drawable/ic_baseline_undo_24"
             android:visibility="visible"
-             />
+            android:contentDescription="@string/undo_button" />
 
         <ImageButton
             android:id="@+id/redoButton"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:enabled="false"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:foreground="@drawable/ic_baseline_redo_24"
             android:visibility="visible"
-           />
+            android:contentDescription="@string/redo_button" />
     </LinearLayout>
 
 
     <ImageButton
         android:id="@+id/addTagBtn"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
         android:layout_margin="@dimen/margin"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:foreground="@drawable/ic_baseline_local_offer_24"
+        android:foreground="@drawable/ic_baseline_tag_24"
         android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/labelBtn" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/labelBtn"
+        android:contentDescription="@string/add_tag_button" />
 
     <ImageButton
         android:id="@+id/labelBtn"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
         android:layout_margin="@dimen/margin"
         android:layout_marginTop="@dimen/margin"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:foreground="@drawable/ic_baseline_bookmark_add_24"
+        android:foreground="@drawable/ic_outline_bookmark_add_24"
         android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:contentDescription="@string/add_label_button" />
 </androidx.constraintlayout.widget.ConstraintLayout>

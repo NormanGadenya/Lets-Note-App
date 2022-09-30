@@ -6,12 +6,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/coordinatorlayout"
-    tools:context=".AddEditNoteActivity">
+    tools:context=".ui.addEditNote.AddEditNoteActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
 
         android:layout_height="match_parent">
+
         <EditText
             android:id="@+id/noteEditTitle"
             android:layout_width="match_parent"
@@ -20,19 +21,20 @@
             android:background="@android:color/transparent"
             android:hint="@string/title"
             android:inputType="textAutoComplete"
-            android:autofillHints="name"
             android:minHeight="60dp"
             android:paddingTop="8dp"
             android:paddingBottom="8dp"
+            android:textColorHint="#78909C"
             android:textSize="32sp"
             android:textStyle="bold"
-            app:layout_constraintTop_toBottomOf="@+id/actionBar" />
+            app:layout_constraintTop_toBottomOf="@+id/actionBar"
+            tools:layout_editor_absoluteX="16dp"
+            android:importantForAutofill="no" />
 
         <androidx.core.widget.NestedScrollView
             android:id="@+id/scrollView2"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginTop="@dimen/margin"
             android:layout_marginBottom="4dp"
             app:layout_constraintBottom_toTopOf="@id/reminderIcon"
             app:layout_constraintTop_toBottomOf="@id/noteEditTitle"
@@ -50,18 +52,20 @@
                     android:id="@+id/noteEditDesc"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:autoLink="web"
+                    android:layout_marginTop="8dp"
                     android:background="@android:color/transparent"
                     android:completionThreshold="1"
-                    android:autoLink="web"
                     android:gravity="top"
-                    android:visibility="visible"
                     android:hint="@string/note_content"
                     android:importantForAutofill="no"
                     android:inputType="textMultiLine"
                     android:lineSpacingMultiplier="1.1"
-                    android:popupBackground="?attr/colorOnSecondary"
-                    android:textSize="24sp"
                     android:minHeight="60dp"
+                    android:popupBackground="?attr/colorOnSecondary"
+                    android:textColorHint="#78909C"
+                    android:textSize="24sp"
+                    android:visibility="visible"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <androidx.recyclerview.widget.RecyclerView
@@ -83,54 +87,54 @@
                         android:minWidth="48dp"
                         android:visibility="visible"
                         android:minHeight="48dp"
-                        android:layout_marginTop="@dimen/margin"
                         android:src="@drawable/ic_baseline_add_24"
                         android:background="?attr/selectableItemBackgroundBorderless"
                         app:layout_constraintTop_toBottomOf="@id/todoRV"
                         app:layout_constraintStart_toStartOf="parent"
                     />
 
-                <EditText
-                    android:id="@+id/todoItemDescTV"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/margin"
-                    android:visibility="gone"
-                    android:hint="@string/_hint"
-                    android:background="@android:color/transparent"
-                    android:minHeight="48dp"
-                    app:layout_constraintBottom_toBottomOf="@+id/todoCheckBox"
-                    app:layout_constraintEnd_toStartOf="@+id/dismissTodoBtn"
-                    app:layout_constraintStart_toEndOf="@+id/todoCheckBox"
-                    app:layout_constraintTop_toTopOf="@+id/todoCheckBox"
-                    tools:text="See family" />
+                    <EditText
+                        android:id="@+id/todoItemDescTV"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        android:hint="@string/_hint"
+                        android:background="@android:color/transparent"
+                        android:minHeight="48dp"
+                        app:layout_constraintBottom_toBottomOf="@+id/todoCheckBox"
+                        app:layout_constraintEnd_toStartOf="@+id/dismissTodoBtn"
+                        app:layout_constraintStart_toEndOf="@+id/todoCheckBox"
+                        app:layout_constraintTop_toTopOf="@+id/todoCheckBox"
+                        tools:text="See family"
+                        android:textColorHint="#78909C"
+                        android:autofillHints="Todo Item"
+                        android:inputType="text" />
 
-                <CheckBox
-                    android:id="@+id/todoCheckBox"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/margin"
-                    android:layout_marginTop="@dimen/margin"
-                    android:minWidth="48dp"
-                    android:visibility="gone"
-                    android:minHeight="48dp"
-                    app:layout_constraintStart_toEndOf="@+id/addTodo"
-                    app:layout_constraintTop_toBottomOf="@id/todoRV" />
+                    <CheckBox
+                        android:id="@+id/todoCheckBox"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/margin"
+                        android:minWidth="48dp"
+                        android:visibility="gone"
+                        android:minHeight="48dp"
+                        app:layout_constraintStart_toEndOf="@+id/addTodo"
+                        app:layout_constraintTop_toBottomOf="@id/todoRV" />
 
-                <ImageButton
-                    android:id="@+id/dismissTodoBtn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="@dimen/margin"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:minWidth="48dp"
-                    android:minHeight="48dp"
-                    android:visibility="gone"
-
-                    android:src="@drawable/ic_baseline_close_24"
-                    app:layout_constraintBottom_toBottomOf="@+id/todoItemDescTV"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/todoItemDescTV" />
+                    <ImageButton
+                        android:id="@+id/dismissTodoBtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/margin"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:minWidth="48dp"
+                        android:minHeight="48dp"
+                        android:visibility="gone"
+                        android:src="@drawable/ic_baseline_close_24"
+                        app:layout_constraintBottom_toBottomOf="@+id/todoItemDescTV"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="@+id/todoItemDescTV"
+                        android:contentDescription="@string/dismiss_todo_button" />
 
 
                 <androidx.recyclerview.widget.RecyclerView
@@ -144,8 +148,6 @@
                     tools:itemCount="1" />
 
 
-
-
             </androidx.constraintlayout.widget.ConstraintLayout>
 
 
@@ -157,10 +159,10 @@
             android:visibility="gone"
             android:layout_margin="@dimen/margin"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_baseline_access_alarm_24"
+            android:src="@drawable/ic_baseline_access_alarm_add_edit_note_24"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toTopOf="@id/infoContainer"
-            />
+            android:contentDescription="@string/reminder_icon" />
 
         <TextView
             android:id="@+id/reminderTV"

@@ -4,11 +4,9 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
+import android.os.Build
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -19,14 +17,16 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.google.android.gms.ads.AdRequest
 import com.google.gson.Gson
-import com.neuralbit.letsnote.AddEditNoteActivity
-import com.neuralbit.letsnote.Fingerprint
-import com.neuralbit.letsnote.Services.DeleteReceiver
-import com.neuralbit.letsnote.adapters.NoteFireClick
-import com.neuralbit.letsnote.adapters.NoteRVAdapter
+import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.databinding.FragmentArchivedNotesBinding
 import com.neuralbit.letsnote.entities.NoteFire
+import com.neuralbit.letsnote.services.DeleteReceiver
+import com.neuralbit.letsnote.ui.adapters.NoteFireClick
+import com.neuralbit.letsnote.ui.adapters.NoteRVAdapter
+import com.neuralbit.letsnote.ui.addEditNote.AddEditNoteActivity
+import com.neuralbit.letsnote.ui.addEditNote.Fingerprint
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import com.neuralbit.letsnote.ui.settings.SettingsViewModel
 import java.util.*
@@ -63,9 +63,14 @@ class ArchivedFragment : Fragment() , NoteFireClick {
         archiveText = binding.archivedText
         allNotesViewModel.archiveFrag = true
         allNotesViewModel.deleteFrag.value = false
+        val adView = binding.adView
+        val adRequest = AdRequest.Builder().build()
+        adView.loadAd(adRequest)
         val settingsSharedPref = context?.getSharedPreferences("Settings", AppCompatActivity.MODE_PRIVATE)
         val fontStyle = settingsSharedPref?.getString("font",null)
-        noteRVAdapter?.fontStyle = fontStyle
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            noteRVAdapter?.fontStyle = fontStyle
+        }
         val staggeredLayoutManagerAll = StaggeredGridLayoutManager( 2,LinearLayoutManager.VERTICAL)
         allNotesViewModel.staggeredView.observe(viewLifecycleOwner){
             if (it){
@@ -75,22 +80,14 @@ class ArchivedFragment : Fragment() , NoteFireClick {
                 notesRV.layoutManager = LinearLayoutManager(context)
             }
         }
+        setHasOptionsMenu(true)
+
         allNotesViewModel.allFireNotes.observe(viewLifecycleOwner) {
-            val pref = context?.getSharedPreferences("DeletedNotes", AppCompatActivity.MODE_PRIVATE)
-            val deletedNotes = pref?.getStringSet("noteUids", HashSet())
             val archivedNotes = ArrayList<NoteFire>()
 
             for ( note in it){
-                if (deletedNotes != null){
-                    if (!deletedNotes.contains(note.noteUid)){
-                        if (note.archived){
-                            archivedNotes.add(note)
-                        }
-                    }
-                }else{
-                    if (note.archived){
-                        archivedNotes.add(note)
-                    }
+                if (note.deletedDate == (0).toLong() && note.archived) {
+                    archivedNotes.add(note)
                 }
             }
             if (archivedNotes.isEmpty()){
@@ -107,25 +104,18 @@ class ArchivedFragment : Fragment() , NoteFireClick {
         archivedViewModel.itemDeleteClicked.observe(viewLifecycleOwner){
             if (it && allNotesViewModel.selectedNotes.isNotEmpty()){
                 val selectedNotesCount = allNotesViewModel.selectedNotes.size
-                val pref = context?.getSharedPreferences("DeletedNotes", AppCompatActivity.MODE_PRIVATE)
                 val settings = context?.getSharedPreferences("Settings", AppCompatActivity.MODE_PRIVATE)
                 val emptyTrashImmediately = settings?.getBoolean("EmptyTrashImmediately",false)
 
                 for ( note in allNotesViewModel.selectedNotes){
-                    val editor: SharedPreferences.Editor ?= pref?.edit()
-                    val noteUids = pref?.getStringSet("noteUids",HashSet())
-                    val deletedNoteUids = HashSet<String>()
-                    if (noteUids != null){ deletedNoteUids.addAll(noteUids)}
 
                     if (emptyTrashImmediately != true){
-                        editor?.putLong(note.noteUid,System.currentTimeMillis())
-
-                        note.noteUid?.let { it1 -> deletedNoteUids.add(it1) }
+                        val noteUpdate = HashMap<String,Any>()
+                        noteUpdate["deletedDate"] = System.currentTimeMillis()
+                        note.noteUid?.let { it1 -> allNotesViewModel.updateFireNote(noteUpdate, it1) }
 
                         note.noteUid?.let { it1 -> scheduleDelete(it1,note.tags,note.label,note.timeStamp) }
 
-                        editor?.putStringSet("noteUids",deletedNoteUids)
-                        editor?.apply()
                     }else{
                         allNotesViewModel.notesToDelete.value =  note
                     }
@@ -143,10 +133,10 @@ class ArchivedFragment : Fragment() , NoteFireClick {
                 allNotesViewModel.itemSelectEnabled.value = false
                 allNotesViewModel.itemDeleteClicked.value = false
                 if (selectedNotesCount == 1){
-                    Toast.makeText(context,"Note deleted successfully", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context,resources.getString(R.string.notes_deleted_successfully),Toast.LENGTH_SHORT).show()
 
                 }else{
-                    Toast.makeText(context,"Notes deleted successfully", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context,resources.getString(R.string.notes_deleted_successfully,"s"),Toast.LENGTH_SHORT).show()
                 }
 
             }
@@ -169,9 +159,11 @@ class ArchivedFragment : Fragment() , NoteFireClick {
                 allNotesViewModel.itemDeleteClicked.value = false
                 allNotesViewModel.selectedNotes.clear()
                 if (selectedNotesCount == 1){
-                    Toast.makeText(context,"Note restored successfully", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context,resources.getString(R.string.notes_restored_successfully),Toast.LENGTH_SHORT).show()
+
                 }else{
-                    Toast.makeText(context,"Notes restored successfully", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context,resources.getString(R.string.notes_restored_successfully,"s"),Toast.LENGTH_SHORT).show()
+
                 }
             }
 
@@ -207,6 +199,11 @@ class ArchivedFragment : Fragment() , NoteFireClick {
         _binding = null
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        val trashButton = menu.findItem(R.id.trash)
+        trashButton.isVisible = false
+        super.onCreateOptionsMenu(menu, inflater)
+    }
 
     override fun onNoteFireClick(note: NoteFire, activated : Boolean) {
         if (!note.selected && !activated){

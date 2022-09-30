@@ -17,6 +17,7 @@ class DeletedNotesViewModel (application: Application): AndroidViewModel(applica
     var deletedNotes : HashSet<NoteFire> = HashSet()
     var itemRestoreClicked : MutableLiveData<Boolean> = MutableLiveData()
     var itemDeleteClicked : MutableLiveData<Boolean> = MutableLiveData()
+    var undoDelete = true
 
 
     private val noteRepo = NoteFireRepo()

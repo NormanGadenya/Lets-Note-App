@@ -13,15 +13,16 @@ import com.neuralbit.letsnote.entities.TagFire
 
 class TagFireRepo {
 
-    val database = Firebase.database
+    private val database = Firebase.database
     val TAG = "TagFireRepo"
 
-    private val fUser = FirebaseAuth.getInstance().currentUser
+    private var fUser = FirebaseAuth.getInstance().currentUser
 
     fun getAllTags () : LiveData<List<TagFire>> {
         val live = MutableLiveData<List<TagFire>>()
-        val tagRef = fUser?.let { database.getReference(it.uid).child("tags") }
-        tagRef?.addListenerForSingleValueEvent(object : ValueEventListener{
+        var tagRef = fUser?.let { database.getReference(it.uid).child("tags") }
+
+        val eventListener = object : ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
                 val tags = ArrayList<TagFire>()
                 for ( s : DataSnapshot in snapshot.children ){
@@ -39,8 +40,17 @@ class TagFireRepo {
                 throw error.toException()
 
             }
-        })
-        fUser?.let { database.getReference(it.uid).keepSynced(true) }
+
+        }
+        tagRef?.addValueEventListener(eventListener)
+        FirebaseAuth.getInstance().addAuthStateListener {
+            tagRef?.removeEventListener(eventListener)
+            fUser= it.currentUser
+            tagRef = it.currentUser?.uid?.let { it1 -> database.getReference(it1).child("tags") }
+
+            tagRef?.addValueEventListener(eventListener)
+
+        }
         return live
     }
 
@@ -48,7 +58,11 @@ class TagFireRepo {
     fun addOrDeleteTags(newTagsAdded: HashSet<String>, deletedTags: HashSet<String>, noteUid: String) {
         val tagRef = fUser?.let { database.getReference(it.uid).child("tags")}
         for (tag in newTagsAdded) {
-            val tagStr = tag.split("#")[1]
+            var tagStr = tag
+            val split = tagStr.split("#")
+            if (split.size > 1){
+                tagStr = split[1]
+            }
             tagRef?.child(tagStr)?.addListenerForSingleValueEvent( object :ValueEventListener{
                 override fun onDataChange(snapshot: DataSnapshot) {
                     if (snapshot.exists()){
@@ -79,28 +93,34 @@ class TagFireRepo {
 
         for ( tag in deletedTags){
 
-            val tagStr = tag.split("#")[1]
-            tagRef?.child(tagStr)?.addListenerForSingleValueEvent( object :ValueEventListener{
-                override fun onDataChange(snapshot: DataSnapshot) {
+            var tagStr = tag
+            val split = tagStr.split("#")
+            if (split.size > 1){
+                tagStr = split[1]
+            }
+            if (!tagStr.contains("#")){
+                tagRef?.child(tagStr)?.addListenerForSingleValueEvent( object :ValueEventListener{
+                    override fun onDataChange(snapshot: DataSnapshot) {
 
-                    val tagFire = snapshot.getValue(TagFire::class.java)
-                    if (tagFire != null) {
-                        val noteUids = tagFire.noteUids
-                        noteUids.remove(noteUid)
-                        val updateMap = HashMap<String, Any>()
-                        updateMap["noteUids"] = noteUids
-                        if (noteUids.isNotEmpty()){
-                            tagRef.child(tagStr).updateChildren(updateMap)
-                        }else{
-                            tagRef.child(tagStr).removeValue()
+                        val tagFire = snapshot.getValue(TagFire::class.java)
+                        if (tagFire != null) {
+                            val noteUids = tagFire.noteUids
+                            noteUids.remove(noteUid)
+                            val updateMap = HashMap<String, Any>()
+                            updateMap["noteUids"] = noteUids
+                            if (noteUids.isNotEmpty()){
+                                tagRef.child(tagStr).updateChildren(updateMap)
+                            }else{
+                                tagRef.child(tagStr).removeValue()
+                            }
                         }
                     }
-                }
 
-                override fun onCancelled(error: DatabaseError) {
-                    Log.e(TAG, "onCancelled: $error", )
-                }
-            })
+                    override fun onCancelled(error: DatabaseError) {
+                        Log.e(TAG, "onCancelled: $error", )
+                    }
+                })
+            }
 
         }
 
@@ -110,7 +130,11 @@ class TagFireRepo {
         val tagRef = fUser?.let { database.getReference(it.uid).child("tags") }
         for ( tag in tags){
 
-            val tagStr = tag.split("#")[1]
+            var tagStr = tag
+            val split = tagStr.split("#")
+            if (split.size > 1){
+                tagStr = split[1]
+            }
             tagRef?.child(tagStr)?.addListenerForSingleValueEvent( object :ValueEventListener{
                 override fun onDataChange(snapshot: DataSnapshot) {
 

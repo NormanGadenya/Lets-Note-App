@@ -8,15 +8,17 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <ImageButton
+        android:id="@+id/dragTodo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/dragTodo"
-        android:src="@drawable/baseline_drag_indicator_24"
         android:background="@android:color/transparent"
+        android:contentDescription="@string/drag_todo_button"
+        android:minWidth="32dp"
+        android:minHeight="48dp"
+        android:src="@drawable/baseline_drag_indicator_24"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
-
+        app:layout_constraintTop_toTopOf="parent" />
 
 
     <CheckBox
@@ -25,6 +27,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
 
+        android:minWidth="48dp"
+        android:minHeight="48dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/dragTodo"
         app:layout_constraintTop_toTopOf="parent" />
@@ -44,8 +48,8 @@
         app:layout_constraintStart_toEndOf="@+id/todoCheckBox"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="See family"
-    />
-
+        android:importantForAutofill="no"
+        android:inputType="text" />
 
 
     <ImageButton
@@ -53,6 +57,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/delete_todo_button"
+        android:minWidth="32dp"
+        android:minHeight="48dp"
         android:src="@drawable/ic_baseline_close_24"
         app:layout_constraintBottom_toBottomOf="@+id/todoItemDescET"
         app:layout_constraintEnd_toEndOf="parent"

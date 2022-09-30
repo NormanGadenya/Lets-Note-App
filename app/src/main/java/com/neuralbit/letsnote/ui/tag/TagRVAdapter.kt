@@ -13,7 +13,7 @@ import kotlinx.coroutines.*
 
 class TagRVAdapter (
     val context: Context,
-    val tagItemClick: TagItemClick
+    private val tagItemClick: TagItemClick
         ): RecyclerView.Adapter<TagRVAdapter.ViewHolder>(){
     var searchString : String? = null
 
@@ -53,9 +53,9 @@ class TagRVAdapter (
             for (i in 0..value){
                 delay(100L)
                 if(value==1){
-                    textView.text = context.getString(R.string.noteTagCountSingle,value.toString())
+                    textView.text = context.getString(R.string.noteTagCountSingle,i.toString())
                 }else {
-                    textView.text = context.getString(R.string.noteTagCountMultiple, value.toString())
+                    textView.text = context.getString(R.string.noteCountMultiple, i.toString())
                 }
             }
         }

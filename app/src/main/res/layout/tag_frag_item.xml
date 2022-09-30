@@ -26,6 +26,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/noteCountSize"
                 android:textSize="@dimen/cardNoteTVSize"
+                android:padding="8dp"
                 android:autoSizeTextType="uniform"
                 android:textColor="@color/gunmetal"
                 app:layout_constraintBottom_toTopOf="@+id/noteCount"
@@ -33,7 +34,7 @@
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:text="#James" />
+                tools:text="#Jamesaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" />
 
             <TextView
                 android:id="@+id/noteCount"

@@ -35,11 +35,12 @@ class ArchivedViewModel (application : Application): AndroidViewModel(applicatio
         val newList = ArrayList<NoteFire>()
 
         return if (text != null) {
-            val textLower= text.toLowerCase(Locale.ROOT)
+            val textLower= text.lowercase(Locale.ROOT)
             for ( note in list){
 
-                if(note.title.toLowerCase(Locale.ROOT).contains(textLower) || note.description.toLowerCase(
-                        Locale.ROOT).contains(textLower)){
+                if(note.title.lowercase(Locale.ROOT).contains(textLower) || note.description.lowercase(
+                        Locale.ROOT
+                    ).contains(textLower)){
                     newList.add(note)
                 }
             }

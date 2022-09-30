@@ -7,48 +7,42 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
     <uses-permission android:name="android.permission.USE_FINGERPRINT" />
-    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
 
     <application
         android:name=".utilities.OfflineMode"
         android:allowBackup="true"
         android:appCategory="productivity"
+        android:enableOnBackInvokedCallback="true"
         android:icon="@mipmap/ic_launcher1"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher1_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.App.Starting">
+        android:theme="@style/Theme.App.Activity">
         <activity
-            android:name=".TermsAndConditions"
-            android:theme="@style/Theme.App.Activity"
-            android:parentActivityName=".MainActivity"
-            android:exported="false" />
+            android:name=".ui.signIn.PrivacyPolicy"
+            android:exported="false"
+            android:parentActivityName=".ui.main.MainActivity"
+            android:theme="@style/Theme.App.Activity"/>
         <activity
-            android:name=".Fingerprint"
-            android:theme="@style/Theme.App.Activity"
-            android:exported="false" />
-
+            android:name=".ui.signIn.TermsAndConditions"
+            android:exported="false"
+            android:parentActivityName=".ui.main.MainActivity"
+            android:theme="@style/Theme.App.Activity" />
         <activity
-            android:name=".AddEditNoteActivity"
+            android:name=".ui.addEditNote.Fingerprint"
+            android:exported="false"
+            android:theme="@style/Theme.App.Activity" />
+        <activity
+            android:name=".ui.addEditNote.AddEditNoteActivity"
             android:exported="true"
-            android:theme="@style/Theme.App.Activity"
-            android:parentActivityName=".MainActivity" />
-
+            android:parentActivityName=".ui.main.MainActivity"
+            android:theme="@style/Theme.App.Activity" />
         <activity
-            android:name=".SplashActivity"
-            android:exported="true"
-            >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-
-        </activity>
-        <activity
-            android:name=".SaveSharedNoteActivity"
+            android:name=".ui.addEditNote.SaveSharedNoteActivity"
             android:exported="true"
             android:theme="@style/Theme.AppCompat.Transparent.NoActionBar">
             <intent-filter>
@@ -59,38 +53,47 @@
                 <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
-        <activity android:name="com.canhub.cropper.CropImageActivity"
-            android:theme="@style/Base.Theme.AppCompat"/>
         <activity
-            android:name=".SignInActivity"
+            android:name="com.canhub.cropper.CropImageActivity"
+            android:theme="@style/Base.Theme.AppCompat" />
+        <activity
+            android:name=".ui.signIn.SignInActivity"
             android:exported="true"
-            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
-            android:name=".LabelNotesActivity"
+            android:name=".ui.label.LabelNotesActivity"
             android:exported="true"
-            android:theme="@style/Theme.App.Activity"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".ui.main.MainActivity"
+            android:theme="@style/Theme.App.Activity" />
         <activity
-            android:name=".TagNotesActivity"
+            android:name=".ui.tag.TagNotesActivity"
             android:exported="true"
-            android:theme="@style/Theme.App.Activity"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".ui.main.MainActivity"
+            android:theme="@style/Theme.App.Activity" />
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.main.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.LetsNote.NoActionBar" />
 
         <receiver android:name=".utilities.AlertReceiver" />
         <receiver
-            android:name=".Services.DeleteReceiver"
+            android:name=".services.DeleteReceiver"
             android:enabled="true"
             android:exported="true" />
 
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
-
-
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="@string/app_id" />
     </application>
 
 </manifest>

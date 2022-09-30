@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.cardview.widget.CardView
+    android:layout_width="match_parent"
+    android:layout_height="160dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    app:cardCornerRadius="20dp"
+    android:elevation="0dp"
+    android:layout_margin="@dimen/margin"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/labelCard"
+        >
+
+        <TextView
+            android:id="@+id/labelName"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/noteCountSize"
+            android:textSize="@dimen/cardNoteTVSize"
+            android:autoSizeTextType="uniform"
+            android:textColor="@color/gunmetal"
+            android:padding="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/noteCount"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="#James" />
+
+        <TextView
+            android:id="@+id/noteCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="3"
+            android:textColor="@color/gunmetal"
+            android:textSize="20sp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/imgView"
+            app:layout_constraintEnd_toStartOf="@+id/noteText"
+            app:layout_constraintTop_toBottomOf="@+id/labelName" />
+
+        <TextView
+            android:id="@+id/noteText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/notes"
+            android:textColor="@color/gunmetal"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toTopOf="@+id/imgView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/labelName"
+            app:layout_constraintVertical_bias="0.517" />
+
+        <ImageView
+            android:id="@+id/imgView"
+            android:layout_width="@dimen/tagButtonSize"
+            android:layout_height="@dimen/tagButtonSize"
+            android:backgroundTint="@color/gunmetal"
+            android:background="@drawable/ic_baseline_arrow_forward_24"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/noteCount" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>
+
+
