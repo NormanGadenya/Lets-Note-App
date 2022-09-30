@@ -21,7 +21,7 @@ android {
         applicationId "com.neuralbit.letsnote"
         minSdk 25
         targetSdk 33
-        versionCode 16
+        versionCode 1
         versionName "1.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
