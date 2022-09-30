@@ -23,6 +23,7 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
     var staggeredView : MutableLiveData<Boolean> = MutableLiveData()
     var selectedNotes = HashSet<NoteFire>()
     var deleteFrag : MutableLiveData<Boolean> = MutableLiveData()
+    var signedIn = false
     var archiveFrag = false
 
 

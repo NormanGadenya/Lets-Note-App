@@ -9,6 +9,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.content.pm.ShortcutManager
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Typeface
@@ -1111,6 +1112,9 @@ class AddEditNoteActivity : AppCompatActivity() ,
     }
 
     private fun createShortcut() {
+        val shortcutManager = getSystemService(ShortcutManager::class.java)
+        shortcutManager.disableShortcuts(listOf("newNote","newTodo"))
+        shortcutManager.removeAllDynamicShortcuts()
         val intent = Intent(applicationContext, AddEditNoteActivity::class.java)
         intent.action = Intent.ACTION_VIEW
         val newNoteShortcut = ShortcutInfoCompat.Builder(applicationContext, "newNote")
@@ -1143,9 +1147,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
 
 //    private fun removeShortcuts() {
-//        val shortcutManager = getSystemService(ShortcutManager::class.java)
-//        shortcutManager.disableShortcuts(listOf("newNote","newTodo"))
-//        shortcutManager.removeAllDynamicShortcuts()
+
 //    }
 
 

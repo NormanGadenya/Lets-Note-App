@@ -6,6 +6,8 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
 import android.view.*
@@ -13,6 +15,7 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -127,6 +130,28 @@ class AllNotesFragment : Fragment() , NoteFireClick {
 
             }
         }
+
+        val releaseSharedPrefs : SharedPreferences? = context?.getSharedPreferences("release_settings", AppCompatActivity.MODE_PRIVATE)
+        val releaseEditor  = releaseSharedPrefs?.edit()
+        if (releaseSharedPrefs != null && releaseEditor!= null) {
+            val viewedRelease = releaseSharedPrefs.getBoolean("viewedReleaseNotes1.1", false)
+            if (!viewedRelease && !allNotesViewModel.signedIn){
+                val releaseLayout = layoutInflater.inflate(R.layout.release_notes_layout,null)
+                val releaseDismissBtn = releaseLayout.findViewById<Button>(R.id.okayBtn)
+                val releaseDialog = AlertDialog.Builder(context)
+                    .setView(releaseLayout)
+                    .create()
+                releaseDialog.show()
+                releaseDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+                releaseDismissBtn.setOnClickListener {
+                    releaseDialog.dismiss()
+                }
+
+                releaseEditor.putBoolean("viewedReleaseNotes1.1",true)
+                releaseEditor.apply()
+            }
+        }
+
 
         allNotesViewModel.staggeredView.observe(viewLifecycleOwner){
             val editor: SharedPreferences.Editor ?= settingsSharedPref?.edit()

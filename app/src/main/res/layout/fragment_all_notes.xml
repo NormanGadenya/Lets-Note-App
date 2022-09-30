@@ -27,7 +27,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/welcomeIcon" />
 
+
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedScrollView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -78,8 +80,8 @@
                 android:layout_height="0dp"
                 android:overScrollMode="never"
                 android:visibility="visible"
-                tools:itemCount="2"
                 app:layout_constraintTop_toBottomOf="@id/otherNotesTV"
+                tools:itemCount="2"
                 tools:listitem="@layout/note_rv_item" />
 
 

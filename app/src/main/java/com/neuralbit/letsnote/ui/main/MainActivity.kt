@@ -1,6 +1,9 @@
 package com.neuralbit.letsnote.ui.main
 
+import android.app.AlarmManager
 import android.app.AlertDialog
+import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -33,12 +36,14 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.databinding.ActivityMainBinding
+import com.neuralbit.letsnote.entities.NoteFire
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import com.neuralbit.letsnote.ui.archived.ArchivedViewModel
 import com.neuralbit.letsnote.ui.deletedNotes.DeletedNotesViewModel
 import com.neuralbit.letsnote.ui.label.LabelViewModel
 import com.neuralbit.letsnote.ui.signIn.SignInActivity
 import com.neuralbit.letsnote.ui.tag.TagViewModel
+import com.neuralbit.letsnote.utilities.AlertReceiver
 import kotlinx.coroutines.launch
 
 
@@ -102,11 +107,24 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        // set reminders when a user has been signed in since alarms are cancelled when signed out
         lifecycleScope.launch {
+            val signedIn = intent.getBooleanExtra("Signed in",false)
+            allNotesViewModal.signedIn = signedIn
             viewModal.getAllFireNotes().observe(lifecycleOwner){
+
+                if (signedIn){
+                    for (noteFire in it) {
+                        if (!noteFire.archived && noteFire.deletedDate==(0).toLong() && noteFire.reminderDate> System.currentTimeMillis()){
+                            startAlarm(noteFire, noteFire.reminderDate.toInt())
+                        }
+                    }
+                }
                 allNotesViewModal.allFireNotes.value = it
             }
         }
+
+
         val emptyTrashImmediately = settingsPref.getBoolean("EmptyTrashImmediately",false)
         if (emptyTrashImmediately){
             allNotesViewModal.notesToDelete.observe(lifecycleOwner){
@@ -294,6 +312,27 @@ class MainActivity : AppCompatActivity() {
         a.addCategory(Intent.CATEGORY_HOME)
         a.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         startActivity(a)
+    }
+
+    private fun startAlarm(note : NoteFire, requestCode: Int) {
+
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(this@MainActivity, AlertReceiver::class.java)
+        intent.putExtra("noteTitle",note.title)
+        intent.putExtra("noteUid",note.noteUid)
+        intent.putExtra("noteDesc", note.description)
+        intent.putExtra("timeStamp",System.currentTimeMillis())
+        intent.putExtra("labelColor",note.label)
+        intent.putExtra("pinned",note.pinned)
+        intent.putExtra("archieved",false)
+        intent.putExtra("protected",note.protected)
+        val tags = ArrayList<String>()
+        tags.addAll(note.tags)
+        intent.putStringArrayListExtra("tagList", tags)
+        intent.putExtra("noteType","Edit")
+
+        val pendingIntent = PendingIntent.getBroadcast(this, requestCode, intent, PendingIntent.FLAG_IMMUTABLE)
+        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, note.reminderDate, pendingIntent)
     }
 
     private inner class MActionModeCallBack : ActionMode.Callback {

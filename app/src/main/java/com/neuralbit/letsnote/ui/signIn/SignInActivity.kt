@@ -35,8 +35,10 @@ class SignInActivity : AppCompatActivity() {
         mAuth = FirebaseAuth.getInstance()
         firebaseUser = mAuth.currentUser
         if (firebaseUser!=null){
-            val intent = Intent(this@SignInActivity, MainActivity::class.java)
-            startActivity(intent)
+//            val intent = Intent(this@SignInActivity, MainActivity::class.java)
+//            startActivity(intent)
+            val i = Intent(this,ApplicationIntro::class.java)
+            startActivity(i)
         }
 
         val settingsPref : SharedPreferences = getSharedPreferences("Settings", MODE_PRIVATE)
@@ -116,9 +118,11 @@ class SignInActivity : AppCompatActivity() {
             mAuth.signInAnonymously()
                 .addOnCompleteListener(this) { task ->
                     if (task.isSuccessful) {
+
                         progressBar.visibility = GONE
                         // Sign in success, update UI with the signed-in user's information
                         val intent = Intent(this@SignInActivity, MainActivity::class.java)
+                        intent.putExtra("Signed in", true)
                         startActivity(intent)
                     } else {
                         progressBar.visibility = GONE

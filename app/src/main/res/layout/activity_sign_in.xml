@@ -12,7 +12,7 @@
         android:layout_width="200dp"
         android:layout_height="200dp"
         android:contentDescription="@string/app_icon"
-        android:src="@drawable/ic_launcher1_foreground"
+        android:src="@drawable/pleasant_surprise_cuate__1_"
         app:layout_constraintBottom_toTopOf="@+id/appName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
