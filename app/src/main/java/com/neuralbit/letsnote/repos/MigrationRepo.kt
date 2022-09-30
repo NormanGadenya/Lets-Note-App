@@ -10,7 +10,7 @@ import com.google.firebase.ktx.Firebase
 class MigrationRepo {
 
     private val database = Firebase.database
-    val TAG = "NoteFireRepo"
+    private val TAG = "NoteFireRepo"
 
 
     fun migrateData( oldUser:String, newUser:String){

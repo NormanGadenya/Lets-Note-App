@@ -3,7 +3,6 @@ package com.neuralbit.letsnote.utilities
 import android.app.Activity
 import android.app.DatePickerDialog
 import android.app.Dialog
-import android.content.Context
 import android.os.Bundle
 import android.widget.DatePicker
 import androidx.fragment.app.DialogFragment
@@ -22,7 +21,9 @@ class DatePickerFragment (
         val month = c.get(Calendar.MONTH)
         val day = c.get(Calendar.DAY_OF_MONTH)
 
-        return DatePickerDialog(ctx,this,year,month,day)
+        val dialog = DatePickerDialog(ctx,this,year,month,day)
+        dialog.datePicker.minDate = System.currentTimeMillis() -1000
+        return dialog
     }
 
     override fun onDateSet(view: DatePicker, year: Int, month: Int, day: Int) {

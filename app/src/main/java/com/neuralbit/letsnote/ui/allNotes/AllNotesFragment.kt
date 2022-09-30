@@ -146,7 +146,6 @@ class AllNotesFragment : Fragment() , NoteFireClick {
                 releaseDismissBtn.setOnClickListener {
                     releaseDialog.dismiss()
                 }
-
                 releaseEditor.putBoolean("viewedReleaseNotes1.1",true)
                 releaseEditor.apply()
             }

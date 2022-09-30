@@ -13,6 +13,7 @@ import android.content.pm.ShortcutManager
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Typeface
+import android.graphics.drawable.ColorDrawable
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Build
@@ -1358,36 +1359,34 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
 
     private fun openDateTimeDialog(){
-        val alertDialog: AlertDialog? = this@AddEditNoteActivity.let {
-            val builder = AlertDialog.Builder(it)
-            builder.apply {
-                setPositiveButton(getString(R.string.yes)
-                ) { _, _ ->
-                    if(noteDescriptionEdit.length() > 0 || noteTitleEdit.length() >0 ){
-                        viewModal.noteChanged.value = true
 
-                    }
-                    viewModal.reminderTime = calendar.timeInMillis
-                    viewModal.reminderSet.value = true
-                    alertBottomSheet.dismiss()
-                    Toast.makeText(context,resources.getString(R.string.reminder, DateFormat.getDateFormat(applicationContext).format(calendar.time) , DateFormat.getTimeFormat(applicationContext).format(calendar.time)),Toast.LENGTH_SHORT).show()
-
-                }
-                setNegativeButton(getString(R.string.cancel)
-                ) { _, _ ->
-                    alertBottomSheet.dismiss()
-
-                }
-                setView(R.layout.alert_datetime_dialog)
-                setTitle(getString(R.string.choose_date_time))
-            }
-            builder.create()
+        val dateTimeLayout = layoutInflater.inflate(R.layout.alert_datetime_dialog,null)
+        val dateTimeDismissBtn = dateTimeLayout.findViewById<Button>(R.id.cancelBtn)
+        val dateTimeConfirmBtn = dateTimeLayout.findViewById<Button>(R.id.okayBtn)
+        val dateTimeDialog = AlertDialog.Builder(this@AddEditNoteActivity)
+            .setView(dateTimeLayout)
+            .create()
+        dateTimeDialog.show()
+        dateTimeDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+        dateTimeDismissBtn.setOnClickListener {
+            dateTimeDialog.dismiss()
         }
-        alertDialog?.show()
-        val timePickerBtn=alertDialog?.findViewById<View>(R.id.timePickButton)
-        val datePickerBtn = alertDialog?.findViewById<ImageButton>(R.id.datePickButton)
-        timeTitleTV = alertDialog?.findViewById(R.id.timeTitle)!!
-        dateTitleTV = alertDialog.findViewById(R.id.dateTitle)
+        dateTimeConfirmBtn.setOnClickListener {
+            if(noteDescriptionEdit.length() > 0 || noteTitleEdit.length() >0 ){
+                viewModal.noteChanged.value = true
+            }
+            if (System.currentTimeMillis() < calendar.timeInMillis){
+                viewModal.reminderTime = calendar.timeInMillis
+                viewModal.reminderSet.value = true
+                Toast.makeText(applicationContext,resources.getString(R.string.reminder, DateFormat.getDateFormat(applicationContext).format(calendar.time) , DateFormat.getTimeFormat(applicationContext).format(calendar.time)),Toast.LENGTH_SHORT).show()
+            }
+            dateTimeDialog.dismiss()
+        }
+
+        val timePickerBtn=dateTimeDialog?.findViewById<View>(R.id.timePickButton)
+        val datePickerBtn = dateTimeDialog?.findViewById<ImageButton>(R.id.datePickButton)
+        timeTitleTV = dateTimeDialog?.findViewById(R.id.timeTitle)!!
+        dateTitleTV = dateTimeDialog.findViewById(R.id.dateTitle)
 
         timePickerBtn?.setOnClickListener {
             TimePickerFragment(this).show(supportFragmentManager,"timePicker")

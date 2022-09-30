@@ -1,20 +1,36 @@
-<?xml version="1.0" encoding="utf-8"?>
+
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:padding="@dimen/margin"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="300dp"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+android:padding="16dp"
+android:id="@+id/releaseNotesLayout"
+
+android:background="@drawable/save_shared_background"
+android:layout_height="wrap_content">
 
     <TextView
+        android:id="@+id/reminderTitleTv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/choose_date"
-        android:textSize="20sp"
-        android:layout_marginStart="16dp"
+        android:text="@string/choose_date_time"
+        android:textColor="@color/gunmetal"
+        android:textSize="16sp"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:id="@+id/dateTitle"/>
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <TextView
+        android:id="@+id/dateTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="@string/choose_date"
+        android:textSize="16sp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@id/reminderTitleTv"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <ImageButton
         android:id="@+id/datePickButton"
@@ -24,6 +40,7 @@
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/date_button"
         android:src="@drawable/ic_baseline_date_range_24"
+        app:layout_constraintBottom_toBottomOf="@+id/dateTitle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/dateTitle" />
 
@@ -33,21 +50,46 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:text="@string/choose_time"
-        android:textSize="20sp"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="@+id/timePickButton"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/timePickButton" />
+        app:layout_constraintTop_toBottomOf="@+id/datePickButton" />
 
     <ImageButton
         android:id="@+id/timePickButton"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_marginEnd="@dimen/margin"
-        android:layout_marginTop="16dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/time_button"
         android:src="@drawable/ic_baseline_access_time_24"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/datePickButton" />
 
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/cancelBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="35dp"
+        android:background="@drawable/cancel_button_background"
+        android:text="@string/cancel"
+        android:layout_marginEnd="8dp"
+
+        android:textColor="@color/timberwolf"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/okayBtn"
+        app:layout_constraintTop_toBottomOf="@+id/timePickButton" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/okayBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="35dp"
+        android:background="@drawable/save_button_background"
+        android:text="@string/okay"
+        android:textColor="@color/gunmetal"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/timePickButton" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
