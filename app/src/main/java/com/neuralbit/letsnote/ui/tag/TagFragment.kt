@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.gms.ads.AdRequest
 import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.databinding.FragmentTagBinding
-import com.neuralbit.letsnote.entities.TagFire
+import com.neuralbit.letsnote.firebaseEntities.TagFire
 import com.neuralbit.letsnote.ui.addEditNote.NoteViewModel
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import java.util.*

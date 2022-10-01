@@ -11,7 +11,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.neuralbit.letsnote.R
-import com.neuralbit.letsnote.entities.NoteFireIns
+import com.neuralbit.letsnote.firebaseEntities.NoteFireIns
 import com.neuralbit.letsnote.utilities.Common
 import kotlin.system.exitProcess
 

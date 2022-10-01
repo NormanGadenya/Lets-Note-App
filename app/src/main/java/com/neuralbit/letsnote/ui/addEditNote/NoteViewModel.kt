@@ -4,10 +4,10 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.neuralbit.letsnote.entities.LabelFire
-import com.neuralbit.letsnote.entities.NoteFireIns
-import com.neuralbit.letsnote.entities.TagFire
-import com.neuralbit.letsnote.entities.TodoItem
+import com.neuralbit.letsnote.firebaseEntities.LabelFire
+import com.neuralbit.letsnote.firebaseEntities.NoteFireIns
+import com.neuralbit.letsnote.firebaseEntities.TagFire
+import com.neuralbit.letsnote.firebaseEntities.TodoItem
 import com.neuralbit.letsnote.firebaseRepos.LabelFireRepo
 import com.neuralbit.letsnote.firebaseRepos.NoteFireRepo
 import com.neuralbit.letsnote.firebaseRepos.TagFireRepo

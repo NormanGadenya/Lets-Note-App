@@ -1,4 +1,4 @@
-package com.neuralbit.letsnote.entities
+package com.neuralbit.letsnote.firebaseEntities
 
 data class NoteFireIns(
     val title: String ? ="",

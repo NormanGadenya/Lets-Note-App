@@ -3,7 +3,7 @@ package com.neuralbit.letsnote.ui.label
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import com.neuralbit.letsnote.entities.LabelFire
+import com.neuralbit.letsnote.firebaseEntities.LabelFire
 import com.neuralbit.letsnote.firebaseRepos.LabelFireRepo
 
 class LabelViewModel (application: Application): AndroidViewModel(application)  {

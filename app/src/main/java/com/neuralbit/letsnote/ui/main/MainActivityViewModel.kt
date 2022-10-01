@@ -4,7 +4,7 @@ import android.app.Application
 import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import com.neuralbit.letsnote.entities.NoteFire
+import com.neuralbit.letsnote.firebaseEntities.NoteFire
 import com.neuralbit.letsnote.firebaseRepos.DeleteDataRepo
 import com.neuralbit.letsnote.firebaseRepos.LabelFireRepo
 import com.neuralbit.letsnote.firebaseRepos.NoteFireRepo

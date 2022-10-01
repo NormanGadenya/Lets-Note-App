@@ -3,7 +3,7 @@ package com.neuralbit.letsnote.ui.deletedNotes
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import com.neuralbit.letsnote.entities.NoteFire
+import com.neuralbit.letsnote.firebaseEntities.NoteFire
 import com.neuralbit.letsnote.firebaseRepos.LabelFireRepo
 import com.neuralbit.letsnote.firebaseRepos.NoteFireRepo
 import com.neuralbit.letsnote.firebaseRepos.TagFireRepo

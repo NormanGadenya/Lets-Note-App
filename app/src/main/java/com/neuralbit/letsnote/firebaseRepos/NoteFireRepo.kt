@@ -8,8 +8,8 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import com.neuralbit.letsnote.entities.NoteFire
-import com.neuralbit.letsnote.entities.NoteFireIns
+import com.neuralbit.letsnote.firebaseEntities.NoteFire
+import com.neuralbit.letsnote.firebaseEntities.NoteFireIns
 import com.neuralbit.letsnote.utilities.NoteComparator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

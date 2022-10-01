@@ -19,7 +19,7 @@ import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.neuralbit.letsnote.R
-import com.neuralbit.letsnote.entities.NoteFire
+import com.neuralbit.letsnote.firebaseEntities.NoteFire
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import com.neuralbit.letsnote.utilities.AlertReceiver
 import com.neuralbit.letsnote.utilities.Common

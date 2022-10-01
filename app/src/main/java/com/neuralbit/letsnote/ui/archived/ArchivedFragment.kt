@@ -21,7 +21,7 @@ import com.google.android.gms.ads.AdRequest
 import com.google.gson.Gson
 import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.databinding.FragmentArchivedNotesBinding
-import com.neuralbit.letsnote.entities.NoteFire
+import com.neuralbit.letsnote.firebaseEntities.NoteFire
 import com.neuralbit.letsnote.services.DeleteReceiver
 import com.neuralbit.letsnote.ui.adapters.NoteFireClick
 import com.neuralbit.letsnote.ui.adapters.NoteRVAdapter

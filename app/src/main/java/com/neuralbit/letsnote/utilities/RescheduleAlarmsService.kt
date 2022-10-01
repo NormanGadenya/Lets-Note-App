@@ -8,7 +8,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Context.ALARM_SERVICE
 import android.content.Intent
-import com.neuralbit.letsnote.entities.NoteFire
+import com.neuralbit.letsnote.firebaseEntities.NoteFire
 import com.neuralbit.letsnote.firebaseRepos.NoteFireRepo
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch

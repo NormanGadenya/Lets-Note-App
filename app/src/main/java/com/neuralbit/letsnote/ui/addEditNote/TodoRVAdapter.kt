@@ -18,7 +18,7 @@ import android.widget.ImageButton
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.neuralbit.letsnote.R
-import com.neuralbit.letsnote.entities.TodoItem
+import com.neuralbit.letsnote.firebaseEntities.TodoItem
 
 
 class TodoRVAdapter(
