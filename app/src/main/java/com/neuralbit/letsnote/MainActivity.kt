@@ -28,12 +28,11 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
-    private val TAG = "MainActivity"
     private val allNotesViewModal : AllNotesViewModel by viewModels()
     private val archivedViewModel : ArchivedViewModel by viewModels()
     private val tagViewModel : TagViewModel by viewModels()
     private lateinit var mAuth: FirebaseAuth
-    var fUser : FirebaseUser? = null
+    private var fUser : FirebaseUser? = null
 
 
 
@@ -42,7 +41,6 @@ class MainActivity : AppCompatActivity() {
         mAuth = FirebaseAuth.getInstance()
         fUser= mAuth.currentUser
         if (fUser == null) {
-
             val intent = Intent(applicationContext, SignInActivity::class.java)
             startActivity(intent)
         }
@@ -67,7 +65,6 @@ class MainActivity : AppCompatActivity() {
         val profileIV = headerLayout.findViewById<ImageView>(R.id.profilePic)
         val nameTV = headerLayout.findViewById<TextView>(R.id.accountName)
         val emailTV = headerLayout.findViewById<TextView>(R.id.emailAddress)
-//        val navController.navigate(R.id.profilePic)
         if(profileUrl != null){
             Glide.with(applicationContext).load(profileUrl).into(profileIV)
         }
@@ -86,7 +83,6 @@ class MainActivity : AppCompatActivity() {
 
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-
         menuInflater.inflate(R.menu.main_activity2, menu)
         val searchViewMenuItem = menu.findItem(R.id.search)
         val searchView = searchViewMenuItem.actionView as SearchView
@@ -105,7 +101,6 @@ class MainActivity : AppCompatActivity() {
                     allNotesViewModal.searchQuery.value = p0
                     archivedViewModel.searchQuery.value = p0
                     tagViewModel.searchQuery.value = p0
-
                 }
                 return false
             }

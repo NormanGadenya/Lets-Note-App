@@ -109,6 +109,9 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         tagFireRepo.addTag(tags,noteUid)
     }
 
+    fun deleteTagFire(tags: List<String>, noteUid: String){
+        tagFireRepo.deleteTags(tags, noteUid)
+    }
     fun updateTodoItem(todoItem: TodoItem)= viewModelScope.launch(Dispatchers.IO){
         noteRepo.updateTodo(todoItem)
     }

@@ -88,7 +88,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private var noteDescOrig : String? = null
     private var noteDescOrigList = ArrayList<String>()
     private var noteDescNew : String? = null
-    private var noteDescNewList : List<String> ? = null
     private lateinit var noteType : String
     private var deletable : Boolean = false
     private lateinit var tvTimeStamp : TextView
@@ -1226,6 +1225,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                         noteUpdate["timeStamp"] = currentDate
                         noteUpdate["label"] = labelColor
                         noteUpdate["pinned"] = notePinned
+                        noteUpdate["tags"] = tagList
                         noteUid?.let { viewModal.updateFireNote(noteUpdate, it) }
 
                         if (!deletable || !archived){
@@ -1286,7 +1286,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private fun saveOtherEntities(){
 
         noteUid?.let {
-            viewModal.addTagFire(tagList!!, it)
+            viewModal.addTagFire(tagList, it)
         }
 
 
@@ -1359,10 +1359,14 @@ class AddEditNoteActivity : AppCompatActivity() ,
     }
 
     override fun deleteTag(tag: Tag) {
-        viewModal.tagList.remove(tag)
         if (noteType == "Edit"){
-            viewModal.deleteNoteTagCrossRef(NoteTagCrossRef(noteID,tag.tagTitle))
+            textChanged = true
         }
+        tagList.remove(tag.tagTitle)
+        viewModal.tagList.remove(tag)
+//        if (noteType == "Edit"){
+//            viewModal.deleteNoteTagCrossRef(NoteTagCrossRef(noteID,tag.tagTitle))
+//        }
         tagListAdapter.updateList(viewModal.tagList)
     }
 

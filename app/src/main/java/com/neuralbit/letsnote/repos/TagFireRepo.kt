@@ -29,10 +29,12 @@ class TagFireRepo {
                         val tagFire = snapshot.getValue(TagFire::class.java)
                         if (tagFire != null) {
                             val noteUids = tagFire.noteUids
-                            noteUids.add(noteUid)
-                            val updateMap = HashMap<String, Any>()
-                            updateMap["noteUids"] = noteUids
-                            tagRef.child(tagStr).updateChildren(updateMap)
+                            if (!noteUids.contains(noteUid)){
+                                noteUids.add(noteUid)
+                                val updateMap = HashMap<String, Any>()
+                                updateMap["noteUids"] = noteUids
+                                tagRef.child(tagStr).updateChildren(updateMap)
+                            }
 
                         }
 
@@ -42,6 +44,31 @@ class TagFireRepo {
                         noteUids.add(noteUid)
                         newTagMap["noteUids"] = noteUids
                         tagRef.child(tagStr).setValue(newTagMap)
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e(TAG, "onCancelled: $error", )
+                }
+            })
+        }
+    }
+
+    fun deleteTags(tags: List<String>, noteUid: String){
+        val tagRef = fUser?.let { database.getReference(it.uid).child("tags")}
+
+        for (tag in tags) {
+            val tagStr = tag.split("#")[1]
+            tagRef?.child(tagStr)?.addListenerForSingleValueEvent( object :ValueEventListener{
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val tagFire = snapshot.getValue(TagFire::class.java)
+                    if (tagFire != null) {
+                        val noteUids = tagFire.noteUids
+                        noteUids.remove(noteUid)
+                        val updateMap = HashMap<String, Any>()
+                        updateMap["noteUids"] = noteUids
+                        tagRef.child(tagStr).updateChildren(updateMap)
+
                     }
                 }
 
