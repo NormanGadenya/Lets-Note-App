@@ -1,4 +1,4 @@
-package com.neuralbit.letsnote.repos
+package com.neuralbit.letsnote.firebaseRepos
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

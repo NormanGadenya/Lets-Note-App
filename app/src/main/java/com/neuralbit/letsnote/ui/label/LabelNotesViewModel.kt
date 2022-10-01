@@ -4,9 +4,9 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.neuralbit.letsnote.entities.NoteFire
-import com.neuralbit.letsnote.repos.LabelFireRepo
-import com.neuralbit.letsnote.repos.NoteFireRepo
-import com.neuralbit.letsnote.repos.TagFireRepo
+import com.neuralbit.letsnote.firebaseRepos.LabelFireRepo
+import com.neuralbit.letsnote.firebaseRepos.NoteFireRepo
+import com.neuralbit.letsnote.firebaseRepos.TagFireRepo
 
 class LabelNotesViewModel(
     application: Application) :AndroidViewModel(application){

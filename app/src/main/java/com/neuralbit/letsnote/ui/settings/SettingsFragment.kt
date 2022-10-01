@@ -74,7 +74,6 @@ class SettingsFragment : Fragment() {
         val adRequest = AdRequest.Builder().build()
         adView.loadAd(adRequest)
         migrateProgressBar = binding.migrateProgress
-        oldUser
         val siginBtn = binding.signInWithGoogleBtn
         mAuth = FirebaseAuth.getInstance()
 
@@ -180,8 +179,6 @@ class SettingsFragment : Fragment() {
             .requestIdToken(getString(R.string.default_web_client_id))
             .requestEmail()
             .build()
-
-
         mGoogleSignInClient = activity?.let { GoogleSignIn.getClient(it, gso) }
     }
 

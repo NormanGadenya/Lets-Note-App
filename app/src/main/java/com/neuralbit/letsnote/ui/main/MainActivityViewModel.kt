@@ -5,10 +5,10 @@ import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import com.neuralbit.letsnote.entities.NoteFire
-import com.neuralbit.letsnote.repos.DeleteDataRepo
-import com.neuralbit.letsnote.repos.LabelFireRepo
-import com.neuralbit.letsnote.repos.NoteFireRepo
-import com.neuralbit.letsnote.repos.TagFireRepo
+import com.neuralbit.letsnote.firebaseRepos.DeleteDataRepo
+import com.neuralbit.letsnote.firebaseRepos.LabelFireRepo
+import com.neuralbit.letsnote.firebaseRepos.NoteFireRepo
+import com.neuralbit.letsnote.firebaseRepos.TagFireRepo
 
 class MainActivityViewModel(application : Application) : AndroidViewModel(application)  {
     private val noteFireRepo : NoteFireRepo = NoteFireRepo()

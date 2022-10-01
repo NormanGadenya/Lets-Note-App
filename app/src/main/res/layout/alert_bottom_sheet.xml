@@ -7,7 +7,6 @@
     android:padding="@dimen/margin"
     android:focusableInTouchMode="true"
     android:id="@+id/alert_actions"
-
     android:layout_height="250dp">
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -33,7 +32,7 @@
             android:id="@+id/date1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
             android:text="@string/today_8pm"
             android:textSize="20sp"
             app:layout_constraintBottom_toBottomOf="parent"

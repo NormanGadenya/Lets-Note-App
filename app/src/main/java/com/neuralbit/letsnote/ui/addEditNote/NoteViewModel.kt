@@ -8,9 +8,9 @@ import com.neuralbit.letsnote.entities.LabelFire
 import com.neuralbit.letsnote.entities.NoteFireIns
 import com.neuralbit.letsnote.entities.TagFire
 import com.neuralbit.letsnote.entities.TodoItem
-import com.neuralbit.letsnote.repos.LabelFireRepo
-import com.neuralbit.letsnote.repos.NoteFireRepo
-import com.neuralbit.letsnote.repos.TagFireRepo
+import com.neuralbit.letsnote.firebaseRepos.LabelFireRepo
+import com.neuralbit.letsnote.firebaseRepos.NoteFireRepo
+import com.neuralbit.letsnote.firebaseRepos.TagFireRepo
 import java.util.*
 
 class NoteViewModel(application : Application) : AndroidViewModel(application) {
