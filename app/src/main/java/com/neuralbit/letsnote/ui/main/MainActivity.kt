@@ -43,7 +43,7 @@ import com.neuralbit.letsnote.ui.deletedNotes.DeletedNotesViewModel
 import com.neuralbit.letsnote.ui.label.LabelViewModel
 import com.neuralbit.letsnote.ui.signIn.SignInActivity
 import com.neuralbit.letsnote.ui.tag.TagViewModel
-import com.neuralbit.letsnote.utilities.AlertReceiver
+import com.neuralbit.letsnote.receivers.AlertReceiver
 import kotlinx.coroutines.launch
 
 
@@ -69,7 +69,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         mAuth = FirebaseAuth.getInstance()
         fUser= mAuth.currentUser
-        if (fUser == null) {
+        settingsPref =  getSharedPreferences("Settings", MODE_PRIVATE)
+        val useLocalStorage = settingsPref.getBoolean("useLocalStorage",false)
+        if (fUser == null && !useLocalStorage ) {
             val intent = Intent(applicationContext, SignInActivity::class.java)
             startActivity(intent)
         }
@@ -82,7 +84,6 @@ class MainActivity : AppCompatActivity() {
         val navView: NavigationView = binding.navView
         val navController = findNavController(R.id.nav_host_fragment_content_main)
 
-        settingsPref =  getSharedPreferences("Settings", MODE_PRIVATE)
         appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.nav_home,

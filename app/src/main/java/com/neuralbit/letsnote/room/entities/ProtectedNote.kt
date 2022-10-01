@@ -8,5 +8,5 @@ import androidx.room.PrimaryKey
 class ProtectedNote(
 
     @PrimaryKey(autoGenerate = false)
-    @ColumnInfo(name = "noteID") var noteID: Long
+    @ColumnInfo(name = "noteUid") var noteUid: String
 )

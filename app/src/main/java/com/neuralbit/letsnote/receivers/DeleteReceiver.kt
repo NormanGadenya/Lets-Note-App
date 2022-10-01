@@ -1,4 +1,4 @@
-package com.neuralbit.letsnote.services
+package com.neuralbit.letsnote.receivers
 
 import android.content.BroadcastReceiver
 import android.content.Context

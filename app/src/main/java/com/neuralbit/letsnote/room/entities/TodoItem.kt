@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 
 @Entity
 class TodoItem (
-    var noteId : Long,
+    var noteUid : String,
     var itemDesc : String,
     var itemChecked : Boolean,
 

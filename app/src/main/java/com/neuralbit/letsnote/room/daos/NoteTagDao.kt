@@ -19,7 +19,7 @@ interface NoteTagDao {
 
     @Transaction
     @Query("select * from Note where noteUid = :noteUid")
-    suspend fun getTagsWithNote(noteUid: String) : List<TagsWithNote>
+    fun getTagsWithNote(noteUid: String) : List<TagsWithNote>
 
 
 

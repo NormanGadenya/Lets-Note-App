@@ -10,8 +10,8 @@ import java.util.*
  */
 object ColorTransparentUtils {
     // This default color int
-    const val defaultColorID = R.color.black
-    const val defaultColor = "000000"
+    private const val defaultColorID = R.color.black
+    private const val defaultColor = "000000"
     const val TAG = "ColorTransparentUtils"
 
     /**
@@ -20,7 +20,7 @@ object ColorTransparentUtils {
      * @param trans number of transparency you want
      * @return it return hex decimal number or transparency code
      */
-    fun convert(trans: Int): String {
+    private fun convert(trans: Int): String {
         val hexString = Integer.toHexString(Math.round((255 * trans / 100).toFloat()))
         return (if (hexString.length < 2) "0" else "") + hexString
     }
@@ -36,7 +36,7 @@ object ColorTransparentUtils {
      * @param transCode transparent number
      * @return transparent color code
      */
-    fun convertIntoColor(colorCode: Int, transCode: Int): String {
+    private fun convertIntoColor(colorCode: Int, transCode: Int): String {
         // convert color code into hexa string and remove starting 2 digit
         var color = defaultColor
         try {

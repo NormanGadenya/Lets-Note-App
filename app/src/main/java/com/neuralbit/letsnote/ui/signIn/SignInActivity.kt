@@ -34,15 +34,14 @@ class SignInActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         mAuth = FirebaseAuth.getInstance()
         firebaseUser = mAuth.currentUser
-        if (firebaseUser!=null){
-//            val intent = Intent(this@SignInActivity, MainActivity::class.java)
-//            startActivity(intent)
-            val i = Intent(this,ApplicationIntro::class.java)
-            startActivity(i)
-        }
+
 
         val settingsPref : SharedPreferences = getSharedPreferences("Settings", MODE_PRIVATE)
-
+        val useLocalStorage = settingsPref.getBoolean("useLocalStorage",false)
+        if (firebaseUser!=null || useLocalStorage){
+            val intent = Intent(this@SignInActivity, MainActivity::class.java)
+            startActivity(intent)
+        }
         lifecycleScope.launch {
             when (settingsPref.getString("mode","default")) {
                 "Dark mode" -> {
@@ -65,7 +64,12 @@ class SignInActivity : AppCompatActivity() {
         progressBar = findViewById(R.id.sign_in_progress_bar)
 
         findViewById<View>(R.id.signInWithGoogleBtn).setOnClickListener { signInGoogle() }
-        findViewById<View>(R.id.signInWithAnnoneBtn).setOnClickListener { signInAnon() }
+        findViewById<View>(R.id.signInWithAnnoneBtn).setOnClickListener {
+            val editor :SharedPreferences.Editor = settingsPref.edit()
+            editor.putBoolean("useLocalStorage", true)
+            editor.apply()
+//            signInAnon()
+        }
         val termsAndConditions = findViewById<View>(R.id.termsAndConditionTV)
         termsAndConditions.setOnClickListener {
             val i = Intent(applicationContext, TermsAndConditions::class.java)

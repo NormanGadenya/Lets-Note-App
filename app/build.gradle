@@ -11,7 +11,7 @@ android {
         release {
             storeFile file('/home/annonymous/StudioProjects/letsNote.jks')
             storePassword 'normaneg'
-            keyAlias 'testAlias'
+            keyAlias 'annonymous'
             keyPassword 'normaneg'
         }
     }

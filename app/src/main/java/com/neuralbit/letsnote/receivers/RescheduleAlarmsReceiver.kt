@@ -1,4 +1,4 @@
-package com.neuralbit.letsnote.utilities
+package com.neuralbit.letsnote.receivers
 
 
 
@@ -13,7 +13,7 @@ import com.neuralbit.letsnote.firebaseRepos.NoteFireRepo
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-class RescheduleAlarmsService : BroadcastReceiver() {
+class RescheduleAlarmsReceiver : BroadcastReceiver() {
     private val noteRepo = NoteFireRepo()
 
     private fun startAlarm(note: NoteFire, requestCode: Int, context: Context) {

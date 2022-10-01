@@ -21,7 +21,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.firebaseEntities.NoteFire
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
-import com.neuralbit.letsnote.utilities.AlertReceiver
+import com.neuralbit.letsnote.receivers.AlertReceiver
 import com.neuralbit.letsnote.utilities.Common
 import java.util.*
 import kotlin.math.floor

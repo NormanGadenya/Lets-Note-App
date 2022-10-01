@@ -79,7 +79,7 @@
             android:exported="true"
             android:theme="@style/Theme.LetsNote.NoActionBar" />
 
-        <receiver android:name=".utilities.AlertReceiver" />
+        <receiver android:name=".receivers.AlertReceiver" />
 
         <activity
             android:name=".ui.signIn.ApplicationIntro"
@@ -93,11 +93,11 @@
         </activity>
 
         <receiver
-            android:name=".services.DeleteReceiver"
+            android:name=".receivers.DeleteReceiver"
             android:enabled="true"
             android:exported="true" />
         <receiver
-            android:name=".utilities.RescheduleAlarmsService"
+            android:name=".receivers.RescheduleAlarmsReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />

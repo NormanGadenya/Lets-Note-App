@@ -10,8 +10,10 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import com.google.firebase.auth.FirebaseAuth
 import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.firebaseEntities.NoteFireIns
+import com.neuralbit.letsnote.ui.signIn.SignInActivity
 import com.neuralbit.letsnote.utilities.Common
 import kotlin.system.exitProcess
 
@@ -28,8 +30,14 @@ class SaveSharedNoteActivity : AppCompatActivity() {
         viewModal = ViewModelProvider(
             this,
             ViewModelProvider.AndroidViewModelFactory.getInstance(application)
-        ).get(NoteViewModel::class.java)
-
+        )[NoteViewModel::class.java]
+        val settingsPref =  getSharedPreferences("Settings", MODE_PRIVATE)
+        val useLocalStorage = settingsPref.getBoolean("useLocalStorage",false)
+        val fUser = FirebaseAuth.getInstance().currentUser
+        if (fUser == null && !useLocalStorage ) {
+            val intent = Intent(applicationContext, SignInActivity::class.java)
+            startActivity(intent)
+        }
 
         if(intent?.action == Intent.ACTION_SEND){
             if("text/plain" == intent.type){
