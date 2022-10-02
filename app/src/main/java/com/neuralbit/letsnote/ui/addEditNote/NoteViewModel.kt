@@ -11,6 +11,13 @@ import com.neuralbit.letsnote.firebaseEntities.TodoItem
 import com.neuralbit.letsnote.firebaseRepos.LabelFireRepo
 import com.neuralbit.letsnote.firebaseRepos.NoteFireRepo
 import com.neuralbit.letsnote.firebaseRepos.TagFireRepo
+import com.neuralbit.letsnote.room.NoteDatabase
+import com.neuralbit.letsnote.room.entities.*
+import com.neuralbit.letsnote.room.repos.*
+import com.neuralbit.letsnote.utilities.FirebaseKeyGenerator
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.util.*
 
 class NoteViewModel(application : Application) : AndroidViewModel(application) {
@@ -41,13 +48,62 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     val updatedTodos = ArrayList<TodoItem>()
     var undoMode : MutableLiveData<Boolean> = MutableLiveData()
     var labelFireList = ArrayList<LabelFire>()
+    var useLocalStorage = false
+
+    private val noteRoomDao = NoteDatabase.getDatabase(application).getNotesDao()
+    private val noteRoomRepo = NoteRoomRepo(noteRoomDao)
+
+    private val labelRoomDao = NoteDatabase.getDatabase(application).getLabelDao()
+    private val labelRoomRepo = LabelRoomRepo(labelRoomDao)
+
+    private val tagRoomDao = NoteDatabase.getDatabase(application).getTagDao()
+    private val tagRoomRepo = TagRoomRepo(tagRoomDao)
+
+    private val reminderRoomDao = NoteDatabase.getDatabase(application).getReminderDao()
+    private val reminderRoomRepo = ReminderRoomRepo(reminderRoomDao)
+
+    private val noteTagRoomDao = NoteDatabase.getDatabase(application).getNoteTagDao()
+    private val noteTagRoomRepo = NoteTagRoomRepo(noteTagRoomDao)
 
     fun updateFireNote(noteUpdate : Map<String, Any>, noteUid : String) {
         noteFireRepo.updateNote(noteUpdate,noteUid)
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     fun addFireNote(note: NoteFireIns) : String ?{
-        return noteFireRepo.addNote(note)
+        if (!useLocalStorage){
+            return noteFireRepo.addNote(note)
+
+        }else{
+            val noteUid = FirebaseKeyGenerator.generateKey()
+            val roomNote = Note(title = note.title, description = note.description, timestamp = note.timeStamp, labelColor = note.label, noteUid = noteUid )
+            GlobalScope.launch {
+                noteRoomRepo.insert(roomNote)
+                if (note.pinned){
+                    val pinned = PinnedNote(noteUid)
+                    noteRoomRepo.insertPinned(pinned)
+                }
+
+                if (note.archived){
+                    val archived = ArchivedNote(noteUid)
+                    noteRoomRepo.insertArchive(archived)
+                }
+
+                if (note.protected){
+                    val protected = ProtectedNote(noteUid)
+                    noteRoomRepo.insertProtected(protected)
+                }
+                if (note.reminderDate> 0){
+                    val reminder = Reminder(noteUid, note.reminderDate)
+                    reminderRoomRepo.insert(reminder)
+                }
+                if (note.deletedDate > 0){
+                    val deletedNote = DeletedNote(noteUid,note.deletedDate)
+                    noteRoomRepo.insertDeletedNote(deletedNote)
+                }
+            }
+            return noteUid
+        }
     }
 
     fun allFireTags() : LiveData<List<TagFire>>{

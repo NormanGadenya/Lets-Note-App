@@ -10,7 +10,7 @@ class ReminderRoomRepo (private val reminderDao: ReminderDao){
         reminderDao.insert(reminder)
     }
 
-    suspend fun delete(noteUid: String){
+    fun delete(noteUid: String){
         reminderDao.delete(noteUid)
     }
 

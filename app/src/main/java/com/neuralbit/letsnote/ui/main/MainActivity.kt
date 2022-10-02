@@ -37,13 +37,13 @@ import com.google.firebase.auth.FirebaseUser
 import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.databinding.ActivityMainBinding
 import com.neuralbit.letsnote.firebaseEntities.NoteFire
+import com.neuralbit.letsnote.receivers.AlertReceiver
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import com.neuralbit.letsnote.ui.archived.ArchivedViewModel
 import com.neuralbit.letsnote.ui.deletedNotes.DeletedNotesViewModel
 import com.neuralbit.letsnote.ui.label.LabelViewModel
 import com.neuralbit.letsnote.ui.signIn.SignInActivity
 import com.neuralbit.letsnote.ui.tag.TagViewModel
-import com.neuralbit.letsnote.receivers.AlertReceiver
 import kotlinx.coroutines.launch
 
 
@@ -99,6 +99,8 @@ class MainActivity : AppCompatActivity() {
             this,
             ViewModelProvider.AndroidViewModelFactory.getInstance(application)
         )[MainActivityViewModel::class.java]
+        viewModal.useLocalStorage = useLocalStorage
+
         allNotesViewModal.itemSelectEnabled.observe(this){
             if (it){
                 actionMode = startSupportActionMode(MActionModeCallBack())

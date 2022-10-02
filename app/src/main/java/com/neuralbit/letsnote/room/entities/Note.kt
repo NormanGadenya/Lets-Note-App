@@ -6,10 +6,10 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class Note(
-    @ColumnInfo("title") val title :String,
-    @ColumnInfo("description") val description :String,
-    @ColumnInfo("timestamp") val timestamp :Long = 0,
-    @ColumnInfo("labelColor") val labelColor : Int,
+    @ColumnInfo(name = "title") val title :String ?,
+    @ColumnInfo(name = "description") val description :String ?,
+    @ColumnInfo(name = "timestamp") val timestamp :Long = 0,
+    @ColumnInfo(name = "labelColor") val labelColor : Int,
     @PrimaryKey(autoGenerate = false)
     val noteUid :String
 )

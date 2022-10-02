@@ -1,4 +1,4 @@
-package com.neuralbit.letsnote.daos
+package com.neuralbit.letsnote.room.daos
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
@@ -13,8 +13,8 @@ interface NotesDao {
     @Update
     suspend fun update(note: Note)
 
-    @Delete
-    suspend fun delete(note: Note)
+    @Query("delete from Note where noteUid = :noteUid")
+    fun delete(noteUid: String)
 
     @Insert(onConflict= OnConflictStrategy.REPLACE )
     suspend fun insertProtected(note: ProtectedNote)
@@ -24,7 +24,7 @@ interface NotesDao {
     suspend fun updateProtected(note: ProtectedNote)
 
     @Delete
-    suspend fun deleteProtected(note: ProtectedNote)
+    fun deleteProtected(note: ProtectedNote)
 
 
     @Insert(onConflict= OnConflictStrategy.REPLACE )
@@ -37,22 +37,22 @@ interface NotesDao {
     suspend fun updateTodo(todoItems : TodoItem)
 
     @Delete
-    suspend fun deleteTodo(todoItems : TodoItem)
+    fun deleteTodo(todoItems : TodoItem)
 
     @Delete
-    suspend fun deleteArchive(note : ArchivedNote)
+    fun deleteArchive(note : ArchivedNote)
 
     @Insert(onConflict= OnConflictStrategy.REPLACE )
     suspend fun insertPinned(note : PinnedNote)
 
     @Delete
-    suspend fun deletePinned(note : PinnedNote)
+    fun deletePinned(note : PinnedNote)
 
     @Insert(onConflict= OnConflictStrategy.REPLACE )
     suspend fun insertDeleted(note : DeletedNote)
 
     @Delete
-    suspend fun restoreDeleted(note : DeletedNote)
+    fun restoreDeleted(note : DeletedNote)
 
     @Transaction
     @Query("select * from DeletedNote join Note on DeletedNote.noteUid = Note.noteUid")

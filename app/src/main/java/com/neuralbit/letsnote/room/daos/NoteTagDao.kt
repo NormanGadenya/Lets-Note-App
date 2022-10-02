@@ -11,7 +11,7 @@ interface NoteTagDao {
     suspend fun insertNoteTagCrossRef(crossRef: NoteTagCrossRef)
 
     @Delete
-    suspend fun deleteNoteTagCrossRef(crossRef: NoteTagCrossRef)
+    fun deleteNoteTagCrossRef(crossRef: NoteTagCrossRef)
 
     @Transaction
     @Query("select * from Tag where tagTitle = :tagTitle")

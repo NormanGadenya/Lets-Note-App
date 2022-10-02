@@ -1,7 +1,7 @@
 package com.neuralbit.letsnote.room.repos
 
 import androidx.lifecycle.LiveData
-import com.neuralbit.letsnote.daos.NotesDao
+import com.neuralbit.letsnote.room.daos.NotesDao
 import com.neuralbit.letsnote.room.entities.*
 
 class NoteRoomRepo(
@@ -17,8 +17,8 @@ class NoteRoomRepo(
     }
 
 
-    suspend fun delete(note: Note){
-        notesDao.delete(note)
+    fun delete(noteUid: String){
+        notesDao.delete(noteUid)
     }
 
     suspend fun update(note: Note){
@@ -33,14 +33,14 @@ class NoteRoomRepo(
         return notesDao.insertProtected(note)
     }
 
-    suspend fun deleteProtected(note : ProtectedNote){
+    fun deleteProtected(note : ProtectedNote){
         return notesDao.deleteProtected(note)
     }
 
 
 
 
-    suspend fun deleteTodo(todoItem: TodoItem){
+    fun deleteTodo(todoItem: TodoItem){
         notesDao.deleteTodo(todoItem)
     }
 
@@ -51,7 +51,7 @@ class NoteRoomRepo(
     suspend fun insertDeletedNote (note: DeletedNote){
         notesDao.insertDeleted(note)
     }
-    suspend fun restoreDeletedNote (note: DeletedNote){
+    fun restoreDeletedNote (note: DeletedNote){
         notesDao.restoreDeleted(note)
     }
 
@@ -80,14 +80,14 @@ class NoteRoomRepo(
     suspend fun insertArchive(archivedNote: ArchivedNote){
         notesDao.insertArchive(archivedNote)
     }
-    suspend fun deleteArchive(archivedNote: ArchivedNote){
+    fun deleteArchive(archivedNote: ArchivedNote){
         notesDao.deleteArchive(archivedNote)
     }
 
     suspend fun insertPinned(pinnedNote: PinnedNote){
         notesDao.insertPinned(pinnedNote)
     }
-    suspend fun deletePinned(pinnedNote: PinnedNote){
+    fun deletePinned(pinnedNote: PinnedNote){
         notesDao.deletePinned(pinnedNote)
     }
 

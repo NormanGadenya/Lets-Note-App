@@ -11,7 +11,7 @@ interface ReminderDao {
     suspend fun insert(reminder: Reminder)
 
     @Query("delete from Reminder where noteUid = :noteUid")
-    suspend fun delete(noteUid: String)
+    fun delete(noteUid: String)
 
     @Transaction
     @Query("select * from Reminder where noteUid = :noteUid")

@@ -13,7 +13,7 @@ class LabelRoomRepo(
     }
 
     suspend fun deleteNoteLabel(noteUid: String){
-        labelDao.deleteNoteLabel(noteUid)
+//        labelDao.deleteNoteLabel(noteUid)
     }
     suspend fun deleteLabel(labelColor: Int){
         labelDao.deleteLabel(labelColor)
@@ -27,8 +27,6 @@ class LabelRoomRepo(
         return labelDao.getAllNotes()
     }
 
-    fun getNoteLabel(noteUid: String ): LiveData<Label> {
-        return labelDao.getNoteLabel(noteUid)
-    }
+
 
 }

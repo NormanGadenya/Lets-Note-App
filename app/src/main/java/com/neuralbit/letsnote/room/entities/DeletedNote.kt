@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 @Entity
 class DeletedNote(
     @PrimaryKey(autoGenerate = false)
-    @ColumnInfo(name = "noteID") var noteID: Long,
+    @ColumnInfo(name = "noteUid") var noteUid: String,
 
     @ColumnInfo(name="timestamp") var timestamp :Long
 )

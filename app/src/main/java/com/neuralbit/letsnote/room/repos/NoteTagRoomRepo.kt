@@ -14,7 +14,7 @@ class NoteTagRoomRepo(
         noteTagDao.insertNoteTagCrossRef(crossRef)
     }
 
-    suspend fun deleteNoteTagCrossRef(crossRef: NoteTagCrossRef) {
+    fun deleteNoteTagCrossRef(crossRef: NoteTagCrossRef) {
         noteTagDao.deleteNoteTagCrossRef(crossRef)
     }
 
@@ -22,7 +22,7 @@ class NoteTagRoomRepo(
         return noteTagDao.getNotesWithTag(tagTitle)
     }
 
-    fun getTagsWithNote(noteUid: String) :List<TagsWithNote>{
+    suspend fun getTagsWithNote(noteUid: String) :List<TagsWithNote>{
         return noteTagDao.getTagsWithNote(noteUid)
     }
 

@@ -68,6 +68,9 @@ class SignInActivity : AppCompatActivity() {
             val editor :SharedPreferences.Editor = settingsPref.edit()
             editor.putBoolean("useLocalStorage", true)
             editor.apply()
+            val intent = Intent(this@SignInActivity, MainActivity::class.java)
+            intent.putExtra("Signed in", true)
+            startActivity(intent)
 //            signInAnon()
         }
         val termsAndConditions = findViewById<View>(R.id.termsAndConditionTV)
