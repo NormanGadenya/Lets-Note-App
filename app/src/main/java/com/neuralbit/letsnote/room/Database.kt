@@ -20,7 +20,7 @@ import com.neuralbit.letsnote.room.relationships.NoteTagCrossRef
         TodoItem::class,
         ProtectedNote::class,
         Label::class
-    ],version =5 , exportSchema = true)
+    ],version =8 , exportSchema = true)
 abstract class NoteDatabase : RoomDatabase(){
     abstract fun getNotesDao() : NotesDao
     abstract fun getTagDao() : TagDao
@@ -37,7 +37,7 @@ abstract class NoteDatabase : RoomDatabase(){
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     NoteDatabase::class.java,
-                    "letsNote"
+                    "letsNote3"
                 ).build()
                 INSTANCE = instance
                 instance

@@ -445,6 +445,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 if(p3>0){
 
                     if(!tagListAdapter.deleteIgnored){
+                        viewModal.noteChanged.value = true
                         tagListAdapter.deleteIgnored = true
                         tagListAdapter.notifyDataSetChanged()
 
@@ -489,6 +490,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
             }
         })
+
 
 
         noteDescriptionEdit.setOnKeyListener { _, key, _ ->
@@ -1589,12 +1591,34 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
         val labelColor = viewModal.labelColor.value
         val labelTitle = viewModal.labelTitle.value
+
         if (viewModal.labelChanged){
             if (labelColor != null) {
                 if (labelColor > 0){
-                    noteUid?.let { viewModal.addOrDeleteLabel(labelColor,labelTitle,oldLabel, it,true) }
+                    if ( viewModal.useLocalStorage){
+                        if (oldLabel > 0){
+                            viewModal.allRoomNotesWithLabel(oldLabel).observe(this){
+                                if (it.isEmpty()){
+                                    viewModal.deleteRoomLabel(oldLabel)
+                                }
+                            }
+                        }
+                    }else{
+                        noteUid?.let { viewModal.addOrDeleteLabel(labelColor,labelTitle,oldLabel, it,true) }
+                    }
                 }else{
-                    noteUid?.let { viewModal.addOrDeleteLabel(labelColor,labelTitle, oldLabel, it, false) }
+                    if ( viewModal.useLocalStorage){
+                        if (oldLabel > 0){
+                            viewModal.allRoomNotesWithLabel(oldLabel).observe(this){
+                                if (it.isEmpty()){
+                                    viewModal.deleteRoomLabel(oldLabel)
+                                }
+                            }
+                        }
+                    }else{
+                        noteUid?.let { viewModal.addOrDeleteLabel(labelColor,labelTitle, oldLabel, it, false) }
+
+                    }
 
                 }
             }
@@ -1686,8 +1710,9 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
     }
 
-    override fun onLabelItemClick(labelColor: Int) {
+    override fun onLabelItemClick(labelColor: Int, labelTitle : String?) {
         viewModal.labelColor.value = labelColor
+        viewModal.labelTitle.value = labelTitle
         viewModal.labelChanged = true
         viewModal.noteChanged.value = true
         textChanged = true

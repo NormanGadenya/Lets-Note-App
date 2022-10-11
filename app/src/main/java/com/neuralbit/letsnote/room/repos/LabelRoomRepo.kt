@@ -23,8 +23,8 @@ class LabelRoomRepo(
     fun getNotesWithLabel(labelColor : Int): LiveData<List<LabelWIthNotes>> {
         return labelDao.getNotesWithLabel(  labelColor )
     }
-    fun getAllNotes(): LiveData<List<LabelWIthNotes>> {
-        return labelDao.getAllNotes()
+    fun getAllLabels(): LiveData<List<LabelWIthNotes>> {
+        return labelDao.getAllLabels()
     }
 
 

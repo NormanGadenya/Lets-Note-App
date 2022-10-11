@@ -24,13 +24,13 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.gson.Gson
 import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.firebaseEntities.NoteFire
+import com.neuralbit.letsnote.receivers.AlertReceiver
 import com.neuralbit.letsnote.receivers.DeleteReceiver
 import com.neuralbit.letsnote.ui.adapters.NoteFireClick
 import com.neuralbit.letsnote.ui.adapters.NoteRVAdapter
 import com.neuralbit.letsnote.ui.addEditNote.AddEditNoteActivity
 import com.neuralbit.letsnote.ui.addEditNote.Fingerprint
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
-import com.neuralbit.letsnote.receivers.AlertReceiver
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -74,6 +74,10 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
         noteRVAdapter.lifecycleOwner = this
         val settingsSharedPref = getSharedPreferences("Settings", MODE_PRIVATE)
         val fontStyle = settingsSharedPref?.getString("font",null)
+        val useLocalStorage = settingsSharedPref?.getBoolean("useLocalStorage",false)
+        if (useLocalStorage != null) {
+            allNotesViewModel.useLocalStorage = useLocalStorage
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             noteRVAdapter.fontStyle = fontStyle
         }

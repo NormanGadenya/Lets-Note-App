@@ -11,15 +11,13 @@ interface LabelDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(label: Label)
 
-//    @Query("delete from Label where noteUid = :noteUid")
-//    suspend fun deleteNoteLabel(noteUid: String)
 
     @Query("delete from Label where labelColor = :labelColor")
     suspend fun deleteLabel(labelColor: Int)
 
     @Transaction
     @Query("select * from Label")
-    fun getAllNotes () : LiveData<List<LabelWIthNotes>>
+    fun getAllLabels () : LiveData<List<LabelWIthNotes>>
 
     @Transaction
     @Query("select * from Label where labelColor = :labelColor ")

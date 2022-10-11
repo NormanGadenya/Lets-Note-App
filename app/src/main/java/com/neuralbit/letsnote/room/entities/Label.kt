@@ -8,7 +8,7 @@ class Label(
     @PrimaryKey(autoGenerate =false)
     val labelColor: Int,
 
-    val labelTitle: String,
+    val labelTitle: String ?,
 
 
 

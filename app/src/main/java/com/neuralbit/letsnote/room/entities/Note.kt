@@ -1,15 +1,19 @@
 package com.neuralbit.letsnote.room.entities
 
-import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity
 data class Note(
-    @ColumnInfo(name = "title") val title :String ?,
-    @ColumnInfo(name = "description") val description :String ?,
-    @ColumnInfo(name = "timestamp") val timestamp :Long = 0,
-    @ColumnInfo(name = "labelColor") val labelColor : Int,
+    val title :String? = "",
+    val description :String ? = "",
+    val timestamp :Long = 0,
+    val labelColor : Int = 0,
+    val archived : Boolean = false,
+    val pinned : Boolean = false,
+    val locked : Boolean = false,
+    val deletedDate : Long = 0,
+    val reminderDate : Long = 0,
     @PrimaryKey(autoGenerate = false)
     val noteUid :String
 )

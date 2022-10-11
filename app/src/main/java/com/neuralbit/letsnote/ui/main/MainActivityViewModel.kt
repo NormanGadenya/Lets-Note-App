@@ -48,29 +48,13 @@ class MainActivityViewModel(application : Application) : AndroidViewModel(applic
                     noteFire.title = note.title!!
                     noteFire.timeStamp = note.timestamp
                     noteFire.label = note.labelColor
-                    val reminder = reminderRoomRepo.fetchReminder(note.noteUid)
-                    if (reminder.value != null){
-                        noteFire.reminderDate = reminder.value!!.time
-                    }
-                    val archivedNote = noteRoomRepo.getArchivedNote(note.noteUid)
-                    if (archivedNote.value != null){
-                        noteFire.archived = true
-                    }
+                    noteFire.protected = note.locked
+                    noteFire.archived = note.archived
+                    noteFire.pinned = note.pinned
+                    noteFire.deletedDate = note.deletedDate
+                    noteFire.reminderDate = note.reminderDate
 
-                    val pinnedNote = noteRoomRepo.getPinnedNote(note.noteUid)
-                    if (pinnedNote.value != null){
-                        noteFire.pinned = true
-                    }
 
-                    val deleted = noteRoomRepo.getDeletedNote(note.noteUid)
-                    if (deleted.value != null){
-                        noteFire.deletedDate = deleted.value!!.timestamp
-                    }
-
-                    val protectedNote = noteRoomRepo.getProtectedNote(note.noteUid)
-                    if (protectedNote.value != null){
-                        noteFire.protected = true
-                    }
 //                    val tagRoomList = noteTagRoomRepo.getTagsWithNote(note.noteUid)
 //                    for (t in tagRoomList) {
 //                        val tagSList = ArrayList<String>()
@@ -149,7 +133,6 @@ class MainActivityViewModel(application : Application) : AndroidViewModel(applic
 
     fun deleteNote (noteUid : String, labelColor : Int, tagList : List<String> ){
         if (useLocalStorage) {
-
             val reminder = reminderRoomRepo.fetchReminder(noteUid)
             if (reminder.value != null) {
                 reminderRoomRepo.delete(noteUid)
@@ -162,14 +145,12 @@ class MainActivityViewModel(application : Application) : AndroidViewModel(applic
             val pinnedNote = noteRoomRepo.getPinnedNote(noteUid).value
             if (pinnedNote != null) {
                 noteRoomRepo.deletePinned(pinnedNote)
-
             }
 
             val deleted = noteRoomRepo.getDeletedNote(noteUid).value
             if (deleted != null) {
                 noteRoomRepo.restoreDeletedNote(deleted)
             }
-
             val protectedNote = noteRoomRepo.getProtectedNote(noteUid).value
             if (protectedNote != null) {
                 noteRoomRepo.deleteProtected(protectedNote)

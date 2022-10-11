@@ -71,6 +71,10 @@ class ArchivedFragment : Fragment() , NoteFireClick {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             noteRVAdapter?.fontStyle = fontStyle
         }
+        val useLocalStorage = settingsSharedPref?.getBoolean("useLocalStorage",false)
+        if (useLocalStorage != null) {
+            allNotesViewModel.useLocalStorage = useLocalStorage
+        }
         val staggeredLayoutManagerAll = StaggeredGridLayoutManager( 2,LinearLayoutManager.VERTICAL)
         allNotesViewModel.staggeredView.observe(viewLifecycleOwner){
             if (it){

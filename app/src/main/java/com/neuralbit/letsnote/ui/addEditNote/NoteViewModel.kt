@@ -1,22 +1,20 @@
 package com.neuralbit.letsnote.ui.addEditNote
 
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import com.neuralbit.letsnote.firebaseEntities.LabelFire
-import com.neuralbit.letsnote.firebaseEntities.NoteFireIns
-import com.neuralbit.letsnote.firebaseEntities.TagFire
-import com.neuralbit.letsnote.firebaseEntities.TodoItem
+import androidx.lifecycle.*
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.neuralbit.letsnote.firebaseEntities.*
 import com.neuralbit.letsnote.firebaseRepos.LabelFireRepo
 import com.neuralbit.letsnote.firebaseRepos.NoteFireRepo
 import com.neuralbit.letsnote.firebaseRepos.TagFireRepo
 import com.neuralbit.letsnote.room.NoteDatabase
-import com.neuralbit.letsnote.room.entities.*
+import com.neuralbit.letsnote.room.entities.ArchivedNote
+import com.neuralbit.letsnote.room.entities.Label
+import com.neuralbit.letsnote.room.entities.Note
+import com.neuralbit.letsnote.room.relationships.LabelWIthNotes
 import com.neuralbit.letsnote.room.repos.*
 import com.neuralbit.letsnote.utilities.FirebaseKeyGenerator
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -54,7 +52,7 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     private val noteRoomRepo = NoteRoomRepo(noteRoomDao)
 
     private val labelRoomDao = NoteDatabase.getDatabase(application).getLabelDao()
-    private val labelRoomRepo = LabelRoomRepo(labelRoomDao)
+    val labelRoomRepo = LabelRoomRepo(labelRoomDao)
 
     private val tagRoomDao = NoteDatabase.getDatabase(application).getTagDao()
     private val tagRoomRepo = TagRoomRepo(tagRoomDao)
@@ -65,42 +63,49 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     private val noteTagRoomDao = NoteDatabase.getDatabase(application).getNoteTagDao()
     private val noteTagRoomRepo = NoteTagRoomRepo(noteTagRoomDao)
 
-    fun updateFireNote(noteUpdate : Map<String, Any>, noteUid : String) {
-        noteFireRepo.updateNote(noteUpdate,noteUid)
+    fun updateFireNote(noteUpdate : Map<String, Any>, noteUid : String) =viewModelScope.launch(Dispatchers.IO) {
+        val mapper = ObjectMapper() // jackson's objectmapper
+        val noteFireUpdate: NoteFire = mapper.convertValue(noteUpdate, NoteFire::class.java)
+        val note = Note(
+            noteFireUpdate.title,
+            noteFireUpdate.description,
+            noteFireUpdate.timeStamp,
+            noteFireUpdate.label,
+            noteFireUpdate.archived,
+            noteFireUpdate.pinned,
+            noteFireUpdate.protected,
+            noteFireUpdate.deletedDate,
+            noteFireUpdate.reminderDate,
+            noteUid)
+        val archivedNote = ArchivedNote(noteUid)
+        if (noteFireUpdate.archived){
+            noteRoomRepo.insertArchive(archivedNote)
+        }else{
+            noteRoomRepo.deleteArchive(archivedNote)
+        }
+        noteRoomRepo.update(note)
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
-    fun addFireNote(note: NoteFireIns) : String ?{
+    fun addFireNote(note: NoteFireIns) : String ? {
         if (!useLocalStorage){
             return noteFireRepo.addNote(note)
 
         }else{
             val noteUid = FirebaseKeyGenerator.generateKey()
-            val roomNote = Note(title = note.title, description = note.description, timestamp = note.timeStamp, labelColor = note.label, noteUid = noteUid )
-            GlobalScope.launch {
+
+            val roomNote = Note(
+                note.title,
+                note.description,
+                note.timeStamp,
+                note.label,
+                note.archived,
+                note.pinned,
+                note.protected,
+                note.deletedDate,
+                note.reminderDate,
+                noteUid)
+            viewModelScope.launch {
                 noteRoomRepo.insert(roomNote)
-                if (note.pinned){
-                    val pinned = PinnedNote(noteUid)
-                    noteRoomRepo.insertPinned(pinned)
-                }
-
-                if (note.archived){
-                    val archived = ArchivedNote(noteUid)
-                    noteRoomRepo.insertArchive(archived)
-                }
-
-                if (note.protected){
-                    val protected = ProtectedNote(noteUid)
-                    noteRoomRepo.insertProtected(protected)
-                }
-                if (note.reminderDate> 0){
-                    val reminder = Reminder(noteUid, note.reminderDate)
-                    reminderRoomRepo.insert(reminder)
-                }
-                if (note.deletedDate > 0){
-                    val deletedNote = DeletedNote(noteUid,note.deletedDate)
-                    noteRoomRepo.insertDeletedNote(deletedNote)
-                }
             }
             return noteUid
         }
@@ -110,12 +115,39 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         return tagFireRepo.getAllTags()
     }
 
+    fun allRoomNotesWithLabel(labelColor: Int) : LiveData<List<LabelWIthNotes>>{
+        return labelRoomRepo.getNotesWithLabel(labelColor)
+    }
+
     fun allFireLabels() : LiveData<List<LabelFire>>{
-        return labelFireRepo.getAllLabels()
+        if (!useLocalStorage){
+            return labelFireRepo.getAllLabels()
+        }else{
+            return labelRoomRepo.getAllLabels().map {
+                val mappedLabels = it.map { l ->
+                    val noteUids = l.notes.map { note -> note.noteUid }
+                    val labelFire = LabelFire()
+                    labelFire.labelColor = l.label.labelColor
+                    labelFire.noteUids = ArrayList(noteUids)
+                    if (l.label.labelTitle != null){
+                        labelFire.labelTitle = l.label.labelTitle
+                    }
+                    return@map labelFire
+                }
+                return@map ArrayList(mappedLabels)
+            }
+        }
     }
 
     fun addOrDeleteLabel(labelColor: Int,labelTitle : String? ,oldLabel : Int, noteUid: String, add: Boolean){
-        labelFireRepo.addOrDeleteLabels(labelColor,oldLabel,noteUid,labelTitle,add)
+        if(!useLocalStorage){
+            labelFireRepo.addOrDeleteLabels(labelColor,oldLabel,noteUid,labelTitle,add)
+        }else{
+            viewModelScope.launch {
+                val label = Label(labelColor, labelTitle)
+                labelRoomRepo.insert(label)
+            }
+        }
     }
 
     fun addOrDeleteTags(newTagsAdded: HashSet<String>, deletedTags: HashSet<String>, noteUid: String) {
@@ -126,6 +158,10 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         noteFireRepo.deleteNote(noteUid)
         tagFireRepo.deleteNoteFromTags(tagList,noteUid)
         labelFireRepo.deleteNoteFromLabel(labelColor,noteUid)
+    }
+
+    fun deleteRoomLabel (labelColor: Int) = viewModelScope.launch(Dispatchers.IO){
+        labelRoomRepo.deleteLabel(labelColor)
     }
 
 }

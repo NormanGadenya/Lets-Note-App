@@ -45,7 +45,7 @@ class AddEditLabelAdapter(
         holder.labelViewIV.setColorFilter(labelColor)
         holder.labelTitleTv.text = labelTitle
         holder.labelView.setOnClickListener {
-            labelClickInterface.onLabelItemClick(labelColor)
+            labelClickInterface.onLabelItemClick(labelColor,labelTitle)
         }
     }
 
@@ -60,5 +60,5 @@ class AddEditLabelAdapter(
 }
 
 interface  LabelClickInterface{
-    fun onLabelItemClick(labelColor: Int)
+    fun onLabelItemClick(labelColor: Int, labelTitle : String ?)
 }

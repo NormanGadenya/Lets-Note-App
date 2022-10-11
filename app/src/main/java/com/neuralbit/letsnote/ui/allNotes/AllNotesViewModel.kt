@@ -2,12 +2,12 @@ package com.neuralbit.letsnote.ui.allNotes
 
 import android.app.Application
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.*
 import com.neuralbit.letsnote.firebaseEntities.NoteFire
+import com.neuralbit.letsnote.firebaseEntities.TodoItem
 import com.neuralbit.letsnote.firebaseRepos.NoteFireRepo
+import com.neuralbit.letsnote.room.NoteDatabase
+import com.neuralbit.letsnote.room.repos.*
 import java.util.*
 
 class AllNotesViewModel (application : Application) : AndroidViewModel(application) {
@@ -23,8 +23,24 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
     var staggeredView : MutableLiveData<Boolean> = MutableLiveData()
     var selectedNotes = HashSet<NoteFire>()
     var deleteFrag : MutableLiveData<Boolean> = MutableLiveData()
+    var useLocalStorage = false
     var signedIn = false
     var archiveFrag = false
+
+    private val noteRoomDao = NoteDatabase.getDatabase(application).getNotesDao()
+    private val noteRoomRepo = NoteRoomRepo(noteRoomDao)
+
+    private val labelRoomDao = NoteDatabase.getDatabase(application).getLabelDao()
+    private val labelRoomRepo = LabelRoomRepo(labelRoomDao)
+
+    private val tagRoomDao = NoteDatabase.getDatabase(application).getTagDao()
+    private val tagRoomRepo = TagRoomRepo(tagRoomDao)
+
+    private val reminderRoomDao = NoteDatabase.getDatabase(application).getReminderDao()
+    private val reminderRoomRepo = ReminderRoomRepo(reminderRoomDao)
+
+    private val noteTagRoomDao = NoteDatabase.getDatabase(application).getNoteTagDao()
+    private val noteTagRoomRepo = NoteTagRoomRepo(noteTagRoomDao)
 
 
     fun filterOtherFireList () : LiveData<LinkedList<NoteFire>>{
@@ -53,7 +69,59 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
 
 
     suspend fun getAllFireNotes () : LiveData<ArrayList<NoteFire>>{
-        return noteFireRepo.getAllNotes()
+        if (!useLocalStorage){
+            return noteFireRepo.getAllNotes()
+        }else{
+            return noteRoomRepo.allNotes.map {
+                val mappedNotes = it.map { note ->
+                    val noteFire = NoteFire()
+                    noteFire.noteUid = note.noteUid
+                    noteFire.description = note.description!!
+                    noteFire.title = note.title!!
+                    noteFire.timeStamp = note.timestamp
+                    noteFire.label = note.labelColor
+                    val reminder = reminderRoomRepo.fetchReminder(note.noteUid)
+                    if (reminder.value != null){
+                        noteFire.reminderDate = reminder.value!!.time
+                    }
+                    val archivedNote = noteRoomRepo.getArchivedNote(note.noteUid)
+                    if (archivedNote.value != null){
+                        noteFire.archived = true
+                    }
+
+                    val pinnedNote = noteRoomRepo.getPinnedNote(note.noteUid)
+                    if (pinnedNote.value != null){
+                        noteFire.pinned = true
+                    }
+
+                    val deleted = noteRoomRepo.getDeletedNote(note.noteUid)
+                    if (deleted.value != null){
+                        noteFire.deletedDate = deleted.value!!.timestamp
+                    }
+
+                    val protectedNote = noteRoomRepo.getProtectedNote(note.noteUid)
+                    if (protectedNote.value != null){
+                        noteFire.protected = true
+                    }
+//                    val tagRoomList = noteTagRoomRepo.getTagsWithNote(note.noteUid)
+//                    for (t in tagRoomList) {
+//                        val tagSList = ArrayList<String>()
+//                        for (tag in t.tags) {
+//                            tagSList.add(tag.tagTitle)
+//                        }
+//                        noteFire.tags = tagSList
+//                    }
+                    //TODO fix this
+                    val todoItems = noteRoomRepo.getTodoList(note.noteUid).value
+                    if (todoItems != null){
+                        val items = todoItems.map { t -> TodoItem(item = t.itemDesc, checked = t.itemChecked) }
+                        noteFire.todoItems = items
+                    }
+                    return@map noteFire
+                }
+                return@map ArrayList(mappedNotes)
+            }
+        }
     }
 
     fun updateFireNote(noteUpdate : Map<String, Any>, noteUid : String) {
