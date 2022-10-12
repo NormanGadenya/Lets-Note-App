@@ -57,12 +57,16 @@ class TagFragment : Fragment(), TagRVAdapter.TagItemClick {
                 tagRV.layoutManager = LinearLayoutManager(context)
             }
         }
+        val useLocalStorage = settingsSharedPref?.getBoolean("useLocalStorage",false)
 
         val layoutManager = StaggeredGridLayoutManager( 2, LinearLayoutManager.VERTICAL)
         tagRV.layoutManager =layoutManager
         val tagRVAdapter = context?.let { TagRVAdapter(it,this) }
         tagRV.adapter= tagRVAdapter
 
+        if (useLocalStorage != null) {
+            noteViewModel.useLocalStorage = useLocalStorage
+        }
         noteViewModel.allFireTags().observe(viewLifecycleOwner){
             val tagList = HashSet<Tag>()
             val tagFireList = HashSet<TagFire>()

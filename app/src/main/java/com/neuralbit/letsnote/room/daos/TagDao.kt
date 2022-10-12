@@ -1,6 +1,5 @@
 package com.neuralbit.letsnote.room.daos
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.neuralbit.letsnote.room.entities.Tag
 
@@ -15,5 +14,5 @@ interface TagDao {
 
     @Transaction
     @Query("select * from Tag")
-    fun getTags(): LiveData<List<Tag>>
+    suspend fun getTags(): List<Tag>
 }
