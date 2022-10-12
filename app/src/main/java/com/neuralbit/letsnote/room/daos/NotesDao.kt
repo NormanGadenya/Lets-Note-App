@@ -68,11 +68,11 @@ interface NotesDao {
 
     @Transaction
     @Query("Select * from Note order by timeStamp DESC ")
-    fun getAllNotes(): LiveData<List<Note>>
+    fun getAllNotes(): List<Note>
 
     @Transaction
     @Query("select * from TodoItem where noteUid = :noteUid ")
-    fun getTodoList(noteUid :String): LiveData<List<TodoItem>>
+    suspend fun getTodoList(noteUid :String): List<TodoItem>
 
     @Transaction
     @Query("Select * from ArchivedNote join Note on ArchivedNote.noteUid = Note.noteUid and  not exists (select * from DeletedNote where DeletedNote.noteUid = ArchivedNote.noteUid)")

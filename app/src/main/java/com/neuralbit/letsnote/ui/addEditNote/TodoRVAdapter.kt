@@ -106,8 +106,11 @@ class TodoRVAdapter(
             }
 
             override fun afterTextChanged(p0: Editable?) {
+                todoItem.item = p0.toString()
+                todoItemInterface.onItemDescChanged(holder.adapterPosition, todoItem)
 
             }
+
         })
 
 

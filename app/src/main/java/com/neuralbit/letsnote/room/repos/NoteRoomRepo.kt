@@ -7,11 +7,6 @@ import com.neuralbit.letsnote.room.entities.*
 class NoteRoomRepo(
     private val notesDao : NotesDao
     ) {
-    val notesWithoutPinArc: LiveData<List<Note>> = notesDao.getNotesWithoutPinArc()
-    val allNotes: LiveData<List<Note>> = notesDao.getAllNotes()
-    val archivedNotes : LiveData<List<Note>> = notesDao.getArchivedNotes()
-    val deletedNotes : LiveData<List<Note>> = notesDao.getDeletedNotes()
-    val pinnedNotes : LiveData<List<Note>> = notesDao.getPinnedNotes()
     suspend fun  insert(note: Note){
         return notesDao.insert(note)
     }
@@ -37,6 +32,10 @@ class NoteRoomRepo(
         return notesDao.deleteProtected(note)
     }
 
+    suspend fun getAllNotes () : List<Note> {
+        return notesDao.getAllNotes()
+    }
+
 
 
 
@@ -58,7 +57,7 @@ class NoteRoomRepo(
     fun getNote(noteUid: String) : LiveData<Note>{
         return notesDao.getNote(noteUid)
     }
-    fun getTodoList(noteUid: String) : LiveData<List<TodoItem>>{
+    suspend fun getTodoList(noteUid: String) : List<TodoItem>{
         return notesDao.getTodoList(noteUid)
     }
 

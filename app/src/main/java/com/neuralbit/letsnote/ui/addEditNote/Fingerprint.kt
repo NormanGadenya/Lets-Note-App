@@ -112,7 +112,9 @@ class Fingerprint : AppCompatActivity() {
             override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                 super.onAuthenticationSucceeded(result)
                 val user = FirebaseAuth.getInstance().currentUser
-                if (user != null) {
+                val settingsPref = applicationContext.getSharedPreferences("Settings", MODE_PRIVATE)
+                val useLocalStorage = settingsPref.getBoolean("useLocalStorage",false)
+                if (user != null || useLocalStorage) {
                     retryTV.visibility = GONE
 
                     fingerprint.setColorFilter(

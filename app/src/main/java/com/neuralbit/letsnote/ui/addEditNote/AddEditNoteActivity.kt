@@ -1469,9 +1469,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         viewModal.labelColor.observe(this){
             labelColor = it
         }
-
         if(viewModal.noteChanged.value == true){
-
             if (noteTitle.isNotEmpty() || noteDescription.isNotEmpty() || viewModal.todoItems.isNotEmpty()){
 
                 val tags = ArrayList<String>()
@@ -1583,12 +1581,10 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
     private fun saveOtherEntities(){
         noteUid?.let {
-
             val newTagsAdded = viewModal.newTags
             val deletedTags = viewModal.deletedTags
             viewModal.addOrDeleteTags(newTagsAdded,deletedTags,it)
         }
-
         val labelColor = viewModal.labelColor.value
         val labelTitle = viewModal.labelTitle.value
 
@@ -1603,9 +1599,9 @@ class AddEditNoteActivity : AppCompatActivity() ,
                                 }
                             }
                         }
-                    }else{
-                        noteUid?.let { viewModal.addOrDeleteLabel(labelColor,labelTitle,oldLabel, it,true) }
                     }
+                    noteUid?.let { viewModal.addOrDeleteLabel(labelColor,labelTitle,oldLabel, it,true) }
+
                 }else{
                     if ( viewModal.useLocalStorage){
                         if (oldLabel > 0){
@@ -1615,17 +1611,13 @@ class AddEditNoteActivity : AppCompatActivity() ,
                                 }
                             }
                         }
-                    }else{
-                        noteUid?.let { viewModal.addOrDeleteLabel(labelColor,labelTitle, oldLabel, it, false) }
-
                     }
+                    noteUid?.let { viewModal.addOrDeleteLabel(labelColor,labelTitle, oldLabel, it, false) }
+
 
                 }
             }
         }
-
-
-
 
         if (viewModal.reminderTime > 0){
             if (viewModal.reminderSet.value == true){
@@ -1707,7 +1699,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
         tags.addAll(viewModal.newTags)
         tagListAdapter.updateList(ArrayList(tags))
         viewModal.noteChanged.value = true
-
     }
 
     override fun onLabelItemClick(labelColor: Int, labelTitle : String?) {
@@ -1744,8 +1735,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
         todoItems[position] = todoItem
         viewModal.todoItems = todoItems
         todoRVAdapter.updateTodoItems(todoItems)
-        todoRVAdapter.notifyItemChanged(position)
-
         viewModal.updatedTodos.add(todoItem)
     }
 
@@ -1756,7 +1745,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
         viewModal.todoItems = todoItems
         todoRVAdapter.notifyItemChanged(position)
         viewModal.updatedTodos.add(todoItem)
-
     }
 
 
