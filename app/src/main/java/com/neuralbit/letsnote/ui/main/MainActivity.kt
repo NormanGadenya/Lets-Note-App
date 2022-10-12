@@ -64,7 +64,6 @@ class MainActivity : AppCompatActivity() {
     private val lifecycleOwner = this
 
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mAuth = FirebaseAuth.getInstance()
@@ -116,14 +115,34 @@ class MainActivity : AppCompatActivity() {
             allNotesViewModal.signedIn = signedIn
             viewModal.getAllFireNotes().observe(lifecycleOwner){
 
-                if (signedIn){
+                val modifiedNotes = ArrayList<NoteFire>()
+
+                if(useLocalStorage){
                     for (noteFire in it) {
+                        noteFire.noteUid?.let { it1 -> viewModal.getTagsWithNote(it1).observe(lifecycleOwner){ t ->
+                            val tags = ArrayList<String>()
+                            for (tagWithNote in t){
+                                for (tag in tagWithNote.tags) {
+                                    tags.add(tag.tagTitle)
+                                }
+                            }
+                            noteFire.tags = tags
+                            modifiedNotes.add(noteFire)
+                            allNotesViewModal.allFireNotes.value = modifiedNotes
+                        } }
+                    }
+                }else{
+                    allNotesViewModal.allFireNotes.value = it
+                }
+                for (noteFire in it) {
+
+                    if (signedIn){
                         if (!noteFire.archived && noteFire.deletedDate==(0).toLong() && noteFire.reminderDate> System.currentTimeMillis()){
                             startAlarm(noteFire, noteFire.reminderDate.toInt())
                         }
                     }
                 }
-                allNotesViewModal.allFireNotes.value = it
+
             }
         }
 

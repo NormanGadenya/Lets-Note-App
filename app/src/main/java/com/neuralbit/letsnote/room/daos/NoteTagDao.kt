@@ -1,5 +1,6 @@
 package com.neuralbit.letsnote.room.daos
 
+import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.neuralbit.letsnote.room.relationships.NoteTagCrossRef
 import com.neuralbit.letsnote.room.relationships.NotesWithTag
@@ -19,7 +20,7 @@ interface NoteTagDao {
 
     @Transaction
     @Query("select * from Note where noteUid = :noteUid")
-    fun getTagsWithNote(noteUid: String) : List<TagsWithNote>
+    fun getTagsWithNote(noteUid: String) : LiveData<List<TagsWithNote>>
 
 
 

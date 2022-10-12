@@ -1,6 +1,7 @@
 package com.neuralbit.letsnote.ui.addEditNote
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.*
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.neuralbit.letsnote.firebaseEntities.*
@@ -11,10 +12,14 @@ import com.neuralbit.letsnote.room.NoteDatabase
 import com.neuralbit.letsnote.room.entities.ArchivedNote
 import com.neuralbit.letsnote.room.entities.Label
 import com.neuralbit.letsnote.room.entities.Note
+import com.neuralbit.letsnote.room.entities.Tag
 import com.neuralbit.letsnote.room.relationships.LabelWIthNotes
+import com.neuralbit.letsnote.room.relationships.NoteTagCrossRef
 import com.neuralbit.letsnote.room.repos.*
 import com.neuralbit.letsnote.utilities.FirebaseKeyGenerator
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -111,9 +116,82 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         }
     }
 
-    fun allFireTags() : LiveData<List<TagFire>>{
-        return tagFireRepo.getAllTags()
+     fun allFireTags() : LiveData<List<TagFire>>{
+        if (!useLocalStorage){
+            return tagFireRepo.getAllTags()
+        }else{
+            val getDataJob = GlobalScope.async {
+                val tagFireList = ArrayList<TagFire>()
+                tagRoomRepo.getAllTags().forEach {
+
+                    val tagList = noteTagRoomRepo.getNotesWithTag(tagTitle = it.tagTitle)
+                    val noteUids = ArrayList<String>()
+                    for (notesWithTag in tagList) {
+                        for ( n in notesWithTag.notes){
+                            noteUids.add(n.noteUid)
+                        }
+                    }
+                    val tag = TagFire()
+                    tag.tagName = it.tagTitle
+                    tag.noteUids = noteUids
+                    tagFireList.add(tag)
+//                    tagFireMutableData.value = tagFireList
+                    Log.d(TAG, "allFireTags: $tagFireList")
+
+                }
+                return@async tagFireList
+            }
+            getDataJob.invokeOnCompletion {
+
+            }
+
+
+            // tell the job to invoke this code when it's done
+            getDataJob.invokeOnCompletion { cause ->
+                if (cause != null) {
+                    // error!  Handle that here
+                    Unit
+                } else {
+                    val myData = getDataJob.getCompleted()
+
+                    // ITEM 1
+                    // ***************************
+                    // do something with your data
+                    // ***************************
+
+                    Unit  // this is just because the lambda here has to return Unit
+                }
+            }
+            val tagFireMutableData = MutableLiveData<List<TagFire>>()
+//                viewModelScope.launch {
+//
+//                }
+            GlobalScope.launch {
+                val tagFireList = ArrayList<TagFire>()
+                tagRoomRepo.getAllTags().forEach {
+                        val tagList = noteTagRoomRepo.getNotesWithTag(tagTitle = it.tagTitle)
+                        val noteUids = ArrayList<String>()
+                        for (notesWithTag in tagList) {
+                            for ( n in notesWithTag.notes){
+                                noteUids.add(n.noteUid)
+                            }
+                        }
+                        val tag = TagFire()
+                        tag.tagName = it.tagTitle
+                        tag.noteUids = noteUids
+                        tagFireList.add(tag)
+                        tagFireMutableData.postValue(tagFireList)
+                }
+            }
+
+
+            return tagFireMutableData
+        }
     }
+
+
+
+
 
     fun allRoomNotesWithLabel(labelColor: Int) : LiveData<List<LabelWIthNotes>>{
         return labelRoomRepo.getNotesWithLabel(labelColor)
@@ -150,8 +228,37 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         }
     }
 
+
     fun addOrDeleteTags(newTagsAdded: HashSet<String>, deletedTags: HashSet<String>, noteUid: String) {
-        tagFireRepo.addOrDeleteTags(newTagsAdded,deletedTags,noteUid)
+        if (!useLocalStorage){
+            tagFireRepo.addOrDeleteTags(newTagsAdded,deletedTags,noteUid)
+        }else{
+            viewModelScope.launch {
+                for (tagTitle in newTagsAdded) {
+                    var tagStr = tagTitle
+                    val split = tagStr.split("#")
+                    if (split.size > 1){
+                        tagStr = split[1]
+                    }
+                    val tag = Tag(tagStr)
+
+                    tagRoomRepo.insert(tag)
+                    val noteTagCrossRef = NoteTagCrossRef(noteUid,tagStr)
+                    noteTagRoomRepo.insertNoteTagCrossRef(noteTagCrossRef)
+
+                }
+
+                for (tagTitle in deletedTags){
+                    var tagStr = tagTitle
+                    val split = tagStr.split("#")
+                    if (split.size > 1){
+                        tagStr = split[1]
+                    }
+                    val noteTagCrossRef = NoteTagCrossRef(noteUid,tagStr)
+                    noteTagRoomRepo.deleteNoteTagCrossRef(noteTagCrossRef)
+                }
+            }
+        }
     }
 
     fun deleteNote (noteUid : String, labelColor : Int, tagList : List<String> ){
@@ -162,6 +269,11 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
 
     fun deleteRoomLabel (labelColor: Int) = viewModelScope.launch(Dispatchers.IO){
         labelRoomRepo.deleteLabel(labelColor)
+    }
+
+    fun deleteRoomTag (tagTitle: String) = viewModelScope.launch(Dispatchers.IO){
+        val tag = Tag(tagTitle)
+        tagRoomRepo.delete(tag)
     }
 
 }

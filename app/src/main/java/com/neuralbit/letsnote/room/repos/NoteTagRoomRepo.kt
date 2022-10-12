@@ -1,5 +1,6 @@
 package com.neuralbit.letsnote.room.repos
 
+import androidx.lifecycle.LiveData
 import com.neuralbit.letsnote.room.daos.NoteTagDao
 import com.neuralbit.letsnote.room.relationships.NoteTagCrossRef
 import com.neuralbit.letsnote.room.relationships.NotesWithTag
@@ -22,7 +23,7 @@ class NoteTagRoomRepo(
         return noteTagDao.getNotesWithTag(tagTitle)
     }
 
-    suspend fun getTagsWithNote(noteUid: String) :List<TagsWithNote>{
+    fun getTagsWithNote(noteUid: String) :LiveData<List<TagsWithNote>>{
         return noteTagDao.getTagsWithNote(noteUid)
     }
 
