@@ -77,6 +77,7 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
         val useLocalStorage = settingsSharedPref?.getBoolean("useLocalStorage",false)
         if (useLocalStorage != null) {
             allNotesViewModel.useLocalStorage = useLocalStorage
+            viewModel.useLocalStorage = useLocalStorage
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             noteRVAdapter.fontStyle = fontStyle
@@ -331,6 +332,11 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
                     ) { _, _ ->
                         if (viewModel.labelTitle!=null){
                             supportActionBar?.title = viewModel.labelTitle
+                            if (viewModel.labelTitle != null && viewModel.labelColor > 0){
+                                val update = HashMap<String,String>()
+                                update["labelTitle"] = viewModel.labelTitle!!
+                                viewModel.updateLabel(update,viewModel.labelColor)
+                            }
                         }
 
                     }
@@ -365,15 +371,6 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
         return true
     }
 
-    override fun onDestroy() {
-        if (viewModel.labelTitle != null && viewModel.labelColor > 0){
-            val update = HashMap<String,Any>()
-            update["labelTitle"] = viewModel.labelTitle!!
-            viewModel.updateLabel(update,viewModel.labelColor)
-        }
-        super.onDestroy()
-
-    }
 
     override fun onNoteFireClick(note: NoteFire, activated : Boolean) {
         if (!note.selected && !activated){

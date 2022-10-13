@@ -53,9 +53,10 @@ class MainActivityViewModel(application : Application) : AndroidViewModel(applic
                     val tagsList = ArrayList<String>()
                     for (tagsWithNote in noteTagRoomRepo.getTagsWithNote(note.noteUid)) {
                         for (t in tagsWithNote.tags){
-                            tagsList.add(t.tagTitle)
+                            tagsList.add("#${t.tagTitle}")
                         }
                     }
+                    noteFire.tags = tagsList
                     val todoItems = noteRoomRepo.getTodoList(note.noteUid)
                     val items = todoItems.map { t -> TodoItem(item = t.itemDesc, checked = t.itemChecked) }
                     noteFire.todoItems = items

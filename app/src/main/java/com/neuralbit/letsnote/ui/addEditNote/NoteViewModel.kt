@@ -55,7 +55,7 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     private val noteRoomRepo = NoteRoomRepo(noteRoomDao)
 
     private val labelRoomDao = NoteDatabase.getDatabase(application).getLabelDao()
-    val labelRoomRepo = LabelRoomRepo(labelRoomDao)
+    private val labelRoomRepo = LabelRoomRepo(labelRoomDao)
 
     private val tagRoomDao = NoteDatabase.getDatabase(application).getTagDao()
     private val tagRoomRepo = TagRoomRepo(tagRoomDao)
@@ -152,7 +152,7 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
                         }
                     }
                     val tag = TagFire()
-                    tag.tagName = it.tagTitle
+                    tag.tagName = "#${it.tagTitle}"
                     tag.noteUids = noteUids
                     tagFireList.add(tag)
                     tagFireMutableData.postValue(tagFireList)

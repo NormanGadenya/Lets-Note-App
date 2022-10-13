@@ -1201,7 +1201,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
                             }
                         }
 
-
                     }
                     setNegativeButton(getString(R.string.cancel)
                     ) { _, _ ->
@@ -1429,6 +1428,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
         tags.removeAll(viewModal.deletedTags.toSet())
         intent.putStringArrayListExtra("tagList", tags)
         intent.putExtra("noteType","Edit")
+        val toDoItemString: String = Gson().toJson(viewModal.todoItems)
+        intent.putExtra("todoItems", toDoItemString)
 
         val pendingIntent = PendingIntent.getBroadcast(this, requestCode, intent, PendingIntent.FLAG_IMMUTABLE)
         alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)

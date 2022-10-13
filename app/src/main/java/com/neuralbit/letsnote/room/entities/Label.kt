@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity
-class Label(
+data class Label(
     @PrimaryKey(autoGenerate =false)
     val labelColor: Int,
 
