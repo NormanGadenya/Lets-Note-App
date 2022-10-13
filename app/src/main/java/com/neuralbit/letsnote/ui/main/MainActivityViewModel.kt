@@ -13,6 +13,7 @@ import com.neuralbit.letsnote.firebaseRepos.NoteFireRepo
 import com.neuralbit.letsnote.firebaseRepos.TagFireRepo
 import com.neuralbit.letsnote.room.NoteDatabase
 import com.neuralbit.letsnote.room.relationships.NoteTagCrossRef
+import com.neuralbit.letsnote.room.repos.LabelRoomRepo
 import com.neuralbit.letsnote.room.repos.NoteRoomRepo
 import com.neuralbit.letsnote.room.repos.NoteTagRoomRepo
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -30,6 +31,8 @@ class MainActivityViewModel(application : Application) : AndroidViewModel(applic
     private val noteTagRoomDao = NoteDatabase.getDatabase(application).getNoteTagDao()
     private val noteTagRoomRepo = NoteTagRoomRepo(noteTagRoomDao)
 
+    private val labelRoomDao = NoteDatabase.getDatabase(application).getLabelDao()
+    private val labelRoomRepo = LabelRoomRepo(labelRoomDao)
 
 
     @OptIn(DelicateCoroutinesApi::class)
@@ -71,10 +74,13 @@ class MainActivityViewModel(application : Application) : AndroidViewModel(applic
         }
     }
 
-
+    //TODO does not react after delete
     fun deleteNote (noteUid : String, labelColor : Int, tagList : List<String> ){
-        if (useLocalStorage) {
-
+        if (!useLocalStorage){
+            noteFireRepo.deleteNote(noteUid)
+            tagFireRepo.deleteNoteFromTags(tagList,noteUid)
+            labelFireRepo.deleteNoteFromLabel(labelColor,noteUid)
+        }else{
             GlobalScope.launch {
                 for (tagTitle in tagList){
                     var tagStr = tagTitle
@@ -91,16 +97,13 @@ class MainActivityViewModel(application : Application) : AndroidViewModel(applic
                     noteRoomRepo.deleteTodo(oldTodoItem)
                 }
 
-
-
                 noteRoomRepo.delete(noteUid)
+                labelRoomRepo.getNotesWithLabel(labelColor).forEach {
+                    if (it.notes.isEmpty()){
+                        labelRoomRepo.deleteLabel(labelColor)
+                    }
+                }
             }
-
-        }else{
-
-            noteFireRepo.deleteNote(noteUid)
-            tagFireRepo.deleteNoteFromTags(tagList,noteUid)
-            labelFireRepo.deleteNoteFromLabel(labelColor,noteUid)
         }
     }
 

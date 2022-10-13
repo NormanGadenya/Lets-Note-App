@@ -86,6 +86,7 @@ class TagNotesActivity : AppCompatActivity() , NoteFireClick {
             recyclerView.layoutManager = LinearLayoutManager(applicationContext)
         }
         allNotesViewModel.useLocalStorage =useLocalStorage
+        viewModel.useLocalStorage = useLocalStorage
         allNotesViewModel.itemSelectEnabled.observe(this){
             if (it){
                 actionMode = startSupportActionMode(MActionModeCallBack())

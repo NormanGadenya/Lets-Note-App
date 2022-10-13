@@ -47,6 +47,8 @@ class SettingsFragment : Fragment() {
         _binding = SettingsFragmentBinding.inflate(inflater, container, false)
         val root: View = binding.root
         settingsPref = context?.getSharedPreferences("Settings", AppCompatActivity.MODE_PRIVATE)!!
+        val useLocalStorage = settingsPref.getBoolean("useLocalStorage",false)
+
         editor = settingsPref.edit()
         settingsViewModel.settingsFrag.value = true
 
@@ -79,7 +81,7 @@ class SettingsFragment : Fragment() {
 
         oldUser = mAuth.currentUser
 
-        if (oldUser?.isAnonymous == true){
+        if (oldUser?.isAnonymous == true || useLocalStorage){
 
             migrateCard.visibility = VISIBLE
             migrateTV.visibility = VISIBLE

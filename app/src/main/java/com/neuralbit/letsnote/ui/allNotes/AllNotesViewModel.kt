@@ -8,7 +8,6 @@ import com.neuralbit.letsnote.firebaseEntities.NoteFire
 import com.neuralbit.letsnote.firebaseEntities.TodoItem
 import com.neuralbit.letsnote.firebaseRepos.NoteFireRepo
 import com.neuralbit.letsnote.room.NoteDatabase
-import com.neuralbit.letsnote.room.entities.ArchivedNote
 import com.neuralbit.letsnote.room.entities.Note
 import com.neuralbit.letsnote.room.repos.NoteRoomRepo
 import com.neuralbit.letsnote.room.repos.NoteTagRoomRepo
@@ -115,29 +114,42 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
     }
 
 
-    fun updateFireNote(noteUpdate : Map<String, Any>, noteUid : String) =viewModelScope.launch(
-        Dispatchers.IO) {
-        val mapper = ObjectMapper() // jackson's objectmapper
-        val noteFireUpdate: NoteFire = mapper.convertValue(noteUpdate, NoteFire::class.java)
-        val note = Note(
-            noteFireUpdate.title,
-            noteFireUpdate.description,
-            noteFireUpdate.timeStamp,
-            noteFireUpdate.label,
-            noteFireUpdate.archived,
-            noteFireUpdate.pinned,
-            noteFireUpdate.protected,
-            noteFireUpdate.deletedDate,
-            noteFireUpdate.reminderDate,
-            noteUid)
-        val archivedNote = ArchivedNote(noteUid)
-        if (noteFireUpdate.archived){
-            noteRoomRepo.insertArchive(archivedNote)
+    fun updateFireNote(noteUpdate : Map<String, Any>, noteUid : String) =viewModelScope.launch(Dispatchers.IO) {
+        if (!useLocalStorage){
+            noteFireRepo.updateNote(noteUpdate,noteUid)
         }else{
-            noteRoomRepo.deleteArchive(archivedNote)
+            val mapper = ObjectMapper() // jackson's objectmapper
+            val noteFireUpdate: NoteFire = mapper.convertValue(noteUpdate, NoteFire::class.java)
+
+            val note = Note(
+                noteFireUpdate.title,
+                noteFireUpdate.description,
+                noteFireUpdate.timeStamp,
+                noteFireUpdate.label,
+                noteFireUpdate.archived,
+                noteFireUpdate.pinned,
+                noteFireUpdate.protected,
+                noteFireUpdate.deletedDate,
+                noteFireUpdate.reminderDate,
+                noteUid)
+            GlobalScope.launch {
+                val oldTodoItems = noteRoomRepo.getTodoList(noteUid)
+                for (oldTodoItem in oldTodoItems) {
+                    noteRoomRepo.deleteTodo(oldTodoItem)
+                }
+                val newTodoItems = noteFireUpdate.todoItems
+                for (todoItem in newTodoItems){
+                    val todo = com.neuralbit.letsnote.room.entities.TodoItem(noteUid,todoItem.item,todoItem.checked)
+                    noteRoomRepo.insertTodo(todo)
+                }
+
+            }
+
+
+            noteRoomRepo.update(note)
         }
-        noteRoomRepo.update(note)
     }
+
 
     private fun filterList(list : LinkedList<NoteFire>, text: String?) : LinkedList<NoteFire>{
         val newList = LinkedList<NoteFire>()

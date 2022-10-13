@@ -133,7 +133,6 @@ class MainActivity : AppCompatActivity() {
         if (emptyTrashImmediately){
             allNotesViewModal.notesToDelete.observe(lifecycleOwner){
                 it.noteUid?.let { uid -> viewModal.deleteNote(uid,it.label,it.tags) }
-
             }
             allNotesViewModal.selectedNotes.clear()
         }

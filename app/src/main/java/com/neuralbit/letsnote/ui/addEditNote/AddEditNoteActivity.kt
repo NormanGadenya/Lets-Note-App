@@ -1592,27 +1592,11 @@ class AddEditNoteActivity : AppCompatActivity() ,
         if (viewModal.labelChanged){
             if (labelColor != null) {
                 if (labelColor > 0){
-                    if ( viewModal.useLocalStorage){
-                        if (oldLabel > 0){
-                            viewModal.allRoomNotesWithLabel(oldLabel).observe(this){
-                                if (it.isEmpty()){
-                                    viewModal.deleteRoomLabel(oldLabel)
-                                }
-                            }
-                        }
-                    }
+
                     noteUid?.let { viewModal.addOrDeleteLabel(labelColor,labelTitle,oldLabel, it,true) }
 
                 }else{
-                    if ( viewModal.useLocalStorage){
-                        if (oldLabel > 0){
-                            viewModal.allRoomNotesWithLabel(oldLabel).observe(this){
-                                if (it.isEmpty()){
-                                    viewModal.deleteRoomLabel(oldLabel)
-                                }
-                            }
-                        }
-                    }
+
                     noteUid?.let { viewModal.addOrDeleteLabel(labelColor,labelTitle, oldLabel, it, false) }
 
 

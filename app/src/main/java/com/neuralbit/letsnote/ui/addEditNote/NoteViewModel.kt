@@ -13,7 +13,10 @@ import com.neuralbit.letsnote.room.entities.Label
 import com.neuralbit.letsnote.room.entities.Note
 import com.neuralbit.letsnote.room.entities.Tag
 import com.neuralbit.letsnote.room.relationships.NoteTagCrossRef
-import com.neuralbit.letsnote.room.repos.*
+import com.neuralbit.letsnote.room.repos.LabelRoomRepo
+import com.neuralbit.letsnote.room.repos.NoteRoomRepo
+import com.neuralbit.letsnote.room.repos.NoteTagRoomRepo
+import com.neuralbit.letsnote.room.repos.TagRoomRepo
 import com.neuralbit.letsnote.utilities.FirebaseKeyGenerator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -59,8 +62,6 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     private val tagRoomDao = NoteDatabase.getDatabase(application).getTagDao()
     private val tagRoomRepo = TagRoomRepo(tagRoomDao)
 
-    private val reminderRoomDao = NoteDatabase.getDatabase(application).getReminderDao()
-    private val reminderRoomRepo = ReminderRoomRepo(reminderRoomDao)
 
     private val noteTagRoomDao = NoteDatabase.getDatabase(application).getNoteTagDao()
     private val noteTagRoomRepo = NoteTagRoomRepo(noteTagRoomDao)
@@ -186,9 +187,15 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
             labelFireRepo.addOrDeleteLabels(labelColor,oldLabel,noteUid,labelTitle,add)
         }else{
             GlobalScope.launch {
+                if (oldLabel > 0 && oldLabel != labelColor){
+                    labelRoomRepo.getNotesWithLabel(oldLabel).forEach {
+                        if (it.notes.isEmpty()){
+                            labelRoomRepo.deleteLabel(oldLabel)
+                        }
+                    }
+                }
                 if (add){
                     val label = Label(labelColor, labelTitle)
-                    Log.d(TAG, "addOrDeleteLabel: $label")
                     labelRoomRepo.insert(label)
                 }
             }
@@ -265,15 +272,6 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
                 }
             }
         }
-    }
-
-    fun deleteRoomLabel (labelColor: Int) = viewModelScope.launch(Dispatchers.IO){
-        labelRoomRepo.deleteLabel(labelColor)
-    }
-
-    fun deleteRoomTag (tagTitle: String) = viewModelScope.launch(Dispatchers.IO){
-        val tag = Tag(tagTitle)
-        tagRoomRepo.delete(tag)
     }
 
 }

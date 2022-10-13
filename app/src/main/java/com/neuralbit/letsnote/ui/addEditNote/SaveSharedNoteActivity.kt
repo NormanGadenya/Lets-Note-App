@@ -38,6 +38,7 @@ class SaveSharedNoteActivity : AppCompatActivity() {
             val intent = Intent(applicationContext, SignInActivity::class.java)
             startActivity(intent)
         }
+        viewModal.useLocalStorage = useLocalStorage
 
         if(intent?.action == Intent.ACTION_SEND){
             if("text/plain" == intent.type){

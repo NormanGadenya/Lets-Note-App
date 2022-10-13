@@ -92,6 +92,7 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
         val useLocalStorage = settingsSharedPref?.getBoolean("useLocalStorage",false)
         if (useLocalStorage != null) {
             allNotesViewModel.useLocalStorage = useLocalStorage
+            deletedNotesViewModel.useLocalStorage = useLocalStorage
         }
         val staggeredLayoutManagerAll = StaggeredGridLayoutManager( 2,LinearLayoutManager.VERTICAL)
         allNotesViewModel.staggeredView.observe(viewLifecycleOwner){
