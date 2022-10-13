@@ -12,7 +12,6 @@ import com.neuralbit.letsnote.room.NoteDatabase
 import com.neuralbit.letsnote.room.entities.Label
 import com.neuralbit.letsnote.room.entities.Note
 import com.neuralbit.letsnote.room.entities.Tag
-import com.neuralbit.letsnote.room.relationships.LabelWIthNotes
 import com.neuralbit.letsnote.room.relationships.NoteTagCrossRef
 import com.neuralbit.letsnote.room.repos.*
 import com.neuralbit.letsnote.utilities.FirebaseKeyGenerator
@@ -162,14 +161,6 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         }
     }
 
-
-
-
-
-    fun allRoomNotesWithLabel(labelColor: Int) : LiveData<List<LabelWIthNotes>>{
-        return labelRoomRepo.getNotesWithLabel(labelColor)
-    }
-
     fun allFireLabels() : LiveData<List<LabelFire>>{
         if (!useLocalStorage){
             return labelFireRepo.getAllLabels()
@@ -209,7 +200,7 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         if (!useLocalStorage){
             tagFireRepo.addOrDeleteTags(newTagsAdded,deletedTags,noteUid)
         }else{
-            viewModelScope.launch {
+            GlobalScope.launch {
                 for (tagTitle in newTagsAdded) {
                     var tagStr = tagTitle
                     val split = tagStr.split("#")
@@ -232,7 +223,14 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
                     }
                     val noteTagCrossRef = NoteTagCrossRef(noteUid,tagStr)
                     noteTagRoomRepo.deleteNoteTagCrossRef(noteTagCrossRef)
+
+                    noteTagRoomRepo.getNotesWithTag(tagStr).forEach {
+                        if (it.notes.isEmpty()){
+                            tagRoomRepo.delete(Tag(tagStr))
+                        }
+                    }
                 }
+
             }
         }
     }
@@ -259,8 +257,12 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
                     noteRoomRepo.deleteTodo(oldTodoItem)
                 }
 
-
                 noteRoomRepo.delete(noteUid)
+                labelRoomRepo.getNotesWithLabel(labelColor).forEach {
+                    if (it.notes.isEmpty()){
+                        labelRoomRepo.deleteLabel(labelColor)
+                    }
+                }
             }
         }
     }

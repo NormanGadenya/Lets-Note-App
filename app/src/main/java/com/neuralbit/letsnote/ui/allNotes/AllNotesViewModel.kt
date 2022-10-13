@@ -96,9 +96,10 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
                     val tagsList = ArrayList<String>()
                     for (tagsWithNote in noteTagRoomRepo.getTagsWithNote(note.noteUid)) {
                         for (t in tagsWithNote.tags){
-                            tagsList.add(t.tagTitle)
+                            tagsList.add("#${t.tagTitle}")
                         }
                     }
+                    noteFire.tags = tagsList
                     val todoItems = noteRoomRepo.getTodoList(note.noteUid)
                     val items = todoItems.map { t -> TodoItem(item = t.itemDesc, checked = t.itemChecked) }
                     noteFire.todoItems = items
@@ -112,6 +113,7 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
             return noteFireRepo.getAllNotes()
         }
     }
+
 
     fun updateFireNote(noteUpdate : Map<String, Any>, noteUid : String) =viewModelScope.launch(
         Dispatchers.IO) {

@@ -75,11 +75,26 @@ class MainActivityViewModel(application : Application) : AndroidViewModel(applic
     fun deleteNote (noteUid : String, labelColor : Int, tagList : List<String> ){
         if (useLocalStorage) {
 
-            for (tag in tagList) {
-                val noteTagCrossRef = NoteTagCrossRef(tagTitle = tag, noteUid = noteUid)
-                noteTagRoomRepo.deleteNoteTagCrossRef(noteTagCrossRef)
+            GlobalScope.launch {
+                for (tagTitle in tagList){
+                    var tagStr = tagTitle
+                    val split = tagStr.split("#")
+                    if (split.size > 1){
+                        tagStr = split[1]
+                    }
+                    val noteTagCrossRef = NoteTagCrossRef(noteUid,tagStr)
+                    noteTagRoomRepo.deleteNoteTagCrossRef(noteTagCrossRef)
+
+                }
+                val oldTodoItems = noteRoomRepo.getTodoList(noteUid)
+                for (oldTodoItem in oldTodoItems) {
+                    noteRoomRepo.deleteTodo(oldTodoItem)
+                }
+
+
+
+                noteRoomRepo.delete(noteUid)
             }
-            noteRoomRepo.delete(noteUid)
 
         }else{
 
