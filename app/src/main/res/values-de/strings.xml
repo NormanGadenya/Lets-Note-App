@@ -113,6 +113,8 @@
     <string name="clock_icon">Uhrensymbol</string>
     <string name="trash_icon">Uhrensymbol</string>
     <string name="tomorrow_morning">Morgen früh</string>
+    <string name="back_up_active">Sicherung aktiviert</string>
+    <string name="back_up_deactivated">Sicherung deaktiviert</string>
     <string name="choose_date_time">Wählen Sie Datum und Uhrzeit</string>
     <string name="tomorrow_afternoon">Morgen Nachmittag</string>
     <string name="today_8pm">Später heute Morgen um 8:00 Uhr</string>

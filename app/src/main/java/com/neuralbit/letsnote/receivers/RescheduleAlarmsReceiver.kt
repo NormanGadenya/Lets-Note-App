@@ -10,8 +10,6 @@ import android.content.Context.ALARM_SERVICE
 import android.content.Intent
 import com.neuralbit.letsnote.firebase.entities.NoteFire
 import com.neuralbit.letsnote.firebase.repos.NoteFireRepo
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
 class RescheduleAlarmsReceiver : BroadcastReceiver() {
     private val noteRepo = NoteFireRepo()
@@ -40,14 +38,14 @@ class RescheduleAlarmsReceiver : BroadcastReceiver() {
     }
 
     override fun onReceive(p0: Context?, p1: Intent?) {
-        GlobalScope.launch {
-            noteRepo.getAllNotes().value?.forEach { noteFire ->
-                if (!noteFire.archived && noteFire.deletedDate==(0).toLong() && noteFire.reminderDate> System.currentTimeMillis()){
-                    if (p0 != null) {
-                        startAlarm(noteFire, noteFire.reminderDate.toInt(),p0)
-                    }
+
+        noteRepo.getAllNotes().value?.forEach { noteFire ->
+            if (!noteFire.archived && noteFire.deletedDate==(0).toLong() && noteFire.reminderDate> System.currentTimeMillis()){
+                if (p0 != null) {
+                    startAlarm(noteFire, noteFire.reminderDate.toInt(),p0)
                 }
             }
         }
+
     }
 }

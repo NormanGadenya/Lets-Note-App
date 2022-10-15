@@ -30,13 +30,14 @@ class MainActivityViewModel(application : Application) : AndroidViewModel(applic
     private val noteRoomRepo = NoteRoomRepo(noteRoomDao)
     private val noteTagRoomDao = NoteDatabase.getDatabase(application).getNoteTagDao()
     private val noteTagRoomRepo = NoteTagRoomRepo(noteTagRoomDao)
+    val refresh = MutableLiveData<Boolean>()
 
     private val labelRoomDao = NoteDatabase.getDatabase(application).getLabelDao()
     private val labelRoomRepo = LabelRoomRepo(labelRoomDao)
 
 
     @OptIn(DelicateCoroutinesApi::class)
-    suspend fun getAllFireNotes () : LiveData<ArrayList<NoteFire>>{
+    suspend fun getAllFisreNotes () : LiveData<ArrayList<NoteFire>>{
         if (useLocalStorage){
             val mutableNoteData = MutableLiveData<ArrayList<NoteFire>>()
             GlobalScope.launch {

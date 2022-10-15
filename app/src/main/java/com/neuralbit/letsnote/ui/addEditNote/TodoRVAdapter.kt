@@ -16,6 +16,7 @@ import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.ImageButton
 import androidx.core.content.res.ResourcesCompat
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.firebase.entities.TodoItem
@@ -23,9 +24,7 @@ import com.neuralbit.letsnote.firebase.entities.TodoItem
 
 class TodoRVAdapter(
     val context: Context,
-    private val todoItemInterface: TodoItemInterface,
-
-
+    private val todoItemInterface: TodoItemInterface
     ) : RecyclerView.Adapter<TodoRVAdapter.ViewHolder>() {
 
     lateinit var itemView: View
@@ -33,10 +32,8 @@ class TodoRVAdapter(
     val TAG = "TodoRVAdapter"
     var fontStyle : String? = null
     var fontMultiplier : Int = 2
-
-
-
-
+    var viewModel : NoteViewModel? = null
+    var lifecycleOwner: LifecycleOwner? = null
 
     inner class ViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView){
         val todoItemDescET: EditText = itemView.findViewById(R.id.todoItemDescET)
@@ -54,7 +51,27 @@ class TodoRVAdapter(
         val todoItem = allTodoItems[position]
         holder.checkBox.isChecked = todoItem.checked
 
-
+        lifecycleOwner?.let {
+            viewModel?.deletedNote?.observe(it){ d ->
+                if (!d){
+                    viewModel?.archived?.observe(it){ a ->
+                        if (a){
+                            holder.todoItemDescET.isEnabled = false
+                            holder.checkBox.isEnabled = false
+                            holder.deleteButton.isEnabled = false
+                        }else{
+                            holder.todoItemDescET.isEnabled = true
+                            holder.checkBox.isEnabled = true
+                            holder.deleteButton.isEnabled = true
+                        }
+                    }
+                }else{
+                    holder.todoItemDescET.isEnabled = true
+                    holder.checkBox.isEnabled = true
+                    holder.deleteButton.isEnabled = true
+                }
+            }
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val typeface: Typeface? = when (fontStyle) {
                 "Architects daughter" -> {

@@ -211,6 +211,12 @@ class TagNotesActivity : AppCompatActivity() , NoteFireClick {
                     note.noteUid?.let { it1 -> scheduleDelete(it1,note.tags,note.label,note.timeStamp) }
 
                     val noteUpdate = HashMap<String,Any>()
+                    noteUpdate["title"] = note.title
+                    noteUpdate["description"] = note.description
+                    noteUpdate["label"] = note.label
+                    noteUpdate["pinned"] = note.pinned
+                    noteUpdate["reminderDate"] = note.reminderDate
+                    noteUpdate["protected"] = note.protected
                     noteUpdate["deletedDate"] = System.currentTimeMillis()
                     note.noteUid?.let { it1 -> allNotesViewModel.updateFireNote(noteUpdate, it1) }
                 }else{
@@ -269,6 +275,12 @@ class TagNotesActivity : AppCompatActivity() , NoteFireClick {
                 cancelAlarm(note.reminderDate.toInt())
 
                 val noteUpdate = HashMap<String,Any>()
+                noteUpdate["title"] = note.title
+                noteUpdate["description"] = note.description
+                noteUpdate["label"] = note.label
+                noteUpdate["pinned"] = note.pinned
+                noteUpdate["reminderDate"] = note.reminderDate
+                noteUpdate["protected"] = note.protected
                 noteUpdate["archived"] = true
                 note.noteUid?.let { it1 -> allNotesViewModel.updateFireNote(noteUpdate, it1) }
             }
@@ -279,7 +291,7 @@ class TagNotesActivity : AppCompatActivity() , NoteFireClick {
 
             allNotesViewModel.itemSelectEnabled.value = false
             if(selectedNotesCount == 1){
-                Toast.makeText(applicationContext,resources.getString(R.string.notes_archived_successfully), Toast.LENGTH_SHORT).show()
+                Toast.makeText(applicationContext,resources.getString(R.string.notes_archived_successfully,""), Toast.LENGTH_SHORT).show()
 
             }else{
                 Toast.makeText(applicationContext,resources.getString(R.string.notes_archived_successfully,"s"), Toast.LENGTH_SHORT).show()

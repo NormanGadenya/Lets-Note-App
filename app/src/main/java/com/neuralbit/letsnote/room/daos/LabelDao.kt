@@ -23,8 +23,4 @@ interface LabelDao {
     @Query("select * from Label where labelColor = :labelColor ")
     suspend fun getNotesWithLabel(labelColor :Int): List<LabelWIthNotes>
 
-//    @Transaction
-//    @Query("select * from Label where noteUid = :noteUid ")
-//    fun getNoteLabel(noteUid :String): LiveData<Label>
-
 }

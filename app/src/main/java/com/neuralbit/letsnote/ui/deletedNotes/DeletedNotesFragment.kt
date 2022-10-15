@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -104,6 +105,11 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
             }
         }
         setHasOptionsMenu(true)
+        allNotesViewModel.getAllFireNotes().observe(viewLifecycleOwner){
+
+            allNotesViewModel.allFireNotes.value = it
+        }
+
 
         allNotesViewModel.allFireNotes.observe(viewLifecycleOwner){
             val filteredNotes = HashSet<NoteFire>()
@@ -114,6 +120,7 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
                 if (n.deletedDate > 0 && daysLeft > 0){
                     if (daysLeft > 0){
                         filteredNotes.add(n)
+                        Log.d(TAG, "onCreateView: $filteredNotes")
                     }else{
                         n.noteUid?.let { uid ->
                             deletedNotesViewModel.deleteNote(
@@ -141,27 +148,53 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
         deletedNotesViewModel.clearTrash.observe(viewLifecycleOwner){
 
             if (it ){
-                for (deletedNote in deletedNotesViewModel.deletedNotes) {
-                    deletedNote.noteUid?.let { uid -> deletedNotesViewModel.deleteNote(uid,deletedNote.label,deletedNote.tags)
-                        cancelDelete(deletedNote.timeStamp.toInt())
-                    }
+                val snackbar :Snackbar
+                val selectedNotesCount = deletedNotesViewModel.deletedNotes.size
+                snackbar = if (selectedNotesCount > 1){
+                    Snackbar.make(parentLayout,resources.getString(R.string.notes_deleted_successfully,"s"), Snackbar.LENGTH_LONG)
+                }else{
+                    Snackbar.make(parentLayout,resources.getString(R.string.notes_deleted_successfully,""), Snackbar.LENGTH_LONG)
                 }
-                Toast.makeText(context,resources.getString(R.string.notes_deleted_successfully,"s"),Toast.LENGTH_SHORT).show()
-            }
-        }
-
-        deletedNotesViewModel.itemDeleteClicked.observe(viewLifecycleOwner){
-
-
-            if (it && allNotesViewModel.selectedNotes.isNotEmpty()){
-                val snackbar = Snackbar.make(parentLayout,resources.getString(R.string.notes_deleted_successfully,"s"), Snackbar.LENGTH_LONG)
                 snackbar.setAction("UNDO"
                 ) { restoreTempNotes()}
                 snackbar.show()
                 GlobalScope.launch {
                     permanentlyDeleteNotes()
                 }
+                val notes = ArrayList(deletedNotesViewModel.deletedNotes)
+
+                for (deletedNote in deletedNotesViewModel.deletedNotes) {
+
+                    tempNotesToDelete.add(deletedNote)
+                    notes.remove(deletedNote)
+
+                }
+                noteRVAdapter?.updateListFire(notes)
+                trashText.visibility = View.VISIBLE
+                trashIcon.visibility = View.VISIBLE
+                allNotesViewModel.itemSelectEnabled.value = false
+                deletedNotesViewModel.clearTrash.value = false
+            }
+
+        }
+
+        deletedNotesViewModel.itemDeleteClicked.observe(viewLifecycleOwner){
+
+
+            if (it && allNotesViewModel.selectedNotes.isNotEmpty()){
+                val snackbar :Snackbar
                 val selectedNotesCount = allNotesViewModel.selectedNotes.size
+                snackbar = if (selectedNotesCount > 1){
+                    Snackbar.make(parentLayout,resources.getString(R.string.notes_deleted_successfully,"s"), Snackbar.LENGTH_LONG)
+                }else{
+                    Snackbar.make(parentLayout,resources.getString(R.string.notes_deleted_successfully,""), Snackbar.LENGTH_LONG)
+                }
+                snackbar.setAction("UNDO"
+                ) { restoreTempNotes()}
+                snackbar.show()
+                GlobalScope.launch {
+                    permanentlyDeleteNotes()
+                }
                 val notes = ArrayList(deletedNotesViewModel.deletedNotes)
 
                 for (deletedNote in allNotesViewModel.selectedNotes) {
@@ -174,11 +207,6 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
 
                 allNotesViewModel.itemSelectEnabled.value = false
                 deletedNotesViewModel.itemDeleteClicked.value = false
-                if (selectedNotesCount == 1){
-                    Toast.makeText(context,resources.getString(R.string.notes_deleted_successfully,""),Toast.LENGTH_SHORT).show()
-                }else{
-                    Toast.makeText(context,resources.getString(R.string.notes_deleted_successfully,"s"),Toast.LENGTH_SHORT).show()
-                }
             }
         }
 
@@ -190,6 +218,12 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
                 for ( note in allNotesViewModel.selectedNotes){
                     if (note.selected){
                         val noteUpdate = HashMap<String,Any>()
+                        noteUpdate["title"] = note.title
+                        noteUpdate["description"] = note.description
+                        noteUpdate["label"] = note.label
+                        noteUpdate["pinned"] = note.pinned
+                        noteUpdate["reminderDate"] = note.reminderDate
+                        noteUpdate["protected"] = note.protected
                         noteUpdate["deletedDate"] = 0
                         note.noteUid?.let { it1 -> allNotesViewModel.updateFireNote(noteUpdate, it1) }
                         cancelDelete(note.timeStamp.toInt())
@@ -201,10 +235,17 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
                 allNotesViewModel.selectedNotes.clear()
                 allNotesViewModel.itemSelectEnabled.value = false
                 if (selectedNotesCount == 1){
-                    Toast.makeText(context,resources.getString(R.string.notes_restored_successfully),Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context,resources.getString(R.string.notes_restored_successfully,""),Toast.LENGTH_SHORT).show()
                 }else{
                     Toast.makeText(context,resources.getString(R.string.notes_restored_successfully, "s"),Toast.LENGTH_SHORT).show()
 
+                }
+                if (deletedNotesViewModel.deletedNotes.isEmpty()){
+                    trashText.visibility = View.VISIBLE
+                    trashIcon.visibility = View.VISIBLE
+                }else{
+                    trashText.visibility = View.GONE
+                    trashIcon.visibility = View.GONE
                 }
             }
         }
@@ -214,6 +255,8 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
     }
 
     private fun restoreTempNotes() {
+        trashText.visibility = View.GONE
+        trashIcon.visibility = View.GONE
         restoreDeleted = true
         tempNotesToDelete.clear()
         noteRVAdapter?.updateListFire(ArrayList(deletedNotesViewModel.deletedNotes))

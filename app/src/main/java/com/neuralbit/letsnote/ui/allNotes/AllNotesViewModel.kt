@@ -11,7 +11,6 @@ import com.neuralbit.letsnote.room.NoteDatabase
 import com.neuralbit.letsnote.room.entities.Note
 import com.neuralbit.letsnote.room.repos.NoteRoomRepo
 import com.neuralbit.letsnote.room.repos.NoteTagRoomRepo
-import com.neuralbit.letsnote.room.repos.ReminderRoomRepo
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -34,16 +33,10 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
     var useLocalStorage = false
     var signedIn = false
     var archiveFrag = false
+    private val TAG = "ALL_NOTES_VIEW_MODEL"
 
     private val noteRoomDao = NoteDatabase.getDatabase(application).getNotesDao()
     private val noteRoomRepo = NoteRoomRepo(noteRoomDao)
-
-    private val labelRoomDao = NoteDatabase.getDatabase(application).getLabelDao()
-
-    private val tagRoomDao = NoteDatabase.getDatabase(application).getTagDao()
-
-    private val reminderRoomDao = NoteDatabase.getDatabase(application).getReminderDao()
-    private val reminderRoomRepo = ReminderRoomRepo(reminderRoomDao)
 
     private val noteTagRoomDao = NoteDatabase.getDatabase(application).getNoteTagDao()
     private val noteTagRoomRepo = NoteTagRoomRepo(noteTagRoomDao)
@@ -75,9 +68,9 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
 
 
     @OptIn(DelicateCoroutinesApi::class)
-    suspend fun getAllFireNotes () : LiveData<ArrayList<NoteFire>>{
+    fun getAllFireNotes () : LiveData<ArrayList<NoteFire>>{
+        val mutableNoteData = MutableLiveData<ArrayList<NoteFire>>()
         if (useLocalStorage){
-            val mutableNoteData = MutableLiveData<ArrayList<NoteFire>>()
             GlobalScope.launch {
                 val noteList = ArrayList<NoteFire>()
                 for (note in noteRoomRepo.getAllNotes()) {
@@ -105,6 +98,7 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
                     noteList.add(noteFire)
 
                 }
+                Log.d(TAG, "getAllFireNotes: $noteList")
                 mutableNoteData.postValue(noteList)
             }
             return mutableNoteData
@@ -132,20 +126,6 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
                 noteFireUpdate.deletedDate,
                 noteFireUpdate.reminderDate,
                 noteUid)
-            GlobalScope.launch {
-                val oldTodoItems = noteRoomRepo.getTodoList(noteUid)
-                for (oldTodoItem in oldTodoItems) {
-                    noteRoomRepo.deleteTodo(oldTodoItem)
-                }
-                val newTodoItems = noteFireUpdate.todoItems
-                for (todoItem in newTodoItems){
-                    val todo = com.neuralbit.letsnote.room.entities.TodoItem(noteUid,todoItem.item,todoItem.checked)
-                    noteRoomRepo.insertTodo(todo)
-                }
-
-            }
-
-
             noteRoomRepo.update(note)
         }
     }

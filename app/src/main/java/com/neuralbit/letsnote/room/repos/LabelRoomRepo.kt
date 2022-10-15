@@ -12,9 +12,6 @@ class LabelRoomRepo(
         labelDao.insert(label)
     }
 
-    suspend fun deleteNoteLabel(noteUid: String){
-//        labelDao.deleteNoteLabel(noteUid)
-    }
     suspend fun deleteLabel(labelColor: Int){
         labelDao.deleteLabel(labelColor)
     }

@@ -46,7 +46,7 @@
                 android:layout_margin="8dp"
                 android:layout_marginBottom="8dp"
                 android:text="@string/pinned_notes"
-                android:textSize="32sp"
+                android:textSize="25sp"
                 android:visibility="gone"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -69,7 +69,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
                 android:text="@string/other_notes"
-                android:textSize="32sp"
+                android:textSize="25sp"
                 android:visibility="gone"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/pinnedNotesRV" />

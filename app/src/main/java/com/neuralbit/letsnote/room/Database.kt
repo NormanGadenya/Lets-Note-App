@@ -4,28 +4,28 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.neuralbit.letsnote.room.daos.*
-import com.neuralbit.letsnote.room.entities.*
+import com.neuralbit.letsnote.room.daos.LabelDao
+import com.neuralbit.letsnote.room.daos.NoteTagDao
+import com.neuralbit.letsnote.room.daos.NotesDao
+import com.neuralbit.letsnote.room.daos.TagDao
+import com.neuralbit.letsnote.room.entities.Label
+import com.neuralbit.letsnote.room.entities.Note
+import com.neuralbit.letsnote.room.entities.Tag
+import com.neuralbit.letsnote.room.entities.TodoItem
 import com.neuralbit.letsnote.room.relationships.NoteTagCrossRef
 
 @Database(
     entities = [
         Note::class,
         Tag::class,
-        ArchivedNote::class,
-        PinnedNote::class,
         NoteTagCrossRef::class,
-        Reminder::class,
-        DeletedNote::class,
         TodoItem::class,
-        ProtectedNote::class,
         Label::class
     ],version =8 , exportSchema = true)
 abstract class NoteDatabase : RoomDatabase(){
     abstract fun getNotesDao() : NotesDao
     abstract fun getTagDao() : TagDao
     abstract fun getNoteTagDao() : NoteTagDao
-    abstract fun getReminderDao() : ReminderDao
     abstract fun getLabelDao() : LabelDao
 
 
@@ -37,7 +37,7 @@ abstract class NoteDatabase : RoomDatabase(){
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     NoteDatabase::class.java,
-                    "letsNote3"
+                    "letsNote4"
                 ).build()
                 INSTANCE = instance
                 instance

@@ -178,6 +178,8 @@
     <string name="release_notes_desc">- UI optimisation \n- Reminder fix  \n- Crash fixes when adding a new tag  \n- Language support for French, German, Spanish, Italian and Swahili \n- Other bug fixes</string>
     <string name="never_lose_a_note">Never lose a note</string>
     <string name="welcome">Welcome</string>
+    <string name="back_up_active">Backup activated</string>
+    <string name="back_up_deactivated">Backup deactivated</string>
     <string name="never_lose_a_note_desc">Your notes are backed up to the cloud so that you are never worried about your notes getting lost</string>
     <string name="need_privacy">Need some privacy ?</string>
     <string name="need_privacy_desc">We\'ve got you covered. Protected notes are only accessible when authenticated by your fingerprint reader</string>

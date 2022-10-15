@@ -23,6 +23,8 @@
     <string name="rate_app">Souhaitez-vous évaluer notre application?</string>
     <string name="tagTitle"/>
     <string name="createNewTag">Créer</string>
+    <string name="back_up_active">Sauvegarde activée</string>
+    <string name="back_up_deactivated">Sauvegarde désactivée</string>
     <string name="title_activity_main2">Activité principale2</string>
     <string name="navigation_drawer_open">Ouvrir le tiroir de navigation</string>
     <string name="navigation_drawer_close">Fermer le tiroir de navigation</string>

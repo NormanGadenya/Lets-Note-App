@@ -4,7 +4,6 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.neuralbit.letsnote.entities.*
 import com.neuralbit.letsnote.firebase.entities.*
 import com.neuralbit.letsnote.firebase.repos.LabelFireRepo
 import com.neuralbit.letsnote.firebase.repos.NoteFireRepo
@@ -76,6 +75,9 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
             val mapper = ObjectMapper() // jackson's objectmapper
             val noteFireUpdate: NoteFire = mapper.convertValue(noteUpdate, NoteFire::class.java)
 
+            if (noteFireUpdate.deletedDate == (0).toLong()){
+
+            }
             val note = Note(
                 noteFireUpdate.title,
                 noteFireUpdate.description,

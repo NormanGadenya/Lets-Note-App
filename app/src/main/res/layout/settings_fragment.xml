@@ -217,12 +217,12 @@
                     android:padding="8dp"
                     >
 
-                    <Button
+                    <androidx.appcompat.widget.AppCompatButton
                         android:id="@+id/signInWithGoogleBtn"
                         android:layout_width="150dp"
                         android:layout_height="wrap_content"
                         android:layout_margin="16dp"
-                        android:background="@drawable/sign_in_bgnd"
+                        android:background="@drawable/share_app_bgnd"
                         android:drawableLeft="@drawable/icons_google"
                         android:contentDescription="@string/sign_in"
                         android:text="@string/sign_in"

@@ -4,6 +4,8 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import androidx.appcompat.app.AppCompatDialogFragment
@@ -20,6 +22,26 @@ class AddTagDialog(private val getTagFromDialog: GetTagFromDialog, val ctx: Cont
         val layoutInflater = activity?.layoutInflater
         val view = layoutInflater?.inflate(R.layout.add_tag_dialog,null)
         val addTagET = view?.findViewById<AutoCompleteTextView>(R.id.newTagET)
+        addTagET?.addTextChangedListener( object : TextWatcher{
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+            }
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                var tagTyped = p0.toString()
+                if (tagTyped.isNotEmpty()){
+                    if (tagTyped[0] != '#'){
+                        tagTyped = "#${tagTyped}"
+                        addTagET.setText(tagTyped)
+                        addTagET.setSelection(tagTyped.length)
+                    }
+                }
+            }
+
+            override fun afterTextChanged(p0: Editable?) {
+
+            }
+
+        })
 
         val adapter: ArrayAdapter<String> = ArrayAdapter<String>(ctx, android.R.layout.select_dialog_item, tagList)
         addTagET?.setAdapter(adapter)

@@ -35,13 +35,13 @@ import com.google.gson.Gson
 import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.databinding.FragmentAllNotesBinding
 import com.neuralbit.letsnote.firebase.entities.NoteFire
+import com.neuralbit.letsnote.receivers.AlertReceiver
 import com.neuralbit.letsnote.receivers.DeleteReceiver
 import com.neuralbit.letsnote.ui.adapters.NoteFireClick
 import com.neuralbit.letsnote.ui.adapters.NoteRVAdapter
 import com.neuralbit.letsnote.ui.addEditNote.AddEditNoteActivity
 import com.neuralbit.letsnote.ui.addEditNote.Fingerprint
 import com.neuralbit.letsnote.ui.settings.SettingsViewModel
-import com.neuralbit.letsnote.receivers.AlertReceiver
 import java.util.*
 
 class AllNotesFragment : Fragment() , NoteFireClick {
@@ -222,8 +222,13 @@ class AllNotesFragment : Fragment() , NoteFireClick {
 
         allNotesViewModel.selectedNotes.clear()
 
-        allNotesViewModel.allFireNotes.observe(viewLifecycleOwner){ notes ->
+        allNotesViewModel.getAllFireNotes().observe(viewLifecycleOwner){
 
+            allNotesViewModel.allFireNotes.value = it
+        }
+
+
+        allNotesViewModel.allFireNotes.observe(viewLifecycleOwner){ notes ->
             val pinnedNotes = LinkedList<NoteFire>()
             val otherNotes = LinkedList<NoteFire>()
 
@@ -241,6 +246,8 @@ class AllNotesFragment : Fragment() , NoteFireClick {
             if (otherNotes.isEmpty() && pinnedNotes.isEmpty()){
                 welcomeIcon.visibility = VISIBLE
                 welcomeText.visibility = VISIBLE
+                pinnedNotesTV.visibility = GONE
+                otherNotesTV.visibility = GONE
             }else{
                 welcomeIcon.visibility = GONE
                 welcomeText.visibility = GONE
@@ -262,6 +269,8 @@ class AllNotesFragment : Fragment() , NoteFireClick {
             }
             noteRVAdapter?.updateListFire(otherNotes)
         }
+
+
 
 
 
@@ -314,6 +323,12 @@ class AllNotesFragment : Fragment() , NoteFireClick {
                     }
 
                     val noteUpdate = HashMap<String,Any>()
+                    noteUpdate["title"] = note.title
+                    noteUpdate["description"] = note.description
+                    noteUpdate["label"] = note.label
+                    noteUpdate["pinned"] = note.pinned
+                    noteUpdate["reminderDate"] = note.reminderDate
+                    noteUpdate["protected"] = note.protected
                     noteUpdate["archived"] = true
                     note.noteUid?.let { it1 -> allNotesViewModel.updateFireNote(noteUpdate, it1) }
                 }
@@ -329,8 +344,12 @@ class AllNotesFragment : Fragment() , NoteFireClick {
 
 
                 allNotesViewModel.itemSelectEnabled.value = false
+                if (allNotesViewModel.otherFireNotesList.value?.isEmpty() == true && allNotesViewModel.pinnedFireNotesList.value?.isEmpty() == true){
+                    welcomeIcon.visibility = VISIBLE
+                    welcomeText.visibility = VISIBLE
+                }
                 if (selectedNotesCount ==1){
-                    Toast.makeText(context,resources.getString(R.string.notes_archived_successfully),Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context,resources.getString(R.string.notes_archived_successfully,""),Toast.LENGTH_SHORT).show()
                 }else{
                     Toast.makeText(context,resources.getString(R.string.notes_archived_successfully,"s"),Toast.LENGTH_SHORT).show()
                 }
@@ -356,6 +375,12 @@ class AllNotesFragment : Fragment() , NoteFireClick {
                     }
                     if (emptyTrashImmediately != true){
                         val noteUpdate = HashMap<String,Any>()
+                        noteUpdate["title"] = note.title
+                        noteUpdate["description"] = note.description
+                        noteUpdate["label"] = note.label
+                        noteUpdate["pinned"] = note.pinned
+                        noteUpdate["reminderDate"] = note.reminderDate
+                        noteUpdate["protected"] = note.protected
                         noteUpdate["deletedDate"] = System.currentTimeMillis()
                         note.noteUid?.let { it1 -> allNotesViewModel.updateFireNote(noteUpdate, it1) }
 
@@ -386,7 +411,7 @@ class AllNotesFragment : Fragment() , NoteFireClick {
 
                 allNotesViewModel.itemSelectEnabled.value = false
                 if (selectedNotesCount ==1){
-                    Toast.makeText(context,resources.getString(R.string.notes_deleted_successfully),Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context,resources.getString(R.string.notes_deleted_successfully,""),Toast.LENGTH_SHORT).show()
                 }else{
                     Toast.makeText(context,resources.getString(R.string.notes_deleted_successfully,"s"),Toast.LENGTH_SHORT).show()
                 }

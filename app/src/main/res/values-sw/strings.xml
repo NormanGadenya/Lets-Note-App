@@ -24,6 +24,8 @@
     <string name="tagTitle"/>
     <string name="createNewTag">Unda</string>
     <string name="title_activity_main2">Shughuli kuu2</string>
+    <string name="back_up_active">Hifadhi rudufu imewezeshwa</string>
+    <string name="back_up_deactivated">Hifadhi rudufu imezimwa</string>
     <string name="navigation_drawer_open">Fungua droo ya kusogeza</string>
     <string name="navigation_drawer_close">Funga droo ya kusogeza</string>
     <string name="nav_header_title">Studio ya Android</string>

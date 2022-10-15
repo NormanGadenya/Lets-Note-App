@@ -164,7 +164,10 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
     override fun onCreate(savedInstanceState: Bundle?)  {
         super.onCreate(savedInstanceState)
-        window.setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE)
+        protected = intent.getBooleanExtra("protected", false)
+        if (protected){
+            window.setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE)
+        }
         setContentView(R.layout.activity_add_edit_note)
 
         initControllers()
@@ -843,7 +846,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
             viewModal.deletedNote.value = deleted
             viewModal.noteChanged.value = noteChanged
             viewModal.pinned.value = notePinned
-            viewModal.noteLocked.value = intent.getBooleanExtra("protected", false)
+            viewModal.noteLocked.value = protected
         }
 
 
@@ -896,7 +899,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
         todoCheckBox = findViewById(R.id.todoCheckBox)
         todoItemDescTV = findViewById(R.id.todoItemDescTV)
         lifecycleOwner = this
-
+        todoRVAdapter.viewModel = viewModal
+        todoRVAdapter.lifecycleOwner = this
         labelViewModel = ViewModelProvider(
             this,
             ViewModelProvider.AndroidViewModelFactory.getInstance(application)
@@ -1185,32 +1189,35 @@ class AddEditNoteActivity : AppCompatActivity() ,
         labelListRV.layoutManager =layoutManager
         labelListRV.adapter = labelListAdapter
         addNewLabelBtn?.setOnClickListener {
+            val labelAlertLayout = layoutInflater.inflate(R.layout.add_label_dialog,null)
+            val labelConfirmBtn = labelAlertLayout.findViewById<Button>(R.id.okayBtn)
+            val labelDismissBtn = labelAlertLayout.findViewById<Button>(R.id.cancelBtn)
+
             val labelDialog: AlertDialog = this@AddEditNoteActivity.let {
+
                 val builder = AlertDialog.Builder(it)
-                builder.apply {
-                    setPositiveButton(getString(R.string.yes)
-                    ) { _, _ ->
-                        viewModal.noteChanged.value = true
-                        viewModal.labelChanged = true
-                        if (viewModal.labelColor.value != null){
-
-                            val label = viewModal.labelTitle.value?.let { it1 -> LabelFire(labelColor= viewModal.labelColor.value!!,labelTitle= it1) }
-                            if (label != null) {
-                                viewModal.labelFireList.add(label)
-                                labelListAdapter.updateLabelIDList(viewModal.labelFireList)
-                            }
-                        }
-
-                    }
-                    setNegativeButton(getString(R.string.cancel)
-                    ) { _, _ ->
-
-                    }
-                    setView(R.layout.add_label_dialog)
-                    setTitle("Choose a label color")
-                }
+                builder.setView(labelAlertLayout)
                 builder.create()
 
+            }
+            labelDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+
+            labelConfirmBtn.setOnClickListener {
+                viewModal.noteChanged.value = true
+                viewModal.labelChanged = true
+                if (viewModal.labelColor.value != null){
+
+                    val label = viewModal.labelTitle.value?.let { it1 -> LabelFire(labelColor= viewModal.labelColor.value!!,labelTitle= it1) }
+                    if (label != null) {
+                        viewModal.labelFireList.add(label)
+                        labelListAdapter.updateLabelIDList(viewModal.labelFireList)
+                    }
+                }
+                labelDialog.dismiss()
+                labelBottomSheet.dismiss()
+            }
+            labelDismissBtn.setOnClickListener {
+                labelDialog.dismiss()
             }
 
             labelDialog.show()

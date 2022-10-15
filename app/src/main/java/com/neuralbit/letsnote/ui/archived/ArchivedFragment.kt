@@ -74,6 +74,7 @@ class ArchivedFragment : Fragment() , NoteFireClick {
         val useLocalStorage = settingsSharedPref?.getBoolean("useLocalStorage",false)
         if (useLocalStorage != null) {
             allNotesViewModel.useLocalStorage = useLocalStorage
+            archivedViewModel.useLocalStorage = useLocalStorage
         }
         val staggeredLayoutManagerAll = StaggeredGridLayoutManager( 2,LinearLayoutManager.VERTICAL)
         allNotesViewModel.staggeredView.observe(viewLifecycleOwner){
@@ -85,6 +86,10 @@ class ArchivedFragment : Fragment() , NoteFireClick {
             }
         }
         setHasOptionsMenu(true)
+        allNotesViewModel.getAllFireNotes().observe(viewLifecycleOwner){
+
+            allNotesViewModel.allFireNotes.value = it
+        }
 
         allNotesViewModel.allFireNotes.observe(viewLifecycleOwner) {
             val archivedNotes = ArrayList<NoteFire>()
@@ -104,6 +109,15 @@ class ArchivedFragment : Fragment() , NoteFireClick {
             archivedViewModel.archivedFireNotes.value = archivedNotes
             noteRVAdapter?.updateListFire(archivedNotes)
         }
+        archivedViewModel.archivedFireNotes.observe(viewLifecycleOwner){
+            if (it.isEmpty()){
+                archiveIcon.visibility = View.VISIBLE
+                archiveText.visibility = View.VISIBLE
+            }else{
+                archiveIcon.visibility = View.GONE
+                archiveText.visibility = View.GONE
+            }
+        }
 
         archivedViewModel.itemDeleteClicked.observe(viewLifecycleOwner){
             if (it && allNotesViewModel.selectedNotes.isNotEmpty()){
@@ -115,6 +129,12 @@ class ArchivedFragment : Fragment() , NoteFireClick {
 
                     if (emptyTrashImmediately != true){
                         val noteUpdate = HashMap<String,Any>()
+                        noteUpdate["title"] = note.title
+                        noteUpdate["description"] = note.description
+                        noteUpdate["label"] = note.label
+                        noteUpdate["pinned"] = note.pinned
+                        noteUpdate["reminderDate"] = note.reminderDate
+                        noteUpdate["protected"] = note.protected
                         noteUpdate["deletedDate"] = System.currentTimeMillis()
                         note.noteUid?.let { it1 -> allNotesViewModel.updateFireNote(noteUpdate, it1) }
 
@@ -137,13 +157,14 @@ class ArchivedFragment : Fragment() , NoteFireClick {
                 allNotesViewModel.itemSelectEnabled.value = false
                 allNotesViewModel.itemDeleteClicked.value = false
                 if (selectedNotesCount == 1){
-                    Toast.makeText(context,resources.getString(R.string.notes_deleted_successfully),Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context,resources.getString(R.string.notes_deleted_successfully, ""),Toast.LENGTH_SHORT).show()
 
                 }else{
                     Toast.makeText(context,resources.getString(R.string.notes_deleted_successfully,"s"),Toast.LENGTH_SHORT).show()
                 }
 
             }
+
         }
 
         archivedViewModel.itemRestoreClicked.observe(viewLifecycleOwner){
@@ -163,7 +184,7 @@ class ArchivedFragment : Fragment() , NoteFireClick {
                 allNotesViewModel.itemDeleteClicked.value = false
                 allNotesViewModel.selectedNotes.clear()
                 if (selectedNotesCount == 1){
-                    Toast.makeText(context,resources.getString(R.string.notes_restored_successfully),Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context,resources.getString(R.string.notes_restored_successfully,""),Toast.LENGTH_SHORT).show()
 
                 }else{
                     Toast.makeText(context,resources.getString(R.string.notes_restored_successfully,"s"),Toast.LENGTH_SHORT).show()

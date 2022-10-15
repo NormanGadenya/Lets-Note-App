@@ -50,5 +50,36 @@
             app:layout_constraintTop_toBottomOf="@+id/accountName"
             tools:text="Norman Gadenya" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+    <androidx.constraintlayout.widget.ConstraintLayout
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/cloudStatusGroup"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/nav_acc_detail_background"
+        android:padding="16dp"
+        >
+
+        <ImageView
+            android:id="@+id/backupStatusIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_baseline_cloud_off_24"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/backupStatusTV"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textColor="@color/timberwolf"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/backupStatusIcon"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Back up deactivated" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </LinearLayout>

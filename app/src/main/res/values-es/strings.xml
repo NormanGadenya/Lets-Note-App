@@ -23,6 +23,8 @@
     <string name="rate_app">¿Te gustaría calificar nuestra aplicación?</string>
     <string name="tagTitle"/>
     <string name="createNewTag">Crear</string>
+    <string name="back_up_active">Copia de seguridad activada</string>
+    <string name="back_up_deactivated">Copia de seguridad desactivada</string>
     <string name="title_activity_main2">Actividad principal2</string>
     <string name="navigation_drawer_open">Abrir cajón de navegación</string>
     <string name="navigation_drawer_close">Cerrar cajón de navegación</string>

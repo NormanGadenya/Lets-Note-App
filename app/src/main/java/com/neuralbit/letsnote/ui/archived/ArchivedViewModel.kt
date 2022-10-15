@@ -11,6 +11,7 @@ import java.util.*
 
 class ArchivedViewModel (application : Application): AndroidViewModel(application) {
 
+    var useLocalStorage = false
     var archivedFireNotes = MutableLiveData<ArrayList<NoteFire>>()
 
     var searchQuery : MutableLiveData<String> = MutableLiveData()

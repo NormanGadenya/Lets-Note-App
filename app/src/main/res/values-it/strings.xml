@@ -24,6 +24,8 @@
     <string name="tagTitle"/>
     <string name="createNewTag">Creare</string>
     <string name="title_activity_main2">MainActivity2</string>
+    <string name="back_up_active">Backup attivato</string>
+    <string name="back_up_deactivated">Backup disattivato</string>
     <string name="navigation_drawer_open">Apri il cassetto di navigazione</string>
     <string name="navigation_drawer_close">Chiudi il cassetto di navigazione</string>
     <string name="nav_header_title">Android Studio</string>
