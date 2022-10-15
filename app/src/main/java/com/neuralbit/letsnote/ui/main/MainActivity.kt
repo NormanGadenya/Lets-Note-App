@@ -36,7 +36,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.databinding.ActivityMainBinding
-import com.neuralbit.letsnote.firebaseEntities.NoteFire
+import com.neuralbit.letsnote.firebase.entities.NoteFire
 import com.neuralbit.letsnote.receivers.AlertReceiver
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import com.neuralbit.letsnote.ui.archived.ArchivedViewModel

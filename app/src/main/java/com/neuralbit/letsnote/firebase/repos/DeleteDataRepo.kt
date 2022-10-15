@@ -1,4 +1,4 @@
-package com.neuralbit.letsnote.firebaseRepos
+package com.neuralbit.letsnote.firebase.repos
 
 import android.content.Context
 import android.content.Intent

@@ -4,10 +4,11 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.neuralbit.letsnote.firebaseEntities.*
-import com.neuralbit.letsnote.firebaseRepos.LabelFireRepo
-import com.neuralbit.letsnote.firebaseRepos.NoteFireRepo
-import com.neuralbit.letsnote.firebaseRepos.TagFireRepo
+import com.neuralbit.letsnote.entities.*
+import com.neuralbit.letsnote.firebase.entities.*
+import com.neuralbit.letsnote.firebase.repos.LabelFireRepo
+import com.neuralbit.letsnote.firebase.repos.NoteFireRepo
+import com.neuralbit.letsnote.firebase.repos.TagFireRepo
 import com.neuralbit.letsnote.room.NoteDatabase
 import com.neuralbit.letsnote.room.entities.Label
 import com.neuralbit.letsnote.room.entities.Note

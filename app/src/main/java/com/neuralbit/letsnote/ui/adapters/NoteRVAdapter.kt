@@ -19,7 +19,7 @@ import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.neuralbit.letsnote.R
-import com.neuralbit.letsnote.firebaseEntities.NoteFire
+import com.neuralbit.letsnote.firebase.entities.NoteFire
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import com.neuralbit.letsnote.receivers.AlertReceiver
 import com.neuralbit.letsnote.utilities.Common
@@ -316,6 +316,6 @@ class NoteRVAdapter (
 
 
 interface NoteFireClick{
-    fun onNoteFireClick(note : NoteFire , activated : Boolean)
+    fun onNoteFireClick(note : NoteFire, activated : Boolean)
     fun onNoteFireLongClick(note: NoteFire)
 }

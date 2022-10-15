@@ -10,7 +10,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.neuralbit.letsnote.R
-import com.neuralbit.letsnote.firebaseEntities.LabelFire
+import com.neuralbit.letsnote.firebase.entities.LabelFire
 
 
 class AddEditLabelAdapter(

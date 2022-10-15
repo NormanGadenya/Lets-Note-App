@@ -1,4 +1,4 @@
-package com.neuralbit.letsnote.firebaseEntities
+package com.neuralbit.letsnote.firebase.entities
 
 data class NoteFire (
     var title: String ="",

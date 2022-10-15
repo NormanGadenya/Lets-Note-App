@@ -2,7 +2,7 @@ package com.neuralbit.letsnote.ui.settings
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.neuralbit.letsnote.firebaseRepos.MigrationRepo
+import com.neuralbit.letsnote.firebase.repos.MigrationRepo
 
 class SettingsViewModel : ViewModel() {
     val dataMigrated: MutableLiveData<Boolean> = MutableLiveData()

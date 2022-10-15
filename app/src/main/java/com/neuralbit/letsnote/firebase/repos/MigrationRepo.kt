@@ -1,4 +1,4 @@
-package com.neuralbit.letsnote.firebaseRepos
+package com.neuralbit.letsnote.firebase.repos
 
 import android.util.Log
 import com.google.firebase.database.DataSnapshot

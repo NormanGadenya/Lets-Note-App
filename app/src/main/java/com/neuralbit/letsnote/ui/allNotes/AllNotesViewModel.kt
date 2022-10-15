@@ -4,9 +4,9 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.neuralbit.letsnote.firebaseEntities.NoteFire
-import com.neuralbit.letsnote.firebaseEntities.TodoItem
-import com.neuralbit.letsnote.firebaseRepos.NoteFireRepo
+import com.neuralbit.letsnote.firebase.entities.NoteFire
+import com.neuralbit.letsnote.firebase.entities.TodoItem
+import com.neuralbit.letsnote.firebase.repos.NoteFireRepo
 import com.neuralbit.letsnote.room.NoteDatabase
 import com.neuralbit.letsnote.room.entities.Note
 import com.neuralbit.letsnote.room.repos.NoteRoomRepo

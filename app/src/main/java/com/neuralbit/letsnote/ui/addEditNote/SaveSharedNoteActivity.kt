@@ -12,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.neuralbit.letsnote.R
-import com.neuralbit.letsnote.firebaseEntities.NoteFireIns
+import com.neuralbit.letsnote.firebase.entities.NoteFireIns
 import com.neuralbit.letsnote.ui.signIn.SignInActivity
 import com.neuralbit.letsnote.utilities.Common
 import kotlin.system.exitProcess

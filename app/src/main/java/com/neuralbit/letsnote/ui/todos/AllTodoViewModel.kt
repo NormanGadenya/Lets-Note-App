@@ -6,8 +6,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
-import com.neuralbit.letsnote.firebaseEntities.NoteFire
-import com.neuralbit.letsnote.firebaseRepos.NoteFireRepo
+import com.neuralbit.letsnote.firebase.entities.NoteFire
+import com.neuralbit.letsnote.firebase.repos.NoteFireRepo
 import java.util.*
 
 class AllTodoViewModel (application : Application) : AndroidViewModel(application) {

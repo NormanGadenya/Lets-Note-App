@@ -20,7 +20,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.gson.Gson
 import com.neuralbit.letsnote.R
-import com.neuralbit.letsnote.firebaseEntities.NoteFire
+import com.neuralbit.letsnote.firebase.entities.NoteFire
 import com.neuralbit.letsnote.receivers.AlertReceiver
 import com.neuralbit.letsnote.receivers.DeleteReceiver
 import com.neuralbit.letsnote.ui.adapters.NoteFireClick
@@ -314,7 +314,7 @@ class TagNotesActivity : AppCompatActivity() , NoteFireClick {
         return true
     }
 
-    override fun onNoteFireClick(note: NoteFire , activated : Boolean) {
+    override fun onNoteFireClick(note: NoteFire, activated : Boolean) {
         if (!note.selected && !activated){
             val intent : Intent = if(note.protected){
                 Intent( applicationContext, Fingerprint::class.java)

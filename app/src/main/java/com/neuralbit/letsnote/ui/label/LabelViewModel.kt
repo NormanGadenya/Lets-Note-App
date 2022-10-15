@@ -3,8 +3,8 @@ package com.neuralbit.letsnote.ui.label
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import com.neuralbit.letsnote.firebaseEntities.LabelFire
-import com.neuralbit.letsnote.firebaseRepos.LabelFireRepo
+import com.neuralbit.letsnote.firebase.entities.LabelFire
+import com.neuralbit.letsnote.firebase.repos.LabelFireRepo
 
 class LabelViewModel (application: Application): AndroidViewModel(application)  {
     var labelList: ArrayList<Label>  = ArrayList()

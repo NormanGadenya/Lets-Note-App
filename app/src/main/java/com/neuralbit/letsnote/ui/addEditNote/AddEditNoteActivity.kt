@@ -58,9 +58,9 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.neuralbit.letsnote.R
-import com.neuralbit.letsnote.firebaseEntities.LabelFire
-import com.neuralbit.letsnote.firebaseEntities.NoteFireIns
-import com.neuralbit.letsnote.firebaseEntities.TodoItem
+import com.neuralbit.letsnote.firebase.entities.LabelFire
+import com.neuralbit.letsnote.firebase.entities.NoteFireIns
+import com.neuralbit.letsnote.firebase.entities.TodoItem
 import com.neuralbit.letsnote.receivers.AlertReceiver
 import com.neuralbit.letsnote.receivers.DeleteReceiver
 import com.neuralbit.letsnote.ui.label.LabelViewModel
