@@ -1,5 +1,6 @@
 package com.neuralbit.letsnote.firebase.repos
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
@@ -43,8 +44,8 @@ class NoteFireRepo {
                             notes.add(note)
                         }
                     }
-
                     notes.sortWith(NoteComparator())
+                    Log.d(TAG, "onDataChange: $notes")
                     live.value = notes
                 }
 

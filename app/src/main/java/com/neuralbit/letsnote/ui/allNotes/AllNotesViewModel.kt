@@ -97,12 +97,12 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
                     noteList.add(noteFire)
 
                 }
-                Log.d(TAG, "getAllFireNotes: $noteList")
                 mutableNoteData.postValue(noteList)
                 allFireNotes.postValue(noteList)
             }
             return mutableNoteData
         }else{
+
             return noteFireRepo.getAllNotes()
         }
     }

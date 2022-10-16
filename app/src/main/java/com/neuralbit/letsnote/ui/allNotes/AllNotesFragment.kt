@@ -222,11 +222,6 @@ class AllNotesFragment : Fragment() , NoteFireClick {
 
         allNotesViewModel.selectedNotes.clear()
 
-//        allNotesViewModel.getAllFireNotes().observe(viewLifecycleOwner){
-//
-//            allNotesViewModel.allFireNotes.value = it
-//        }
-
 
         allNotesViewModel.allFireNotes.observe(viewLifecycleOwner){ notes ->
             val pinnedNotes = LinkedList<NoteFire>()

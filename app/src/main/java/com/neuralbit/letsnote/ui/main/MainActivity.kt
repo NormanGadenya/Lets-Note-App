@@ -121,7 +121,6 @@ class MainActivity : AppCompatActivity() {
         allNotesViewModal.getAllFireNotes().observe(lifecycleOwner){
 
             allNotesViewModal.allFireNotes.value = it
-            viewModal.refresh.value = false
             if (signedIn){
                 for (noteFire in it) {
 
