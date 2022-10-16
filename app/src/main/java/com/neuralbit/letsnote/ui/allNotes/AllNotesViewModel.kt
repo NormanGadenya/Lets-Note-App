@@ -11,7 +11,6 @@ import com.neuralbit.letsnote.room.NoteDatabase
 import com.neuralbit.letsnote.room.entities.Note
 import com.neuralbit.letsnote.room.repos.NoteRoomRepo
 import com.neuralbit.letsnote.room.repos.NoteTagRoomRepo
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
@@ -66,9 +65,9 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
     }
 
 
-    @OptIn(DelicateCoroutinesApi::class)
     fun getAllFireNotes () : LiveData<ArrayList<NoteFire>>{
         val mutableNoteData = MutableLiveData<ArrayList<NoteFire>>()
+        Log.d(TAG, "getAllFireNotes: $useLocalStorage")
         if (useLocalStorage){
             viewModelScope.launch(Dispatchers.IO) {
                 val noteList = ArrayList<NoteFire>()

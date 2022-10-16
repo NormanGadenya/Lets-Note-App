@@ -11,4 +11,5 @@ class TagViewModel (application: Application): AndroidViewModel(application) {
     var noteUids = ArrayList<String>()
     var searchQuery : MutableLiveData <String> = MutableLiveData()
     var staggeredView : MutableLiveData<Boolean> = MutableLiveData()
+    var useLocalStorage = false
 }

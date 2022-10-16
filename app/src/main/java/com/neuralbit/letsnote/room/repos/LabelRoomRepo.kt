@@ -20,7 +20,7 @@ class LabelRoomRepo(
     suspend fun getNotesWithLabel(labelColor : Int): List<LabelWIthNotes> {
         return labelDao.getNotesWithLabel( labelColor )
     }
-    fun getAllLabels(): LiveData<List<LabelWIthNotes>> {
+    suspend fun getAllLabels(): List<LabelWIthNotes> {
         return labelDao.getAllLabels()
     }
 

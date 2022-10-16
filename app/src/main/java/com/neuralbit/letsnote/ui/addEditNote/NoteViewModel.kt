@@ -2,7 +2,10 @@ package com.neuralbit.letsnote.ui.addEditNote
 
 import android.app.Application
 import android.util.Log
-import androidx.lifecycle.*
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.neuralbit.letsnote.firebase.entities.*
 import com.neuralbit.letsnote.firebase.repos.LabelFireRepo
@@ -169,8 +172,10 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
         if (!useLocalStorage){
             return labelFireRepo.getAllLabels()
         }else{
-            return labelRoomRepo.getAllLabels().map {
-                val mappedLabels = it.map { l ->
+            val labelFireMutableData = MutableLiveData<List<LabelFire>>()
+            GlobalScope.launch {
+                val labelFireList = ArrayList<LabelFire>()
+                labelRoomRepo.getAllLabels().forEach { l ->
                     val noteUids = l.notes.map { note -> note.noteUid }
                     val labelFire = LabelFire()
                     labelFire.labelColor = l.label.labelColor
@@ -178,10 +183,11 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
                     if (l.label.labelTitle != null){
                         labelFire.labelTitle = l.label.labelTitle
                     }
-                    return@map labelFire
+                    labelFireList.add(labelFire)
+                    labelFireMutableData.postValue(labelFireList)
                 }
-                return@map ArrayList(mappedLabels)
             }
+            return labelFireMutableData
         }
     }
 

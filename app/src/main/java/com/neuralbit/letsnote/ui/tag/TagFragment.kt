@@ -42,7 +42,6 @@ class TagFragment : Fragment(), TagRVAdapter.TagItemClick {
         val adRequest = AdRequest.Builder().build()
         adView.loadAd(adRequest)
         val settingsSharedPref = context?.getSharedPreferences("Settings", AppCompatActivity.MODE_PRIVATE)
-        val useLocalStorage = settingsSharedPref?.getBoolean("useLocalStorage",false)
         val staggeredLayoutManagerAll = StaggeredGridLayoutManager( 2,LinearLayoutManager.VERTICAL)
         tagRV.layoutManager = staggeredLayoutManagerAll
         allNotesViewModel.deleteFrag.value = false
@@ -64,9 +63,8 @@ class TagFragment : Fragment(), TagRVAdapter.TagItemClick {
         val tagRVAdapter = context?.let { TagRVAdapter(it,this) }
         tagRV.adapter= tagRVAdapter
 
-        if (useLocalStorage != null) {
-            noteViewModel.useLocalStorage = useLocalStorage
-        }
+        noteViewModel.useLocalStorage = tagViewModel.useLocalStorage
+
         noteViewModel.allFireTags().observe(viewLifecycleOwner){
             val tagList = HashSet<Tag>()
             val tagFireList = HashSet<TagFire>()

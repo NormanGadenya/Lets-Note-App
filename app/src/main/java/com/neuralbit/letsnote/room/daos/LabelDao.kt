@@ -1,6 +1,5 @@
 package com.neuralbit.letsnote.room.daos
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.neuralbit.letsnote.room.entities.Label
 import com.neuralbit.letsnote.room.relationships.LabelWIthNotes
@@ -17,7 +16,7 @@ interface LabelDao {
 
     @Transaction
     @Query("select * from Label")
-    fun getAllLabels () : LiveData<List<LabelWIthNotes>>
+    suspend fun getAllLabels () : List<LabelWIthNotes>
 
     @Transaction
     @Query("select * from Label where labelColor = :labelColor ")

@@ -48,7 +48,7 @@ class SettingsFragment : Fragment() {
         val root: View = binding.root
         settingsPref = context?.getSharedPreferences("Settings", AppCompatActivity.MODE_PRIVATE)!!
         val useLocalStorage = settingsPref.getBoolean("useLocalStorage",false)
-
+        settingsViewModel.useLocalStorage = useLocalStorage
         editor = settingsPref.edit()
         settingsViewModel.settingsFrag.value = true
 
@@ -224,12 +224,30 @@ class SettingsFragment : Fragment() {
         mAuth.signInWithCredential(credential)
             .addOnSuccessListener {
                 val currentUser = it.user
+                if (oldUser != null){
+                    oldUser?.let { it1 ->
+                        if (currentUser != null) {
+                            settingsViewModel.migrateData(it1.uid , currentUser.uid ).observe( viewLifecycleOwner){ done ->
+                                if (done){
+                                    migrateProgressBar.visibility = GONE
+                                    settingsViewModel.dataMigrated.value = true
 
-                oldUser?.let { it1 ->
-                    if (currentUser != null) {
-                        settingsViewModel.migrateData(it1.uid , currentUser.uid )
-                        migrateProgressBar.visibility = GONE
-                        settingsViewModel.dataMigrated.value = true
+                                }
+                            }
+                        }
+                    }
+                }else{
+                    currentUser?.uid?.let { it1 ->
+                        settingsViewModel.migrateData(null , it1).observe( viewLifecycleOwner){ done ->
+                            if (done){
+                                migrateProgressBar.visibility = GONE
+                                val settingsEditor : SharedPreferences.Editor = settingsPref.edit()
+                                settingsEditor.putBoolean("useLocalStorage",false)
+                                settingsEditor.commit()
+                                settingsViewModel.dataMigrated.value = true
+                            }
+
+                        }
                     }
                 }
 

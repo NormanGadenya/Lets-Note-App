@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -61,7 +62,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var settingsPref: SharedPreferences
     private val lifecycleOwner = this
     private var useLocalStorage = false
-
+    val TAG = "MAIN"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,6 +74,7 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(applicationContext, SignInActivity::class.java)
             startActivity(intent)
         }
+        Log.d(TAG, "onCreate: $useLocalStorage")
         MobileAds.initialize(this@MainActivity)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -101,6 +103,8 @@ class MainActivity : AppCompatActivity() {
         allNotesViewModal.useLocalStorage = useLocalStorage
         deleteVieModel.useLocalStorage = useLocalStorage
         archivedViewModel.useLocalStorage = useLocalStorage
+        tagViewModel.useLocalStorage = useLocalStorage
+        labelViewModel.useLocalStorage = useLocalStorage
         viewModal.refresh.value = true
 
         allNotesViewModal.itemSelectEnabled.observe(this){
@@ -200,6 +204,12 @@ class MainActivity : AppCompatActivity() {
                 detailsGroup.visibility = VISIBLE
                 emailTV.text = currentUser.email
                 nameTV.text = currentUser.displayName
+                viewModal.useLocalStorage = false
+                allNotesViewModal.useLocalStorage = false
+                archivedViewModel.useLocalStorage = false
+                deleteVieModel.useLocalStorage = false
+                tagViewModel.useLocalStorage = false
+                labelViewModel.useLocalStorage = false
                 backUpStatusIV.setImageResource(R.drawable.ic_baseline_backup_24)
                 backUpStatusTV.text = resources.getString(R.string.back_up_active)
                 if (currentUser.photoUrl !=null){
@@ -231,6 +241,13 @@ class MainActivity : AppCompatActivity() {
         }else{
             deleteAndSignOut.isVisible = true
             signOutButton.isVisible = true
+        }
+        mAuth.addAuthStateListener {
+            val currentUser = it.currentUser
+            if (currentUser?.isAnonymous == false){
+                deleteAndSignOut.isVisible = true
+                signOutButton.isVisible = true
+            }
         }
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(p0: String?): Boolean {

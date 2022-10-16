@@ -12,6 +12,7 @@ class LabelViewModel (application: Application): AndroidViewModel(application)  
     var labelFire : List<LabelFire> = ArrayList()
     var searchQuery : MutableLiveData<String> = MutableLiveData()
     var bannerKey : String?= null
+    var useLocalStorage = false
 
 
 }
