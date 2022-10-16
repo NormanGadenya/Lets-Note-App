@@ -13,7 +13,6 @@ import com.neuralbit.letsnote.room.repos.NoteRoomRepo
 import com.neuralbit.letsnote.room.repos.NoteTagRoomRepo
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -71,7 +70,7 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
     fun getAllFireNotes () : LiveData<ArrayList<NoteFire>>{
         val mutableNoteData = MutableLiveData<ArrayList<NoteFire>>()
         if (useLocalStorage){
-            GlobalScope.launch {
+            viewModelScope.launch(Dispatchers.IO) {
                 val noteList = ArrayList<NoteFire>()
                 for (note in noteRoomRepo.getAllNotes()) {
                     val noteFire = NoteFire()
@@ -100,6 +99,7 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
                 }
                 Log.d(TAG, "getAllFireNotes: $noteList")
                 mutableNoteData.postValue(noteList)
+                allFireNotes.postValue(noteList)
             }
             return mutableNoteData
         }else{
