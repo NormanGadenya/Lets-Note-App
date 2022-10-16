@@ -115,6 +115,7 @@ class MainActivity : AppCompatActivity() {
 
             }
         }
+        //TODO FIX LOCAL STORAGE SHARED PREFS WHEN DATA HAS BEEN MIGRATED
 
         // set reminders when a user has been signed in since alarms are cancelled when signed out
 

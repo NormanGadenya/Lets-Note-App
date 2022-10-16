@@ -26,6 +26,7 @@ class TagFireRepo {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val tags = ArrayList<TagFire>()
                 for ( s : DataSnapshot in snapshot.children ){
+                    Log.d(TAG, "onDataChange: $s")
                     val tag = s.getValue(TagFire::class.java)
                     if (tag != null) {
                         tag.tagName = "#"+ s.key!!

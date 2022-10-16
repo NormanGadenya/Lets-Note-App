@@ -55,7 +55,9 @@ class MigrationRepo {
         }
         val tagRef = database.getReference(fUserUid).child("tags")
         for ( tag in tags){
-            tagRef.child(tag.tagName).setValue(tag.noteUids)
+            val tagMap = HashMap<String, Any>()
+            tagMap["noteUids"] = tag.noteUids
+            tagRef.child(tag.tagName).setValue(tagMap)
         }
 
         val labelRef = database.getReference(fUserUid).child("labels")
