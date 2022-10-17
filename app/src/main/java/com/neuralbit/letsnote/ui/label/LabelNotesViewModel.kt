@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
 import com.neuralbit.letsnote.firebase.entities.NoteFire
 import com.neuralbit.letsnote.firebase.repos.LabelFireRepo
 import com.neuralbit.letsnote.firebase.repos.NoteFireRepo
@@ -26,7 +27,7 @@ class LabelNotesViewModel(
     var selectedNotes = HashSet<NoteFire>()
     var labelNotes = ArrayList<NoteFire>()
     var noteUids = ArrayList<String>()
-    var useLocalStorage = false
+//    var useLocalStorage = false
     private val noteFireRepo : NoteFireRepo = NoteFireRepo()
     private val labelFireRepo : LabelFireRepo = LabelFireRepo()
     private val tagFireRepo : TagFireRepo = TagFireRepo()
@@ -43,11 +44,12 @@ class LabelNotesViewModel(
 
     private val noteTagRoomDao = NoteDatabase.getDatabase(application).getNoteTagDao()
     private val noteTagRoomRepo = NoteTagRoomRepo(noteTagRoomDao)
+    private val fUser = FirebaseAuth.getInstance().currentUser
 
     val TAG = "Label_Notes_View_Modal"
 
     fun deleteNote (noteUid : String, labelColor : Int, tagList : List<String> ){
-        if (!useLocalStorage){
+        if (fUser != null){
             noteFireRepo.deleteNote(noteUid)
             tagFireRepo.deleteNoteFromTags(tagList,noteUid)
             labelFireRepo.deleteNoteFromLabel(labelColor,noteUid)
@@ -79,8 +81,7 @@ class LabelNotesViewModel(
     }
 
     fun updateLabel (labelUpdate : Map<String,String>, labelColor : Int){
-        if (!useLocalStorage){
-
+        if (fUser != null){
             labelFireRepo.updateNote(labelUpdate, labelColor)
         }else{
             val newLabelTitle = labelUpdate["labelTitle"]

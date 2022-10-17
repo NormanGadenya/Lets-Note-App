@@ -28,7 +28,6 @@ class AllTodoViewModel (application : Application) : AndroidViewModel(applicatio
 
     fun filterOtherFireList () : LiveData<LinkedList<NoteFire>> {
         val textLower = searchQuery.value
-        Log.d("LOG", "filterList:${searchQuery.value} ")
         return if (searchQuery.value!=null){
             Transformations.map(otherFireNotesList,){
                 filterList(it,textLower)

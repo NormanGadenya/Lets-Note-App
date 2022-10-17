@@ -54,13 +54,13 @@ class NoteFireRepo {
 
                 }
             }
-            notesRef?.addListenerForSingleValueEvent(eventListener)
+            notesRef?.addValueEventListener(eventListener)
             FirebaseAuth.getInstance().addAuthStateListener {
                 notesRef?.removeEventListener(eventListener)
                 fUser= it.currentUser
                 notesRef = it.currentUser?.uid?.let { it1 -> database.getReference(it1).child("notes") }
 
-                notesRef?.addListenerForSingleValueEvent(eventListener)
+                notesRef?.addValueEventListener(eventListener)
 
             }
         return live

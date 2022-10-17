@@ -38,8 +38,6 @@ class SaveSharedNoteActivity : AppCompatActivity() {
             val intent = Intent(applicationContext, SignInActivity::class.java)
             startActivity(intent)
         }
-        viewModal.useLocalStorage = useLocalStorage
-
         if(intent?.action == Intent.ACTION_SEND){
             if("text/plain" == intent.type){
                 intent.getStringExtra(Intent.EXTRA_TEXT)?.let {
@@ -83,7 +81,7 @@ class SaveSharedNoteActivity : AppCompatActivity() {
         val cm = Common()
         viewModal.addFireNote(NoteFireIns(noteTitle,noteDesc, timeStamp = cm.currentTimeToLong()))
         Thread.sleep(500)
-        Toast.makeText(applicationContext,"Note saved",Toast.LENGTH_SHORT ).show()
+        Toast.makeText(applicationContext,resources.getString(R.string.note_saved),Toast.LENGTH_SHORT ).show()
         dismissApp()
 
     }

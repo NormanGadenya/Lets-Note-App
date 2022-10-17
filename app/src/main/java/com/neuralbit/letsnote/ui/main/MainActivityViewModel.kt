@@ -1,7 +1,6 @@
 package com.neuralbit.letsnote.ui.main
 
 import android.app.Application
-import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -39,7 +38,7 @@ class MainActivityViewModel(application : Application) : AndroidViewModel(applic
     private val fUser = FirebaseAuth.getInstance().currentUser
 
     fun deleteNote (noteUid : String, labelColor : Int, tagList : List<String> ){
-        if (!useLocalStorage || fUser != null){
+        if (fUser != null){
             noteFireRepo.deleteNote(noteUid)
             tagFireRepo.deleteNoteFromTags(tagList,noteUid)
             labelFireRepo.deleteNoteFromLabel(labelColor,noteUid)
@@ -72,7 +71,7 @@ class MainActivityViewModel(application : Application) : AndroidViewModel(applic
 
     fun updateFireNote(noteUpdate : Map<String, Any>, noteUid : String) =viewModelScope.launch(
         Dispatchers.IO) {
-        if (!useLocalStorage){
+        if (fUser != null){
             noteFireRepo.updateNote(noteUpdate,noteUid)
         }else{
             val mapper = ObjectMapper() // jackson's objectmapper
@@ -94,8 +93,8 @@ class MainActivityViewModel(application : Application) : AndroidViewModel(applic
     }
 
 
-    fun deleteUserDataContent(context : Context){
-        deleteDataRepo.deleteUserData(context)
+    fun deleteUserDataContent() {
+        deleteDataRepo.deleteUserData()
     }
 
 }

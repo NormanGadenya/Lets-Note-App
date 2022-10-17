@@ -3,6 +3,7 @@ package com.neuralbit.letsnote.ui.deletedNotes
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import com.google.firebase.auth.FirebaseAuth
 import com.neuralbit.letsnote.firebase.entities.NoteFire
 import com.neuralbit.letsnote.firebase.repos.LabelFireRepo
 import com.neuralbit.letsnote.firebase.repos.NoteFireRepo
@@ -41,6 +42,7 @@ class DeletedNotesViewModel (application: Application): AndroidViewModel(applica
     private val noteTagRoomRepo = NoteTagRoomRepo(noteTagRoomDao)
 
     var undoDelete = true
+    private val fUser = FirebaseAuth.getInstance().currentUser
 
 
     private val noteFireRepo = NoteFireRepo()
@@ -48,7 +50,7 @@ class DeletedNotesViewModel (application: Application): AndroidViewModel(applica
     private val labelFireRepo = LabelFireRepo()
 
     fun deleteNote (noteUid : String, labelColor : Int, tagList : List<String> ){
-        if (!useLocalStorage){
+        if (fUser != null){
             noteFireRepo.deleteNote(noteUid)
             tagFireRepo.deleteNoteFromTags(tagList,noteUid)
             labelFireRepo.deleteNoteFromLabel(labelColor,noteUid)

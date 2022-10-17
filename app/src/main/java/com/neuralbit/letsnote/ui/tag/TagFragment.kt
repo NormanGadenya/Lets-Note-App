@@ -63,7 +63,6 @@ class TagFragment : Fragment(), TagRVAdapter.TagItemClick {
         val tagRVAdapter = context?.let { TagRVAdapter(it,this) }
         tagRV.adapter= tagRVAdapter
 
-        noteViewModel.useLocalStorage = tagViewModel.useLocalStorage
 
         noteViewModel.allFireTags().observe(viewLifecycleOwner){
             val tagList = HashSet<Tag>()

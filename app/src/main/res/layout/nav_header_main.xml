@@ -57,7 +57,7 @@
         android:id="@+id/cloudStatusGroup"
         android:layout_marginTop="8dp"
         android:background="@drawable/nav_acc_detail_background"
-        android:padding="16dp"
+        android:padding="8dp"
         >
 
         <ImageView

@@ -7,6 +7,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.google.firebase.auth.FirebaseAuth
 import com.neuralbit.letsnote.firebase.entities.*
 import com.neuralbit.letsnote.firebase.repos.LabelFireRepo
 import com.neuralbit.letsnote.firebase.repos.NoteFireRepo
@@ -54,7 +55,6 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     val updatedTodos = ArrayList<TodoItem>()
     var undoMode : MutableLiveData<Boolean> = MutableLiveData()
     var labelFireList = ArrayList<LabelFire>()
-    var useLocalStorage = false
 
     private val noteRoomDao = NoteDatabase.getDatabase(application).getNotesDao()
     private val noteRoomRepo = NoteRoomRepo(noteRoomDao)
@@ -68,9 +68,12 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
 
     private val noteTagRoomDao = NoteDatabase.getDatabase(application).getNoteTagDao()
     private val noteTagRoomRepo = NoteTagRoomRepo(noteTagRoomDao)
+    private var fUser = FirebaseAuth.getInstance().currentUser
+
 
     fun updateFireNote(noteUpdate : Map<String, Any>, noteUid : String) =viewModelScope.launch(Dispatchers.IO) {
-        if (!useLocalStorage){
+
+        if (fUser != null){
             noteFireRepo.updateNote(noteUpdate,noteUid)
         }else{
             Log.d(TAG, "updateFireNote: $noteUpdate")
@@ -111,7 +114,7 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     }
 
     fun addFireNote(note: NoteFireIns) : String ? {
-        if (!useLocalStorage){
+        if (fUser != null){
             return noteFireRepo.addNote(note)
 
         }else{
@@ -143,7 +146,8 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     }
 
      fun allFireTags() : LiveData<List<TagFire>>{
-        if (!useLocalStorage){
+         fUser = FirebaseAuth.getInstance().currentUser
+         if (fUser != null){
             return tagFireRepo.getAllTags()
         }else{
             val tagFireMutableData = MutableLiveData<List<TagFire>>()
@@ -169,7 +173,9 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     }
 
     fun allFireLabels() : LiveData<List<LabelFire>>{
-        if (!useLocalStorage){
+        fUser = FirebaseAuth.getInstance().currentUser
+
+        if (fUser != null){
             return labelFireRepo.getAllLabels()
         }else{
             val labelFireMutableData = MutableLiveData<List<LabelFire>>()
@@ -192,7 +198,7 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     }
 
     fun addOrDeleteLabel(labelColor: Int,labelTitle : String? ,oldLabel : Int, noteUid: String, add: Boolean){
-        if(!useLocalStorage){
+        if(fUser != null){
             labelFireRepo.addOrDeleteLabels(labelColor,oldLabel,noteUid,labelTitle,add)
         }else{
             GlobalScope.launch {
@@ -213,7 +219,7 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
 
 
     fun addOrDeleteTags(newTagsAdded: HashSet<String>, deletedTags: HashSet<String>, noteUid: String) {
-        if (!useLocalStorage){
+        if (fUser != null){
             tagFireRepo.addOrDeleteTags(newTagsAdded,deletedTags,noteUid)
         }else{
             GlobalScope.launch {
@@ -252,7 +258,7 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     }
 
     fun deleteNote (noteUid : String, labelColor : Int, tagList : List<String> ){
-        if (!useLocalStorage){
+        if (fUser != null){
             noteFireRepo.deleteNote(noteUid)
             tagFireRepo.deleteNoteFromTags(tagList,noteUid)
             labelFireRepo.deleteNoteFromLabel(labelColor,noteUid)

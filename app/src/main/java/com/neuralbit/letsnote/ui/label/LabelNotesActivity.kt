@@ -74,11 +74,7 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
         noteRVAdapter.lifecycleOwner = this
         val settingsSharedPref = getSharedPreferences("Settings", MODE_PRIVATE)
         val fontStyle = settingsSharedPref?.getString("font",null)
-        val useLocalStorage = settingsSharedPref?.getBoolean("useLocalStorage",false)
-        if (useLocalStorage != null) {
-            allNotesViewModel.useLocalStorage = useLocalStorage
-            viewModel.useLocalStorage = useLocalStorage
-        }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             noteRVAdapter.fontStyle = fontStyle
         }

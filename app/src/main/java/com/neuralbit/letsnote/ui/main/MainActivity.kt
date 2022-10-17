@@ -115,7 +115,6 @@ class MainActivity : AppCompatActivity() {
 
             }
         }
-        //TODO FIX LOCAL STORAGE SHARED PREFS WHEN DATA HAS BEEN MIGRATED
 
         // set reminders when a user has been signed in since alarms are cancelled when signed out
 
@@ -329,7 +328,15 @@ class MainActivity : AppCompatActivity() {
                 val editor : SharedPreferences.Editor= settingsPref.edit()
                 editor.clear()
                 editor.apply()
-                viewModal.deleteUserDataContent(this@MainActivity)
+                viewModal.deleteUserDataContent()
+                AuthUI.getInstance()
+                    .signOut(applicationContext)
+                    .addOnCompleteListener{
+                        val a = Intent(Intent.ACTION_MAIN)
+                        a.addCategory(Intent.CATEGORY_HOME)
+                        a.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        startActivity(a)
+                    }
             }
 
             alertDialog.setNegativeButton(resources.getString(R.string.cancel)

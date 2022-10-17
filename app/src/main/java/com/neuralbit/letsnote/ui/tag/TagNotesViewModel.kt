@@ -43,7 +43,7 @@ class TagNotesViewModel(
     private val noteTagRoomRepo = NoteTagRoomRepo(noteTagRoomDao)
 
     fun deleteNote (noteUid : String, labelColor : Int, tagList : List<String> ){
-        if (!useLocalStorage || fUser != null){
+        if (fUser != null){
             noteFireRepo.deleteNote(noteUid)
             tagFireRepo.deleteNoteFromTags(tagList,noteUid)
             labelFireRepo.deleteNoteFromLabel(labelColor,noteUid)

@@ -814,8 +814,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
         createShortcut()
 
         settingsPref = applicationContext.getSharedPreferences("Settings", MODE_PRIVATE)
-        val useLocalStorage = settingsPref.getBoolean("useLocalStorage",false)
-        viewModal.useLocalStorage = useLocalStorage
         fontMultiplier = settingsPref.getInt("fontMultiplier",2)
 
         noteTitleEdit = findViewById(R.id.noteEditTitle)

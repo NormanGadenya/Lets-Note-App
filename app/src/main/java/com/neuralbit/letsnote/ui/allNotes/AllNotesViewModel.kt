@@ -4,6 +4,8 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.neuralbit.letsnote.firebase.entities.NoteFire
 import com.neuralbit.letsnote.firebase.entities.TodoItem
 import com.neuralbit.letsnote.firebase.repos.NoteFireRepo
@@ -32,6 +34,7 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
     var signedIn = false
     var archiveFrag = false
     private val TAG = "ALL_NOTES_VIEW_MODEL"
+    private var fUser :FirebaseUser? = null
 
     private val noteRoomDao = NoteDatabase.getDatabase(application).getNotesDao()
     private val noteRoomRepo = NoteRoomRepo(noteRoomDao)
@@ -67,8 +70,9 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
 
     fun getAllFireNotes () : LiveData<ArrayList<NoteFire>>{
         val mutableNoteData = MutableLiveData<ArrayList<NoteFire>>()
-        Log.d(TAG, "getAllFireNotes: $useLocalStorage")
-        if (useLocalStorage){
+        fUser = FirebaseAuth.getInstance().currentUser
+        Log.d(TAG, "getAllFireNotes: ${fUser}")
+        if (fUser == null){
             viewModelScope.launch(Dispatchers.IO) {
                 val noteList = ArrayList<NoteFire>()
                 for (note in noteRoomRepo.getAllNotes()) {
@@ -97,18 +101,20 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
 
                 }
                 mutableNoteData.postValue(noteList)
-                allFireNotes.postValue(noteList)
             }
             return mutableNoteData
         }else{
 
             return noteFireRepo.getAllNotes()
+
         }
     }
 
 
     fun updateFireNote(noteUpdate : Map<String, Any>, noteUid : String) =viewModelScope.launch(Dispatchers.IO) {
-        if (!useLocalStorage){
+        fUser = FirebaseAuth.getInstance().currentUser
+
+        if (fUser != null){
             noteFireRepo.updateNote(noteUpdate,noteUid)
         }else{
             val mapper = ObjectMapper() // jackson's objectmapper

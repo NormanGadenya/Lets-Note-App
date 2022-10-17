@@ -27,11 +27,13 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.neuralbit.letsnote.BuildConfig
 import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.databinding.SettingsFragmentBinding
+import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 
 class SettingsFragment : Fragment() {
 
     private var _binding: SettingsFragmentBinding? = null
     private val settingsViewModel: SettingsViewModel by activityViewModels()
+    private val allNotesViewModel: AllNotesViewModel by activityViewModels()
     private lateinit var settingsPref : SharedPreferences
     private val binding get() = _binding!!
     private lateinit var editor : SharedPreferences.Editor
@@ -219,7 +221,6 @@ class SettingsFragment : Fragment() {
     }
 
     private fun firebaseAuthWithGoogle(acct: GoogleSignInAccount) {
-        val prevUser = mAuth.currentUser?.uid
         val credential = GoogleAuthProvider.getCredential(acct.idToken, null)
         mAuth.signInWithCredential(credential)
             .addOnSuccessListener {
@@ -231,7 +232,7 @@ class SettingsFragment : Fragment() {
                                 if (done){
                                     migrateProgressBar.visibility = GONE
                                     settingsViewModel.dataMigrated.value = true
-
+                                    Toast.makeText(context,resources.getString(R.string.link_complete), Toast.LENGTH_SHORT).show()
                                 }
                             }
                         }
@@ -245,13 +246,13 @@ class SettingsFragment : Fragment() {
                                 settingsEditor.putBoolean("useLocalStorage",false)
                                 settingsEditor.commit()
                                 settingsViewModel.dataMigrated.value = true
+                                Toast.makeText(context,resources.getString(R.string.link_complete), Toast.LENGTH_SHORT).show()
                             }
 
                         }
                     }
                 }
 
-                prevUser?.let { it1 -> currentUser?.uid?.let { it2 -> settingsViewModel.migrateData(oldUser = it1, newUser = it2) } }
             }
     }
 

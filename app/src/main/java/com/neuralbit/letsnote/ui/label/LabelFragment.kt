@@ -43,8 +43,6 @@ class LabelFragment : Fragment(), LabelRVAdapter.LabelClick {
         labelRV.adapter= labelRVAdapter
         val settingsSharedPref = context?.getSharedPreferences("Settings", AppCompatActivity.MODE_PRIVATE)
         val staggeredLayoutManagerAll = StaggeredGridLayoutManager( 2,LinearLayoutManager.VERTICAL)
-        noteViewModel.useLocalStorage = labelViewModel.useLocalStorage
-
         val adView = binding.adView
         val adRequest = AdRequest.Builder().build()
         adView.loadAd(adRequest)

@@ -185,5 +185,5 @@
     <string name="need_privacy_desc">We\'ve got you covered. Protected notes are only accessible when authenticated by your fingerprint reader</string>
     <string name="scared_forgetting">Hmm… scared of forgetting something</string>
     <string name="scared_forgetting_desc">No need to worry, set a reminder so that you never have to forget stuff</string>
-
+    <string name="link_complete">Link completed, cloud backup activated</string>
 </resources>

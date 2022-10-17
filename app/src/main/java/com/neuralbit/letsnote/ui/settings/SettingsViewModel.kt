@@ -1,7 +1,6 @@
 package com.neuralbit.letsnote.ui.settings
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -39,10 +38,8 @@ class SettingsViewModel  (application : Application) : AndroidViewModel(applicat
 
     fun migrateData(oldUser:String ?, newUser:String) : MutableLiveData<Boolean>{
         val migrationCompleted = MutableLiveData<Boolean>()
-        if (!useLocalStorage ){
-            if (oldUser != null) {
-                migrationRepo.migrateDataAnonymous(oldUser, newUser)
-            }
+        if (oldUser != null ){
+            migrationRepo.migrateDataAnonymous(oldUser, newUser)
             migrationCompleted.postValue(true)
 
         }else{
@@ -102,7 +99,6 @@ class SettingsViewModel  (application : Application) : AndroidViewModel(applicat
                     labelFireList.add(labelFire)
                 }
                 migrationRepo.migrateDataRoom(newUser,noteList,tagFireList,labelFireList)
-                Log.d(TAG, "migrateData: notes $noteList tags $tagFireList labels $labelFireList")
                 migrationCompleted.postValue(true)
 
 
