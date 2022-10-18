@@ -44,6 +44,9 @@ import com.neuralbit.letsnote.ui.deletedNotes.DeletedNotesViewModel
 import com.neuralbit.letsnote.ui.label.LabelViewModel
 import com.neuralbit.letsnote.ui.signIn.SignInActivity
 import com.neuralbit.letsnote.ui.tag.TagViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 
 class MainActivity : AppCompatActivity() {
@@ -121,20 +124,24 @@ class MainActivity : AppCompatActivity() {
 
         val signedIn = intent.getBooleanExtra("Signed in",false)
         allNotesViewModal.signedIn = signedIn
+        if (signedIn){
+            GlobalScope.launch(Dispatchers.IO) {
 
-        allNotesViewModal.getAllFireNotes().observe(lifecycleOwner){
+                allNotesViewModal.getAllFireNotes().observe(lifecycleOwner){
 
-            allNotesViewModal.allFireNotes.value = it
-            if (signedIn){
-                for (noteFire in it) {
+                    allNotesViewModal.allFireNotes.value = it
 
-                    if (!noteFire.archived && noteFire.deletedDate==(0).toLong() && noteFire.reminderDate> System.currentTimeMillis()){
-                        startAlarm(noteFire, noteFire.reminderDate.toInt())
+                    for (noteFire in it) {
+
+                        if (!noteFire.archived && noteFire.deletedDate==(0).toLong() && noteFire.reminderDate> System.currentTimeMillis()){
+                            startAlarm(noteFire, noteFire.reminderDate.toInt())
+                        }
+
                     }
+
 
                 }
             }
-
         }
 
 
@@ -144,6 +151,7 @@ class MainActivity : AppCompatActivity() {
         val emptyTrashImmediately = settingsPref.getBoolean("EmptyTrashImmediately",false)
         if (emptyTrashImmediately){
             allNotesViewModal.notesToDelete.observe(lifecycleOwner){
+                Log.d(TAG, "onCreate: ")
                 it.noteUid?.let { uid -> viewModal.deleteNote(uid,it.label,it.tags) }
             }
             allNotesViewModal.selectedNotes.clear()

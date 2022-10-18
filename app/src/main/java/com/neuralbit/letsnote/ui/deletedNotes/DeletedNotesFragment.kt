@@ -105,11 +105,11 @@ class DeletedNotesFragment : Fragment() , NoteFireClick {
             }
         }
         setHasOptionsMenu(true)
-        allNotesViewModel.getAllFireNotes().observe(viewLifecycleOwner){
-
-            allNotesViewModel.allFireNotes.value = it
+        lifecycleScope.launch {
+            allNotesViewModel.getAllFireNotes().observe(viewLifecycleOwner){
+                allNotesViewModel.allFireNotes.value = it
+            }
         }
-
 
         allNotesViewModel.allFireNotes.observe(viewLifecycleOwner){
             val filteredNotes = HashSet<NoteFire>()
