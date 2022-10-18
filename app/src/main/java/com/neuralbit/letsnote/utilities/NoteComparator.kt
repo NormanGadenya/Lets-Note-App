@@ -1,6 +1,6 @@
 package com.neuralbit.letsnote.utilities
 
-import com.neuralbit.letsnote.entities.NoteFire
+import com.neuralbit.letsnote.firebase.entities.NoteFire
 import org.apache.commons.lang3.builder.CompareToBuilder
 
 class NoteComparator : Comparator<NoteFire> {

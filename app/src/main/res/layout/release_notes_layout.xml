@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="300dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="16dp"
+    android:id="@+id/releaseNotesLayout"
+
+    android:background="@drawable/save_shared_background"
+    android:layout_height="wrap_content">
+
+
+    <TextView
+        android:id="@+id/releaseNotesTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:importantForAutofill="no"
+        android:textColor="@color/gunmetal"
+        android:text="@string/release_notes"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/releaseNotesTV"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_goneMarginTop="8dp"
+      />
+
+    <TextView
+        android:id="@+id/releaseNotesTV"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:importantForAutofill="no"
+        android:textColor="@color/gunmetal"
+        android:lineSpacingMultiplier="1.1"
+        android:text="@string/release_notes_desc"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toTopOf="@+id/okayBtn"
+        app:layout_goneMarginTop="8dp"
+         />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:layout_width="wrap_content"
+        android:layout_height="35dp"
+        android:id="@+id/okayBtn"
+        android:text="@string/okay"
+        android:background="@drawable/cancel_button_background"
+        android:textColor="@color/timberwolf"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

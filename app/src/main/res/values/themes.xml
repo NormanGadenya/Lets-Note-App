@@ -41,6 +41,12 @@
 
     </style>
 
+    <style name="Custom_dialog_style" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorControlNormal">@color/gunmetal</item>
+        <item name="android:textColor">@color/gunmetal</item>
+        <item name="colorOnPrimary">@color/gunmetal</item>
+    </style>
+
     <style name="ActivityToolbarNavButtonStyle" parent="Widget.AppCompat.Toolbar.Button.Navigation">
         <item name="tint">@color/timberwolf</item>
         <item name="android:textColorPrimary">@color/timberwolf</item>

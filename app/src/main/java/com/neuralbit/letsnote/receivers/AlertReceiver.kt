@@ -1,4 +1,4 @@
-package com.neuralbit.letsnote.utilities
+package com.neuralbit.letsnote.receivers
 
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import com.neuralbit.letsnote.ui.addEditNote.AddEditNoteActivity
 import com.neuralbit.letsnote.ui.addEditNote.Fingerprint
+import com.neuralbit.letsnote.utilities.NotificationHelper
 
 class AlertReceiver : BroadcastReceiver() {
     val TAG = "tag"

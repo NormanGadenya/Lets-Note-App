@@ -2,12 +2,19 @@ package com.neuralbit.letsnote.ui.allNotes
 
 import android.app.Application
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import com.neuralbit.letsnote.entities.NoteFire
-import com.neuralbit.letsnote.repos.NoteFireRepo
+import androidx.lifecycle.*
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.neuralbit.letsnote.firebase.entities.NoteFire
+import com.neuralbit.letsnote.firebase.entities.TodoItem
+import com.neuralbit.letsnote.firebase.repos.NoteFireRepo
+import com.neuralbit.letsnote.room.NoteDatabase
+import com.neuralbit.letsnote.room.entities.Note
+import com.neuralbit.letsnote.room.repos.NoteRoomRepo
+import com.neuralbit.letsnote.room.repos.NoteTagRoomRepo
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.*
 
 class AllNotesViewModel (application : Application) : AndroidViewModel(application) {
@@ -23,7 +30,17 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
     var staggeredView : MutableLiveData<Boolean> = MutableLiveData()
     var selectedNotes = HashSet<NoteFire>()
     var deleteFrag : MutableLiveData<Boolean> = MutableLiveData()
+    var useLocalStorage = false
+    var signedIn = false
     var archiveFrag = false
+    private val TAG = "ALL_NOTES_VIEW_MODEL"
+    private var fUser :FirebaseUser? = null
+
+    private val noteRoomDao = NoteDatabase.getDatabase(application).getNotesDao()
+    private val noteRoomRepo = NoteRoomRepo(noteRoomDao)
+
+    private val noteTagRoomDao = NoteDatabase.getDatabase(application).getNoteTagDao()
+    private val noteTagRoomRepo = NoteTagRoomRepo(noteTagRoomDao)
 
 
     fun filterOtherFireList () : LiveData<LinkedList<NoteFire>>{
@@ -51,13 +68,73 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
     }
 
 
-    suspend fun getAllFireNotes () : LiveData<ArrayList<NoteFire>>{
-        return noteFireRepo.getAllNotes()
+    fun getAllFireNotes () : LiveData<ArrayList<NoteFire>>{
+        val mutableNoteData = MutableLiveData<ArrayList<NoteFire>>()
+        fUser = FirebaseAuth.getInstance().currentUser
+        Log.d(TAG, "getAllFireNotes: ${fUser}")
+        if (fUser == null){
+            viewModelScope.launch(Dispatchers.IO) {
+                val noteList = ArrayList<NoteFire>()
+                for (note in noteRoomRepo.getAllNotes()) {
+                    val noteFire = NoteFire()
+                    noteFire.noteUid = note.noteUid
+                    noteFire.description = note.description!!
+                    noteFire.title = note.title!!
+                    noteFire.timeStamp = note.timestamp
+                    noteFire.label = note.labelColor
+                    noteFire.protected = note.locked
+                    noteFire.archived = note.archived
+                    noteFire.pinned = note.pinned
+                    noteFire.deletedDate = note.deletedDate
+                    noteFire.reminderDate = note.reminderDate
+                    val tagsList = ArrayList<String>()
+                    for (tagsWithNote in noteTagRoomRepo.getTagsWithNote(note.noteUid)) {
+                        for (t in tagsWithNote.tags){
+                            tagsList.add("#${t.tagTitle}")
+                        }
+                    }
+                    noteFire.tags = tagsList
+                    val todoItems = noteRoomRepo.getTodoList(note.noteUid)
+                    val items = todoItems.map { t -> TodoItem(item = t.itemDesc, checked = t.itemChecked) }
+                    noteFire.todoItems = items
+                    noteList.add(noteFire)
+
+                }
+                mutableNoteData.postValue(noteList)
+            }
+            return mutableNoteData
+        }else{
+
+            return noteFireRepo.getAllNotes()
+
+        }
     }
 
-    fun updateFireNote(noteUpdate : Map<String, Any>, noteUid : String) {
-        noteFireRepo.updateNote(noteUpdate,noteUid)
+
+    fun updateFireNote(noteUpdate : Map<String, Any>, noteUid : String) =viewModelScope.launch(Dispatchers.IO) {
+        fUser = FirebaseAuth.getInstance().currentUser
+
+        if (fUser != null){
+            noteFireRepo.updateNote(noteUpdate,noteUid)
+        }else{
+            val mapper = ObjectMapper() // jackson's objectmapper
+            val noteFireUpdate: NoteFire = mapper.convertValue(noteUpdate, NoteFire::class.java)
+
+            val note = Note(
+                noteFireUpdate.title,
+                noteFireUpdate.description,
+                noteFireUpdate.timeStamp,
+                noteFireUpdate.label,
+                noteFireUpdate.archived,
+                noteFireUpdate.pinned,
+                noteFireUpdate.protected,
+                noteFireUpdate.deletedDate,
+                noteFireUpdate.reminderDate,
+                noteUid)
+            noteRoomRepo.update(note)
+        }
     }
+
 
     private fun filterList(list : LinkedList<NoteFire>, text: String?) : LinkedList<NoteFire>{
         val newList = LinkedList<NoteFire>()

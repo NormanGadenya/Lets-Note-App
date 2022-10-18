@@ -3,7 +3,7 @@ package com.neuralbit.letsnote.ui.tag
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import com.neuralbit.letsnote.entities.TagFire
+import com.neuralbit.letsnote.firebase.entities.TagFire
 
 class TagViewModel (application: Application): AndroidViewModel(application) {
     var allTags  = ArrayList<Tag>()
@@ -11,4 +11,5 @@ class TagViewModel (application: Application): AndroidViewModel(application) {
     var noteUids = ArrayList<String>()
     var searchQuery : MutableLiveData <String> = MutableLiveData()
     var staggeredView : MutableLiveData<Boolean> = MutableLiveData()
+    var useLocalStorage = false
 }

@@ -19,9 +19,9 @@ import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.neuralbit.letsnote.R
-import com.neuralbit.letsnote.entities.NoteFire
+import com.neuralbit.letsnote.firebase.entities.NoteFire
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
-import com.neuralbit.letsnote.utilities.AlertReceiver
+import com.neuralbit.letsnote.receivers.AlertReceiver
 import com.neuralbit.letsnote.utilities.Common
 import java.util.*
 import kotlin.math.floor
@@ -67,25 +67,30 @@ class NoteRVAdapter (
         val note = allNotesFire[position]
         var title = note.title
         if (fontStyle != null){
-            val typeface: Typeface? = when (fontStyle) {
-                "Architects daughter" -> {
-                    ResourcesCompat.getFont(context, R.font.architects_daughter)
+            try {
+                val typeface: Typeface? = when (fontStyle) {
+                    "Architects daughter" -> {
+                        ResourcesCompat.getFont(context, R.font.architects_daughter)
+                    }
+                    "Abreeze" -> {
+                        ResourcesCompat.getFont(context, R.font.abeezee)
+                    }
+                    "Adamina" -> {
+                        ResourcesCompat.getFont(context, R.font.adamina)
+                    }
+                    else -> {
+                        ResourcesCompat.getFont(context, R.font.roboto)
+                    }
                 }
-                "Abreeze" -> {
-                    ResourcesCompat.getFont(context, R.font.abeezee)
-                }
-                "Adamina" -> {
-                    ResourcesCompat.getFont(context, R.font.adamina)
-                }
-                else -> {
-                    ResourcesCompat.getFont(context, R.font.roboto)
-                }
+                holder.noteTextTV.typeface = typeface
+                holder.noteTitleTV.typeface = typeface
+                holder.daysLeft.typeface = typeface
+                holder.reminderTV.typeface = typeface
+                holder.tagsTV.typeface = typeface
+            }catch (_: Exception){
+
             }
-            holder.noteTextTV.typeface = typeface
-            holder.noteTitleTV.typeface = typeface
-            holder.daysLeft.typeface = typeface
-            holder.reminderTV.typeface = typeface
-            holder.tagsTV.typeface = typeface
+
         }
         val settingsPref = context.getSharedPreferences("Settings", AppCompatActivity.MODE_PRIVATE)
         val fontMultiplier = settingsPref.getInt("fontMultiplier",2)
@@ -311,6 +316,6 @@ class NoteRVAdapter (
 
 
 interface NoteFireClick{
-    fun onNoteFireClick(note : NoteFire , activated : Boolean)
+    fun onNoteFireClick(note : NoteFire, activated : Boolean)
     fun onNoteFireLongClick(note: NoteFire)
 }

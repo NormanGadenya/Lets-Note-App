@@ -1,9 +1,13 @@
 package com.neuralbit.letsnote.ui.main
 
+import android.app.AlarmManager
 import android.app.AlertDialog
+import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -19,7 +23,6 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -33,13 +36,14 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.databinding.ActivityMainBinding
+import com.neuralbit.letsnote.firebase.entities.NoteFire
+import com.neuralbit.letsnote.receivers.AlertReceiver
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import com.neuralbit.letsnote.ui.archived.ArchivedViewModel
 import com.neuralbit.letsnote.ui.deletedNotes.DeletedNotesViewModel
 import com.neuralbit.letsnote.ui.label.LabelViewModel
 import com.neuralbit.letsnote.ui.signIn.SignInActivity
 import com.neuralbit.letsnote.ui.tag.TagViewModel
-import kotlinx.coroutines.launch
 
 
 class MainActivity : AppCompatActivity() {
@@ -57,17 +61,20 @@ class MainActivity : AppCompatActivity() {
     private var fUser : FirebaseUser? = null
     private lateinit var settingsPref: SharedPreferences
     private val lifecycleOwner = this
-
-
+    private var useLocalStorage = false
+    val TAG = "MAIN"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mAuth = FirebaseAuth.getInstance()
         fUser= mAuth.currentUser
-        if (fUser == null) {
+        settingsPref =  getSharedPreferences("Settings", MODE_PRIVATE)
+        useLocalStorage = settingsPref.getBoolean("useLocalStorage",false)
+        if (fUser == null && !useLocalStorage ) {
             val intent = Intent(applicationContext, SignInActivity::class.java)
             startActivity(intent)
         }
+        Log.d(TAG, "onCreate: $useLocalStorage")
         MobileAds.initialize(this@MainActivity)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -77,7 +84,6 @@ class MainActivity : AppCompatActivity() {
         val navView: NavigationView = binding.navView
         val navController = findNavController(R.id.nav_host_fragment_content_main)
 
-        settingsPref =  getSharedPreferences("Settings", MODE_PRIVATE)
         appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.nav_home,
@@ -93,6 +99,14 @@ class MainActivity : AppCompatActivity() {
             this,
             ViewModelProvider.AndroidViewModelFactory.getInstance(application)
         )[MainActivityViewModel::class.java]
+        viewModal.useLocalStorage = useLocalStorage
+        allNotesViewModal.useLocalStorage = useLocalStorage
+        deleteVieModel.useLocalStorage = useLocalStorage
+        archivedViewModel.useLocalStorage = useLocalStorage
+        tagViewModel.useLocalStorage = useLocalStorage
+        labelViewModel.useLocalStorage = useLocalStorage
+        viewModal.refresh.value = true
+
         allNotesViewModal.itemSelectEnabled.observe(this){
             if (it){
                 actionMode = startSupportActionMode(MActionModeCallBack())
@@ -102,24 +116,52 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        lifecycleScope.launch {
-            viewModal.getAllFireNotes().observe(lifecycleOwner){
-                allNotesViewModal.allFireNotes.value = it
+        // set reminders when a user has been signed in since alarms are cancelled when signed out
+
+
+        val signedIn = intent.getBooleanExtra("Signed in",false)
+        allNotesViewModal.signedIn = signedIn
+
+        allNotesViewModal.getAllFireNotes().observe(lifecycleOwner){
+
+            allNotesViewModal.allFireNotes.value = it
+            if (signedIn){
+                for (noteFire in it) {
+
+                    if (!noteFire.archived && noteFire.deletedDate==(0).toLong() && noteFire.reminderDate> System.currentTimeMillis()){
+                        startAlarm(noteFire, noteFire.reminderDate.toInt())
+                    }
+
+                }
             }
+
         }
+
+
+
+
+
         val emptyTrashImmediately = settingsPref.getBoolean("EmptyTrashImmediately",false)
         if (emptyTrashImmediately){
             allNotesViewModal.notesToDelete.observe(lifecycleOwner){
                 it.noteUid?.let { uid -> viewModal.deleteNote(uid,it.label,it.tags) }
-
             }
             allNotesViewModal.selectedNotes.clear()
+            viewModal.refresh.value = true
+
         }
         archivedViewModel.notesToRestore.observe(lifecycleOwner){
             val update = HashMap<String,Any>()
+            update["title"] = it.title
+            update["description"] = it.description
+            update["label"] = it.label
+            update["pinned"] = it.pinned
+            update["reminderDate"] = it.reminderDate
+            update["protected"] = it.protected
             update["archived"] = false
             update["timeStamp"] = System.currentTimeMillis()
             it.noteUid?.let { it1 -> viewModal.updateFireNote(update, it1) }
+            viewModal.refresh.value = true
         }
 
         setupActionBarWithNavController(navController, appBarConfiguration)
@@ -131,6 +173,8 @@ class MainActivity : AppCompatActivity() {
         val nameTV = headerLayout.findViewById<TextView>(R.id.accountName)
         val emailTV = headerLayout.findViewById<TextView>(R.id.emailAddress)
         val detailsGroup = headerLayout.findViewById<View>(R.id.detailsGroup)
+        val backUpStatusIV = headerLayout.findViewById<ImageView>(R.id.backupStatusIcon)
+        val backUpStatusTV = headerLayout.findViewById<TextView>(R.id.backupStatusTV)
         if(profileUrl != null){
             Glide.with(applicationContext).load(profileUrl).into(profileIV)
         }
@@ -145,10 +189,13 @@ class MainActivity : AppCompatActivity() {
         if (emailAdd != null){
             emailTV.text = emailAdd
         }
-        if (fUser?.isAnonymous == true){
+        if (fUser?.isAnonymous == true || useLocalStorage){
             detailsGroup.visibility = GONE
+            backUpStatusTV.text = resources.getString(R.string.back_up_deactivated)
         }else{
             detailsGroup.visibility = VISIBLE
+            backUpStatusTV.text = resources.getString(R.string.back_up_active)
+            backUpStatusIV.setImageResource(R.drawable.ic_baseline_backup_24)
         }
 
         mAuth.addAuthStateListener {
@@ -157,6 +204,14 @@ class MainActivity : AppCompatActivity() {
                 detailsGroup.visibility = VISIBLE
                 emailTV.text = currentUser.email
                 nameTV.text = currentUser.displayName
+                viewModal.useLocalStorage = false
+                allNotesViewModal.useLocalStorage = false
+                archivedViewModel.useLocalStorage = false
+                deleteVieModel.useLocalStorage = false
+                tagViewModel.useLocalStorage = false
+                labelViewModel.useLocalStorage = false
+                backUpStatusIV.setImageResource(R.drawable.ic_baseline_backup_24)
+                backUpStatusTV.text = resources.getString(R.string.back_up_active)
                 if (currentUser.photoUrl !=null){
                     Glide.with(applicationContext).load(currentUser.photoUrl).into(profileIV)
                 }
@@ -180,6 +235,20 @@ class MainActivity : AppCompatActivity() {
         searchIcon.setImageDrawable(ContextCompat.getDrawable(applicationContext,
             R.drawable.ic_baseline_search_24
         ))
+        if (fUser == null){
+            deleteAndSignOut.isVisible = false
+            signOutButton.isVisible = false
+        }else{
+            deleteAndSignOut.isVisible = true
+            signOutButton.isVisible = true
+        }
+        mAuth.addAuthStateListener {
+            val currentUser = it.currentUser
+            if (currentUser?.isAnonymous == false){
+                deleteAndSignOut.isVisible = true
+                signOutButton.isVisible = true
+            }
+        }
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(p0: String?): Boolean {
                 if (p0 != null) {
@@ -211,6 +280,8 @@ class MainActivity : AppCompatActivity() {
                 alertDialog.setPositiveButton(resources.getString(R.string.yes)
                 ) { _, _ ->
                     deleteVieModel.clearTrash.value = true
+                    viewModal.refresh.value = true
+
                 }
                 alertDialog.setNegativeButton(resources.getString(R.string.cancel)
                 ) { dialog, _ -> dialog.cancel() }
@@ -234,12 +305,6 @@ class MainActivity : AppCompatActivity() {
             }
             alertDialog.setPositiveButton(resources.getString(R.string.yes)
             ) { _, _ ->
-                lifecycleScope.launch {
-                    viewModal.getAllFireNotes().observe(lifecycleOwner){
-                        allNotesViewModal.allFireNotes.value = it
-                    }
-                }
-
 
                 AuthUI.getInstance()
                     .signOut(this@MainActivity)
@@ -259,11 +324,17 @@ class MainActivity : AppCompatActivity() {
             alertDialog.setTitle(resources.getString(R.string.delete_and_sign_out_alert))
             alertDialog.setPositiveButton(resources.getString(R.string.yes)
             ) { _, _ ->
-                Toast.makeText(applicationContext,resources.getString(R.string.delete_and_sign_out_message), Toast.LENGTH_SHORT).show()
                 val editor : SharedPreferences.Editor= settingsPref.edit()
                 editor.clear()
                 editor.apply()
-                viewModal.deleteUserDataContent(this@MainActivity)
+                viewModal.deleteUserDataContent()
+                Toast.makeText(applicationContext,resources.getString(R.string.delete_and_sign_out_message), Toast.LENGTH_SHORT).show()
+                AuthUI.getInstance()
+                    .signOut(this@MainActivity)
+                    .addOnCompleteListener{
+                        val intent = Intent(this@MainActivity, SignInActivity::class.java)
+                        startActivity(intent)
+                    }
             }
 
             alertDialog.setNegativeButton(resources.getString(R.string.cancel)
@@ -294,6 +365,27 @@ class MainActivity : AppCompatActivity() {
         a.addCategory(Intent.CATEGORY_HOME)
         a.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         startActivity(a)
+    }
+
+    private fun startAlarm(note : NoteFire, requestCode: Int) {
+
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(this@MainActivity, AlertReceiver::class.java)
+        intent.putExtra("noteTitle",note.title)
+        intent.putExtra("noteUid",note.noteUid)
+        intent.putExtra("noteDesc", note.description)
+        intent.putExtra("timeStamp",System.currentTimeMillis())
+        intent.putExtra("labelColor",note.label)
+        intent.putExtra("pinned",note.pinned)
+        intent.putExtra("archieved",false)
+        intent.putExtra("protected",note.protected)
+        val tags = ArrayList<String>()
+        tags.addAll(note.tags)
+        intent.putStringArrayListExtra("tagList", tags)
+        intent.putExtra("noteType","Edit")
+
+        val pendingIntent = PendingIntent.getBroadcast(this, requestCode, intent, PendingIntent.FLAG_IMMUTABLE)
+        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, note.reminderDate, pendingIntent)
     }
 
     private inner class MActionModeCallBack : ActionMode.Callback {

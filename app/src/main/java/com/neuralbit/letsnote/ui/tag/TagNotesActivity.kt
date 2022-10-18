@@ -20,14 +20,14 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.gson.Gson
 import com.neuralbit.letsnote.R
-import com.neuralbit.letsnote.entities.NoteFire
-import com.neuralbit.letsnote.services.DeleteReceiver
+import com.neuralbit.letsnote.firebase.entities.NoteFire
+import com.neuralbit.letsnote.receivers.AlertReceiver
+import com.neuralbit.letsnote.receivers.DeleteReceiver
 import com.neuralbit.letsnote.ui.adapters.NoteFireClick
 import com.neuralbit.letsnote.ui.adapters.NoteRVAdapter
 import com.neuralbit.letsnote.ui.addEditNote.AddEditNoteActivity
 import com.neuralbit.letsnote.ui.addEditNote.Fingerprint
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
-import com.neuralbit.letsnote.utilities.AlertReceiver
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -78,12 +78,15 @@ class TagNotesActivity : AppCompatActivity() , NoteFireClick {
         recyclerView.layoutManager = staggeredLayoutManagerAll
         allNotesViewModel.deleteFrag.value = false
         val staggered = settingsSharedPref?.getBoolean("staggered",true)
+        val useLocalStorage = settingsSharedPref.getBoolean("useLocalStorage",false)
+
         if (staggered == true){
             recyclerView.layoutManager = staggeredLayoutManagerAll
         }else{
             recyclerView.layoutManager = LinearLayoutManager(applicationContext)
         }
-
+        allNotesViewModel.useLocalStorage =useLocalStorage
+        viewModel.useLocalStorage = useLocalStorage
         allNotesViewModel.itemSelectEnabled.observe(this){
             if (it){
                 actionMode = startSupportActionMode(MActionModeCallBack())
@@ -208,6 +211,12 @@ class TagNotesActivity : AppCompatActivity() , NoteFireClick {
                     note.noteUid?.let { it1 -> scheduleDelete(it1,note.tags,note.label,note.timeStamp) }
 
                     val noteUpdate = HashMap<String,Any>()
+                    noteUpdate["title"] = note.title
+                    noteUpdate["description"] = note.description
+                    noteUpdate["label"] = note.label
+                    noteUpdate["pinned"] = note.pinned
+                    noteUpdate["reminderDate"] = note.reminderDate
+                    noteUpdate["protected"] = note.protected
                     noteUpdate["deletedDate"] = System.currentTimeMillis()
                     note.noteUid?.let { it1 -> allNotesViewModel.updateFireNote(noteUpdate, it1) }
                 }else{
@@ -266,6 +275,12 @@ class TagNotesActivity : AppCompatActivity() , NoteFireClick {
                 cancelAlarm(note.reminderDate.toInt())
 
                 val noteUpdate = HashMap<String,Any>()
+                noteUpdate["title"] = note.title
+                noteUpdate["description"] = note.description
+                noteUpdate["label"] = note.label
+                noteUpdate["pinned"] = note.pinned
+                noteUpdate["reminderDate"] = note.reminderDate
+                noteUpdate["protected"] = note.protected
                 noteUpdate["archived"] = true
                 note.noteUid?.let { it1 -> allNotesViewModel.updateFireNote(noteUpdate, it1) }
             }
@@ -276,7 +291,7 @@ class TagNotesActivity : AppCompatActivity() , NoteFireClick {
 
             allNotesViewModel.itemSelectEnabled.value = false
             if(selectedNotesCount == 1){
-                Toast.makeText(applicationContext,resources.getString(R.string.notes_archived_successfully), Toast.LENGTH_SHORT).show()
+                Toast.makeText(applicationContext,resources.getString(R.string.notes_archived_successfully,""), Toast.LENGTH_SHORT).show()
 
             }else{
                 Toast.makeText(applicationContext,resources.getString(R.string.notes_archived_successfully,"s"), Toast.LENGTH_SHORT).show()
@@ -311,7 +326,7 @@ class TagNotesActivity : AppCompatActivity() , NoteFireClick {
         return true
     }
 
-    override fun onNoteFireClick(note: NoteFire , activated : Boolean) {
+    override fun onNoteFireClick(note: NoteFire, activated : Boolean) {
         if (!note.selected && !activated){
             val intent : Intent = if(note.protected){
                 Intent( applicationContext, Fingerprint::class.java)

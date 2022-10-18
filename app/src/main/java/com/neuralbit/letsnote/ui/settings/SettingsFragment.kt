@@ -27,11 +27,13 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.neuralbit.letsnote.BuildConfig
 import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.databinding.SettingsFragmentBinding
+import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 
 class SettingsFragment : Fragment() {
 
     private var _binding: SettingsFragmentBinding? = null
     private val settingsViewModel: SettingsViewModel by activityViewModels()
+    private val allNotesViewModel: AllNotesViewModel by activityViewModels()
     private lateinit var settingsPref : SharedPreferences
     private val binding get() = _binding!!
     private lateinit var editor : SharedPreferences.Editor
@@ -47,6 +49,8 @@ class SettingsFragment : Fragment() {
         _binding = SettingsFragmentBinding.inflate(inflater, container, false)
         val root: View = binding.root
         settingsPref = context?.getSharedPreferences("Settings", AppCompatActivity.MODE_PRIVATE)!!
+        val useLocalStorage = settingsPref.getBoolean("useLocalStorage",false)
+        settingsViewModel.useLocalStorage = useLocalStorage
         editor = settingsPref.edit()
         settingsViewModel.settingsFrag.value = true
 
@@ -69,23 +73,35 @@ class SettingsFragment : Fragment() {
         val migrateTV = binding.backUpTV
         val adView = binding.adView
         val versionNameTv = binding.versionNameTV
+        val shareAppBtn = binding.shareButton
         versionNameTv.text = resources.getString(R.string.app_version_template,BuildConfig.VERSION_NAME)
         val adRequest = AdRequest.Builder().build()
         adView.loadAd(adRequest)
         migrateProgressBar = binding.migrateProgress
-        oldUser
         val siginBtn = binding.signInWithGoogleBtn
         mAuth = FirebaseAuth.getInstance()
 
         oldUser = mAuth.currentUser
 
-        if (oldUser?.isAnonymous == true){
+        if (oldUser?.isAnonymous == true || useLocalStorage){
 
             migrateCard.visibility = VISIBLE
             migrateTV.visibility = VISIBLE
         }else{
             migrateCard.visibility = GONE
             migrateTV.visibility = GONE
+        }
+        shareAppBtn.setOnClickListener {
+            val sendIntent: Intent = Intent().apply {
+                action = Intent.ACTION_SEND
+
+                val appLink = "https://play.google.com/store/apps/details?id=com.neuralbit.letsnote"
+
+                putExtra(Intent.EXTRA_TEXT, appLink)
+                type = "text/plain"
+            }
+            val shareIntent = Intent.createChooser(sendIntent, null)
+            startActivity(shareIntent)
         }
         createRequest()
         setHasOptionsMenu(true)
@@ -167,8 +183,6 @@ class SettingsFragment : Fragment() {
             .requestIdToken(getString(R.string.default_web_client_id))
             .requestEmail()
             .build()
-
-
         mGoogleSignInClient = activity?.let { GoogleSignIn.getClient(it, gso) }
     }
 
@@ -207,21 +221,35 @@ class SettingsFragment : Fragment() {
     }
 
     private fun firebaseAuthWithGoogle(acct: GoogleSignInAccount) {
-        val prevUser = mAuth.currentUser?.uid
         val credential = GoogleAuthProvider.getCredential(acct.idToken, null)
+        val prevUser = mAuth.currentUser?.uid
         mAuth.signInWithCredential(credential)
             .addOnSuccessListener {
                 val currentUser = it.user
+                if (prevUser != null){
+                    prevUser.let { it1 -> currentUser?.uid?.let { it2 -> settingsViewModel.migrateData(oldUser = it1, newUser = it2).observe(viewLifecycleOwner){ done ->
+                        if (done){
+                            migrateProgressBar.visibility = GONE
+                            settingsViewModel.dataMigrated.value = true
+                            Toast.makeText(context,resources.getString(R.string.link_complete), Toast.LENGTH_SHORT).show()
+                        }
+                    } } }
+                }else{
+                    currentUser?.uid?.let { it1 ->
+                        settingsViewModel.migrateData(null , it1).observe( viewLifecycleOwner){ done ->
+                            if (done){
+                                migrateProgressBar.visibility = GONE
+                                val settingsEditor : SharedPreferences.Editor = settingsPref.edit()
+                                settingsEditor.putBoolean("useLocalStorage",false)
+                                settingsEditor.commit()
+                                settingsViewModel.dataMigrated.value = true
+                                Toast.makeText(context,resources.getString(R.string.link_complete), Toast.LENGTH_SHORT).show()
+                            }
 
-                oldUser?.let { it1 ->
-                    if (currentUser != null) {
-                        settingsViewModel.migrateData(it1.uid , currentUser.uid )
-                        migrateProgressBar.visibility = GONE
-                        settingsViewModel.dataMigrated.value = true
+                        }
                     }
                 }
 
-                prevUser?.let { it1 -> currentUser?.uid?.let { it2 -> settingsViewModel.migrateData(oldUser = it1, newUser = it2) } }
             }
     }
 

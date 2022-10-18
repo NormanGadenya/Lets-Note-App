@@ -31,6 +31,11 @@
         <item name="android:textColor">@color/gunmetal</item>
         <item name="android:background">@color/Apricot</item>
     </style>
+    <style name="Custom_dialog_style" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorControlNormal">@color/gunmetal</item>
+        <item name="android:textColor">@color/gunmetal</item>
+        <item name="colorOnPrimary">@color/gunmetal</item>
+    </style>
 
     <style name="Theme.App.Activity" parent="Theme.AppCompat.DayNight.DarkActionBar">
         <item name="colorPrimary">@color/gunmetal</item>

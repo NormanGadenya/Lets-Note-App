@@ -27,7 +27,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/welcomeIcon" />
 
+
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedScrollView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -44,7 +46,7 @@
                 android:layout_margin="8dp"
                 android:layout_marginBottom="8dp"
                 android:text="@string/pinned_notes"
-                android:textSize="32sp"
+                android:textSize="25sp"
                 android:visibility="gone"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -67,7 +69,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
                 android:text="@string/other_notes"
-                android:textSize="32sp"
+                android:textSize="25sp"
                 android:visibility="gone"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/pinnedNotesRV" />
@@ -78,8 +80,8 @@
                 android:layout_height="0dp"
                 android:overScrollMode="never"
                 android:visibility="visible"
-                tools:itemCount="2"
                 app:layout_constraintTop_toBottomOf="@id/otherNotesTV"
+                tools:itemCount="2"
                 tools:listitem="@layout/note_rv_item" />
 
 
@@ -104,6 +106,21 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:contentDescription="@string/new_todo_button" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@+id/FABAddNote"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/floating_button_title_background"
+        android:padding="8dp"
+        android:visibility="gone"
+        android:text="@string/new_text_note"
+        android:textColor="@color/timberwolf"
+        android:id = "@+id/note_title_tv"
+        app:layout_constraintEnd_toStartOf="@+id/FABAddNote"
+        app:layout_constraintTop_toTopOf="@+id/FABAddNote"
+    />
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/FABAddNote"
         android:layout_width="wrap_content"
@@ -118,6 +135,20 @@
         app:layout_constraintBottom_toTopOf="@id/FABNoteType"
         app:layout_constraintEnd_toEndOf="parent"
         android:contentDescription="@string/new_note_button" />
+
+    <TextView
+        android:id="@+id/note_todo_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/floating_button_title_background"
+        android:padding="8dp"
+        android:visibility="gone"
+        android:layout_marginEnd="8dp"
+        android:text="@string/new_todo_note"
+        android:textColor="@color/timberwolf"
+        app:layout_constraintBottom_toBottomOf="@+id/FABAddTodoList"
+        app:layout_constraintEnd_toStartOf="@+id/FABAddTodoList"
+        app:layout_constraintTop_toTopOf="@+id/FABAddTodoList" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/FABNoteType"
