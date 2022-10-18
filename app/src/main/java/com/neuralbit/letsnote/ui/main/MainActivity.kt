@@ -324,18 +324,16 @@ class MainActivity : AppCompatActivity() {
             alertDialog.setTitle(resources.getString(R.string.delete_and_sign_out_alert))
             alertDialog.setPositiveButton(resources.getString(R.string.yes)
             ) { _, _ ->
-                Toast.makeText(applicationContext,resources.getString(R.string.delete_and_sign_out_message), Toast.LENGTH_SHORT).show()
                 val editor : SharedPreferences.Editor= settingsPref.edit()
                 editor.clear()
                 editor.apply()
                 viewModal.deleteUserDataContent()
+                Toast.makeText(applicationContext,resources.getString(R.string.delete_and_sign_out_message), Toast.LENGTH_SHORT).show()
                 AuthUI.getInstance()
-                    .signOut(applicationContext)
+                    .signOut(this@MainActivity)
                     .addOnCompleteListener{
-                        val a = Intent(Intent.ACTION_MAIN)
-                        a.addCategory(Intent.CATEGORY_HOME)
-                        a.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                        startActivity(a)
+                        val intent = Intent(this@MainActivity, SignInActivity::class.java)
+                        startActivity(intent)
                     }
             }
 

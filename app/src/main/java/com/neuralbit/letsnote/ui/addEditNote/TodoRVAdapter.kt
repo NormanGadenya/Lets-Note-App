@@ -97,6 +97,7 @@ class TodoRVAdapter(
             val strikethroughSpan = StrikethroughSpan()
             spannableString.setSpan(strikethroughSpan, 0, spannableString.length , SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
             holder.todoItemDescET.setText(spannableString)
+            holder.todoItemDescET.setTextColor(context.resources.getColor(R.color.sel_card_color))
         }else{
             holder.todoItemDescET.setText(todoItem.item)
         }
@@ -107,8 +108,10 @@ class TodoRVAdapter(
                 val strikethroughSpan = StrikethroughSpan()
                 spannableString.setSpan(strikethroughSpan, 0, spannableString.length , SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
                 holder.todoItemDescET.setText(spannableString)
+                holder.todoItemDescET.setTextColor(context.resources.getColor(R.color.sel_card_color))
             }else{
                 holder.todoItemDescET.setText(todoItem.item)
+                holder.todoItemDescET.setTextColor(context.resources.getColor(R.color.black))
 
             }
             todoItemInterface.onItemCheckChanged(holder.adapterPosition, todoItem)

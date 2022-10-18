@@ -243,6 +243,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 tagListAdapter.updateList(viewModal.oldTagList)
             }
             else -> {
+                if (noteType != "Todo")
                 redoUndoGroup.visibility = VISIBLE
 
                 tvTimeStamp.visibility =GONE
