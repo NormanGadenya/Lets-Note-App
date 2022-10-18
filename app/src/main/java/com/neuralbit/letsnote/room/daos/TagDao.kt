@@ -15,4 +15,7 @@ interface TagDao {
     @Transaction
     @Query("select * from Tag")
     suspend fun getTags(): List<Tag>
+
+    @Query("DELETE FROM Tag")
+    suspend fun deleteAllTags()
 }

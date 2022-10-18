@@ -222,21 +222,18 @@ class SettingsFragment : Fragment() {
 
     private fun firebaseAuthWithGoogle(acct: GoogleSignInAccount) {
         val credential = GoogleAuthProvider.getCredential(acct.idToken, null)
+        val prevUser = mAuth.currentUser?.uid
         mAuth.signInWithCredential(credential)
             .addOnSuccessListener {
                 val currentUser = it.user
-                if (oldUser != null){
-                    oldUser?.let { it1 ->
-                        if (currentUser != null) {
-                            settingsViewModel.migrateData(it1.uid , currentUser.uid ).observe( viewLifecycleOwner){ done ->
-                                if (done){
-                                    migrateProgressBar.visibility = GONE
-                                    settingsViewModel.dataMigrated.value = true
-                                    Toast.makeText(context,resources.getString(R.string.link_complete), Toast.LENGTH_SHORT).show()
-                                }
-                            }
+                if (prevUser != null){
+                    prevUser.let { it1 -> currentUser?.uid?.let { it2 -> settingsViewModel.migrateData(oldUser = it1, newUser = it2).observe(viewLifecycleOwner){ done ->
+                        if (done){
+                            migrateProgressBar.visibility = GONE
+                            settingsViewModel.dataMigrated.value = true
+                            Toast.makeText(context,resources.getString(R.string.link_complete), Toast.LENGTH_SHORT).show()
                         }
-                    }
+                    } } }
                 }else{
                     currentUser?.uid?.let { it1 ->
                         settingsViewModel.migrateData(null , it1).observe( viewLifecycleOwner){ done ->

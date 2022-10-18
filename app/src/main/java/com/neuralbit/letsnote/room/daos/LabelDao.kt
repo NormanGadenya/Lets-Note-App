@@ -18,6 +18,9 @@ interface LabelDao {
     @Query("select * from Label")
     suspend fun getAllLabels () : List<LabelWIthNotes>
 
+    @Query("DELETE FROM Label")
+    suspend fun deleteAllLabels()
+
     @Transaction
     @Query("select * from Label where labelColor = :labelColor ")
     suspend fun getNotesWithLabel(labelColor :Int): List<LabelWIthNotes>

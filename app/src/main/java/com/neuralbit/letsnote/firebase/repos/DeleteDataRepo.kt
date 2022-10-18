@@ -7,7 +7,6 @@ import com.google.firebase.ktx.Firebase
 class DeleteDataRepo() {
 
     private val database = Firebase.database
-    val TAG = "NoteFireRepo"
     private val fUser = FirebaseAuth.getInstance().currentUser
 
 

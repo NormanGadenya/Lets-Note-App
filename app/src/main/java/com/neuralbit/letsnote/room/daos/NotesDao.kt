@@ -25,6 +25,11 @@ interface NotesDao {
     @Delete
     fun deleteTodo(todoItems : TodoItem)
 
+    @Query("DELETE FROM Note")
+    suspend fun deleteAllNotes()
+
+    @Query("DELETE FROM TodoItem")
+    suspend fun deleteAllTodos()
 
     @Transaction
     @Query("select * from Note where noteUid = :noteUid")

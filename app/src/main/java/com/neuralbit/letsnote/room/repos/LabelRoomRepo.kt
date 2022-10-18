@@ -1,6 +1,5 @@
 package com.neuralbit.letsnote.room.repos
 
-import androidx.lifecycle.LiveData
 import com.neuralbit.letsnote.room.daos.LabelDao
 import com.neuralbit.letsnote.room.entities.Label
 import com.neuralbit.letsnote.room.relationships.LabelWIthNotes
@@ -24,6 +23,8 @@ class LabelRoomRepo(
         return labelDao.getAllLabels()
     }
 
-
+    suspend fun deleteAllLabels() {
+        labelDao.deleteAllLabels()
+    }
 
 }

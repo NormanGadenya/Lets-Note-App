@@ -21,6 +21,9 @@ interface NoteTagDao {
     @Query("select * from Note where noteUid = :noteUid")
     suspend fun getTagsWithNote(noteUid: String) : List<TagsWithNote>
 
+    @Query("DELETE FROM NoteTagCrossRef")
+    suspend fun deleteAllNoteTagCrossRefs()
+
 
 
 

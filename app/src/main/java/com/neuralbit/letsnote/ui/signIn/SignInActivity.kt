@@ -116,30 +116,30 @@ class SignInActivity : AppCompatActivity() {
         }
     }
 
-    private fun signInAnon(){
-        if (!isNetworkConnected()){
-            Toast.makeText(applicationContext,resources.getString(R.string.no_internet_connection_init),Toast.LENGTH_SHORT).show()
-        }else{
-            progressBar.visibility = View.VISIBLE
-
-            mAuth.signInAnonymously()
-                .addOnCompleteListener(this) { task ->
-                    if (task.isSuccessful) {
-
-                        progressBar.visibility = GONE
-                        // Sign in success, update UI with the signed-in user's information
-                        val intent = Intent(this@SignInActivity, MainActivity::class.java)
-                        intent.putExtra("Signed in", true)
-                        startActivity(intent)
-                    } else {
-                        progressBar.visibility = GONE
-
-                        // If sign in fails, display a message to the user.
-                        Toast.makeText(applicationContext, "Authentication failed.", Toast.LENGTH_SHORT).show()
-                    }
-                }
-        }
-    }
+//    private fun signInAnon(){
+//        if (!isNetworkConnected()){
+//            Toast.makeText(applicationContext,resources.getString(R.string.no_internet_connection_init),Toast.LENGTH_SHORT).show()
+//        }else{
+//            progressBar.visibility = View.VISIBLE
+//
+//            mAuth.signInAnonymously()
+//                .addOnCompleteListener(this) { task ->
+//                    if (task.isSuccessful) {
+//
+//                        progressBar.visibility = GONE
+//                        // Sign in success, update UI with the signed-in user's information
+//                        val intent = Intent(this@SignInActivity, MainActivity::class.java)
+//                        intent.putExtra("Signed in", true)
+//                        startActivity(intent)
+//                    } else {
+//                        progressBar.visibility = GONE
+//
+//                        // If sign in fails, display a message to the user.
+//                        Toast.makeText(applicationContext, "Authentication failed.", Toast.LENGTH_SHORT).show()
+//                    }
+//                }
+//        }
+//    }
 
     private fun isNetworkConnected(): Boolean {
         val cm = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager

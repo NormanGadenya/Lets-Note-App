@@ -26,5 +26,9 @@ class NoteTagRoomRepo(
         return noteTagDao.getTagsWithNote(noteUid)
     }
 
+    suspend fun deleteAllNoteTagCrossRefs(){
+        noteTagDao.deleteAllNoteTagCrossRefs()
+    }
+
 }
 

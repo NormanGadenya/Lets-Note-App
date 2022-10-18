@@ -32,6 +32,13 @@ class NoteRoomRepo(
         return notesDao.getNote(noteUid)
     }
 
+    suspend fun deleteAllNotes(){
+        notesDao.deleteAllNotes()
+    }
+
+    suspend fun deleteAllTodoItems(){
+        notesDao.deleteAllTodos()
+    }
 
     fun deleteTodo(todoItem: TodoItem){
         notesDao.deleteTodo(todoItem)

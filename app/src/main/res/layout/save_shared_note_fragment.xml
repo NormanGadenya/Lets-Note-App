@@ -40,18 +40,20 @@
         android:id="@+id/noteEditDesc"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:background="@android:color/transparent"
         android:hint="@string/note_content"
-        android:lineSpacingMultiplier="1.1"
-        android:maxLines="8"
+        android:importantForAutofill="no"
         android:textSize="16sp"
+        android:inputType="textMultiLine"
+        android:lineSpacingMultiplier="1.1"
+        android:linksClickable="true"
         android:minHeight="60dp"
-        android:layout_marginTop="8dp"
-        app:layout_goneMarginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@id/noteEditTitle"
-        android:inputType="text"
-        android:importantForAutofill="no" />
 
+        app:layout_constraintBottom_toTopOf="@+id/cancelButton"
+        app:layout_constraintTop_toBottomOf="@id/noteEditTitle"
+        app:layout_goneMarginTop="8dp" />
     <Button
         android:id="@+id/cancelButton"
         android:layout_width="wrap_content"
@@ -59,11 +61,9 @@
         android:layout_marginEnd="8dp"
         android:background="@drawable/cancel_button_background"
         android:text="@string/Cancel"
-        android:layout_marginTop="16dp"
         android:textColor="@color/timberwolf"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/saveNoteButton"
-        app:layout_constraintTop_toBottomOf="@+id/noteEditDesc" />
+        app:layout_constraintEnd_toStartOf="@id/saveNoteButton" />
     <Button
         android:layout_width="wrap_content"
         android:layout_height="35dp"

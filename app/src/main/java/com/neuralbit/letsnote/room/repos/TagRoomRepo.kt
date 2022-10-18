@@ -17,4 +17,8 @@ class TagRoomRepo(private val tagDao : TagDao) {
     suspend fun getAllTags() : List<Tag> {
         return tagDao.getTags()
     }
+
+    suspend fun deleteAllTags(){
+        tagDao.deleteAllTags()
+    }
 }

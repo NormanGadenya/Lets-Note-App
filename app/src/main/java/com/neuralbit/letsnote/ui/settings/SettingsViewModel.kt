@@ -99,8 +99,13 @@ class SettingsViewModel  (application : Application) : AndroidViewModel(applicat
                     labelFireList.add(labelFire)
                 }
                 migrationRepo.migrateDataRoom(newUser,noteList,tagFireList,labelFireList)
-                migrationCompleted.postValue(true)
+                // clear database
+                noteTagRoomRepo.deleteAllNoteTagCrossRefs()
+                tagRoomRepo.deleteAllTags()
+                noteRoomRepo.deleteAllNotes()
+                labelRoomDao.deleteAllLabels()
 
+                migrationCompleted.postValue(true)
 
             }
 
