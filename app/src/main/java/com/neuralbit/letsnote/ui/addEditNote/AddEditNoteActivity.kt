@@ -9,9 +9,11 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.content.pm.ShortcutManager
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Typeface
+import android.graphics.drawable.ColorDrawable
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Build
@@ -56,10 +58,11 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.neuralbit.letsnote.R
-import com.neuralbit.letsnote.entities.LabelFire
-import com.neuralbit.letsnote.entities.NoteFireIns
-import com.neuralbit.letsnote.entities.TodoItem
-import com.neuralbit.letsnote.services.DeleteReceiver
+import com.neuralbit.letsnote.firebase.entities.LabelFire
+import com.neuralbit.letsnote.firebase.entities.NoteFireIns
+import com.neuralbit.letsnote.firebase.entities.TodoItem
+import com.neuralbit.letsnote.receivers.AlertReceiver
+import com.neuralbit.letsnote.receivers.DeleteReceiver
 import com.neuralbit.letsnote.ui.label.LabelViewModel
 import com.neuralbit.letsnote.ui.main.MainActivity
 import com.neuralbit.letsnote.utilities.*
@@ -161,7 +164,10 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
     override fun onCreate(savedInstanceState: Bundle?)  {
         super.onCreate(savedInstanceState)
-        window.setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE)
+        protected = intent.getBooleanExtra("protected", false)
+        if (protected){
+            window.setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE)
+        }
         setContentView(R.layout.activity_add_edit_note)
 
         initControllers()
@@ -237,6 +243,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 tagListAdapter.updateList(viewModal.oldTagList)
             }
             else -> {
+                if (noteType != "Todo")
                 redoUndoGroup.visibility = VISIBLE
 
                 tvTimeStamp.visibility =GONE
@@ -438,10 +445,10 @@ class AddEditNoteActivity : AppCompatActivity() ,
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 tvTimeStamp.visibility =GONE
-                redoUndoGroup.visibility = VISIBLE
                 if(p3>0){
 
                     if(!tagListAdapter.deleteIgnored){
+                        viewModal.noteChanged.value = true
                         tagListAdapter.deleteIgnored = true
                         tagListAdapter.notifyDataSetChanged()
 
@@ -486,6 +493,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
             }
         })
+
 
 
         noteDescriptionEdit.setOnKeyListener { _, key, _ ->
@@ -836,7 +844,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
             viewModal.deletedNote.value = deleted
             viewModal.noteChanged.value = noteChanged
             viewModal.pinned.value = notePinned
-            viewModal.noteLocked.value = intent.getBooleanExtra("protected", false)
+            viewModal.noteLocked.value = protected
         }
 
 
@@ -889,7 +897,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
         todoCheckBox = findViewById(R.id.todoCheckBox)
         todoItemDescTV = findViewById(R.id.todoItemDescTV)
         lifecycleOwner = this
-
+        todoRVAdapter.viewModel = viewModal
+        todoRVAdapter.lifecycleOwner = this
         labelViewModel = ViewModelProvider(
             this,
             ViewModelProvider.AndroidViewModelFactory.getInstance(application)
@@ -911,30 +920,34 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            try{
+                val typeface: Typeface? = when (fontStyle) {
+                    "Architects daughter" -> {
+                        ResourcesCompat.getFont(applicationContext, R.font.architects_daughter)
+                    }
+                    "Abreeze" -> {
+                        ResourcesCompat.getFont(applicationContext, R.font.abeezee)
+                    }
+                    "Adamina" -> {
+                        ResourcesCompat.getFont(applicationContext, R.font.adamina)
+                    }
+                    else -> {
+                        ResourcesCompat.getFont(applicationContext, R.font.roboto)
+                    }
+                }
 
-            val typeface: Typeface? = when (fontStyle) {
-                "Architects daughter" -> {
-                    ResourcesCompat.getFont(applicationContext, R.font.architects_daughter)
-                }
-                "Abreeze" -> {
-                    ResourcesCompat.getFont(applicationContext, R.font.abeezee)
-                }
-                "Adamina" -> {
-                    ResourcesCompat.getFont(applicationContext, R.font.adamina)
-                }
-                else -> {
-                    ResourcesCompat.getFont(applicationContext, R.font.roboto)
-                }
+
+                todoItemDescTV.typeface = typeface
+                todoRVAdapter.fontStyle = fontStyle
+                todoRVAdapter.fontMultiplier = fontMultiplier
+                noteDescriptionEdit.typeface = typeface
+                noteTitleEdit.typeface = typeface
+                reminderTV.typeface = typeface
+                tvTimeStamp.typeface = typeface
+            }catch (_ : Exception){
+
             }
 
-
-            todoItemDescTV.typeface = typeface
-            todoRVAdapter.fontStyle = fontStyle
-            todoRVAdapter.fontMultiplier = fontMultiplier
-            noteDescriptionEdit.typeface = typeface
-            noteTitleEdit.typeface = typeface
-            reminderTV.typeface = typeface
-            tvTimeStamp.typeface = typeface
         }
         if (noteType == "NewTodo"){
             noteDescriptionEdit.visibility = GONE
@@ -1107,18 +1120,24 @@ class AddEditNoteActivity : AppCompatActivity() ,
     }
 
     private fun createShortcut() {
+        val shortcutManager = getSystemService(ShortcutManager::class.java)
+        shortcutManager.disableShortcuts(listOf("newNote","newTodo"))
+        shortcutManager.removeAllDynamicShortcuts()
         val intent = Intent(applicationContext, AddEditNoteActivity::class.java)
         intent.action = Intent.ACTION_VIEW
         val newNoteShortcut = ShortcutInfoCompat.Builder(applicationContext, "newNote")
             .setShortLabel(getString(R.string.note_shortcut_short_label))
             .setLongLabel(getString(R.string.note_shortcut_long_label))
-            .setIcon(IconCompat.createWithResource(applicationContext,
+            .setIcon(
+                IconCompat.createWithResource(applicationContext,
                 R.drawable.ic_baseline_mode_edit_24
             ))
             .setIntent(intent) // Push the shortcut
             .build()
+        ShortcutManagerCompat.pushDynamicShortcut(applicationContext, newNoteShortcut)
 
         intent.putExtra("noteType","NewTodo")
+
 
         val newTodoShortcut = ShortcutInfoCompat.Builder(applicationContext, "newTodo")
             .setShortLabel(getString(R.string.todo_shortcut_short_label))
@@ -1130,17 +1149,13 @@ class AddEditNoteActivity : AppCompatActivity() ,
             .build()
 
         ShortcutManagerCompat.pushDynamicShortcut(applicationContext, newTodoShortcut)
-        ShortcutManagerCompat.pushDynamicShortcut(applicationContext, newNoteShortcut)
-
 
 
     }
 
 
 //    private fun removeShortcuts() {
-//        val shortcutManager = getSystemService(ShortcutManager::class.java)
-//        shortcutManager.disableShortcuts(listOf("newNote","newTodo"))
-//        shortcutManager.removeAllDynamicShortcuts()
+
 //    }
 
 
@@ -1172,33 +1187,35 @@ class AddEditNoteActivity : AppCompatActivity() ,
         labelListRV.layoutManager =layoutManager
         labelListRV.adapter = labelListAdapter
         addNewLabelBtn?.setOnClickListener {
+            val labelAlertLayout = layoutInflater.inflate(R.layout.add_label_dialog,null)
+            val labelConfirmBtn = labelAlertLayout.findViewById<Button>(R.id.okayBtn)
+            val labelDismissBtn = labelAlertLayout.findViewById<Button>(R.id.cancelBtn)
+
             val labelDialog: AlertDialog = this@AddEditNoteActivity.let {
+
                 val builder = AlertDialog.Builder(it)
-                builder.apply {
-                    setPositiveButton(getString(R.string.yes)
-                    ) { _, _ ->
-                        viewModal.noteChanged.value = true
-                        viewModal.labelChanged = true
-                        if (viewModal.labelColor.value != null){
-
-                            val label = viewModal.labelTitle.value?.let { it1 -> LabelFire(labelColor= viewModal.labelColor.value!!,labelTitle= it1) }
-                            if (label != null) {
-                                viewModal.labelFireList.add(label)
-                                labelListAdapter.updateLabelIDList(viewModal.labelFireList)
-                            }
-                        }
-
-
-                    }
-                    setNegativeButton(getString(R.string.cancel)
-                    ) { _, _ ->
-
-                    }
-                    setView(R.layout.add_label_dialog)
-                    setTitle("Choose a label color")
-                }
+                builder.setView(labelAlertLayout)
                 builder.create()
 
+            }
+            labelDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+
+            labelConfirmBtn.setOnClickListener {
+                viewModal.noteChanged.value = true
+                viewModal.labelChanged = true
+                if (viewModal.labelColor.value != null){
+
+                    val label = viewModal.labelTitle.value?.let { it1 -> LabelFire(labelColor= viewModal.labelColor.value!!,labelTitle= it1) }
+                    if (label != null) {
+                        viewModal.labelFireList.add(label)
+                        labelListAdapter.updateLabelIDList(viewModal.labelFireList)
+                    }
+                }
+                labelDialog.dismiss()
+                labelBottomSheet.dismiss()
+            }
+            labelDismissBtn.setOnClickListener {
+                labelDialog.dismiss()
             }
 
             labelDialog.show()
@@ -1351,36 +1368,34 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
 
     private fun openDateTimeDialog(){
-        val alertDialog: AlertDialog? = this@AddEditNoteActivity.let {
-            val builder = AlertDialog.Builder(it)
-            builder.apply {
-                setPositiveButton(getString(R.string.yes)
-                ) { _, _ ->
-                    if(noteDescriptionEdit.length() > 0 || noteTitleEdit.length() >0 ){
-                        viewModal.noteChanged.value = true
 
-                    }
-                    Toast.makeText(context, getString(R.string.reminder_set), Toast.LENGTH_SHORT).show()
-                    viewModal.reminderTime = calendar.timeInMillis
-                    viewModal.reminderSet.value = true
-                    alertBottomSheet.dismiss()
-
-                }
-                setNegativeButton(getString(R.string.cancel)
-                ) { _, _ ->
-                    alertBottomSheet.dismiss()
-
-                }
-                setView(R.layout.alert_datetime_dialog)
-                setTitle(getString(R.string.choose_date_time))
-            }
-            builder.create()
+        val dateTimeLayout = layoutInflater.inflate(R.layout.alert_datetime_dialog,null)
+        val dateTimeDismissBtn = dateTimeLayout.findViewById<Button>(R.id.cancelBtn)
+        val dateTimeConfirmBtn = dateTimeLayout.findViewById<Button>(R.id.okayBtn)
+        val dateTimeDialog = AlertDialog.Builder(this@AddEditNoteActivity)
+            .setView(dateTimeLayout)
+            .create()
+        dateTimeDialog.show()
+        dateTimeDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+        dateTimeDismissBtn.setOnClickListener {
+            dateTimeDialog.dismiss()
         }
-        alertDialog?.show()
-        val timePickerBtn=alertDialog?.findViewById<View>(R.id.timePickButton)
-        val datePickerBtn = alertDialog?.findViewById<ImageButton>(R.id.datePickButton)
-        timeTitleTV = alertDialog?.findViewById(R.id.timeTitle)!!
-        dateTitleTV = alertDialog.findViewById(R.id.dateTitle)
+        dateTimeConfirmBtn.setOnClickListener {
+            if(noteDescriptionEdit.length() > 0 || noteTitleEdit.length() >0 ){
+                viewModal.noteChanged.value = true
+            }
+            if (System.currentTimeMillis() < calendar.timeInMillis){
+                viewModal.reminderTime = calendar.timeInMillis
+                viewModal.reminderSet.value = true
+                Toast.makeText(applicationContext,resources.getString(R.string.reminder, DateFormat.getDateFormat(applicationContext).format(calendar.time) , DateFormat.getTimeFormat(applicationContext).format(calendar.time)),Toast.LENGTH_SHORT).show()
+            }
+            dateTimeDialog.dismiss()
+        }
+
+        val timePickerBtn=dateTimeDialog?.findViewById<View>(R.id.timePickButton)
+        val datePickerBtn = dateTimeDialog?.findViewById<ImageButton>(R.id.datePickButton)
+        timeTitleTV = dateTimeDialog?.findViewById(R.id.timeTitle)!!
+        dateTitleTV = dateTimeDialog.findViewById(R.id.dateTitle)
 
         timePickerBtn?.setOnClickListener {
             TimePickerFragment(this).show(supportFragmentManager,"timePicker")
@@ -1418,6 +1433,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
         tags.removeAll(viewModal.deletedTags.toSet())
         intent.putStringArrayListExtra("tagList", tags)
         intent.putExtra("noteType","Edit")
+        val toDoItemString: String = Gson().toJson(viewModal.todoItems)
+        intent.putExtra("todoItems", toDoItemString)
 
         val pendingIntent = PendingIntent.getBroadcast(this, requestCode, intent, PendingIntent.FLAG_IMMUTABLE)
         alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
@@ -1458,9 +1475,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         viewModal.labelColor.observe(this){
             labelColor = it
         }
-
         if(viewModal.noteChanged.value == true){
-
             if (noteTitle.isNotEmpty() || noteDescription.isNotEmpty() || viewModal.todoItems.isNotEmpty()){
 
                 val tags = ArrayList<String>()
@@ -1505,7 +1520,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                             saveOtherEntities()
 
                         }
-                        Toast.makeText(this,getString(R.string.note_updated) , Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this,getString(R.string.note_saved) , Toast.LENGTH_SHORT).show()
 
                     }
                 }else{
@@ -1572,27 +1587,27 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
     private fun saveOtherEntities(){
         noteUid?.let {
-
             val newTagsAdded = viewModal.newTags
             val deletedTags = viewModal.deletedTags
             viewModal.addOrDeleteTags(newTagsAdded,deletedTags,it)
         }
-
         val labelColor = viewModal.labelColor.value
         val labelTitle = viewModal.labelTitle.value
+
         if (viewModal.labelChanged){
             if (labelColor != null) {
                 if (labelColor > 0){
+
                     noteUid?.let { viewModal.addOrDeleteLabel(labelColor,labelTitle,oldLabel, it,true) }
+
                 }else{
+
                     noteUid?.let { viewModal.addOrDeleteLabel(labelColor,labelTitle, oldLabel, it, false) }
+
 
                 }
             }
         }
-
-
-
 
         if (viewModal.reminderTime > 0){
             if (viewModal.reminderSet.value == true){
@@ -1674,11 +1689,11 @@ class AddEditNoteActivity : AppCompatActivity() ,
         tags.addAll(viewModal.newTags)
         tagListAdapter.updateList(ArrayList(tags))
         viewModal.noteChanged.value = true
-
     }
 
-    override fun onLabelItemClick(labelColor: Int) {
+    override fun onLabelItemClick(labelColor: Int, labelTitle : String?) {
         viewModal.labelColor.value = labelColor
+        viewModal.labelTitle.value = labelTitle
         viewModal.labelChanged = true
         viewModal.noteChanged.value = true
         textChanged = true
@@ -1710,8 +1725,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
         todoItems[position] = todoItem
         viewModal.todoItems = todoItems
         todoRVAdapter.updateTodoItems(todoItems)
-        todoRVAdapter.notifyItemChanged(position)
-
         viewModal.updatedTodos.add(todoItem)
     }
 
@@ -1722,7 +1735,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
         viewModal.todoItems = todoItems
         todoRVAdapter.notifyItemChanged(position)
         viewModal.updatedTodos.add(todoItem)
-
     }
 
 

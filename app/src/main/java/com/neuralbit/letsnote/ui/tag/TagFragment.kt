@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.gms.ads.AdRequest
 import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.databinding.FragmentTagBinding
-import com.neuralbit.letsnote.entities.TagFire
+import com.neuralbit.letsnote.firebase.entities.TagFire
 import com.neuralbit.letsnote.ui.addEditNote.NoteViewModel
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import java.util.*
@@ -62,6 +62,7 @@ class TagFragment : Fragment(), TagRVAdapter.TagItemClick {
         tagRV.layoutManager =layoutManager
         val tagRVAdapter = context?.let { TagRVAdapter(it,this) }
         tagRV.adapter= tagRVAdapter
+
 
         noteViewModel.allFireTags().observe(viewLifecycleOwner){
             val tagList = HashSet<Tag>()

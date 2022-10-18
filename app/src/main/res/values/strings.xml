@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Let\'s note</string>
+    <string name="app_name" translatable="false">Let\'s note</string>
     <string name="app_version">App version 1.0</string>
     <string name="app_icon">App icon</string>
     <string name="welcome_text">Let\'s get started</string>
@@ -65,6 +65,7 @@
     <string name="note">Note</string>
     <string name="font_style">Font style</string>
     <string name="font_size">Font size</string>
+    <string name="fingerprint_retry">Click the fingerprint icon to try again</string>
     <string name="skip">Skip</string>
     <string name="yes">Yes</string>
     <string name="note_archived">Note archived</string>
@@ -168,4 +169,21 @@
     <string name="all_tag_notes">List of all notes belonging to this tag</string>
     <string name="all_deleted_notes">List of all deleted notes</string>
     <string name="delete_note">Delete Note</string>
+    <string name="new_todo_note">New todo</string>
+    <string name="new_text_note">New note</string>
+    <string name="share_app">Share App</string>
+    <string name="let_others_know_about_us">Let others know about us</string>
+    <string name="okay">Okay</string>
+    <string name="release_notes">Release notes</string>
+    <string name="release_notes_desc">- UI optimisation \n- Reminder fix  \n- Crash fixes when adding a new tag  \n- Language support for French, German, Spanish, Italian and Swahili \n- Other bug fixes</string>
+    <string name="never_lose_a_note">Never lose a note</string>
+    <string name="welcome">Welcome</string>
+    <string name="back_up_active">Backup activated</string>
+    <string name="back_up_deactivated">Backup deactivated</string>
+    <string name="never_lose_a_note_desc">Your notes are backed up to the cloud so that you are never worried about your notes getting lost</string>
+    <string name="need_privacy">Need some privacy ?</string>
+    <string name="need_privacy_desc">We\'ve got you covered. Protected notes are only accessible when authenticated by your fingerprint reader</string>
+    <string name="scared_forgetting">Hmm… scared of forgetting something</string>
+    <string name="scared_forgetting_desc">No need to worry, set a reminder so that you never have to forget stuff</string>
+    <string name="link_complete">Link completed, cloud backup activated</string>
 </resources>

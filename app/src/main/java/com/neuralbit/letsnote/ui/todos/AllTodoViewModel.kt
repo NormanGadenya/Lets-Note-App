@@ -6,8 +6,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
-import com.neuralbit.letsnote.entities.NoteFire
-import com.neuralbit.letsnote.repos.NoteFireRepo
+import com.neuralbit.letsnote.firebase.entities.NoteFire
+import com.neuralbit.letsnote.firebase.repos.NoteFireRepo
 import java.util.*
 
 class AllTodoViewModel (application : Application) : AndroidViewModel(application) {
@@ -28,7 +28,6 @@ class AllTodoViewModel (application : Application) : AndroidViewModel(applicatio
 
     fun filterOtherFireList () : LiveData<LinkedList<NoteFire>> {
         val textLower = searchQuery.value
-        Log.d("LOG", "filterList:${searchQuery.value} ")
         return if (searchQuery.value!=null){
             Transformations.map(otherFireNotesList,){
                 filterList(it,textLower)

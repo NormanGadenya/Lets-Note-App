@@ -1,9 +1,9 @@
-package com.neuralbit.letsnote.entities
+package com.neuralbit.letsnote.firebase.entities
 
 data class NoteFire (
-    val title: String ="",
-    val description: String = "",
-    val timeStamp: Long = 0,
+    var title: String ="",
+    var description: String = "",
+    var timeStamp: Long = 0,
     var reminderDate :Long = 0,
     var pinned: Boolean = false,
     var archived: Boolean = false,

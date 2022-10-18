@@ -1,5 +1,6 @@
-package com.neuralbit.letsnote.repos
+package com.neuralbit.letsnote.firebase.repos
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
@@ -8,11 +9,9 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import com.neuralbit.letsnote.entities.NoteFire
-import com.neuralbit.letsnote.entities.NoteFireIns
+import com.neuralbit.letsnote.firebase.entities.NoteFire
+import com.neuralbit.letsnote.firebase.entities.NoteFireIns
 import com.neuralbit.letsnote.utilities.NoteComparator
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 class NoteFireRepo {
 
@@ -31,9 +30,8 @@ class NoteFireRepo {
     }
 
 
-    suspend fun getAllNotes () : LiveData<ArrayList<NoteFire>> {
+    fun getAllNotes () : LiveData<ArrayList<NoteFire>> {
         val live = MutableLiveData<ArrayList<NoteFire>>()
-        withContext(Dispatchers.Main){
             var notesRef = fUser?.let { database.getReference(it.uid).child("notes") }
             val eventListener = object : ValueEventListener{
                 override fun onDataChange(snapshot: DataSnapshot) {
@@ -46,8 +44,8 @@ class NoteFireRepo {
                             notes.add(note)
                         }
                     }
-
                     notes.sortWith(NoteComparator())
+                    Log.d(TAG, "onDataChange: $notes")
                     live.value = notes
                 }
 
@@ -65,9 +63,6 @@ class NoteFireRepo {
                 notesRef?.addValueEventListener(eventListener)
 
             }
-        }
-
-
         return live
     }
 

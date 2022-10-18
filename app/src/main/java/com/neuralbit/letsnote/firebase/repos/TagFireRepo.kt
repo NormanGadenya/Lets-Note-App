@@ -1,4 +1,4 @@
-package com.neuralbit.letsnote.repos
+package com.neuralbit.letsnote.firebase.repos
 
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -9,7 +9,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import com.neuralbit.letsnote.entities.TagFire
+import com.neuralbit.letsnote.firebase.entities.TagFire
 
 class TagFireRepo {
 
@@ -26,6 +26,7 @@ class TagFireRepo {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val tags = ArrayList<TagFire>()
                 for ( s : DataSnapshot in snapshot.children ){
+                    Log.d(TAG, "onDataChange: $s")
                     val tag = s.getValue(TagFire::class.java)
                     if (tag != null) {
                         tag.tagName = "#"+ s.key!!

@@ -13,6 +13,7 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:scrollbars="none"
         android:layout_marginBottom="4dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/adView"
@@ -53,14 +54,20 @@
 
                     <RadioButton
                         android:id="@+id/darkMode"
-                        android:text="@string/dark_mode" />
+                        android:text="@string/dark_mode"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
 
                     <RadioButton
                         android:id="@+id/lightMode"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:text="@string/light_mode" />
 
                     <RadioButton
                         android:id="@+id/defaultMode"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:text="@string/default_mode" />
                 </RadioGroup>
             </androidx.cardview.widget.CardView>
@@ -150,21 +157,29 @@
 
                     <RadioButton
                         android:id="@+id/fontA"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:fontFamily="@font/architects_daughter"
                         android:text="@string/architects_daughter" />
 
                     <RadioButton
                         android:id="@+id/fontB"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:fontFamily="@font/abeezee"
                         android:text="@string/abreeze" />
 
                     <RadioButton
                         android:id="@+id/fontC"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:fontFamily="@font/adamina"
                         android:text="@string/adamina" />
 
                     <RadioButton
                         android:id="@+id/fontDef"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:fontFamily="@font/roboto"
                         android:text="@string/default_mode" />
 
@@ -182,12 +197,15 @@
                 app:layout_constraintTop_toBottomOf="@+id/cardView3" />
 
 
+
+
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardView4"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
                 android:clickable="true"
+                android:visibility="visible"
                 android:focusable="true"
                 app:cardCornerRadius="10dp"
                 app:layout_constraintTop_toBottomOf="@+id/backUpTV"
@@ -197,15 +215,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="8dp"
-
                     >
 
-                    <Button
+                    <androidx.appcompat.widget.AppCompatButton
                         android:id="@+id/signInWithGoogleBtn"
                         android:layout_width="150dp"
                         android:layout_height="wrap_content"
                         android:layout_margin="16dp"
-                        android:background="@drawable/sign_in_bgnd"
+                        android:background="@drawable/share_app_bgnd"
                         android:drawableLeft="@drawable/icons_google"
                         android:contentDescription="@string/sign_in"
                         android:text="@string/sign_in"
@@ -235,6 +252,51 @@
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.cardview.widget.CardView>
 
+            <TextView
+                android:id="@+id/shareAppTitleTV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:text="@string/let_others_know_about_us"
+                android:textSize="20sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/cardView4" />
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardView5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardCornerRadius="10dp"
+                app:layout_constraintTop_toBottomOf="@+id/shareAppTitleTV"
+                >
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    >
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/shareButton"
+                        android:layout_width="150dp"
+                        android:layout_height="50dp"
+                        android:layout_margin="16dp"
+                        android:padding="8dp"
+
+                        android:background="@drawable/share_app_bgnd"
+                        android:contentDescription="@string/sign_in"
+                        android:drawableStart="@drawable/baseline_share_24"
+                        android:text="@string/share_app"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.cardview.widget.CardView>
+
 
             <com.google.android.material.switchmaterial.SwitchMaterial
                 android:id="@+id/emptyTrashSwitch"
@@ -244,7 +306,7 @@
                 android:text="@string/empty_trash"
                 android:textSize="16sp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/cardView4" />
+                app:layout_constraintTop_toBottomOf="@+id/cardView5" />
 
 
             <TextView

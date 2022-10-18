@@ -34,13 +34,14 @@ class SignInActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         mAuth = FirebaseAuth.getInstance()
         firebaseUser = mAuth.currentUser
-        if (firebaseUser!=null){
+
+
+        val settingsPref : SharedPreferences = getSharedPreferences("Settings", MODE_PRIVATE)
+        val useLocalStorage = settingsPref.getBoolean("useLocalStorage",false)
+        if (firebaseUser!=null || useLocalStorage){
             val intent = Intent(this@SignInActivity, MainActivity::class.java)
             startActivity(intent)
         }
-
-        val settingsPref : SharedPreferences = getSharedPreferences("Settings", MODE_PRIVATE)
-
         lifecycleScope.launch {
             when (settingsPref.getString("mode","default")) {
                 "Dark mode" -> {
@@ -63,7 +64,15 @@ class SignInActivity : AppCompatActivity() {
         progressBar = findViewById(R.id.sign_in_progress_bar)
 
         findViewById<View>(R.id.signInWithGoogleBtn).setOnClickListener { signInGoogle() }
-        findViewById<View>(R.id.signInWithAnnoneBtn).setOnClickListener { signInAnon() }
+        findViewById<View>(R.id.signInWithAnnoneBtn).setOnClickListener {
+            val editor :SharedPreferences.Editor = settingsPref.edit()
+            editor.putBoolean("useLocalStorage", true)
+            editor.apply()
+            val intent = Intent(this@SignInActivity, MainActivity::class.java)
+            intent.putExtra("Signed in", true)
+            startActivity(intent)
+//            signInAnon()
+        }
         val termsAndConditions = findViewById<View>(R.id.termsAndConditionTV)
         termsAndConditions.setOnClickListener {
             val i = Intent(applicationContext, TermsAndConditions::class.java)
@@ -107,28 +116,30 @@ class SignInActivity : AppCompatActivity() {
         }
     }
 
-    private fun signInAnon(){
-        if (!isNetworkConnected()){
-            Toast.makeText(applicationContext,resources.getString(R.string.no_internet_connection_init),Toast.LENGTH_SHORT).show()
-        }else{
-            progressBar.visibility = View.VISIBLE
-
-            mAuth.signInAnonymously()
-                .addOnCompleteListener(this) { task ->
-                    if (task.isSuccessful) {
-                        progressBar.visibility = GONE
-                        // Sign in success, update UI with the signed-in user's information
-                        val intent = Intent(this@SignInActivity, MainActivity::class.java)
-                        startActivity(intent)
-                    } else {
-                        progressBar.visibility = GONE
-
-                        // If sign in fails, display a message to the user.
-                        Toast.makeText(applicationContext, "Authentication failed.", Toast.LENGTH_SHORT).show()
-                    }
-                }
-        }
-    }
+//    private fun signInAnon(){
+//        if (!isNetworkConnected()){
+//            Toast.makeText(applicationContext,resources.getString(R.string.no_internet_connection_init),Toast.LENGTH_SHORT).show()
+//        }else{
+//            progressBar.visibility = View.VISIBLE
+//
+//            mAuth.signInAnonymously()
+//                .addOnCompleteListener(this) { task ->
+//                    if (task.isSuccessful) {
+//
+//                        progressBar.visibility = GONE
+//                        // Sign in success, update UI with the signed-in user's information
+//                        val intent = Intent(this@SignInActivity, MainActivity::class.java)
+//                        intent.putExtra("Signed in", true)
+//                        startActivity(intent)
+//                    } else {
+//                        progressBar.visibility = GONE
+//
+//                        // If sign in fails, display a message to the user.
+//                        Toast.makeText(applicationContext, "Authentication failed.", Toast.LENGTH_SHORT).show()
+//                    }
+//                }
+//        }
+//    }
 
     private fun isNetworkConnected(): Boolean {
         val cm = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager

@@ -1,11 +1,11 @@
-package com.neuralbit.letsnote.services
+package com.neuralbit.letsnote.receivers
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.neuralbit.letsnote.repos.LabelFireRepo
-import com.neuralbit.letsnote.repos.NoteFireRepo
-import com.neuralbit.letsnote.repos.TagFireRepo
+import com.neuralbit.letsnote.firebase.repos.LabelFireRepo
+import com.neuralbit.letsnote.firebase.repos.NoteFireRepo
+import com.neuralbit.letsnote.firebase.repos.TagFireRepo
 
 class DeleteReceiver : BroadcastReceiver() {
 

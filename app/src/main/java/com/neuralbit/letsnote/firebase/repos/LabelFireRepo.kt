@@ -1,4 +1,4 @@
-package com.neuralbit.letsnote.repos
+package com.neuralbit.letsnote.firebase.repos
 
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -9,7 +9,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import com.neuralbit.letsnote.entities.LabelFire
+import com.neuralbit.letsnote.firebase.entities.LabelFire
 
 class LabelFireRepo {
     private val database = Firebase.database
@@ -54,7 +54,7 @@ class LabelFireRepo {
 
     fun addOrDeleteLabels(newLabel : Int, oldLabel : Int, noteUid: String, labelTitle : String?, add : Boolean) {
         val labelRef = fUser?.let { database.getReference(it.uid).child("labels")}
-        if (newLabel>0){
+
             labelRef?.addListenerForSingleValueEvent( object  : ValueEventListener {
                 override fun onDataChange(s: DataSnapshot) {
                     var exists = false
@@ -63,7 +63,7 @@ class LabelFireRepo {
                         if (snapshot.key == newLabel.toString()){
                             if (labelFire != null) {
                                 val noteUids = labelFire.noteUids
-                                if (add) {
+                                if (add && newLabel > 0) {
                                     if (!noteUids.contains(noteUid)){
                                         noteUids.add(noteUid)
                                         val updateMap = HashMap<String, Any>()
@@ -100,7 +100,7 @@ class LabelFireRepo {
                             }
                         }
                     }
-                    if (!exists){
+                    if (!exists && add){
                         val newLabelMap = HashMap<String, Any>()
                         val noteUids = ArrayList<String>()
                         noteUids.add(noteUid)
@@ -117,7 +117,7 @@ class LabelFireRepo {
                     Log.d(TAG, "onCancelled: $error")
                 }
             })
-        }
+
 
     }
 

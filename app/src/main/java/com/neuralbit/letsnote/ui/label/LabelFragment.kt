@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.gms.ads.AdRequest
 import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.databinding.LabelFragmentBinding
-import com.neuralbit.letsnote.entities.LabelFire
+import com.neuralbit.letsnote.firebase.entities.LabelFire
 import com.neuralbit.letsnote.ui.addEditNote.NoteViewModel
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import com.neuralbit.letsnote.ui.settings.SettingsViewModel

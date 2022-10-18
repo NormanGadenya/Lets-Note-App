@@ -20,5 +20,5 @@
     <alpha
         android:fromAlpha="1"
         android:toAlpha="0"
-        android:duration= "150"/>
+        android:duration= "100"/>
 </set>

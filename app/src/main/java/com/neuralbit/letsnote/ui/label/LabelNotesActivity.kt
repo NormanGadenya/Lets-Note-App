@@ -23,14 +23,14 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.gson.Gson
 import com.neuralbit.letsnote.R
-import com.neuralbit.letsnote.entities.NoteFire
-import com.neuralbit.letsnote.services.DeleteReceiver
+import com.neuralbit.letsnote.firebase.entities.NoteFire
+import com.neuralbit.letsnote.receivers.AlertReceiver
+import com.neuralbit.letsnote.receivers.DeleteReceiver
 import com.neuralbit.letsnote.ui.adapters.NoteFireClick
 import com.neuralbit.letsnote.ui.adapters.NoteRVAdapter
 import com.neuralbit.letsnote.ui.addEditNote.AddEditNoteActivity
 import com.neuralbit.letsnote.ui.addEditNote.Fingerprint
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
-import com.neuralbit.letsnote.utilities.AlertReceiver
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -74,6 +74,7 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
         noteRVAdapter.lifecycleOwner = this
         val settingsSharedPref = getSharedPreferences("Settings", MODE_PRIVATE)
         val fontStyle = settingsSharedPref?.getString("font",null)
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             noteRVAdapter.fontStyle = fontStyle
         }
@@ -193,6 +194,12 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
                     note.noteUid?.let { it1 -> scheduleDelete(it1,note.tags,note.label,note.timeStamp) }
 
                     val noteUpdate = HashMap<String,Any>()
+                    noteUpdate["title"] = note.title
+                    noteUpdate["description"] = note.description
+                    noteUpdate["label"] = note.label
+                    noteUpdate["pinned"] = note.pinned
+                    noteUpdate["reminderDate"] = note.reminderDate
+                    noteUpdate["protected"] = note.protected
                     noteUpdate["deletedDate"] = System.currentTimeMillis()
                     note.noteUid?.let { it1 -> allNotesViewModel.updateFireNote(noteUpdate, it1) }
                 }else{
@@ -235,6 +242,12 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
                 cancelAlarm(note.reminderDate.toInt())
 
                 val noteUpdate = HashMap<String,Any>()
+                noteUpdate["title"] = note.title
+                noteUpdate["description"] = note.description
+                noteUpdate["label"] = note.label
+                noteUpdate["pinned"] = note.pinned
+                noteUpdate["reminderDate"] = note.reminderDate
+                noteUpdate["protected"] = note.protected
                 noteUpdate["archived"] = true
                 note.noteUid?.let { it1 -> allNotesViewModel.updateFireNote(noteUpdate, it1) }
             }
@@ -245,7 +258,7 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
 
             allNotesViewModel.itemSelectEnabled.value = false
             if (selectedNotesCount == 1){
-                Toast.makeText(applicationContext,resources.getString(R.string.notes_archived_successfully),Toast.LENGTH_SHORT).show()
+                Toast.makeText(applicationContext,resources.getString(R.string.notes_archived_successfully,""),Toast.LENGTH_SHORT).show()
 
             }else{
                 Toast.makeText(applicationContext,resources.getString(R.string.notes_archived_successfully,"s"),Toast.LENGTH_SHORT).show()
@@ -327,6 +340,11 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
                     ) { _, _ ->
                         if (viewModel.labelTitle!=null){
                             supportActionBar?.title = viewModel.labelTitle
+                            if (viewModel.labelTitle != null && viewModel.labelColor > 0){
+                                val update = HashMap<String,String>()
+                                update["labelTitle"] = viewModel.labelTitle!!
+                                viewModel.updateLabel(update,viewModel.labelColor)
+                            }
                         }
 
                     }
@@ -361,15 +379,6 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
         return true
     }
 
-    override fun onDestroy() {
-        if (viewModel.labelTitle != null && viewModel.labelColor > 0){
-            val update = HashMap<String,Any>()
-            update["labelTitle"] = viewModel.labelTitle!!
-            viewModel.updateLabel(update,viewModel.labelColor)
-        }
-        super.onDestroy()
-
-    }
 
     override fun onNoteFireClick(note: NoteFire, activated : Boolean) {
         if (!note.selected && !activated){

@@ -6,17 +6,20 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
-import com.neuralbit.letsnote.entities.NoteFire
+import com.google.firebase.auth.FirebaseAuth
+import com.neuralbit.letsnote.firebase.entities.NoteFire
 import java.util.*
 
 class ArchivedViewModel (application : Application): AndroidViewModel(application) {
 
+    var useLocalStorage = false
     var archivedFireNotes = MutableLiveData<ArrayList<NoteFire>>()
 
     var searchQuery : MutableLiveData<String> = MutableLiveData()
     var itemRestoreClicked : MutableLiveData<Boolean> = MutableLiveData()
     var itemDeleteClicked : MutableLiveData<Boolean> = MutableLiveData()
     var notesToRestore : MutableLiveData<NoteFire> = MutableLiveData()
+    private val fUser = FirebaseAuth.getInstance().currentUser
 
 
     fun filterArchivedFireList () : LiveData<ArrayList<NoteFire>>{
