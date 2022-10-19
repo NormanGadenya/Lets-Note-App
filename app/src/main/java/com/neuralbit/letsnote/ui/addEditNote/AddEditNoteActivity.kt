@@ -243,8 +243,9 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 tagListAdapter.updateList(viewModal.oldTagList)
             }
             else -> {
-                if (noteType != "Todo")
-                redoUndoGroup.visibility = VISIBLE
+                if (noteType != "NewTodo"){
+                    redoUndoGroup.visibility = VISIBLE
+                }
 
                 tvTimeStamp.visibility =GONE
             }
@@ -540,7 +541,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
         noteTitleEdit.setOnKeyListener { _, _, _ ->
             viewModal.noteChanged.value = true
             tvTimeStamp.visibility = GONE
-            redoUndoGroup.visibility = VISIBLE
 
             false
         }
@@ -549,7 +549,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
             textChanged = it
             if(it){
                 tvTimeStamp.visibility = GONE
-                redoUndoGroup.visibility = VISIBLE
             }else{
                 tvTimeStamp.visibility = VISIBLE
                 redoUndoGroup.visibility = GONE

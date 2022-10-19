@@ -22,9 +22,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        android:visibility="gone"
-        android:textColor="@color/Red"
         android:text="@string/fingerprint_retry"
+        android:textColor="@color/Red"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/imageView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

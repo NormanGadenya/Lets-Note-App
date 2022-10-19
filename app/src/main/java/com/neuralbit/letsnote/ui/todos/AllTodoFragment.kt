@@ -114,7 +114,6 @@ class AllTodoFragment : Fragment() , NoteFireClick {
                 allNotesViewModel.allFireNotes.value = it
             }
         }
-        //TODO fix freezing issue
         allNotesViewModel.allFireNotes.observe(viewLifecycleOwner){ notes ->
 
             val pinnedNotes = LinkedList<NoteFire>()
