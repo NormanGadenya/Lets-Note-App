@@ -23,6 +23,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -44,9 +45,6 @@ import com.neuralbit.letsnote.ui.deletedNotes.DeletedNotesViewModel
 import com.neuralbit.letsnote.ui.label.LabelViewModel
 import com.neuralbit.letsnote.ui.signIn.SignInActivity
 import com.neuralbit.letsnote.ui.tag.TagViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
 
 class MainActivity : AppCompatActivity() {
@@ -125,7 +123,7 @@ class MainActivity : AppCompatActivity() {
         val signedIn = intent.getBooleanExtra("Signed in",false)
         allNotesViewModal.signedIn = signedIn
         if (signedIn){
-            GlobalScope.launch(Dispatchers.IO) {
+            lifecycleScope.launchWhenStarted {
 
                 allNotesViewModal.getAllFireNotes().observe(lifecycleOwner){
 

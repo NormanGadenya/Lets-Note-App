@@ -23,7 +23,9 @@ class ApplicationIntro : AppIntro2() {
         }
         addSlide(AppIntroFragment.createInstance(
             title = "Welcome",
+            titleColorRes =  R.color.gunmetal,
             description = resources.getString(R.string.welcome_text),
+            descriptionColorRes =  R.color.gunmetal,
             backgroundColorRes= R.color.Honeydew_Dark,
             imageDrawable = R.drawable.next_steps_rafiki,
         ))
@@ -31,6 +33,8 @@ class ApplicationIntro : AppIntro2() {
         addSlide(
             AppIntroFragment.createInstance(
                 imageDrawable = R.drawable.memory_storage_cuate__1_,
+                titleColorRes =  R.color.gunmetal,
+                descriptionColorRes =  R.color.gunmetal,
                 title = resources.getString(R.string.never_lose_a_note),
                 backgroundColorRes= R.color.Apricot_Dark,
                 description = resources.getString(R.string.never_lose_a_note_desc)
@@ -39,6 +43,8 @@ class ApplicationIntro : AppIntro2() {
         addSlide(AppIntroFragment.createInstance(
             title = resources.getString(R.string.need_privacy),
             imageDrawable = R.drawable.fingerprint_rafiki,
+            descriptionColorRes =  R.color.gunmetal,
+            titleColorRes =  R.color.gunmetal,
             backgroundColorRes= R.color.Honeydew_Dark,
             description = resources.getString(R.string.need_privacy_desc)
         ))
@@ -46,6 +52,8 @@ class ApplicationIntro : AppIntro2() {
         addSlide(AppIntroFragment.createInstance(
             title = resources.getString(R.string.scared_forgetting) ,
             imageDrawable = R.drawable.reminders_pana,
+            descriptionColorRes =  R.color.gunmetal,
+            titleColorRes =  R.color.gunmetal,
             backgroundColorRes= R.color.Wild_orchid_Dark,
             description = resources.getString(R.string.scared_forgetting_desc)
         ))
