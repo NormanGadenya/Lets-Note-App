@@ -243,8 +243,9 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 tagListAdapter.updateList(viewModal.oldTagList)
             }
             else -> {
-                if (noteType != "Todo")
-                redoUndoGroup.visibility = VISIBLE
+                if (noteType != "NewTodo"){
+                    redoUndoGroup.visibility = VISIBLE
+                }
 
                 tvTimeStamp.visibility =GONE
             }
@@ -445,6 +446,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 tvTimeStamp.visibility =GONE
+                viewModal.deleteIgnored.value = true
+
                 if(p3>0){
 
                     if(!tagListAdapter.deleteIgnored){
@@ -476,7 +479,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
             override fun onTextChanged(p0: CharSequence?, start: Int, before: Int, count: Int) {
                 viewModal.noteChanged.value = true
-
+                viewModal.deleteIgnored.value = true
                 tvTimeStamp.visibility =GONE
                 redoUndoGroup.visibility = VISIBLE
                 if(p0?.length!! > 0){
@@ -540,7 +543,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
         noteTitleEdit.setOnKeyListener { _, _, _ ->
             viewModal.noteChanged.value = true
             tvTimeStamp.visibility = GONE
-            redoUndoGroup.visibility = VISIBLE
 
             false
         }
@@ -549,7 +551,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
             textChanged = it
             if(it){
                 tvTimeStamp.visibility = GONE
-                redoUndoGroup.visibility = VISIBLE
             }else{
                 tvTimeStamp.visibility = VISIBLE
                 redoUndoGroup.visibility = GONE
@@ -910,6 +911,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
         if (reminderTime > (0).toLong()){
             viewModal.reminderSet.value = true
         }
+        tagListAdapter.viewModel = viewModal
+        tagListAdapter.lifecycleOwner = lifecycleOwner
         viewModal.allTodoItems.value = todoDoItemList
         if (oldLabel > 0){
             viewModal.labelColor.value = oldLabel
@@ -1482,6 +1485,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 tags.addAll(viewModal.oldTagList)
                 tags.addAll(viewModal.newTags)
                 tags.removeAll(viewModal.deletedTags.toSet())
+                val emptyTrashImmediately = settingsPref.getBoolean("EmptyTrashImmediately",false)
 
                 if (viewModal.deletedNote.value != true){
                     if(noteType == "Edit" && noteUid!= null){
@@ -1516,6 +1520,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                             noteFire.label = labelColor
                             noteFire.protected = viewModal.noteLocked.value == true
                             noteFire.todoItems = ArrayList(viewModal.todoItems)
+                            noteFire.archived = viewModal.archived.value == true
                             noteUid =  viewModal.addFireNote(noteFire)
                             saveOtherEntities()
 
@@ -1524,7 +1529,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
                     }
                 }else{
-                    val emptyTrashImmediately = settingsPref.getBoolean("EmptyTrashImmediately",false)
                     if (!emptyTrashImmediately){
                         cancelDelete(viewModal.reminderTime.toInt())
                         val noteUpdate = HashMap<String,Any>()

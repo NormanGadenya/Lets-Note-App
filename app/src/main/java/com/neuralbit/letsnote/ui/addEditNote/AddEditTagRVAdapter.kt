@@ -8,6 +8,7 @@ import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.neuralbit.letsnote.R
 
@@ -18,6 +19,9 @@ class AddEditTagRVAdapter (
     ) : RecyclerView.Adapter<AddEditTagRVAdapter.ViewHolder>(){
     var deleteIgnored = false
     private val allTags = ArrayList<String>()
+    var lifecycleOwner : LifecycleOwner ? = null
+    var viewModel : NoteViewModel ? = null
+
     val TAG = " TAG "
 
 
@@ -43,13 +47,16 @@ class AddEditTagRVAdapter (
             return@setOnLongClickListener true
         }
         holder.deleteBtn.setOnClickListener {
+            holder.deleteBtn.visibility = GONE
             tagRVInterface.deleteTag(tag)
         }
-
-        if (deleteIgnored) {
-            holder.deleteBtn.visibility = GONE
+        lifecycleOwner?.let {
+            viewModel?.deleteIgnored?.observe(it){ d ->
+                if (d){
+                    holder.deleteBtn.visibility = GONE
+                }
+            }
         }
-
     }
 
     override fun getItemCount(): Int {

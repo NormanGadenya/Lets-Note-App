@@ -29,6 +29,7 @@ import com.neuralbit.letsnote.ui.addEditNote.AddEditNoteActivity
 import com.neuralbit.letsnote.ui.addEditNote.Fingerprint
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import com.neuralbit.letsnote.ui.settings.SettingsViewModel
+import kotlinx.coroutines.launch
 import java.util.*
 
 class ArchivedFragment : Fragment() , NoteFireClick {
@@ -86,9 +87,10 @@ class ArchivedFragment : Fragment() , NoteFireClick {
             }
         }
         setHasOptionsMenu(true)
-        allNotesViewModel.getAllFireNotes().observe(viewLifecycleOwner){
-
-            allNotesViewModel.allFireNotes.value = it
+        lifecycleScope.launch {
+            allNotesViewModel.getAllFireNotes().observe(viewLifecycleOwner){
+                allNotesViewModel.allFireNotes.value = it
+            }
         }
 
         allNotesViewModel.allFireNotes.observe(viewLifecycleOwner) {

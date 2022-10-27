@@ -37,7 +37,6 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     var deletedTags = HashSet<String>()
     var noteChanged = MutableLiveData<Boolean>()
     var appPaused = false
-    var adViewed = false
     var archived : MutableLiveData<Boolean> = MutableLiveData()
     var noteLocked = MutableLiveData<Boolean>()
     var deletedNote : MutableLiveData<Boolean> = MutableLiveData()
@@ -55,6 +54,7 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     val updatedTodos = ArrayList<TodoItem>()
     var undoMode : MutableLiveData<Boolean> = MutableLiveData()
     var labelFireList = ArrayList<LabelFire>()
+    val deleteIgnored = MutableLiveData<Boolean>()
 
     private val noteRoomDao = NoteDatabase.getDatabase(application).getNotesDao()
     private val noteRoomRepo = NoteRoomRepo(noteRoomDao)

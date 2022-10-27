@@ -12,6 +12,8 @@ import com.google.firebase.ktx.Firebase
 import com.neuralbit.letsnote.firebase.entities.NoteFire
 import com.neuralbit.letsnote.firebase.entities.NoteFireIns
 import com.neuralbit.letsnote.utilities.NoteComparator
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class NoteFireRepo {
 
@@ -30,40 +32,42 @@ class NoteFireRepo {
     }
 
 
-    fun getAllNotes () : LiveData<ArrayList<NoteFire>> {
-        val live = MutableLiveData<ArrayList<NoteFire>>()
-            var notesRef = fUser?.let { database.getReference(it.uid).child("notes") }
-            val eventListener = object : ValueEventListener{
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val notes = ArrayList<NoteFire>()
-                    for ( s : DataSnapshot in snapshot.children ){
+     fun getAllNotes () : LiveData<ArrayList<NoteFire>> {
+        val liveNotes = MutableLiveData<ArrayList<NoteFire>>()
+         var notesRef = fUser?.let { database.getReference(it.uid).child("notes") }
+         GlobalScope.launch {
+             val eventListener = object : ValueEventListener{
+                 override fun onDataChange(snapshot: DataSnapshot) {
+                     val notes = ArrayList<NoteFire>()
+                     for ( s : DataSnapshot in snapshot.children ){
 
-                        val note = s.getValue(NoteFire::class.java)
-                        if (note != null) {
-                            note.noteUid = s.key
-                            notes.add(note)
-                        }
-                    }
-                    notes.sortWith(NoteComparator())
-                    Log.d(TAG, "onDataChange: $notes")
-                    live.value = notes
-                }
+                         val note = s.getValue(NoteFire::class.java)
+                         if (note != null) {
+                             note.noteUid = s.key
+                             notes.add(note)
+                         }
+                     }
+                     notes.sortWith(NoteComparator())
+                     Log.d(TAG, "onDataChange: $notes")
+                     liveNotes.postValue(notes)
+                 }
 
-                override fun onCancelled(error: DatabaseError) {
-                    throw error.toException()
+                 override fun onCancelled(error: DatabaseError) {
+                     throw error.toException()
 
-                }
-            }
-            notesRef?.addValueEventListener(eventListener)
-            FirebaseAuth.getInstance().addAuthStateListener {
-                notesRef?.removeEventListener(eventListener)
-                fUser= it.currentUser
-                notesRef = it.currentUser?.uid?.let { it1 -> database.getReference(it1).child("notes") }
+                 }
+             }
+             notesRef?.addValueEventListener(eventListener)
+             FirebaseAuth.getInstance().addAuthStateListener {
+                 notesRef?.removeEventListener(eventListener)
+                 fUser= it.currentUser
+                 notesRef = it.currentUser?.uid?.let { it1 -> database.getReference(it1).child("notes") }
 
-                notesRef?.addValueEventListener(eventListener)
+                 notesRef?.addValueEventListener(eventListener)
 
-            }
-        return live
+             }
+         }
+         return liveNotes
     }
 
     fun updateNote(noteUpdate : Map<String,Any>, noteUid : String) {

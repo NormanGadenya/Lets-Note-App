@@ -68,7 +68,7 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
     }
 
 
-    fun getAllFireNotes () : LiveData<ArrayList<NoteFire>>{
+    suspend fun getAllFireNotes () : LiveData<ArrayList<NoteFire>>{
         val mutableNoteData = MutableLiveData<ArrayList<NoteFire>>()
         fUser = FirebaseAuth.getInstance().currentUser
         Log.d(TAG, "getAllFireNotes: ${fUser}")
