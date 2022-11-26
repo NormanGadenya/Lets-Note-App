@@ -127,7 +127,7 @@ class MainActivity : AppCompatActivity() {
 
                 allNotesViewModal.getAllFireNotes().observe(lifecycleOwner){
 
-                    allNotesViewModal.allFireNotes.value = it
+//                    allNotesViewModal.allFireNotes.value = it
 
                     for (noteFire in it) {
 
