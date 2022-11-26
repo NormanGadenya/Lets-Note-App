@@ -1387,11 +1387,10 @@ class AddEditNoteActivity : AppCompatActivity() ,
             if(noteDescriptionEdit.length() > 0 || noteTitleEdit.length() >0 ){
                 viewModal.noteChanged.value = true
             }
-            if (System.currentTimeMillis() < calendar.timeInMillis){
                 viewModal.reminderTime = calendar.timeInMillis
                 viewModal.reminderSet.value = true
                 Toast.makeText(applicationContext,resources.getString(R.string.reminder, DateFormat.getDateFormat(applicationContext).format(calendar.time) , DateFormat.getTimeFormat(applicationContext).format(calendar.time)),Toast.LENGTH_SHORT).show()
-            }
+
             dateTimeDialog.dismiss()
         }
 
@@ -1667,7 +1666,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
     override fun getTimeInfo(calendar : Calendar) {
 
-        this.calendar[Calendar.HOUR]= calendar[Calendar.HOUR]
+        this.calendar[Calendar.HOUR_OF_DAY]= calendar[Calendar.HOUR_OF_DAY]
         this.calendar[Calendar.MINUTE]= calendar[Calendar.MINUTE]
         this.calendar[Calendar.SECOND]= calendar[Calendar.SECOND]
         timeTitleTV.text= resources.getString(R.string.date_time_set,"Time ", DateFormat.getTimeFormat(applicationContext).format(calendar.time))

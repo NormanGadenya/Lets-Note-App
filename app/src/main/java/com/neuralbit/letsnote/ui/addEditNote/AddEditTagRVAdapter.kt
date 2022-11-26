@@ -43,6 +43,7 @@ class AddEditTagRVAdapter (
         }
         holder.tagTitle.text = tagTitle
         holder.itemView.setOnLongClickListener {
+
             holder.deleteBtn.visibility = VISIBLE
             return@setOnLongClickListener true
         }
