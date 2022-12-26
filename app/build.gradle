@@ -21,8 +21,8 @@ android {
         applicationId "com.neuralbit.letsnote"
         minSdk 25
         targetSdk 33
-        versionCode 20
-        versionName "1.1"
+        versionCode 22
+        versionName "1.2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         signingConfig signingConfigs.release

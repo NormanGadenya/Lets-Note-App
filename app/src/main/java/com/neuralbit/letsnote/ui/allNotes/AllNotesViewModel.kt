@@ -154,11 +154,15 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
                         }
                     }
                 }else{
-                    if(note.title.lowercase(Locale.ROOT).contains(textLower) || note.description.lowercase(
-                            Locale.ROOT
-                        )
-                            .contains(textLower)){
+                    if(note.title.lowercase(Locale.ROOT).contains(textLower) || note.description.lowercase(Locale.ROOT).contains(textLower)){
                         newList.add(note)
+                    }else{
+                        for(tag in note.tags){
+                            if(tag.lowercase(Locale.ROOT).contains(text)){
+                                newList.add(note)
+                                break
+                            }
+                        }
                     }
                 }
             }
