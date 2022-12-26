@@ -55,6 +55,7 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
     var undoMode : MutableLiveData<Boolean> = MutableLiveData()
     var labelFireList = ArrayList<LabelFire>()
     val deleteIgnored = MutableLiveData<Boolean>()
+    val webPhoneLinks = MutableLiveData<List<WebPhoneLink>>()
 
     private val noteRoomDao = NoteDatabase.getDatabase(application).getNotesDao()
     private val noteRoomRepo = NoteRoomRepo(noteRoomDao)
@@ -81,9 +82,6 @@ class NoteViewModel(application : Application) : AndroidViewModel(application) {
             val mapper = ObjectMapper() // jackson's objectmapper
             val noteFireUpdate: NoteFire = mapper.convertValue(noteUpdate, NoteFire::class.java)
 
-            if (noteFireUpdate.deletedDate == (0).toLong()){
-
-            }
             val note = Note(
                 noteFireUpdate.title,
                 noteFireUpdate.description,

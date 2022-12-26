@@ -22,6 +22,9 @@ import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
 import android.text.format.DateFormat
+import android.text.method.LinkMovementMethod
+import android.util.Log
+import android.util.Patterns
 import android.util.SparseArray
 import android.util.TypedValue
 import android.view.*
@@ -69,6 +72,7 @@ import com.neuralbit.letsnote.utilities.*
 import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.*
+import java.util.regex.Matcher
 
 
 class AddEditNoteActivity : AppCompatActivity() ,
@@ -119,11 +123,13 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private lateinit var tagListRV : RecyclerView
     private lateinit var labelListRV : RecyclerView
     private lateinit var todoRV : RecyclerView
+    private lateinit var webLinkRV : RecyclerView
     private lateinit var todoCheckBox: CheckBox
     private lateinit var todoItemDescTV : EditText
     private var todoItemChecked: Boolean = false
     private lateinit var todoRVAdapter : TodoRVAdapter
     private lateinit var tagListAdapter : AddEditTagRVAdapter
+    private lateinit var webLinkAdapter : WebLinkAdapter
     private lateinit var labelListAdapter : AddEditLabelAdapter
     private lateinit var alertBottomSheet : BottomSheetDialog
     private lateinit var labelBottomSheet : BottomSheetDialog
@@ -180,6 +186,11 @@ class AddEditNoteActivity : AppCompatActivity() ,
                     noteDesc = it
                     viewModal.noteChanged.value = true
                     noteDescriptionEdit.setText(it)
+                    val phoneNumbers = extractPhoneNumber(it)
+                    val links = extractUrl(it)
+                    val webPhoneLinks = links + phoneNumbers
+                    Log.d(TAG, "onTextChanged: $webPhoneLinks")
+                    viewModal.webPhoneLinks.value = webPhoneLinks
                 }
             }
         }
@@ -235,6 +246,12 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 noteTitleEdit.setText(noteTitle)
 
                 noteDescriptionEdit.setText(noteDesc)
+                if ( noteDesc != null){
+                    val phoneNumbers = extractPhoneNumber(noteDesc!!)
+                    val links = extractUrl(noteDesc!!)
+                    val webPhoneLinks = links + phoneNumbers
+                    viewModal.webPhoneLinks.value = webPhoneLinks
+                }
                 tvTimeStamp.visibility =VISIBLE
                 redoUndoGroup.visibility = GONE
 
@@ -468,7 +485,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
         noteDescriptionEdit.addTextChangedListener(object : TextWatcher{
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
 
-
                 if (!backPressed ) {
                     noteDescOrigList.clear()
                     noteDescOrig = p0?.toString()
@@ -483,7 +499,13 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 tvTimeStamp.visibility =GONE
                 redoUndoGroup.visibility = VISIBLE
                 if(p0?.length!! > 0){
-
+                    if (p0[p0.length -1] == ' '){
+                        val phoneNumbers = extractPhoneNumber(p0.toString())
+                        val links = extractUrl(p0.toString())
+                        val webPhoneLinks = links + phoneNumbers
+                        Log.d(TAG, "onTextChanged: $webPhoneLinks")
+                        viewModal.webPhoneLinks.value = webPhoneLinks
+                    }
                     noteListBullet()
 
                     getTagFromString(p0)
@@ -500,10 +522,10 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
 
         noteDescriptionEdit.setOnKeyListener { _, key, _ ->
-
             viewModal.backPressed.value = key == KeyEvent.KEYCODE_DEL
 
-            false
+
+            return@setOnKeyListener false
         }
 
         viewModal.noteLocked.observe(lifecycleOwner){
@@ -557,6 +579,9 @@ class AddEditNoteActivity : AppCompatActivity() ,
             }
         }
 
+        viewModal.webPhoneLinks.observe(this){
+            webLinkAdapter.updateWebPhoneLinkList(it)
+        }
 
         ocrButton.setOnClickListener {
             if(isNetworkConnected()){
@@ -643,6 +668,34 @@ class AddEditNoteActivity : AppCompatActivity() ,
         }
     }
 
+    private fun extractUrl(text: String): List<WebPhoneLink> {
+        val webPhoneLinks: MutableList<WebPhoneLink> = ArrayList()
+        val matcher: Matcher = Patterns.WEB_URL.matcher(text)
+        while (matcher.find()) {
+            val start: Int = matcher.start()
+            if (start > 0 && text[start - 1] == '@') {
+                continue
+            } //from w  w w  .j av a  2s .  c o  m
+            var url: String = matcher.group()
+            if (!url.startsWith("http")) {
+                url = "http://$url"
+            }
+            val webPhoneLink = WebPhoneLink(WebPhoneType.WEB, url)
+            webPhoneLinks.add(webPhoneLink)
+        }
+        return webPhoneLinks
+    }
+
+    private fun extractPhoneNumber(text: String): List<WebPhoneLink> {
+        val phoneLinks: MutableList<WebPhoneLink> = ArrayList()
+        val matcher: Matcher = Patterns.PHONE.matcher(text)
+        while (matcher.find()) {
+            val phoneNumber: String = matcher.group()
+            val webPhoneLink = WebPhoneLink(WebPhoneType.PHONE_NUMBER, phoneNumber)
+            phoneLinks.add(webPhoneLink)
+        }
+        return phoneLinks
+    }
 
     private fun deleteNote(){
         val alertDialog: AlertDialog? = this@AddEditNoteActivity.let {
@@ -684,7 +737,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
                 }
             }
-            if (noteContentSplit[lineIndex].endsWith(":")) {
+            if ((noteContentSplit[lineIndex].endsWith(":")) || (noteContentSplit[lineIndex].endsWith(": "))) {
                 if (noteContent.endsWith("\n")) {
                     if (!backPressed) {
                         noteDescriptionEdit.append("- ")
@@ -822,6 +875,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
         layoutManager = LinearLayoutManager(applicationContext,LinearLayoutManager.HORIZONTAL,false)
         calendar = Calendar.getInstance()
         noteDescriptionEdit = findViewById(R.id.noteEditDesc)
+        noteDescriptionEdit.movementMethod = LinkMovementMethod.getInstance()
+
         tvTimeStamp = findViewById(R.id.tvTimeStamp)
         redoUndoGroup = findViewById(R.id.redoUndoGroup)
         tagListRV = findViewById(R.id.tagListRV)
@@ -884,6 +939,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         tagListAdapter= AddEditTagRVAdapter(applicationContext,this)
         labelListAdapter= AddEditLabelAdapter(applicationContext,this)
         todoRVAdapter = TodoRVAdapter(applicationContext,this)
+        webLinkAdapter = WebLinkAdapter(applicationContext)
         labelBottomSheet.setContentView(R.layout.note_label_bottom_sheet)
         delLabelBtn = labelBottomSheet.findViewById(R.id.delLabel)!!
         tagListRV.layoutManager= layoutManager
@@ -892,8 +948,14 @@ class AddEditNoteActivity : AppCompatActivity() ,
         dismissTodoButton = findViewById(R.id.dismissTodoBtn)
         noteDescScrollView = findViewById(R.id.scrollView2)
         todoRV = findViewById(R.id.todoRV)
+        webLinkRV = findViewById(R.id.LinkListRV)
         val layoutManagerTodo = LinearLayoutManager(applicationContext,LinearLayoutManager.VERTICAL,false)
         todoRV.layoutManager = layoutManagerTodo
+        
+        val layoutManagerWebLink = LinearLayoutManager(applicationContext,LinearLayoutManager.VERTICAL,false)
+        webLinkRV.layoutManager = layoutManagerWebLink
+        
+        webLinkRV.adapter = webLinkAdapter
         todoRV.adapter = todoRVAdapter
         todoCheckBox = findViewById(R.id.todoCheckBox)
         todoItemDescTV = findViewById(R.id.todoItemDescTV)

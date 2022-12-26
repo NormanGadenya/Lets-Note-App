@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="10dp"
+    android:layout_margin="16dp"
+    app:cardBackgroundColor="@color/def_Card_Color"
+    android:padding="8dp"
+    android:focusable="true"
+    android:clickable="true"
+    app:cardElevation="0dp">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:background="@android:color/transparent"
+        android:id="@+id/webPhoneCard"
+        android:weightSum="3"
+        >
+
+        <ImageView
+            android:id="@+id/linkTypeIB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_baseline_link_24"
+            android:contentDescription="@string/line_type"/>
+
+        <TextView
+            android:id="@+id/webPhoneLink"
+            android:layout_width="0dp"
+            android:layout_marginStart="8dp"
+            android:textColor="@color/gunmetal"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            tools:text = "dhdhdhdhhdhdhdhhdhdhdhdhhdhdhdndndnndndnddndndndndndndnndndn"
+            />
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>
