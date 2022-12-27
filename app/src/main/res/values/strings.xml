@@ -187,4 +187,6 @@
     <string name="scared_forgetting_desc">No need to worry, set a reminder so that you never have to forget stuff</string>
     <string name="link_complete">Link completed, cloud backup activated</string>
     <string name="line_type">Link type</string>
+    <string name="link_copied">Link copied to clipboard</string>
+    <string name="phone_copied">Phone number copied to clipboard</string>
 </resources>
