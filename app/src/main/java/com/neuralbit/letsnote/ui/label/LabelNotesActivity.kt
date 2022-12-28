@@ -400,6 +400,10 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
                 map["labelTitle"] = newLabelTitle
                 viewModel.updateLabel(newLabelTitle, newLabelColor)
                 labelDialog.dismiss()
+                for (labelNote in viewModel.labelNotes) {
+                    labelNote.label = newLabelColor
+                }
+                noteRVAdapter.updateListFire(viewModel.labelNotes)
             }
             labelDismissBtn.setOnClickListener {
                 labelDialog.dismiss()

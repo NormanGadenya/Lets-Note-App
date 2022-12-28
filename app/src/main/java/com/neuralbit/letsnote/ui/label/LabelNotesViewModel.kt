@@ -81,14 +81,22 @@ class LabelNotesViewModel(
 
     fun updateLabel ( labelTitle : String , newLabelColor: Int){
         if (fUser != null){
-//            labelFireRepo.updateNote(labelUpdate, labelColor)
             labelFireRepo.updateLabelColorOrTitle(labelTitle,labelColor.toString(),newLabelColor.toString() )
         }else{
             val newLabelTitle = labelTitle
-            val label = com.neuralbit.letsnote.room.entities.Label(labelColor, newLabelTitle)
+            val label = com.neuralbit.letsnote.room.entities.Label(newLabelColor, newLabelTitle)
             viewModelScope.launch {
                 labelRoomRepo.insert(label)
+                for ( noteUid in noteUids){
+                    val note = noteRoomRepo.getNote(noteUid)
+                    note.labelColor = newLabelColor
+                    noteRoomRepo.update(note)
+                }
+
+                labelRoomRepo.deleteLabel(labelColor)
             }
+
+
 
         }
     }
