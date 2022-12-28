@@ -1,6 +1,9 @@
 package com.neuralbit.letsnote.ui.addEditNote
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
+import android.content.Context.CLIPBOARD_SERVICE
 import android.content.Intent
 import android.net.Uri
 import android.view.LayoutInflater
@@ -26,9 +29,6 @@ class WebLinkAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val itemView = LayoutInflater.from(context).inflate(R.layout.web_phone_link_layout, parent, false)
-        itemView.setOnClickListener{
-            Toast.makeText(context, "Touched", Toast.LENGTH_SHORT).show()
-        }
         return ViewHolder(itemView)
     }
 
@@ -43,6 +43,20 @@ class WebLinkAdapter(
                 context.startActivity(browserIntent)
             }
 
+            holder.linkIcon.setOnClickListener {
+                val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(webPhoneLink.link))
+                browserIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK;
+                context.startActivity(browserIntent)
+            }
+
+            holder.linkText.setOnLongClickListener {
+                val clipboard = context.getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+                val clip = ClipData.newPlainText("label", webPhoneLink.link)
+                clipboard.setPrimaryClip(clip)
+                Toast.makeText(context, R.string.link_copied, Toast.LENGTH_SHORT).show()
+                return@setOnLongClickListener true
+            }
+
         }else{
             holder.linkIcon.setImageResource(R.drawable.ic_baseline_local_phone_black_24)
             holder.linkText.setOnClickListener {
@@ -50,6 +64,22 @@ class WebLinkAdapter(
                 phoneIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK;
                 context.startActivity(phoneIntent)
             }
+
+            holder.linkIcon.setOnClickListener {
+                val phoneIntent = Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", webPhoneLink.link, null))
+                phoneIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK;
+                context.startActivity(phoneIntent)
+            }
+
+            holder.linkText.setOnLongClickListener {
+                val clipboard = context.getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+                val clip = ClipData.newPlainText("label", webPhoneLink.link)
+                clipboard.setPrimaryClip(clip)
+                Toast.makeText(context, R.string.phone_copied, Toast.LENGTH_SHORT).show()
+                return@setOnLongClickListener true
+            }
+
+
         }
 
     }

@@ -1,7 +1,6 @@
 package com.neuralbit.letsnote.ui.label
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -80,17 +79,26 @@ class LabelNotesViewModel(
         }
     }
 
-    fun updateLabel (labelUpdate : Map<String,String>, labelColor : Int){
+    fun updateLabel ( labelTitle : String , newLabelColor: Int){
         if (fUser != null){
-            labelFireRepo.updateNote(labelUpdate, labelColor)
+            labelFireRepo.updateLabelColorOrTitle(labelTitle,labelColor.toString(),newLabelColor.toString() )
         }else{
-            val newLabelTitle = labelUpdate["labelTitle"]
-            val label = com.neuralbit.letsnote.room.entities.Label(labelColor, newLabelTitle)
-            Log.d(TAG, "updateLabel: $label")
+            val newLabelTitle = labelTitle
+            val label = com.neuralbit.letsnote.room.entities.Label(newLabelColor, newLabelTitle)
             viewModelScope.launch {
                 labelRoomRepo.insert(label)
+                for ( noteUid in noteUids){
+                    val note = noteRoomRepo.getNote(noteUid)
+                    note.labelColor = newLabelColor
+                    noteRoomRepo.update(note)
+                }
+
+                labelRoomRepo.deleteLabel(labelColor)
             }
+
+
 
         }
     }
+
 }

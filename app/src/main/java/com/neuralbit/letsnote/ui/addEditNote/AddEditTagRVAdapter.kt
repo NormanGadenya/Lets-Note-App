@@ -21,7 +21,6 @@ class AddEditTagRVAdapter (
     private val allTags = ArrayList<String>()
     var lifecycleOwner : LifecycleOwner ? = null
     var viewModel : NoteViewModel ? = null
-
     val TAG = " TAG "
 
 
