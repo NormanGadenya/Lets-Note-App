@@ -187,9 +187,10 @@ class AddEditNoteActivity : AppCompatActivity() ,
                     viewModal.noteChanged.value = true
                     noteDescriptionEdit.setText(it)
                     val phoneNumbers = extractPhoneNumber(it)
-                    val links = extractUrl(it)
-                    val webPhoneLinks = links + phoneNumbers
-                    Log.d(TAG, "onTextChanged: $webPhoneLinks")
+                    val webLinks = extractUrl(it)
+                    val emailLinks = extractEmail(it)
+                    val webPhoneLinks = emailLinks + webLinks + phoneNumbers
+                    Log.d(TAG, "onCreate: $webPhoneLinks")
                     viewModal.webPhoneLinks.value = webPhoneLinks
                 }
             }
@@ -248,8 +249,9 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 noteDescriptionEdit.setText(noteDesc)
                 if ( noteDesc != null){
                     val phoneNumbers = extractPhoneNumber(noteDesc!!)
-                    val links = extractUrl(noteDesc!!)
-                    val webPhoneLinks = links + phoneNumbers
+                    val webLinks = extractUrl(noteDesc!!)
+                    val emailLinks = extractEmail(noteDesc!!)
+                    val webPhoneLinks = emailLinks + webLinks + phoneNumbers
                     viewModal.webPhoneLinks.value = webPhoneLinks
                 }
                 tvTimeStamp.visibility =VISIBLE
@@ -501,9 +503,9 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 if(p0?.length!! > 0){
                     if (p0[p0.length -1] == ' '){
                         val phoneNumbers = extractPhoneNumber(p0.toString())
-                        val links = extractUrl(p0.toString())
-                        val webPhoneLinks = links + phoneNumbers
-                        Log.d(TAG, "onTextChanged: $webPhoneLinks")
+                        val webLinks = extractUrl(p0.toString())
+                        val emailLinks = extractEmail(p0.toString())
+                        val webPhoneLinks = emailLinks + webLinks + phoneNumbers
                         viewModal.webPhoneLinks.value = webPhoneLinks
                     }
                     noteListBullet()
@@ -696,6 +698,18 @@ class AddEditNoteActivity : AppCompatActivity() ,
         }
         return phoneLinks
     }
+
+    private fun extractEmail(text: String): List<WebPhoneLink> {
+        val emailLinks: MutableList<WebPhoneLink> = ArrayList()
+        val matcher: Matcher = Patterns.EMAIL_ADDRESS.matcher(text)
+        while (matcher.find()) {
+            val email: String = matcher.group()
+            val webPhoneLink = WebPhoneLink(WebPhoneType.EMAIL, email)
+            emailLinks.add(webPhoneLink)
+        }
+        return emailLinks
+    }
+
 
     private fun deleteNote(){
         val alertDialog: AlertDialog? = this@AddEditNoteActivity.let {
@@ -1219,11 +1233,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
     }
 
 
-//    private fun removeShortcuts() {
-
-//    }
-
-
     private fun getTagFromString(p0: CharSequence?) {
         val strL = p0?.toString()?.split(" ")
         if (!backPressed) {
@@ -1240,7 +1249,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
         }
 
     }
-
 
 
     private fun showLabelBottomSheetDialog() {
@@ -1428,8 +1436,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
         }
     }
-
-
 
 
     private fun openDateTimeDialog(){

@@ -189,4 +189,5 @@
     <string name="line_type">Link type</string>
     <string name="link_copied">Link copied to clipboard</string>
     <string name="phone_copied">Phone number copied to clipboard</string>
+    <string name="email_copied">Email copied to clipboard</string>
 </resources>
