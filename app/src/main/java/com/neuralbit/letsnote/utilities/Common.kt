@@ -72,7 +72,7 @@ class Common (){
             ofe = tvt.indexOf(textToHighlight, ofs)
             if (ofe == -1) break else {
                 wordToSpan.setSpan(
-                    RelativeSizeSpan(2.5f),
+                    RelativeSizeSpan(1.5f),
                     ofe,
                     ofe + textToHighlight.length,
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
