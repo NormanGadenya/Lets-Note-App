@@ -20,8 +20,8 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.firebase.entities.NoteFire
-import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import com.neuralbit.letsnote.receivers.AlertReceiver
+import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import com.neuralbit.letsnote.utilities.Common
 import java.util.*
 import kotlin.math.floor
@@ -209,8 +209,12 @@ class NoteRVAdapter (
         }
         if (note.label > 0) {
             holder.noteCard.setBackgroundColor(note.label)
+            holder.noteTextTV.setTextColor(cm.getFontColor(note.label))
+            holder.noteTitleTV.setTextColor(cm.getFontColor(note.label))
         }else{
             holder.noteCard.setBackgroundColor(context.resources.getColor(R.color.def_Card_Color,null))
+            holder.noteTextTV.setTextColor(context.resources.getColor(cm.getFontColor(0), null))
+            holder.noteTitleTV.setTextColor(context.resources.getColor(cm.getFontColor(0), null))
         }
 
         val reminderDate = note.reminderDate
@@ -240,8 +244,8 @@ class NoteRVAdapter (
 
 
         searchString?.let {
-            cm.setHighLightedText(holder.noteTextTV, it)
-            cm.setHighLightedText(holder.noteTitleTV, it)
+            cm.setHighlightFontSize(holder.noteTextTV, it)
+            cm.setHighlightFontSize(holder.noteTitleTV, it)
 
         }
         lifecycleOwner?.let { owner ->

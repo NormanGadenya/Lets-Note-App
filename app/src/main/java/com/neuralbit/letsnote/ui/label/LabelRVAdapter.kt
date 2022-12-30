@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.neuralbit.letsnote.R
+import com.neuralbit.letsnote.utilities.Common
 import kotlinx.coroutines.*
 
 class LabelRVAdapter(
@@ -43,13 +44,15 @@ class LabelRVAdapter(
 
     @OptIn(DelicateCoroutinesApi::class)
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-
+        val cm = Common()
         val labelColor = labels[position].labelColor
         val labelCount = labels[position].labelCount
         val labelTitle = labels[position].labelTitle
 
         holder.labelCard.setBackgroundColor(labelColor)
         holder.labelTitleTV.text = labelTitle
+        holder.labelTitleTV.setTextColor(cm.getFontColor(labelColor))
+
 
         if (labelCount == 1){
             holder.noteText.text = "note"
