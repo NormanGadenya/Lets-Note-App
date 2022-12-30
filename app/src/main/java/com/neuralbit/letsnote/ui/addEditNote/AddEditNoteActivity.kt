@@ -1310,7 +1310,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
             })
 
             colorPickerView.addOnColorSelectedListener{
-                val hex = ColorTransparentUtils.transparentColor(it,30)
+                val hex = ColorTransparentUtils.transparentColor(it,50)
                 viewModal.labelColor.value = Color.parseColor(hex)
                 delLabelBtn.visibility = VISIBLE
 

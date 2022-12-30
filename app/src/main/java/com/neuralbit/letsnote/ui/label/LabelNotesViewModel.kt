@@ -84,7 +84,10 @@ class LabelNotesViewModel(
             labelFireRepo.updateLabelColorOrTitle(labelTitle,labelColor.toString(),newLabelColor.toString() )
         }else{
             val newLabelTitle = labelTitle
-            val label = com.neuralbit.letsnote.room.entities.Label(newLabelColor, newLabelTitle)
+            var label = com.neuralbit.letsnote.room.entities.Label(newLabelColor, newLabelTitle)
+            if (newLabelColor == 0){
+                label = com.neuralbit.letsnote.room.entities.Label(labelColor, newLabelTitle)
+            }
             viewModelScope.launch {
                 labelRoomRepo.insert(label)
                 for ( noteUid in noteUids){

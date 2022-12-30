@@ -354,18 +354,6 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
             }
             labelDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
 
-            labelConfirmBtn.setOnClickListener {
-
-                val map: HashMap<String, String> = HashMap()
-                map["newLabelColor"] = newLabelColor.toString()
-                map["labelTitle"] = newLabelTitle
-                viewModel.updateLabel(newLabelTitle, newLabelColor)
-                labelDialog.dismiss()
-                for (labelNote in viewModel.labelNotes) {
-                    labelNote.label = newLabelColor
-                }
-                noteRVAdapter.updateListFire(viewModel.labelNotes)
-            }
             labelDismissBtn.setOnClickListener {
                 labelDialog.dismiss()
             }
@@ -374,6 +362,16 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
             val colorPickerView : ColorPickerView = labelDialog.findViewById(R.id.colorPicker)
             val labelTitleET : EditText = labelDialog.findViewById(R.id.labelTitle)
             labelTitleET.setText(viewModel.labelTitle)
+            labelConfirmBtn.setOnClickListener {
+                if (newLabelColor > 0){
+                    for (labelNote in viewModel.labelNotes) {
+                        labelNote.label = newLabelColor
+                    }
+                    noteRVAdapter.updateListFire(viewModel.labelNotes)
+                }
+                viewModel.updateLabel(labelTitleET.text.toString(), newLabelColor)
+                labelDialog.dismiss()
+            }
             labelTitleET.addTextChangedListener(object : TextWatcher {
                 override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
                     newLabelTitle = p0.toString()
@@ -381,19 +379,18 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
                 }
 
                 override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                    newLabelTitle = p0.toString()
 
                 }
 
                 override fun afterTextChanged(p0: Editable?) {
-                    newLabelTitle = p0.toString()
                     supportActionBar?.title = newLabelTitle
                 }
             })
 
             colorPickerView.addOnColorSelectedListener{
-                val hex = ColorTransparentUtils.transparentColor(it,30)
+                val hex = ColorTransparentUtils.transparentColor(it,50)
                 newLabelColor = Color.parseColor(hex)
-
             }
             return@setOnMenuItemClickListener true
         }
