@@ -57,7 +57,7 @@ class WebLinkAdapter(
                 return@setOnLongClickListener true
             }
 
-        }else{
+        }else if( webPhoneLink.type == WebPhoneType.PHONE_NUMBER ){
             holder.linkIcon.setImageResource(R.drawable.ic_baseline_local_phone_black_24)
             holder.linkText.setOnClickListener {
                 val phoneIntent = Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", webPhoneLink.link, null))
@@ -80,6 +80,27 @@ class WebLinkAdapter(
             }
 
 
+        }else{
+            holder.linkIcon.setImageResource(R.drawable.ic_baseline_email_24)
+            holder.linkText.setOnClickListener {
+                val emailIntent = Intent(Intent.ACTION_VIEW, Uri.parse("mailto:" + webPhoneLink.link))
+                emailIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK;
+                context.startActivity(emailIntent)
+            }
+
+            holder.linkIcon.setOnClickListener {
+                val emailIntent = Intent(Intent.ACTION_VIEW, Uri.parse("mailto:" + webPhoneLink.link))
+                emailIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK;
+                context.startActivity(emailIntent)
+            }
+
+            holder.linkText.setOnLongClickListener {
+                val clipboard = context.getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+                val clip = ClipData.newPlainText("label", webPhoneLink.link)
+                clipboard.setPrimaryClip(clip)
+                Toast.makeText(context, R.string.email_copied, Toast.LENGTH_SHORT).show()
+                return@setOnLongClickListener true
+            }
         }
 
     }

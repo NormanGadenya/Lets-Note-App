@@ -227,7 +227,7 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
 
             allNotesViewModel.itemSelectEnabled.value = false
             if (selectedNotesCount == 1){
-                Toast.makeText(applicationContext,resources.getString(R.string.notes_deleted_successfully),Toast.LENGTH_SHORT).show()
+                Toast.makeText(applicationContext,resources.getString(R.string.notes_deleted_successfully,""),Toast.LENGTH_SHORT).show()
 
             }else{
                 Toast.makeText(applicationContext,resources.getString(R.string.notes_deleted_successfully,"s"),Toast.LENGTH_SHORT).show()
@@ -341,46 +341,6 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
         var newLabelTitle = ""
 
         editButton.setOnMenuItemClickListener {
-//            val labelDialog: AlertDialog = this.let {
-//                val builder = AlertDialog.Builder(it)
-//                builder.apply {
-//                    setPositiveButton("ok"
-//                    ) { _, _ ->
-//                        if (viewModel.labelTitle!=null){
-//                            supportActionBar?.title = viewModel.labelTitle
-//                            if (viewModel.labelTitle != null && viewModel.labelColor > 0){
-//                                val update = HashMap<String,String>()
-//                                update["labelTitle"] = viewModel.labelTitle!!
-//                                viewModel.updateLabel(update,viewModel.labelColor)
-//                            }
-//                        }
-//
-//                    }
-//                    setNegativeButton("cancel"
-//                    ) { _, _ ->
-//
-//                    }
-//                    setView(R.layout.label_title_dialog)
-//                    setTitle("Choose a label title")
-//                }
-//                builder.create()
-//
-//            }
-//
-//            labelDialog.show()
-//            val labelTitleET = labelDialog.findViewById<EditText>(R.id.labelTitleET)
-//            labelTitleET.addTextChangedListener(object : TextWatcher {
-//                override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-//                }
-//
-//                override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-//
-//                }
-//
-//                override fun afterTextChanged(p0: Editable?) {
-//                    viewModel.labelTitle = p0.toString()
-//                }
-//            })
             val labelAlertLayout = layoutInflater.inflate(R.layout.add_label_dialog,null)
             val labelConfirmBtn = labelAlertLayout.findViewById<Button>(R.id.okayBtn)
             val labelDismissBtn = labelAlertLayout.findViewById<Button>(R.id.cancelBtn)
@@ -394,17 +354,6 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
             }
             labelDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
 
-            labelConfirmBtn.setOnClickListener {
-                val map: HashMap<String, String> = HashMap()
-                map["newLabelColor"] = newLabelColor.toString()
-                map["labelTitle"] = newLabelTitle
-                viewModel.updateLabel(newLabelTitle, newLabelColor)
-                labelDialog.dismiss()
-                for (labelNote in viewModel.labelNotes) {
-                    labelNote.label = newLabelColor
-                }
-                noteRVAdapter.updateListFire(viewModel.labelNotes)
-            }
             labelDismissBtn.setOnClickListener {
                 labelDialog.dismiss()
             }
@@ -413,24 +362,35 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
             val colorPickerView : ColorPickerView = labelDialog.findViewById(R.id.colorPicker)
             val labelTitleET : EditText = labelDialog.findViewById(R.id.labelTitle)
             labelTitleET.setText(viewModel.labelTitle)
+            labelConfirmBtn.setOnClickListener {
+                if (newLabelColor > 0){
+                    for (labelNote in viewModel.labelNotes) {
+                        labelNote.label = newLabelColor
+                    }
+                    noteRVAdapter.updateListFire(viewModel.labelNotes)
+                }
+                viewModel.updateLabel(labelTitleET.text.toString(), newLabelColor)
+                labelDialog.dismiss()
+            }
             labelTitleET.addTextChangedListener(object : TextWatcher {
                 override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                    newLabelTitle = p0.toString()
+
                 }
 
                 override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                    newLabelTitle = p0.toString()
 
                 }
 
                 override fun afterTextChanged(p0: Editable?) {
-                    newLabelTitle = p0.toString()
                     supportActionBar?.title = newLabelTitle
                 }
             })
 
             colorPickerView.addOnColorSelectedListener{
-                val hex = ColorTransparentUtils.transparentColor(it,30)
+                val hex = ColorTransparentUtils.transparentColor(it,50)
                 newLabelColor = Color.parseColor(hex)
-
             }
             return@setOnMenuItemClickListener true
         }

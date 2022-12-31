@@ -20,9 +20,13 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.firebase.entities.NoteFire
-import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import com.neuralbit.letsnote.receivers.AlertReceiver
+import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import com.neuralbit.letsnote.utilities.Common
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 import kotlin.math.floor
 
@@ -94,10 +98,9 @@ class NoteRVAdapter (
         }
         val settingsPref = context.getSharedPreferences("Settings", AppCompatActivity.MODE_PRIVATE)
         val fontMultiplier = settingsPref.getInt("fontMultiplier",2)
-        holder.noteTextTV.setTextSize(TypedValue.COMPLEX_UNIT_SP,16f+ ((fontMultiplier-2)*4).toFloat())
-        holder.noteTitleTV.setTextSize(TypedValue.COMPLEX_UNIT_SP,24f+ ((fontMultiplier-2)*4).toFloat())
-        holder.reminderTV.setTextSize(TypedValue.COMPLEX_UNIT_SP,12f+ ((fontMultiplier-2)).toFloat())
-        holder.tagsTV.setTextSize(TypedValue.COMPLEX_UNIT_SP,12f+ ((fontMultiplier-2)).toFloat())
+        GlobalScope.launch {
+            setFontSize(holder, fontMultiplier)
+        }
 
         if (!note.protected){
             var desc = note.description
@@ -209,8 +212,12 @@ class NoteRVAdapter (
         }
         if (note.label > 0) {
             holder.noteCard.setBackgroundColor(note.label)
+            holder.noteTextTV.setTextColor(cm.getFontColor(note.label))
+            holder.noteTitleTV.setTextColor(cm.getFontColor(note.label))
         }else{
             holder.noteCard.setBackgroundColor(context.resources.getColor(R.color.def_Card_Color,null))
+            holder.noteTextTV.setTextColor(context.resources.getColor(cm.getFontColor(0), null))
+            holder.noteTitleTV.setTextColor(context.resources.getColor(cm.getFontColor(0), null))
         }
 
         val reminderDate = note.reminderDate
@@ -240,8 +247,8 @@ class NoteRVAdapter (
 
 
         searchString?.let {
-            cm.setHighLightedText(holder.noteTextTV, it)
-            cm.setHighLightedText(holder.noteTitleTV, it)
+            cm.setHighlightFontSize(holder.noteTextTV, it)
+            cm.setHighlightFontSize(holder.noteTitleTV, it)
 
         }
         lifecycleOwner?.let { owner ->
@@ -294,6 +301,32 @@ class NoteRVAdapter (
             return@setOnLongClickListener false
         }
     }
+
+    private suspend fun setFontSize(
+        holder: ViewHolder,
+        fontMultiplier: Int
+    ) {
+        withContext(Dispatchers.Main){
+
+            holder.noteTextTV.setTextSize(
+                TypedValue.COMPLEX_UNIT_SP,
+                16f + ((fontMultiplier - 2) * 4).toFloat()
+            )
+            holder.noteTitleTV.setTextSize(
+                TypedValue.COMPLEX_UNIT_SP,
+                24f + ((fontMultiplier - 2) * 4).toFloat()
+            )
+            holder.reminderTV.setTextSize(
+                TypedValue.COMPLEX_UNIT_SP,
+                12f + ((fontMultiplier - 2)).toFloat()
+            )
+            holder.tagsTV.setTextSize(
+                TypedValue.COMPLEX_UNIT_SP,
+                12f + ((fontMultiplier - 2)).toFloat()
+            )
+        }
+    }
+
     override fun getItemCount(): Int {
         return allNotesFire.size
     }
@@ -311,6 +344,8 @@ class NoteRVAdapter (
         val pendingIntent = PendingIntent.getBroadcast(context, reminder, intent, PendingIntent.FLAG_IMMUTABLE)
         alarmManager.cancel(pendingIntent)
     }
+
+
 
 }
 

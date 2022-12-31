@@ -8,7 +8,7 @@
     app:cardCornerRadius="20dp"
     android:id="@+id/tagCard"
     android:layout_margin="@dimen/margin"
-    app:cardBackgroundColor="@color/Apricot"
+    app:cardBackgroundColor="@color/Celadon"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintStart_toStartOf="parent"

@@ -167,7 +167,7 @@ class TagNotesActivity : AppCompatActivity() , NoteFireClick {
                 return true
             }else if (item?.itemId == R.id.delete){
 
-                val alertDialog: AlertDialog.Builder = AlertDialog.Builder(applicationContext)
+                val alertDialog: AlertDialog.Builder = AlertDialog.Builder(this@TagNotesActivity)
                 alertDialog.setTitle(resources.getString(R.string.general_warning_message))
                 alertDialog.setPositiveButton(resources.getString(R.string.yes)
                 ) { _, _ ->
@@ -233,7 +233,11 @@ class TagNotesActivity : AppCompatActivity() , NoteFireClick {
 
 
             }
-
+            if(allNotesViewModel.selectedNotes.size == 1){
+                Toast.makeText(applicationContext,resources.getString(R.string.notes_deleted_successfully, ""), Toast.LENGTH_SHORT).show()
+            }else{
+                Toast.makeText(applicationContext,resources.getString(R.string.notes_deleted_successfully, "s"), Toast.LENGTH_SHORT).show()
+            }
             if (emptyTrashImmediately != true){
                 allNotesViewModel.selectedNotes.clear()
             }
@@ -241,7 +245,6 @@ class TagNotesActivity : AppCompatActivity() , NoteFireClick {
 
             allNotesViewModel.itemSelectEnabled.value = false
 
-            Toast.makeText(applicationContext,resources.getString(R.string.notes_deleted_successfully), Toast.LENGTH_SHORT).show()
         }
 
     }
