@@ -216,8 +216,8 @@ class NoteRVAdapter (
             holder.noteTitleTV.setTextColor(cm.getFontColor(note.label))
         }else{
             holder.noteCard.setBackgroundColor(context.resources.getColor(R.color.def_Card_Color,null))
-            holder.noteTextTV.setTextColor(context.resources.getColor(cm.getFontColor(0), null))
-            holder.noteTitleTV.setTextColor(context.resources.getColor(cm.getFontColor(0), null))
+            holder.noteTextTV.setTextColor(cm.getFontColor(0))
+            holder.noteTitleTV.setTextColor(cm.getFontColor(0))
         }
 
         val reminderDate = note.reminderDate
