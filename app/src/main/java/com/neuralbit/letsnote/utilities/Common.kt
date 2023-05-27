@@ -1,5 +1,6 @@
 package com.neuralbit.letsnote.utilities
 
+import android.graphics.Color
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.BackgroundColorSpan
@@ -13,7 +14,12 @@ import java.util.*
 
 class Common (){
 
-
+    val ARCHITECTS_DAUGHTER = "Architects daughter"
+    val ABREEZE = "Abreeze"
+    val ADAMINA = "Adamina"
+    val BELLEZA ="Belleza"
+    val JOTI_ONE = "Joti One"
+    val NOVA_FLAT = "Nova flat"
      fun convertLongToTime(time: Long): List<String> {
         val date = Date(time)
         val dateFormat = SimpleDateFormat("yyyy-MM-dd")
@@ -83,6 +89,26 @@ class Common (){
         }
     }
 
+    fun manipulateColor(color: Int, factor: Float): Int {
+        val a: Int = Color.alpha(color)
+        val r = Math.round(Color.red(color) * factor)
+        val g = Math.round(Color.green(color) * factor)
+        val b = Math.round(Color.blue(color) * factor)
+        return Color.argb(
+            a,
+            Math.min(r, 255),
+            Math.min(g, 255),
+            Math.min(b, 255)
+        )
+    }
+
+    fun darkenColor(color: Int, factor: Float): Int {
+        return ColorUtils.blendARGB(color, Color.BLACK, factor)
+    }
+
+    fun lightenColor(color: Int, factor: Float): Int {
+        return ColorUtils.blendARGB(color, Color.WHITE, factor)
+    }
 
 
 }

@@ -20,6 +20,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.firebase.entities.TodoItem
+import com.neuralbit.letsnote.utilities.Common
 
 
 class TodoRVAdapter(
@@ -73,15 +74,26 @@ class TodoRVAdapter(
             }
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val cm = Common()
             val typeface: Typeface? = when (fontStyle) {
-                "Architects daughter" -> {
+
+                cm.ARCHITECTS_DAUGHTER -> {
                     ResourcesCompat.getFont(context, R.font.architects_daughter)
                 }
-                "Abreeze" -> {
+                cm.ABREEZE -> {
                     ResourcesCompat.getFont(context, R.font.abeezee)
                 }
-                "Adamina" -> {
+                cm.ADAMINA -> {
                     ResourcesCompat.getFont(context, R.font.adamina)
+                }
+                cm.BELLEZA-> {
+                    ResourcesCompat.getFont(context, R.font.belleza)
+                }
+                cm.JOTI_ONE -> {
+                    ResourcesCompat.getFont(context, R.font.joti_one)
+                }
+                cm.NOVA_FLAT -> {
+                    ResourcesCompat.getFont(context, R.font.nova_flat)
                 }
                 else -> {
                     ResourcesCompat.getFont(context, R.font.roboto)

@@ -43,6 +43,7 @@
             android:name=".ui.addEditNote.AddEditNoteActivity"
             android:exported="true"
             android:parentActivityName=".ui.main.MainActivity"
+            android:configChanges="uiMode"
             android:theme="@style/Theme.App.Activity" />
         <activity
             android:name=".ui.addEditNote.SaveSharedNoteActivity"

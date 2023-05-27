@@ -1,14 +1,18 @@
 package com.neuralbit.letsnote.ui.label
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.utilities.Common
 import kotlinx.coroutines.*
+
 
 class LabelRVAdapter(
     val context: Context,
@@ -22,6 +26,7 @@ class LabelRVAdapter(
         val labelTitleTV: TextView = itemView.findViewById(R.id.labelName)
         val labelCard : View = itemView.findViewById(R.id.labelCard)
         val noteText : TextView = itemView.findViewById(R.id.noteText)
+        val noteArrow : ImageView = itemView.findViewById(R.id.imgView)
 
     }
 
@@ -51,9 +56,14 @@ class LabelRVAdapter(
 
         holder.labelCard.setBackgroundColor(labelColor)
         holder.labelTitleTV.text = labelTitle
-        holder.labelTitleTV.setTextColor(cm.getFontColor(labelColor))
-
-
+        holder.labelTitleTV.setTextColor(cm.darkenColor(labelColor, 0.8f))
+        holder.noteText.setTextColor(cm.darkenColor(labelColor, 0.8f))
+        holder.noteCountTV.setTextColor(cm.darkenColor(labelColor, 0.8f))
+        val drawable: Drawable = context.getResources().getDrawable(R.drawable.ic_baseline_arrow_forward_24)
+        var wrappedDrawable = DrawableCompat.wrap(drawable)
+        wrappedDrawable = wrappedDrawable.mutate()
+        DrawableCompat.setTint(wrappedDrawable, cm.darkenColor(labelColor, 0.8f))
+        holder.noteArrow.setImageDrawable(drawable)
         if (labelCount == 1){
             holder.noteText.text = "note"
         }else{

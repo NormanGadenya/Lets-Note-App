@@ -177,6 +177,29 @@
                         android:text="@string/adamina" />
 
                     <RadioButton
+                        android:id="@+id/fontD"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/belleza"
+                        android:text="Belleza" />
+
+                    <RadioButton
+                        android:id="@+id/fontE"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/joti_one"
+                        android:text="Joti One" />
+
+                    <RadioButton
+                        android:id="@+id/fontF"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/nova_flat"
+                        android:text="Nova flat" />
+
+
+
+                    <RadioButton
                         android:id="@+id/fontDef"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

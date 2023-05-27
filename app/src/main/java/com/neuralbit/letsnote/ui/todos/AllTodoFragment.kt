@@ -149,6 +149,10 @@ class AllTodoFragment : Fragment() , NoteFireClick {
                 pinnedNotesTV.visibility = GONE
                 pinnedNotesRV.visibility = GONE
             }
+
+            if (otherNotes.isEmpty()){
+                otherNotesTV.visibility = GONE
+            }
             noteRVAdapter?.updateListFire(otherNotes)
         }
 
