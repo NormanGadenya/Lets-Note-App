@@ -10,6 +10,9 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.neuralbit.letsnote.firebase.entities.LabelFire
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class LabelFireRepo {
     private val database = Firebase.database
@@ -149,68 +152,70 @@ class LabelFireRepo {
 
 
     fun updateLabelColorOrTitle(labelTitle : String, oldLabelColor : String, newLabelColor : String) {
+        GlobalScope.launch(Dispatchers.IO){
 
-        val oldLabelRef = fUser?.let { database.getReference(it.uid).child("labels").child(oldLabelColor) }
-        oldLabelRef?.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(s: DataSnapshot) {
-                val oldLabelObj = s.getValue(LabelFire::class.java)
+            val oldLabelRef = fUser?.let { database.getReference(it.uid).child("labels").child(oldLabelColor) }
+            oldLabelRef?.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(s: DataSnapshot) {
+                    val oldLabelObj = s.getValue(LabelFire::class.java)
 
-                fUser?.let { database.getReference(it.uid).child("labels").child(newLabelColor).addListenerForSingleValueEvent( object : ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        val existingLabel = snapshot.getValue(LabelFire::class.java)
-                        if (oldLabelObj != null){
+                    fUser?.let { database.getReference(it.uid).child("labels").child(newLabelColor).addListenerForSingleValueEvent( object : ValueEventListener {
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            val existingLabel = snapshot.getValue(LabelFire::class.java)
+                            if (oldLabelObj != null){
 
-                            if (newLabelColor!= "0"){
+                                if (newLabelColor!= "0"){
 
-                                val noteUids = HashSet<String>()
-                                if (existingLabel != null){
-                                    noteUids.addAll(existingLabel.noteUids)
-                                    noteUids.addAll(oldLabelObj.noteUids)
-                                    val existingLabelRef = database.reference.child(it.uid).child("labels").child(newLabelColor)
-                                    val updateMap = HashMap<String, Any>()
-                                    updateMap["noteUids"] = ArrayList(noteUids)
-                                    updateMap["labelTitle"] = labelTitle
-                                    existingLabelRef.updateChildren(updateMap)
+                                    val noteUids = HashSet<String>()
+                                    if (existingLabel != null){
+                                        noteUids.addAll(existingLabel.noteUids)
+                                        noteUids.addAll(oldLabelObj.noteUids)
+                                        val existingLabelRef = database.reference.child(it.uid).child("labels").child(newLabelColor)
+                                        val updateMap = HashMap<String, Any>()
+                                        updateMap["noteUids"] = ArrayList(noteUids)
+                                        updateMap["labelTitle"] = labelTitle
+                                        existingLabelRef.updateChildren(updateMap)
 
+                                    }else{
+                                        val newLabelMap = HashMap<String, Any>()
+                                        noteUids.addAll(oldLabelObj.noteUids)
+
+                                        newLabelMap["noteUids"] = ArrayList(noteUids)
+                                        newLabelMap["labelTitle"] = labelTitle
+                                        val newLabelRef = database.reference.child(it.uid).child("labels").child(newLabelColor)
+                                        newLabelRef.setValue(newLabelMap)
+                                    }
+
+                                    for ( noteUid in noteUids){
+                                        val noteRef = database.getReference(it.uid).child("notes").child(noteUid)
+                                        val noteUpdate = HashMap<String, Any>()
+                                        noteUpdate["label"] = Integer.parseInt(newLabelColor)
+                                        noteRef.updateChildren(noteUpdate)
+                                    }
+                                    oldLabelRef.removeValue()
                                 }else{
-                                    val newLabelMap = HashMap<String, Any>()
-                                    noteUids.addAll(oldLabelObj.noteUids)
-
-                                    newLabelMap["noteUids"] = ArrayList(noteUids)
-                                    newLabelMap["labelTitle"] = labelTitle
-                                    val newLabelRef = database.reference.child(it.uid).child("labels").child(newLabelColor)
-                                    newLabelRef.setValue(newLabelMap)
+                                    val updateMap = HashMap<String, Any>()
+                                    updateMap["labelTitle"] = labelTitle
+                                    oldLabelRef.updateChildren(updateMap)
                                 }
-
-                                for ( noteUid in noteUids){
-                                    val noteRef = database.getReference(it.uid).child("notes").child(noteUid)
-                                    val noteUpdate = HashMap<String, Any>()
-                                    noteUpdate["label"] = Integer.parseInt(newLabelColor)
-                                    noteRef.updateChildren(noteUpdate)
-                                }
-                                oldLabelRef.removeValue()
-                            }else{
-                                val updateMap = HashMap<String, Any>()
-                                updateMap["labelTitle"] = labelTitle
-                                oldLabelRef.updateChildren(updateMap)
                             }
+
+
                         }
 
+                        override fun onCancelled(error: DatabaseError) {
 
-                    }
+                        }
 
-                    override fun onCancelled(error: DatabaseError) {
+                    }) }
 
-                    }
+                }
 
-                }) }
-
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                Log.d(TAG, "onCancelled: $error")
-            }
-        })
+                override fun onCancelled(error: DatabaseError) {
+                    Log.d(TAG, "onCancelled: $error")
+                }
+            })
+        }
 
     }
 }

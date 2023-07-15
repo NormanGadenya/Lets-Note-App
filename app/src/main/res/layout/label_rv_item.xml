@@ -24,7 +24,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:background="@drawable/tag_background"
         android:padding="4dp"
 
         app:layout_constraintEnd_toEndOf="parent"

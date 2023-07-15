@@ -22,7 +22,6 @@ import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
 import android.text.format.DateFormat
-import android.text.method.LinkMovementMethod
 import android.util.Log
 import android.util.Patterns
 import android.util.SparseArray
@@ -549,19 +548,40 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 pinItem?.setIcon(R.drawable.ic_outline_push_pin_24)
             }
         }
+        window.statusBarColor = resources.getColor(R.color.black)
+        window.navigationBarColor = resources.getColor(R.color.black)
+        supportActionBar?.setBackgroundDrawable(ColorDrawable(resources.getColor(R.color.black)))
 
         viewModal.labelColor.observe(this){
             labelColor = it
             if (it>0){
+                window.statusBarColor = cm.darkenColor(it, 0.9f)
+                window.navigationBarColor = cm.darkenColor(it, 0.9f)
+                supportActionBar?.setBackgroundDrawable(ColorDrawable(cm.darkenColor(it, 0.9f)))
+
+                noteDescriptionEdit.setTextColor(cm.darkenColor(it,0.9f))
+                noteTitleEdit.setTextColor(cm.darkenColor(it,0.9f))
+                noteTitleEdit.setHintTextColor(cm.darkenColor(it,0.6f))
+                noteDescriptionEdit.setHintTextColor(cm.darkenColor(it,0.6f))
+
+                todoRVAdapter.updateTextColor(cm.darkenColor(it, 0.9f))
                 coordinatorlayout.setBackgroundColor(it)
                 delLabelBtn.visibility = VISIBLE
 
             }else{
                 coordinatorlayout.setBackgroundColor(Color.TRANSPARENT)
+                noteDescriptionEdit.setTextColor(resources.getColor(R.color.black))
+                todoRVAdapter.updateTextColor(resources.getColor(R.color.black))
+                window.statusBarColor = resources.getColor(R.color.black)
+                window.navigationBarColor = resources.getColor(R.color.black)
+                supportActionBar?.setBackgroundDrawable(ColorDrawable(cm.darkenColor(it, 0.9f)))
                 delLabelBtn.visibility = GONE
 
             }
+
+
         }
+
 
 
         noteTitleEdit.setOnKeyListener { _, _, _ ->
@@ -743,18 +763,26 @@ class AddEditNoteActivity : AppCompatActivity() ,
         }
 
         if (noteContentSplit.size > 1) {
+            val allowedIndents = ArrayList<String>()
+            allowedIndents.add("      ")
+            allowedIndents.add("     ")
+            allowedIndents.add("    ")
+            allowedIndents.add("   ")
+            allowedIndents.add("  ")
 
-            val prefix = listOf(" ", "->", "-", "+", "*", ">")
-            for (p in prefix) {
+            val allPrefixes = ArrayList<String>();
+            allPrefixes.addAll(allowedIndents)
+            allPrefixes.addAll(listOf(" ", "->", "-", "+", "*", ">"))
+            for (p in allPrefixes) {
                 if (!backPressed) {
-                    addBulletin(noteContentSplit, lineIndex, noteContent, p)
+                    addBulletin(noteContentSplit, lineIndex, noteContent, p, allowedIndents)
 
                 }
             }
             if ((noteContentSplit[lineIndex].endsWith(":")) || (noteContentSplit[lineIndex].endsWith(": "))) {
                 if (noteContent.endsWith("\n")) {
                     if (!backPressed) {
-                        noteDescriptionEdit.append("- ")
+                        noteDescriptionEdit.append("+ ")
 
                     }
                 }
@@ -836,10 +864,15 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
     }
 
-    private fun addBulletin(noteContentSplit : List<String>, lineIndex : Int ,noteContent : Editable, prefix: String){
+    private fun addBulletin(noteContentSplit : List<String>, lineIndex : Int ,noteContent : Editable, prefix: String, allowedIndents : ArrayList<String>){
         if (noteContentSplit[lineIndex].startsWith(prefix)){
+
             if(noteContent.endsWith("\n")){
-                noteDescriptionEdit.append("$prefix ")
+                if (allowedIndents.contains(prefix)){
+                    noteDescriptionEdit.append(prefix)
+                }else{
+                    noteDescriptionEdit.append("$prefix ")
+                }
             }
         }
     }
@@ -889,7 +922,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
         layoutManager = LinearLayoutManager(applicationContext,LinearLayoutManager.HORIZONTAL,false)
         calendar = Calendar.getInstance()
         noteDescriptionEdit = findViewById(R.id.noteEditDesc)
-        noteDescriptionEdit.movementMethod = LinkMovementMethod.getInstance()
 
         tvTimeStamp = findViewById(R.id.tvTimeStamp)
         redoUndoGroup = findViewById(R.id.redoUndoGroup)
@@ -989,6 +1021,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
         }
         tagListAdapter.viewModel = viewModal
         tagListAdapter.lifecycleOwner = lifecycleOwner
+        tagListAdapter.defaultTextColor = resources.getColor(R.color.black)
+
         viewModal.allTodoItems.value = todoDoItemList
         if (oldLabel > 0){
             viewModal.labelColor.value = oldLabel
@@ -1001,14 +1035,23 @@ class AddEditNoteActivity : AppCompatActivity() ,
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             try{
                 val typeface: Typeface? = when (fontStyle) {
-                    "Architects daughter" -> {
+                    cm.ARCHITECTS_DAUGHTER -> {
                         ResourcesCompat.getFont(applicationContext, R.font.architects_daughter)
                     }
-                    "Abreeze" -> {
+                    cm.ABREEZE -> {
                         ResourcesCompat.getFont(applicationContext, R.font.abeezee)
                     }
-                    "Adamina" -> {
+                    cm.ADAMINA -> {
                         ResourcesCompat.getFont(applicationContext, R.font.adamina)
+                    }
+                    cm.BELLEZA-> {
+                        ResourcesCompat.getFont(applicationContext, R.font.belleza)
+                    }
+                    cm.JOTI_ONE -> {
+                        ResourcesCompat.getFont(applicationContext, R.font.joti_one)
+                    }
+                    cm.NOVA_FLAT -> {
+                        ResourcesCompat.getFont(applicationContext, R.font.nova_flat)
                     }
                     else -> {
                         ResourcesCompat.getFont(applicationContext, R.font.roboto)
@@ -1704,6 +1747,11 @@ class AddEditNoteActivity : AppCompatActivity() ,
     }
 
 
+    override fun onDestroy() {
+
+        Log.d(TAG, "onDestroy: App destroyed")
+        super.onDestroy()
+    }
 
 
     override fun onBackPressed() {

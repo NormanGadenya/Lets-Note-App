@@ -44,14 +44,16 @@
         android:layout_marginBottom="8dp"
         android:background="@android:color/transparent"
         android:hint="@string/note_content"
+        android:scrollbars="vertical"
         android:importantForAutofill="no"
-        android:textSize="16sp"
         android:inputType="textMultiLine"
         android:lineSpacingMultiplier="1.1"
         android:linksClickable="true"
+        android:maxHeight="200dp"
         android:minHeight="60dp"
-
         app:layout_constraintBottom_toTopOf="@+id/cancelButton"
+        app:layout_constraintEnd_toEndOf="@+id/noteEditTitle"
+        app:layout_constraintStart_toStartOf="@+id/noteEditTitle"
         app:layout_constraintTop_toBottomOf="@id/noteEditTitle"
         app:layout_goneMarginTop="8dp" />
     <Button
