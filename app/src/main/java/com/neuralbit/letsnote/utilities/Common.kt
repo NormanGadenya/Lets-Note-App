@@ -1,5 +1,6 @@
 package com.neuralbit.letsnote.utilities
 
+import android.graphics.Color
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.BackgroundColorSpan
@@ -12,7 +13,12 @@ import java.util.*
 
 class Common (){
 
-
+    val ARCHITECTS_DAUGHTER = "Architects daughter"
+    val ABREEZE = "Abreeze"
+    val ADAMINA = "Adamina"
+    val BELLEZA ="Belleza"
+    val JOTI_ONE = "Joti One"
+    val NOVA_FLAT = "Nova flat"
      fun convertLongToTime(time: Long): List<String> {
         val date = Date(time)
         val dateFormat = SimpleDateFormat("yyyy-MM-dd")
@@ -24,47 +30,20 @@ class Common (){
         return System.currentTimeMillis()
     }
 
-//    fun getLabelColor(labelID : Int) : Int{
-//        return when (labelID){
-//            1-> R.color.white
-//            2 -> R.color.Wild_orchid
-//            3 -> R.color.Honeydew
-//            4 -> R.color.English_violet
-//            5 -> R.color.Celadon
-//            6 -> R.color.Apricot
-//            else-> R.color.white
-//        }
-//    }
-
-//    fun getToolBarDrawable (labelID: Int) : Int{
-//        return when (labelID){
-//            1-> R.drawable.white_toolbar
-//            2 -> R.drawable.wild_orchid_toolbar
-//            3 -> R.drawable.honey_drew_toolbar
-//            4 -> R.drawable.ev_toolbar
-//            5 -> R.drawable.celadon_toolbar
-//            6 -> R.drawable.apricot_toolbar
-//            else-> R.color.white
-//        }
-//    }
-//    fun getStatusBarColor (labelID: Int) : Int{
-//        return when (labelID){
-//            1-> R.color.whiteDark
-//            2 -> R.color.Wild_orchid_Dark
-//            3 -> R.color.Honeydew_Dark
-//            4 -> R.color.English_violet_Dark
-//            5 -> R.color.Celadon_Dark
-//            6 -> R.color.Apricot_Dark
-//            else-> R.color.whiteDark
-//        }
-//    }
     fun getFontColor(color : Int):Int{
-        return if(ColorUtils.calculateLuminance(color) < 0.5){
+//
+//        return if(ColorUtils.calculateLuminance(color) < 0.7){
+//            R.color.lightGrey
+//        }else{
+//            R.color.black
+//        }
+        return if (color == 0){
+            R.color.black
+        }else if ( ColorUtils.calculateLuminance(color) > 0 && ColorUtils.calculateLuminance(color) > 0.6 ){
             R.color.lightGrey
         }else{
-            R.color.darkGrey
+            R.color.black
         }
-
 
     }
 
@@ -89,6 +68,28 @@ class Common (){
         }
     }
 
+
+
+    fun manipulateColor(color: Int, factor: Float): Int {
+        val a: Int = Color.alpha(color)
+        val r = Math.round(Color.red(color) * factor)
+        val g = Math.round(Color.green(color) * factor)
+        val b = Math.round(Color.blue(color) * factor)
+        return Color.argb(
+            a,
+            Math.min(r, 255),
+            Math.min(g, 255),
+            Math.min(b, 255)
+        )
+    }
+
+    fun darkenColor(color: Int, factor: Float): Int {
+        return ColorUtils.blendARGB(color, Color.BLACK, factor)
+    }
+
+    fun lightenColor(color: Int, factor: Float): Int {
+        return ColorUtils.blendARGB(color, Color.WHITE, factor)
+    }
 
 
 }

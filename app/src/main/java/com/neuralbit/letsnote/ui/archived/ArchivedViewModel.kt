@@ -6,7 +6,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
-import com.google.firebase.auth.FirebaseAuth
 import com.neuralbit.letsnote.firebase.entities.NoteFire
 import java.util.*
 
@@ -19,7 +18,6 @@ class ArchivedViewModel (application : Application): AndroidViewModel(applicatio
     var itemRestoreClicked : MutableLiveData<Boolean> = MutableLiveData()
     var itemDeleteClicked : MutableLiveData<Boolean> = MutableLiveData()
     var notesToRestore : MutableLiveData<NoteFire> = MutableLiveData()
-    private val fUser = FirebaseAuth.getInstance().currentUser
 
 
     fun filterArchivedFireList () : LiveData<ArrayList<NoteFire>>{
@@ -40,11 +38,28 @@ class ArchivedViewModel (application : Application): AndroidViewModel(applicatio
         return if (text != null) {
             val textLower= text.lowercase(Locale.ROOT)
             for ( note in list){
-
-                if(note.title.lowercase(Locale.ROOT).contains(textLower) || note.description.lowercase(
-                        Locale.ROOT
-                    ).contains(textLower)){
-                    newList.add(note)
+                if (note.todoItems.isNotEmpty()){
+                    for (todo in note.todoItems){
+                        if(note.title.lowercase(Locale.ROOT).contains(textLower) || note.description.lowercase(
+                                Locale.ROOT
+                            )
+                                .contains(textLower) || todo.item.lowercase(Locale.ROOT).contains(textLower) ){
+                            if (!newList.contains(note)){
+                                newList.add(note)
+                            }
+                        }
+                    }
+                }else{
+                    if(note.title.lowercase(Locale.ROOT).contains(textLower) || note.description.lowercase(Locale.ROOT).contains(textLower)){
+                        newList.add(note)
+                    }else{
+                        for(tag in note.tags){
+                            if(tag.lowercase(Locale.ROOT).contains(text)){
+                                newList.add(note)
+                                break
+                            }
+                        }
+                    }
                 }
             }
             newList
@@ -53,6 +68,7 @@ class ArchivedViewModel (application : Application): AndroidViewModel(applicatio
         }
 
     }
+
 
 
 

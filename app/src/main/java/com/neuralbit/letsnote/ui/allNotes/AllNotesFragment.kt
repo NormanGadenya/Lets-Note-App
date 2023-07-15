@@ -1,7 +1,6 @@
 package com.neuralbit.letsnote.ui.allNotes
 
 import android.app.AlarmManager
-import android.app.AlertDialog
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -25,8 +24,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.play.core.review.ReviewManager
-import com.google.android.play.core.review.ReviewManagerFactory
 import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.Gson
 import com.neuralbit.letsnote.R
@@ -39,6 +36,8 @@ import com.neuralbit.letsnote.ui.adapters.NoteRVAdapter
 import com.neuralbit.letsnote.ui.addEditNote.AddEditNoteActivity
 import com.neuralbit.letsnote.ui.addEditNote.Fingerprint
 import com.neuralbit.letsnote.ui.settings.SettingsViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.*
 
 class AllNotesFragment : Fragment() , NoteFireClick {
@@ -94,40 +93,6 @@ class AllNotesFragment : Fragment() , NoteFireClick {
         settingsViewModel.settingsFrag.value = false
         allNotesViewModel.archiveFrag = false
         allNotesViewModel.staggeredView.value = settingsSharedPref?.getBoolean("staggered",true)
-        val reviewSharedPrefs : SharedPreferences? = context?.getSharedPreferences("Review_count_down", AppCompatActivity.MODE_PRIVATE)
-        reviewSharedPrefEditor = reviewSharedPrefs?.edit()
-        if (reviewSharedPrefEditor != null && reviewSharedPrefs!= null){
-            var reviewCount = reviewSharedPrefs.getInt("count", 0)
-            reviewCount +=1
-            reviewSharedPrefEditor!!.putInt("count",reviewCount)
-            val reviewManager: ReviewManager? = context?.let { ReviewManagerFactory.create(it) }
-
-            if (reviewCount == 10){
-
-                val alertDialog: AlertDialog.Builder = AlertDialog.Builder(context)
-                alertDialog.setTitle(resources.getString(R.string.rate_app))
-                alertDialog.setPositiveButton(resources.getString(R.string.yes)
-                ) { _, _ ->
-                    val requestReviewTask = reviewManager?.requestReviewFlow()
-
-                    requestReviewTask?.addOnCompleteListener { request ->
-                        if (request.isSuccessful) {
-                            activity?.let { reviewManager.launchReviewFlow(it, request.result) }
-                        }
-                    }
-                }
-                alertDialog.setNegativeButton(resources.getString(R.string.cancel)
-                ) { dialog, _ ->
-                    reviewCount = 0
-                    reviewSharedPrefEditor?.apply()
-
-                    dialog.cancel()
-                }
-                alertDialog.show()
-
-            }
-        }
-
 
         allNotesViewModel.staggeredView.observe(viewLifecycleOwner){
             val editor: SharedPreferences.Editor ?= settingsSharedPref?.edit()
@@ -199,8 +164,11 @@ class AllNotesFragment : Fragment() , NoteFireClick {
 
         allNotesViewModel.selectedNotes.clear()
 
-        allNotesViewModel.getAllFireNotes().observe(viewLifecycleOwner){
-            allNotesViewModel.allFireNotes.value = it
+        lifecycleScope.launch(Dispatchers.Main) {
+            allNotesViewModel.getAllFireNotes().observe(viewLifecycleOwner){
+                allNotesViewModel.allFireNotes.value = it
+
+            }
         }
 
         allNotesViewModel.allFireNotes.observe(viewLifecycleOwner){ notes ->

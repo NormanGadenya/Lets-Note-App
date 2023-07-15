@@ -43,6 +43,7 @@
             android:name=".ui.addEditNote.AddEditNoteActivity"
             android:exported="true"
             android:parentActivityName=".ui.main.MainActivity"
+            android:configChanges="uiMode"
             android:theme="@style/Theme.App.Activity" />
         <activity
             android:name=".ui.addEditNote.SaveSharedNoteActivity"
@@ -99,9 +100,12 @@
             android:exported="true" />
         <receiver
             android:name=".receivers.RescheduleAlarmsReceiver"
+            android:enabled="true"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>
             </intent-filter>
         </receiver>
 

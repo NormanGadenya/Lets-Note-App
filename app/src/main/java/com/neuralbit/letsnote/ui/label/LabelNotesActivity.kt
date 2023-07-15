@@ -5,12 +5,15 @@ import android.app.AlertDialog
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -21,6 +24,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.flask.colorpicker.ColorPickerView
 import com.google.gson.Gson
 import com.neuralbit.letsnote.R
 import com.neuralbit.letsnote.firebase.entities.NoteFire
@@ -31,6 +35,7 @@ import com.neuralbit.letsnote.ui.adapters.NoteRVAdapter
 import com.neuralbit.letsnote.ui.addEditNote.AddEditNoteActivity
 import com.neuralbit.letsnote.ui.addEditNote.Fingerprint
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
+import com.neuralbit.letsnote.utilities.ColorTransparentUtils
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -62,9 +67,9 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
         setContentView(R.layout.activity_label_notes)
         recyclerView = findViewById(R.id.notesRV)
         val noteUids = intent.getStringArrayListExtra("noteUids")
-        val labelTitle = intent.getStringExtra("labelTitle")
+        viewModel.labelTitle = intent.getStringExtra("labelTitle")
         viewModel.labelColor = intent.getIntExtra("labelColor",0)
-        supportActionBar?.title = labelTitle
+        supportActionBar?.title = viewModel.labelTitle
 
         val layoutManager = StaggeredGridLayoutManager( 2, LinearLayoutManager.VERTICAL)
         recyclerView.layoutManager = layoutManager
@@ -222,7 +227,7 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
 
             allNotesViewModel.itemSelectEnabled.value = false
             if (selectedNotesCount == 1){
-                Toast.makeText(applicationContext,resources.getString(R.string.notes_deleted_successfully),Toast.LENGTH_SHORT).show()
+                Toast.makeText(applicationContext,resources.getString(R.string.notes_deleted_successfully,""),Toast.LENGTH_SHORT).show()
 
             }else{
                 Toast.makeText(applicationContext,resources.getString(R.string.notes_deleted_successfully,"s"),Toast.LENGTH_SHORT).show()
@@ -332,47 +337,61 @@ class LabelNotesActivity : AppCompatActivity() , NoteFireClick {
         })
 
         val editButton = menu.findItem(R.id.edit)
+        var newLabelColor = 0
+        var newLabelTitle = ""
+
         editButton.setOnMenuItemClickListener {
-            val labelDialog: AlertDialog = this.let {
+            val labelAlertLayout = layoutInflater.inflate(R.layout.add_label_dialog,null)
+            val labelConfirmBtn = labelAlertLayout.findViewById<Button>(R.id.okayBtn)
+            val labelDismissBtn = labelAlertLayout.findViewById<Button>(R.id.cancelBtn)
+
+            val labelDialog: AlertDialog = this@LabelNotesActivity.let {
+
                 val builder = AlertDialog.Builder(it)
-                builder.apply {
-                    setPositiveButton("ok"
-                    ) { _, _ ->
-                        if (viewModel.labelTitle!=null){
-                            supportActionBar?.title = viewModel.labelTitle
-                            if (viewModel.labelTitle != null && viewModel.labelColor > 0){
-                                val update = HashMap<String,String>()
-                                update["labelTitle"] = viewModel.labelTitle!!
-                                viewModel.updateLabel(update,viewModel.labelColor)
-                            }
-                        }
-
-                    }
-                    setNegativeButton("cancel"
-                    ) { _, _ ->
-
-                    }
-                    setView(R.layout.label_title_dialog)
-                    setTitle("Choose a label title")
-                }
+                builder.setView(labelAlertLayout)
                 builder.create()
 
             }
+            labelDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT));
+
+            labelDismissBtn.setOnClickListener {
+                labelDialog.dismiss()
+            }
 
             labelDialog.show()
-            val labelTitleET = labelDialog.findViewById<EditText>(R.id.labelTitleET)
+            val colorPickerView : ColorPickerView = labelDialog.findViewById(R.id.colorPicker)
+            val labelTitleET : EditText = labelDialog.findViewById(R.id.labelTitle)
+            labelTitleET.setText(viewModel.labelTitle)
+            labelConfirmBtn.setOnClickListener {
+                if (newLabelColor > 0){
+                    for (labelNote in viewModel.labelNotes) {
+                        labelNote.label = newLabelColor
+                    }
+                    noteRVAdapter.updateListFire(viewModel.labelNotes)
+                }
+                viewModel.updateLabel(labelTitleET.text.toString(), newLabelColor)
+                labelDialog.dismiss()
+            }
             labelTitleET.addTextChangedListener(object : TextWatcher {
                 override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                    newLabelTitle = p0.toString()
+
                 }
 
                 override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                    newLabelTitle = p0.toString()
 
                 }
 
                 override fun afterTextChanged(p0: Editable?) {
-                    viewModel.labelTitle = p0.toString()
+                    supportActionBar?.title = newLabelTitle
                 }
             })
+
+            colorPickerView.addOnColorSelectedListener{
+                val hex = ColorTransparentUtils.transparentColor(it,50)
+                newLabelColor = Color.parseColor(hex)
+            }
             return@setOnMenuItemClickListener true
         }
 

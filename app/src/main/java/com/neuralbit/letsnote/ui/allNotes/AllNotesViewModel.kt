@@ -68,10 +68,9 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
     }
 
 
-    fun getAllFireNotes () : LiveData<ArrayList<NoteFire>>{
+    suspend fun getAllFireNotes () : LiveData<ArrayList<NoteFire>>{
         val mutableNoteData = MutableLiveData<ArrayList<NoteFire>>()
         fUser = FirebaseAuth.getInstance().currentUser
-        Log.d(TAG, "getAllFireNotes: ${fUser}")
         if (fUser == null){
             viewModelScope.launch(Dispatchers.IO) {
                 val noteList = ArrayList<NoteFire>()
@@ -154,11 +153,15 @@ class AllNotesViewModel (application : Application) : AndroidViewModel(applicati
                         }
                     }
                 }else{
-                    if(note.title.lowercase(Locale.ROOT).contains(textLower) || note.description.lowercase(
-                            Locale.ROOT
-                        )
-                            .contains(textLower)){
+                    if(note.title.lowercase(Locale.ROOT).contains(textLower) || note.description.lowercase(Locale.ROOT).contains(textLower)){
                         newList.add(note)
+                    }else{
+                        for(tag in note.tags){
+                            if(tag.lowercase(Locale.ROOT).contains(text)){
+                                newList.add(note)
+                                break
+                            }
+                        }
                     }
                 }
             }

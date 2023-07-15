@@ -22,6 +22,8 @@ import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
 import android.text.format.DateFormat
+import android.util.Log
+import android.util.Patterns
 import android.util.SparseArray
 import android.util.TypedValue
 import android.view.*
@@ -69,6 +71,7 @@ import com.neuralbit.letsnote.utilities.*
 import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.*
+import java.util.regex.Matcher
 
 
 class AddEditNoteActivity : AppCompatActivity() ,
@@ -119,11 +122,13 @@ class AddEditNoteActivity : AppCompatActivity() ,
     private lateinit var tagListRV : RecyclerView
     private lateinit var labelListRV : RecyclerView
     private lateinit var todoRV : RecyclerView
+    private lateinit var webLinkRV : RecyclerView
     private lateinit var todoCheckBox: CheckBox
     private lateinit var todoItemDescTV : EditText
     private var todoItemChecked: Boolean = false
     private lateinit var todoRVAdapter : TodoRVAdapter
     private lateinit var tagListAdapter : AddEditTagRVAdapter
+    private lateinit var webLinkAdapter : WebLinkAdapter
     private lateinit var labelListAdapter : AddEditLabelAdapter
     private lateinit var alertBottomSheet : BottomSheetDialog
     private lateinit var labelBottomSheet : BottomSheetDialog
@@ -180,6 +185,12 @@ class AddEditNoteActivity : AppCompatActivity() ,
                     noteDesc = it
                     viewModal.noteChanged.value = true
                     noteDescriptionEdit.setText(it)
+                    val phoneNumbers = extractPhoneNumber(it)
+                    val webLinks = extractUrl(it)
+                    val emailLinks = extractEmail(it)
+                    val webPhoneLinks = emailLinks + webLinks + phoneNumbers
+                    Log.d(TAG, "onCreate: $webPhoneLinks")
+                    viewModal.webPhoneLinks.value = webPhoneLinks
                 }
             }
         }
@@ -235,6 +246,13 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 noteTitleEdit.setText(noteTitle)
 
                 noteDescriptionEdit.setText(noteDesc)
+                if ( noteDesc != null){
+                    val phoneNumbers = extractPhoneNumber(noteDesc!!)
+                    val webLinks = extractUrl(noteDesc!!)
+                    val emailLinks = extractEmail(noteDesc!!)
+                    val webPhoneLinks = emailLinks + webLinks + phoneNumbers
+                    viewModal.webPhoneLinks.value = webPhoneLinks
+                }
                 tvTimeStamp.visibility =VISIBLE
                 redoUndoGroup.visibility = GONE
 
@@ -243,8 +261,9 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 tagListAdapter.updateList(viewModal.oldTagList)
             }
             else -> {
-                if (noteType != "Todo")
-                redoUndoGroup.visibility = VISIBLE
+                if (noteType != "NewTodo"){
+                    redoUndoGroup.visibility = VISIBLE
+                }
 
                 tvTimeStamp.visibility =GONE
             }
@@ -445,6 +464,8 @@ class AddEditNoteActivity : AppCompatActivity() ,
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 tvTimeStamp.visibility =GONE
+                viewModal.deleteIgnored.value = true
+
                 if(p3>0){
 
                     if(!tagListAdapter.deleteIgnored){
@@ -465,7 +486,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
         noteDescriptionEdit.addTextChangedListener(object : TextWatcher{
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
 
-
                 if (!backPressed ) {
                     noteDescOrigList.clear()
                     noteDescOrig = p0?.toString()
@@ -476,11 +496,17 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
             override fun onTextChanged(p0: CharSequence?, start: Int, before: Int, count: Int) {
                 viewModal.noteChanged.value = true
-
+                viewModal.deleteIgnored.value = true
                 tvTimeStamp.visibility =GONE
                 redoUndoGroup.visibility = VISIBLE
                 if(p0?.length!! > 0){
-
+                    if (p0[p0.length -1] == ' '){
+                        val phoneNumbers = extractPhoneNumber(p0.toString())
+                        val webLinks = extractUrl(p0.toString())
+                        val emailLinks = extractEmail(p0.toString())
+                        val webPhoneLinks = emailLinks + webLinks + phoneNumbers
+                        viewModal.webPhoneLinks.value = webPhoneLinks
+                    }
                     noteListBullet()
 
                     getTagFromString(p0)
@@ -497,10 +523,10 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
 
         noteDescriptionEdit.setOnKeyListener { _, key, _ ->
-
             viewModal.backPressed.value = key == KeyEvent.KEYCODE_DEL
 
-            false
+
+            return@setOnKeyListener false
         }
 
         viewModal.noteLocked.observe(lifecycleOwner){
@@ -522,25 +548,45 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 pinItem?.setIcon(R.drawable.ic_outline_push_pin_24)
             }
         }
+        window.statusBarColor = resources.getColor(R.color.black)
+        window.navigationBarColor = resources.getColor(R.color.black)
+        supportActionBar?.setBackgroundDrawable(ColorDrawable(resources.getColor(R.color.black)))
 
         viewModal.labelColor.observe(this){
             labelColor = it
             if (it>0){
+                window.statusBarColor = cm.darkenColor(it, 0.9f)
+                window.navigationBarColor = cm.darkenColor(it, 0.9f)
+                supportActionBar?.setBackgroundDrawable(ColorDrawable(cm.darkenColor(it, 0.9f)))
+
+                noteDescriptionEdit.setTextColor(cm.darkenColor(it,0.9f))
+                noteTitleEdit.setTextColor(cm.darkenColor(it,0.9f))
+                noteTitleEdit.setHintTextColor(cm.darkenColor(it,0.6f))
+                noteDescriptionEdit.setHintTextColor(cm.darkenColor(it,0.6f))
+
+                todoRVAdapter.updateTextColor(cm.darkenColor(it, 0.9f))
                 coordinatorlayout.setBackgroundColor(it)
                 delLabelBtn.visibility = VISIBLE
 
             }else{
                 coordinatorlayout.setBackgroundColor(Color.TRANSPARENT)
+                noteDescriptionEdit.setTextColor(resources.getColor(R.color.black))
+                todoRVAdapter.updateTextColor(resources.getColor(R.color.black))
+                window.statusBarColor = resources.getColor(R.color.black)
+                window.navigationBarColor = resources.getColor(R.color.black)
+                supportActionBar?.setBackgroundDrawable(ColorDrawable(cm.darkenColor(it, 0.9f)))
                 delLabelBtn.visibility = GONE
 
             }
+
+
         }
+
 
 
         noteTitleEdit.setOnKeyListener { _, _, _ ->
             viewModal.noteChanged.value = true
             tvTimeStamp.visibility = GONE
-            redoUndoGroup.visibility = VISIBLE
 
             false
         }
@@ -549,13 +595,15 @@ class AddEditNoteActivity : AppCompatActivity() ,
             textChanged = it
             if(it){
                 tvTimeStamp.visibility = GONE
-                redoUndoGroup.visibility = VISIBLE
             }else{
                 tvTimeStamp.visibility = VISIBLE
                 redoUndoGroup.visibility = GONE
             }
         }
 
+        viewModal.webPhoneLinks.observe(this){
+            webLinkAdapter.updateWebPhoneLinkList(it)
+        }
 
         ocrButton.setOnClickListener {
             if(isNetworkConnected()){
@@ -642,6 +690,46 @@ class AddEditNoteActivity : AppCompatActivity() ,
         }
     }
 
+    private fun extractUrl(text: String): List<WebPhoneLink> {
+        val webPhoneLinks: MutableList<WebPhoneLink> = ArrayList()
+        val matcher: Matcher = Patterns.WEB_URL.matcher(text)
+        while (matcher.find()) {
+            val start: Int = matcher.start()
+            if (start > 0 && text[start - 1] == '@') {
+                continue
+            } //from w  w w  .j av a  2s .  c o  m
+            var url: String = matcher.group()
+            if (!url.startsWith("http")) {
+                url = "http://$url"
+            }
+            val webPhoneLink = WebPhoneLink(WebPhoneType.WEB, url)
+            webPhoneLinks.add(webPhoneLink)
+        }
+        return webPhoneLinks
+    }
+
+    private fun extractPhoneNumber(text: String): List<WebPhoneLink> {
+        val phoneLinks: MutableList<WebPhoneLink> = ArrayList()
+        val matcher: Matcher = Patterns.PHONE.matcher(text)
+        while (matcher.find()) {
+            val phoneNumber: String = matcher.group()
+            val webPhoneLink = WebPhoneLink(WebPhoneType.PHONE_NUMBER, phoneNumber)
+            phoneLinks.add(webPhoneLink)
+        }
+        return phoneLinks
+    }
+
+    private fun extractEmail(text: String): List<WebPhoneLink> {
+        val emailLinks: MutableList<WebPhoneLink> = ArrayList()
+        val matcher: Matcher = Patterns.EMAIL_ADDRESS.matcher(text)
+        while (matcher.find()) {
+            val email: String = matcher.group()
+            val webPhoneLink = WebPhoneLink(WebPhoneType.EMAIL, email)
+            emailLinks.add(webPhoneLink)
+        }
+        return emailLinks
+    }
+
 
     private fun deleteNote(){
         val alertDialog: AlertDialog? = this@AddEditNoteActivity.let {
@@ -675,18 +763,26 @@ class AddEditNoteActivity : AppCompatActivity() ,
         }
 
         if (noteContentSplit.size > 1) {
+            val allowedIndents = ArrayList<String>()
+            allowedIndents.add("      ")
+            allowedIndents.add("     ")
+            allowedIndents.add("    ")
+            allowedIndents.add("   ")
+            allowedIndents.add("  ")
 
-            val prefix = listOf(" ", "->", "-", "+", "*", ">")
-            for (p in prefix) {
+            val allPrefixes = ArrayList<String>();
+            allPrefixes.addAll(allowedIndents)
+            allPrefixes.addAll(listOf(" ", "->", "-", "+", "*", ">"))
+            for (p in allPrefixes) {
                 if (!backPressed) {
-                    addBulletin(noteContentSplit, lineIndex, noteContent, p)
+                    addBulletin(noteContentSplit, lineIndex, noteContent, p, allowedIndents)
 
                 }
             }
-            if (noteContentSplit[lineIndex].endsWith(":")) {
+            if ((noteContentSplit[lineIndex].endsWith(":")) || (noteContentSplit[lineIndex].endsWith(": "))) {
                 if (noteContent.endsWith("\n")) {
                     if (!backPressed) {
-                        noteDescriptionEdit.append("- ")
+                        noteDescriptionEdit.append("+ ")
 
                     }
                 }
@@ -768,10 +864,15 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
     }
 
-    private fun addBulletin(noteContentSplit : List<String>, lineIndex : Int ,noteContent : Editable, prefix: String){
+    private fun addBulletin(noteContentSplit : List<String>, lineIndex : Int ,noteContent : Editable, prefix: String, allowedIndents : ArrayList<String>){
         if (noteContentSplit[lineIndex].startsWith(prefix)){
+
             if(noteContent.endsWith("\n")){
-                noteDescriptionEdit.append("$prefix ")
+                if (allowedIndents.contains(prefix)){
+                    noteDescriptionEdit.append(prefix)
+                }else{
+                    noteDescriptionEdit.append("$prefix ")
+                }
             }
         }
     }
@@ -821,6 +922,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         layoutManager = LinearLayoutManager(applicationContext,LinearLayoutManager.HORIZONTAL,false)
         calendar = Calendar.getInstance()
         noteDescriptionEdit = findViewById(R.id.noteEditDesc)
+
         tvTimeStamp = findViewById(R.id.tvTimeStamp)
         redoUndoGroup = findViewById(R.id.redoUndoGroup)
         tagListRV = findViewById(R.id.tagListRV)
@@ -883,6 +985,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
         tagListAdapter= AddEditTagRVAdapter(applicationContext,this)
         labelListAdapter= AddEditLabelAdapter(applicationContext,this)
         todoRVAdapter = TodoRVAdapter(applicationContext,this)
+        webLinkAdapter = WebLinkAdapter(applicationContext)
         labelBottomSheet.setContentView(R.layout.note_label_bottom_sheet)
         delLabelBtn = labelBottomSheet.findViewById(R.id.delLabel)!!
         tagListRV.layoutManager= layoutManager
@@ -891,8 +994,14 @@ class AddEditNoteActivity : AppCompatActivity() ,
         dismissTodoButton = findViewById(R.id.dismissTodoBtn)
         noteDescScrollView = findViewById(R.id.scrollView2)
         todoRV = findViewById(R.id.todoRV)
+        webLinkRV = findViewById(R.id.LinkListRV)
         val layoutManagerTodo = LinearLayoutManager(applicationContext,LinearLayoutManager.VERTICAL,false)
         todoRV.layoutManager = layoutManagerTodo
+        
+        val layoutManagerWebLink = LinearLayoutManager(applicationContext,LinearLayoutManager.VERTICAL,false)
+        webLinkRV.layoutManager = layoutManagerWebLink
+        
+        webLinkRV.adapter = webLinkAdapter
         todoRV.adapter = todoRVAdapter
         todoCheckBox = findViewById(R.id.todoCheckBox)
         todoItemDescTV = findViewById(R.id.todoItemDescTV)
@@ -910,6 +1019,10 @@ class AddEditNoteActivity : AppCompatActivity() ,
         if (reminderTime > (0).toLong()){
             viewModal.reminderSet.value = true
         }
+        tagListAdapter.viewModel = viewModal
+        tagListAdapter.lifecycleOwner = lifecycleOwner
+        tagListAdapter.defaultTextColor = resources.getColor(R.color.black)
+
         viewModal.allTodoItems.value = todoDoItemList
         if (oldLabel > 0){
             viewModal.labelColor.value = oldLabel
@@ -922,14 +1035,23 @@ class AddEditNoteActivity : AppCompatActivity() ,
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             try{
                 val typeface: Typeface? = when (fontStyle) {
-                    "Architects daughter" -> {
+                    cm.ARCHITECTS_DAUGHTER -> {
                         ResourcesCompat.getFont(applicationContext, R.font.architects_daughter)
                     }
-                    "Abreeze" -> {
+                    cm.ABREEZE -> {
                         ResourcesCompat.getFont(applicationContext, R.font.abeezee)
                     }
-                    "Adamina" -> {
+                    cm.ADAMINA -> {
                         ResourcesCompat.getFont(applicationContext, R.font.adamina)
+                    }
+                    cm.BELLEZA-> {
+                        ResourcesCompat.getFont(applicationContext, R.font.belleza)
+                    }
+                    cm.JOTI_ONE -> {
+                        ResourcesCompat.getFont(applicationContext, R.font.joti_one)
+                    }
+                    cm.NOVA_FLAT -> {
+                        ResourcesCompat.getFont(applicationContext, R.font.nova_flat)
                     }
                     else -> {
                         ResourcesCompat.getFont(applicationContext, R.font.roboto)
@@ -1154,11 +1276,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
     }
 
 
-//    private fun removeShortcuts() {
-
-//    }
-
-
     private fun getTagFromString(p0: CharSequence?) {
         val strL = p0?.toString()?.split(" ")
         if (!backPressed) {
@@ -1175,7 +1292,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
         }
 
     }
-
 
 
     private fun showLabelBottomSheetDialog() {
@@ -1237,7 +1353,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
             })
 
             colorPickerView.addOnColorSelectedListener{
-                val hex = ColorTransparentUtils.transparentColor(it,30)
+                val hex = ColorTransparentUtils.transparentColor(it,50)
                 viewModal.labelColor.value = Color.parseColor(hex)
                 delLabelBtn.visibility = VISIBLE
 
@@ -1365,8 +1481,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
     }
 
 
-
-
     private fun openDateTimeDialog(){
 
         val dateTimeLayout = layoutInflater.inflate(R.layout.alert_datetime_dialog,null)
@@ -1384,11 +1498,10 @@ class AddEditNoteActivity : AppCompatActivity() ,
             if(noteDescriptionEdit.length() > 0 || noteTitleEdit.length() >0 ){
                 viewModal.noteChanged.value = true
             }
-            if (System.currentTimeMillis() < calendar.timeInMillis){
                 viewModal.reminderTime = calendar.timeInMillis
                 viewModal.reminderSet.value = true
                 Toast.makeText(applicationContext,resources.getString(R.string.reminder, DateFormat.getDateFormat(applicationContext).format(calendar.time) , DateFormat.getTimeFormat(applicationContext).format(calendar.time)),Toast.LENGTH_SHORT).show()
-            }
+
             dateTimeDialog.dismiss()
         }
 
@@ -1482,6 +1595,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 tags.addAll(viewModal.oldTagList)
                 tags.addAll(viewModal.newTags)
                 tags.removeAll(viewModal.deletedTags.toSet())
+                val emptyTrashImmediately = settingsPref.getBoolean("EmptyTrashImmediately",false)
 
                 if (viewModal.deletedNote.value != true){
                     if(noteType == "Edit" && noteUid!= null){
@@ -1516,6 +1630,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
                             noteFire.label = labelColor
                             noteFire.protected = viewModal.noteLocked.value == true
                             noteFire.todoItems = ArrayList(viewModal.todoItems)
+                            noteFire.archived = viewModal.archived.value == true
                             noteUid =  viewModal.addFireNote(noteFire)
                             saveOtherEntities()
 
@@ -1524,7 +1639,6 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
                     }
                 }else{
-                    val emptyTrashImmediately = settingsPref.getBoolean("EmptyTrashImmediately",false)
                     if (!emptyTrashImmediately){
                         cancelDelete(viewModal.reminderTime.toInt())
                         val noteUpdate = HashMap<String,Any>()
@@ -1633,6 +1747,11 @@ class AddEditNoteActivity : AppCompatActivity() ,
     }
 
 
+    override fun onDestroy() {
+
+        Log.d(TAG, "onDestroy: App destroyed")
+        super.onDestroy()
+    }
 
 
     override fun onBackPressed() {
@@ -1663,7 +1782,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
 
     override fun getTimeInfo(calendar : Calendar) {
 
-        this.calendar[Calendar.HOUR]= calendar[Calendar.HOUR]
+        this.calendar[Calendar.HOUR_OF_DAY]= calendar[Calendar.HOUR_OF_DAY]
         this.calendar[Calendar.MINUTE]= calendar[Calendar.MINUTE]
         this.calendar[Calendar.SECOND]= calendar[Calendar.SECOND]
         timeTitleTV.text= resources.getString(R.string.date_time_set,"Time ", DateFormat.getTimeFormat(applicationContext).format(calendar.time))

@@ -8,7 +8,7 @@ data class Note(
     val title :String? = "",
     val description :String ? = "",
     val timestamp :Long = 0,
-    val labelColor : Int = 0,
+    var labelColor : Int = 0,
     val archived : Boolean = false,
     val pinned : Boolean = false,
     val locked : Boolean = false,

@@ -23,6 +23,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -121,20 +122,24 @@ class MainActivity : AppCompatActivity() {
 
         val signedIn = intent.getBooleanExtra("Signed in",false)
         allNotesViewModal.signedIn = signedIn
+        if (signedIn){
+            lifecycleScope.launchWhenStarted {
 
-        allNotesViewModal.getAllFireNotes().observe(lifecycleOwner){
+                allNotesViewModal.getAllFireNotes().observe(lifecycleOwner){
 
-            allNotesViewModal.allFireNotes.value = it
-            if (signedIn){
-                for (noteFire in it) {
+//                    allNotesViewModal.allFireNotes.value = it
 
-                    if (!noteFire.archived && noteFire.deletedDate==(0).toLong() && noteFire.reminderDate> System.currentTimeMillis()){
-                        startAlarm(noteFire, noteFire.reminderDate.toInt())
+                    for (noteFire in it) {
+
+                        if (!noteFire.archived && noteFire.deletedDate==(0).toLong() && noteFire.reminderDate> System.currentTimeMillis()){
+                            startAlarm(noteFire, noteFire.reminderDate.toInt())
+                        }
+
                     }
+
 
                 }
             }
-
         }
 
 
@@ -144,6 +149,7 @@ class MainActivity : AppCompatActivity() {
         val emptyTrashImmediately = settingsPref.getBoolean("EmptyTrashImmediately",false)
         if (emptyTrashImmediately){
             allNotesViewModal.notesToDelete.observe(lifecycleOwner){
+                Log.d(TAG, "onCreate: ")
                 it.noteUid?.let { uid -> viewModal.deleteNote(uid,it.label,it.tags) }
             }
             allNotesViewModal.selectedNotes.clear()

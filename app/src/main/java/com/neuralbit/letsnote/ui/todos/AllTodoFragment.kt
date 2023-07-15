@@ -36,6 +36,7 @@ import com.neuralbit.letsnote.ui.addEditNote.AddEditNoteActivity
 import com.neuralbit.letsnote.ui.addEditNote.Fingerprint
 import com.neuralbit.letsnote.ui.allNotes.AllNotesViewModel
 import com.neuralbit.letsnote.ui.settings.SettingsViewModel
+import kotlinx.coroutines.launch
 import java.util.*
 
 class AllTodoFragment : Fragment() , NoteFireClick {
@@ -106,11 +107,13 @@ class AllTodoFragment : Fragment() , NoteFireClick {
         pinnedNoteRVAdapter?.fontStyle = fontStyle
 
         allNotesViewModel.selectedNotes.clear()
-        allNotesViewModel.getAllFireNotes().observe(viewLifecycleOwner){
+        lifecycleScope.launch {
 
-            allNotesViewModel.allFireNotes.value = it
+            allNotesViewModel.getAllFireNotes().observe(viewLifecycleOwner){
+
+                allNotesViewModel.allFireNotes.value = it
+            }
         }
-
         allNotesViewModel.allFireNotes.observe(viewLifecycleOwner){ notes ->
 
             val pinnedNotes = LinkedList<NoteFire>()
@@ -145,6 +148,10 @@ class AllTodoFragment : Fragment() , NoteFireClick {
                 otherNotesTV.visibility = GONE
                 pinnedNotesTV.visibility = GONE
                 pinnedNotesRV.visibility = GONE
+            }
+
+            if (otherNotes.isEmpty()){
+                otherNotesTV.visibility = GONE
             }
             noteRVAdapter?.updateListFire(otherNotes)
         }
