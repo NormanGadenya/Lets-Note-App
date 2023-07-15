@@ -24,6 +24,7 @@
         <entry key="app/src/main/res/drawable/drawer_handler.xml" value="0.1155" />
         <entry key="app/src/main/res/drawable/eng_violet_tag.xml" value="0.22291666666666668" />
         <entry key="app/src/main/res/drawable/ev_toolbar.xml" value="0.1225" />
+        <entry key="app/src/main/res/drawable/fingerprint_rafiki.xml" value="0.3135" />
         <entry key="app/src/main/res/drawable/honey_dew.xml" value="0.22291666666666668" />
         <entry key="app/src/main/res/drawable/honey_drew_toolbar.xml" value="0.1225" />
         <entry key="app/src/main/res/drawable/ic_apricot_24.xml" value="0.353125" />
@@ -41,6 +42,7 @@
         <entry key="app/src/main/res/drawable/save_shared_background.xml" value="0.2015" />
         <entry key="app/src/main/res/drawable/side_nav_bar.xml" value="0.1415" />
         <entry key="app/src/main/res/drawable/sign_in_bgnd.xml" value="0.111" />
+        <entry key="app/src/main/res/drawable/skip_bgrnd.xml" value="0.3135" />
         <entry key="app/src/main/res/drawable/tag_background.xml" value="0.1975" />
         <entry key="app/src/main/res/drawable/tag_background_sel.xml" value="0.3205" />
         <entry key="app/src/main/res/drawable/welcome_icon.xml" value="0.158" />
@@ -49,7 +51,8 @@
         <entry key="app/src/main/res/drawable/wild_orchid_tag.xml" value="0.22291666666666668" />
         <entry key="app/src/main/res/drawable/wild_orchid_toolbar.xml" value="0.1225" />
         <entry key="app/src/main/res/font/abeezee.xml" value="0.20555555555555555" />
-        <entry key="app/src/main/res/layout/activity_add_edit_note.xml" value="0.5" />
+        <entry key="app/src/main/res/font/belleza.xml" value="0.3734375" />
+        <entry key="app/src/main/res/layout/activity_add_edit_note.xml" value="0.461839530332681" />
         <entry key="app/src/main/res/layout/activity_add_edit_todo.xml" value="0.19375" />
         <entry key="app/src/main/res/layout/activity_fingerprint.xml" value="0.35885416666666664" />
         <entry key="app/src/main/res/layout/activity_label_notes.xml" value="0.17" />
@@ -88,12 +91,14 @@
         <entry key="app/src/main/res/layout/note_label_bottom_sheet.xml" value="0.25" />
         <entry key="app/src/main/res/layout/note_rv_item.xml" value="0.5" />
         <entry key="app/src/main/res/layout/save_shared_note_fragment.xml" value="0.15" />
+        <entry key="app/src/main/res/layout/settings_fragment.xml" value="0.1" />
         <entry key="app/src/main/res/layout/spinner_tag_row.xml" value="0.3328125" />
         <entry key="app/src/main/res/layout/tag_adapter_item.xml" value="0.75" />
         <entry key="app/src/main/res/layout/tag_frag_item.xml" value="0.33" />
         <entry key="app/src/main/res/layout/tag_item.xml" value="0.5" />
         <entry key="app/src/main/res/layout/tag_notes_fragment.xml" value="0.22864583333333333" />
         <entry key="app/src/main/res/layout/tag_spinner_row.xml" value="0.3328125" />
+        <entry key="app/src/main/res/layout/tag_title_layout.xml" value="0.11203703703703703" />
         <entry key="app/src/main/res/layout/todo_rv_item.xml" value="0.5" />
         <entry key="app/src/main/res/menu/action_menu.xml" value="0.35885416666666664" />
         <entry key="app/src/main/res/menu/activity_main_drawer.xml" value="0.33" />

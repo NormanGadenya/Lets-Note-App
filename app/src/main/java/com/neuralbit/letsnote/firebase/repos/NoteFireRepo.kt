@@ -1,6 +1,5 @@
 package com.neuralbit.letsnote.firebase.repos
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
@@ -12,6 +11,7 @@ import com.google.firebase.ktx.Firebase
 import com.neuralbit.letsnote.firebase.entities.NoteFire
 import com.neuralbit.letsnote.firebase.entities.NoteFireIns
 import com.neuralbit.letsnote.utilities.NoteComparator
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
@@ -35,7 +35,8 @@ class NoteFireRepo {
      fun getAllNotes () : LiveData<ArrayList<NoteFire>> {
         val liveNotes = MutableLiveData<ArrayList<NoteFire>>()
          var notesRef = fUser?.let { database.getReference(it.uid).child("notes") }
-         GlobalScope.launch {
+
+         GlobalScope.launch(Dispatchers.IO) {
              val eventListener = object : ValueEventListener{
                  override fun onDataChange(snapshot: DataSnapshot) {
                      val notes = ArrayList<NoteFire>()
@@ -48,7 +49,6 @@ class NoteFireRepo {
                          }
                      }
                      notes.sortWith(NoteComparator())
-                     Log.d(TAG, "onDataChange: $notes")
                      liveNotes.postValue(notes)
                  }
 

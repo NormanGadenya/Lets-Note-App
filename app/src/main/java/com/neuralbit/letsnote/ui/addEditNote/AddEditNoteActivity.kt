@@ -548,22 +548,33 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 pinItem?.setIcon(R.drawable.ic_outline_push_pin_24)
             }
         }
+        window.statusBarColor = resources.getColor(R.color.black)
+        window.navigationBarColor = resources.getColor(R.color.black)
+        supportActionBar?.setBackgroundDrawable(ColorDrawable(resources.getColor(R.color.black)))
 
         viewModal.labelColor.observe(this){
             labelColor = it
             if (it>0){
-                noteDescriptionEdit.setTextColor(cm.darkenColor(it,0.8f))
-                noteTitleEdit.setTextColor(cm.darkenColor(it,0.8f))
-                noteTitleEdit.setHintTextColor(cm.darkenColor(it,0.8f))
-                noteDescriptionEdit.setHintTextColor(cm.darkenColor(it,0.8f))
+                window.statusBarColor = cm.darkenColor(it, 0.9f)
+                window.navigationBarColor = cm.darkenColor(it, 0.9f)
+                supportActionBar?.setBackgroundDrawable(ColorDrawable(cm.darkenColor(it, 0.9f)))
 
+                noteDescriptionEdit.setTextColor(cm.darkenColor(it,0.9f))
+                noteTitleEdit.setTextColor(cm.darkenColor(it,0.9f))
+                noteTitleEdit.setHintTextColor(cm.darkenColor(it,0.6f))
+                noteDescriptionEdit.setHintTextColor(cm.darkenColor(it,0.6f))
 
+                todoRVAdapter.updateTextColor(cm.darkenColor(it, 0.9f))
                 coordinatorlayout.setBackgroundColor(it)
                 delLabelBtn.visibility = VISIBLE
 
             }else{
                 coordinatorlayout.setBackgroundColor(Color.TRANSPARENT)
                 noteDescriptionEdit.setTextColor(resources.getColor(R.color.black))
+                todoRVAdapter.updateTextColor(resources.getColor(R.color.black))
+                window.statusBarColor = resources.getColor(R.color.black)
+                window.navigationBarColor = resources.getColor(R.color.black)
+                supportActionBar?.setBackgroundDrawable(ColorDrawable(cm.darkenColor(it, 0.9f)))
                 delLabelBtn.visibility = GONE
 
             }
@@ -771,7 +782,7 @@ class AddEditNoteActivity : AppCompatActivity() ,
             if ((noteContentSplit[lineIndex].endsWith(":")) || (noteContentSplit[lineIndex].endsWith(": "))) {
                 if (noteContent.endsWith("\n")) {
                     if (!backPressed) {
-                        noteDescriptionEdit.append("- ")
+                        noteDescriptionEdit.append("+ ")
 
                     }
                 }

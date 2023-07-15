@@ -51,6 +51,7 @@ class TodoRVAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val todoItem = allTodoItems[position]
         holder.checkBox.isChecked = todoItem.checked
+        val cm = Common()
 
         lifecycleOwner?.let {
             viewModel?.deletedNote?.observe(it){ d ->
@@ -72,9 +73,22 @@ class TodoRVAdapter(
                     holder.deleteButton.isEnabled = true
                 }
             }
+            viewModel?.labelColor?.observe(it){ color ->
+                if (color >0){
+                    holder.todoItemDescET.setTextColor(cm.darkenColor(color,0.8f))
+                    holder.todoItemDescET.setHintTextColor(cm.darkenColor(color,0.8f))
+
+
+                }else{
+                    holder.todoItemDescET.setTextColor(context.getColor(R.color.black))
+                    holder.todoItemDescET.setHintTextColor(context.getColor(R.color.black))
+
+                }
+
+
+            }
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val cm = Common()
             val typeface: Typeface? = when (fontStyle) {
 
                 cm.ARCHITECTS_DAUGHTER -> {
@@ -170,6 +184,10 @@ class TodoRVAdapter(
 
     override fun getItemCount(): Int {
         return allTodoItems.size
+    }
+
+    fun updateTextColor(darkenColor: Int) {
+
     }
 
 

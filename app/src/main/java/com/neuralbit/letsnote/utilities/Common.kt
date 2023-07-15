@@ -4,7 +4,6 @@ import android.graphics.Color
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.BackgroundColorSpan
-import android.text.style.RelativeSizeSpan
 import android.widget.TextView
 import androidx.core.graphics.ColorUtils
 import com.neuralbit.letsnote.R
@@ -69,25 +68,7 @@ class Common (){
         }
     }
 
-    fun setHighlightFontSize(tv: TextView, textToHighlight: String){
-        val tvt = tv.text.toString()
-        var ofe = tvt.indexOf(textToHighlight, 0)
-        val wordToSpan: Spannable = SpannableString(tv.text)
-        var ofs = 0
-        while (ofs < tvt.length && ofe != -1) {
-            ofe = tvt.indexOf(textToHighlight, ofs)
-            if (ofe == -1) break else {
-                wordToSpan.setSpan(
-                    RelativeSizeSpan(1.5f),
-                    ofe,
-                    ofe + textToHighlight.length,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
-                tv.setText(wordToSpan, TextView.BufferType.SPANNABLE)
-            }
-            ofs = ofe + 1
-        }
-    }
+
 
     fun manipulateColor(color: Int, factor: Float): Int {
         val a: Int = Color.alpha(color)

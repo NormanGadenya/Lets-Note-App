@@ -7,6 +7,9 @@ import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.RelativeSizeSpan
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -122,15 +125,25 @@ class NoteRVAdapter (
                 desc = desc.substring(0, 250) + "..."
             }
             val todoItems = note.todoItems
+            GlobalScope.launch {
+                for (todoItem in todoItems) {
+                    desc += if (todoItem.checked){
+                        "\n + ${todoItem.item} "
+                    }else{
 
-            for (todoItem in todoItems) {
-                desc += if (todoItem.checked){
-                    "\n + ${todoItem.item} "
-                }else{
-
-                    "\n - ${todoItem.item} "
+                        "\n - ${todoItem.item} "
+                    }
+                }
+                withContext(Dispatchers.Main){
+                    if (desc.isEmpty()) {
+                        holder.noteTextTV.visibility = GONE
+                    } else {
+                        holder.noteTextTV.text = desc
+                        holder.noteTextTV.visibility = VISIBLE
+                    }
                 }
             }
+
 
 
             if (todoItems.isEmpty()){
@@ -139,12 +152,7 @@ class NoteRVAdapter (
                 holder.todoIcon.visibility = VISIBLE
 
             }
-            if (desc.isEmpty()) {
-                holder.noteTextTV.visibility = GONE
-            } else {
-                holder.noteTextTV.text = desc
-                holder.noteTextTV.visibility = VISIBLE
-            }
+
         }else{
             holder.noteTextTV.text = "**protected**"
             val todoItems = note.todoItems
@@ -281,8 +289,8 @@ class NoteRVAdapter (
 
 
         searchString?.let {
-            cm.setHighlightFontSize(holder.noteTextTV, it)
-            cm.setHighlightFontSize(holder.noteTitleTV, it)
+            setHighlightFontSize(holder.noteTextTV, it)
+            setHighlightFontSize(holder.noteTitleTV, it)
 
         }
         lifecycleOwner?.let { owner ->
@@ -365,6 +373,33 @@ class NoteRVAdapter (
         return allNotesFire.size
     }
 
+    fun setHighlightFontSize(tv: TextView, textToHighlight: String){
+        GlobalScope.launch {
+
+            val tvt = tv.text.toString()
+            var ofe = tvt.indexOf(textToHighlight, 0)
+            val wordToSpan: Spannable = SpannableString(tv.text)
+            var ofs = 0
+            while (ofs < tvt.length && ofe != -1) {
+                ofe = tvt.indexOf(textToHighlight, ofs)
+                if (ofe == -1) break else {
+                    wordToSpan.setSpan(
+                        RelativeSizeSpan(1.5f),
+                        ofe,
+                        ofe + textToHighlight.length,
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                    )
+                    withContext(Dispatchers.Main){
+                        tv.setText(wordToSpan, TextView.BufferType.SPANNABLE)
+                    }
+                }
+                ofs = ofe + 1
+            }
+        }
+
+
+
+    }
 
     fun updateListFire( newList: List<NoteFire>){
         allNotesFire = newList
