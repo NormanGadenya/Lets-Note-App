@@ -36,8 +36,6 @@ import com.neuralbit.letsnote.ui.adapters.NoteRVAdapter
 import com.neuralbit.letsnote.ui.addEditNote.AddEditNoteActivity
 import com.neuralbit.letsnote.ui.addEditNote.Fingerprint
 import com.neuralbit.letsnote.ui.settings.SettingsViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.util.*
 
 class AllNotesFragment : Fragment() , NoteFireClick {
@@ -164,12 +162,12 @@ class AllNotesFragment : Fragment() , NoteFireClick {
 
         allNotesViewModel.selectedNotes.clear()
 
-        lifecycleScope.launch(Dispatchers.Main) {
-            allNotesViewModel.getAllFireNotes().observe(viewLifecycleOwner){
-                allNotesViewModel.allFireNotes.value = it
 
-            }
+        allNotesViewModel.getAllFireNotes().observe(viewLifecycleOwner){
+            allNotesViewModel.allFireNotes.value = it
+
         }
+
 
         allNotesViewModel.allFireNotes.observe(viewLifecycleOwner){ notes ->
             val pinnedNotes = LinkedList<NoteFire>()

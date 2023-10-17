@@ -41,8 +41,6 @@ class NoteRVAdapter (
     val context: Context,
     private val noteFireClick :NoteFireClick,
 
-
-
     ): RecyclerView.Adapter<NoteRVAdapter.ViewHolder>(){
     var viewModel : AllNotesViewModel ? = null
     var lifecycleScope : LifecycleCoroutineScope? = null
