@@ -2,7 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.neuralbit.letsnote">
 
-    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
+    <uses-permission  android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
@@ -29,7 +33,7 @@
             android:name=".ui.signIn.PrivacyPolicy"
             android:exported="false"
             android:parentActivityName=".ui.main.MainActivity"
-            android:theme="@style/Theme.App.Activity" />
+            android:theme="@style/Theme.App.Activity"/>
         <activity
             android:name=".ui.signIn.TermsAndConditions"
             android:exported="false"
@@ -44,7 +48,7 @@
             android:exported="true"
             android:parentActivityName=".ui.main.MainActivity"
             android:configChanges="uiMode"
-            android:theme="@style/Theme.App.Activity" />
+            android:theme="@style/Theme.LetsNote" />
         <activity
             android:name=".ui.addEditNote.SaveSharedNoteActivity"
             android:exported="true"

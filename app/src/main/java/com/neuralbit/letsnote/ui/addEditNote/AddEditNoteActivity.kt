@@ -547,9 +547,9 @@ class AddEditNoteActivity : AppCompatActivity() ,
                 pinItem?.setIcon(R.drawable.ic_outline_push_pin_24)
             }
         }
-        window.statusBarColor = resources.getColor(R.color.black)
-        window.navigationBarColor = resources.getColor(R.color.black)
-        supportActionBar?.setBackgroundDrawable(ColorDrawable(resources.getColor(R.color.black)))
+//        window.statusBarColor = resources.getColor(R.color.black)
+//        window.navigationBarColor = resources.getColor(R.color.black)
+//        supportActionBar?.setBackgroundDrawable(ColorDrawable(resources.getColor(R.color.black)))
 
         viewModal.labelColor.observe(this){
             labelColor = it
